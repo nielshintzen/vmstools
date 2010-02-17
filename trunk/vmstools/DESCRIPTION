@@ -3,9 +3,9 @@ Type: Package
 Title: For analysing fisheries VMS (Vessel Monitoring System) data
 Version: 0.01
 Date: 2010-02-15
-Author: Andy South <andy.south@cefas.co.uk>,Niels Hintzen <niels.hintzen@wur.nl>
+Author: Andy South <andy.south@cefas.co.uk>, Niels Hintzen <niels.hintzen@wur.nl>, Francois Bastardie <fba@aqua.dtu.dk>
 Maintainer: Niels Hintzen <niels.hintzen@wur.nl>
 Description: To enable standardised analysis of fisheries VMS (Vessel Monitoring System) data in Europe, to include identifying trips, linking to logbook data, estimating fishing, converting points to spatial coverages and estimating pressure indicators. 
 License: GPL (>= 2)
-Depends: R (>= 2.10.0), sp, maptools, foreign
+Depends: R (>= 2.10.0), sp, maptools, foreign, ade4
 Suggests: fields, spam, mapdata, RColorBrewer, classInt
