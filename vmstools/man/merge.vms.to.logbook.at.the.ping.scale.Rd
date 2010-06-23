@@ -78,6 +78,20 @@ Francois Bastardie
                 a.vesselid=c("vessel1","vessel2"))
   #=> per vessel, merge logbook with vms
 
+
+  # map landing e.g. of POK
+  # load() # get the 'merged' object for a given vessel
+  df1<-merged[,colnames(merged)%in% c("SI_LATI","SI_LONG","LE_KG_POK")]
+  df1$SI_LONG<-as.numeric(as.character(df1$SI_LONG))
+  df1$SI_LATI<-as.numeric(as.character(df1$SI_LATI))
+  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+
+  # remove steaming points before gridding!
+  df2<-df1[-which(df1$LE_KG_POK==0),]
+  df3<-df2[-which(is.na(df2$ LE_KG_POK)),]
+  vmsGridCreate(df3,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+
+
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
