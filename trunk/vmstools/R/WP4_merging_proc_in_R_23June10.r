@@ -319,6 +319,7 @@ assign.points.to.a.spatial.grid <- function(xx, general){
 merge.vms.to.logbook.at.the.ping.scale <-
            function(logbooks, general=general, ...){
 
+an <<- function(x) as.numeric(as.character(x)) # alias
 
   lstargs <- list(...)
   an <- function(x) as.numeric(as.character(x))
@@ -685,8 +686,8 @@ merge.vms.to.logbook.at.the.ping.scale <-
 
 
 
-         rm(er); rm(xx) ; gc()
-
+         rm(er); rm(xx) ; gc(reset=TRUE)
+                                           
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # SET UP PRIMARY KEYS FOR MERGING!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
@@ -1084,11 +1085,10 @@ return()
  if(FALSE) {
 
 
-  an <<- function(x) as.numeric(as.character(x)) # alias
 
   # general settings
   general <- list()
-  general$main.path    <- file.path("../data")
+  general$main.path    <- file.path("C:", "delivery_WP4_merging_proc_in_R")
   general$metier.def   <- "gear_targetpca" # gear_meshsize, #gear_meshsize_targetpca, or NULL if LE_MET already exists
   general$a.year       <- '2008'
   general$visual.check <- TRUE # plot for checking the first merging
@@ -1109,9 +1109,9 @@ return()
 
   # TEST FOR GIVEN VESSELS
   merge.vms.to.logbook.at.the.ping.scale (logbooks=eflalo, general=general, 
-                 a.vesselid=c("DNK000003999","DNK000006040"))
+                 a.vesselid=c("vessel1","vessel2"))
   #=> per vessel, merge logbook with vms
-  gc()
+  gc(reset=TRUE)
 
 
   # read the quality check table
