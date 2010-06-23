@@ -96,7 +96,9 @@ if ( nrow(dF) > 0 )
 
     if (plotMap)
        {
-        mapGrid(spatialGridDataFrame, we=we, ea=ea, so=so, no=no
+       
+        mapGrid(spatialGridDataFrame, sPDF
+               ,we=we, ea=ea, so=so, no=no
                ,gridValName=gridValName, plotTitle = plotTitle
                ,numCats = numCats, addLegend = addLegend
                ,legendx=legendx, legendncol = legendncol
