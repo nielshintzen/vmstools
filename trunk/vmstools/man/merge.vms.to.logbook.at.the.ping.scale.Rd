@@ -59,14 +59,14 @@ Francois Bastardie
 
   # general settings
   general <- list()
-  general$main.path    <- file.path("C:", "delivery_WP4_merging_proc_in_R")
-  general$metier.def   <- "gear_targetpca" # gear_meshsize, #gear_meshsize_targetpca, or NULL if LE_MET already exists
-  general$a.year       <- '2008'
-  general$visual.check <- TRUE # plot for checking the first merging
+  general$output.path             <- file.path("../data")
+  general$metier.def              <- "gear_targetpca" # gear_meshsize, #gear_meshsize_targetpca, or NULL if LE_MET already exists
+  general$a.year                  <- '2008'
+  general$visual.check            <- TRUE # plot for checking the first merging
   general$export.check.merging.quality <- TRUE  # export in a file the info we can see also displayed on the console...
   general$landings.redistribution <- "mixture123" # AT THE PING SCALE
    # (optional) create the export file for checking the merging quality
-  general$sp.to.keep <- c("LE_KG_COD","LE_KG_PLE") 
+  general$sp.to.keep              <- c("LE_KG_COD","LE_KG_PLE") 
   #=> caution: sp to keep for export check, but all species will be in 'merged' anyway.
 
   
