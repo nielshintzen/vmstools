@@ -317,7 +317,7 @@ assign.points.to.a.spatial.grid <- function(xx, general){
 #!!!!!!!!!!!!!!!!!!!!!#
 #!!!!!!!!!!!!!!!!!!!!!#
 merge.vms.to.logbook.at.the.ping.scale <-
-           function(logbooks, general=general, ...){
+           function(logbooks, vms, general=general, ...){
 
 an <<- function(x) as.numeric(as.character(x)) # alias
 
@@ -422,13 +422,12 @@ an <<- function(x) as.numeric(as.character(x)) # alias
          # VMS INPUT: load traj with 'at sea' pings
          # ABSOLUTELY REQUIRED: c("VE_REF","SI_LATI","SI_LONG", "SI_DATE", "SI_TIME", "SI_FT", "SI_HARB", "SI_STATE")
          # optional: "fuelcons"
-         cat(paste("load vms traj for",a.vesselid,"\n"))
-         er <- try(load(file.path(general$main.path,
-                         paste("tacsat-", a.vesselid,".RData", sep=""))),
-                           silent=TRUE) # get 'tacsat'
 
-         if(class(er)!="try-error"){
+
+         if(a.vesselid %in% unique(tacsat$VE_REF)){
          
+         tacsat <- tacsat[tacsat$VE_REF == a.vesselid,] # subset for this vessel
+         tacsat$VE_REF <- factor(tacsat$VE_REF)
          
          # convert TACSAT names in local names (if required)
          colnames(tacsat)  [colnames(tacsat) %in% "VE_REF"]   <- "vesselid"
@@ -1103,12 +1102,14 @@ return()
   # load logbooks (eflalo)
   load(file.path(general$main.path,
      paste("eflalo.RData",sep=''))) 
-      # get 'eflalo' i.e. the logbook data
 
+  # load vms (tacsat)
+  load(file.path(general$main.path,
+     paste("tacsat.RData",sep=''))) 
 
 
   # TEST FOR GIVEN VESSELS
-  merge.vms.to.logbook.at.the.ping.scale (logbooks=eflalo, general=general, 
+  merge.vms.to.logbook.at.the.ping.scale (logbooks=eflalo, vms=tacsat, general=general, 
                  a.vesselid=c("vessel1","vessel2"))
   #=> per vessel, merge logbook with vms
   gc(reset=TRUE)
