@@ -2,6 +2,7 @@
 #andy south 10/2/09
 
 #flexible function to create fishing activity grids from VMS
+#change to check upload Paris june 10
 
 vmsGridCreate <- function( dF
                          , nameLon = "Longitude"
