@@ -1088,7 +1088,7 @@ return()
 
   # general settings
   general <- list()
-  general$main.path    <- file.path("C:", "delivery_WP4_merging_proc_in_R")
+  general$main.path    <- file.path("../data")
   general$metier.def   <- "gear_targetpca" # gear_meshsize, #gear_meshsize_targetpca, or NULL if LE_MET already exists
   general$a.year       <- '2008'
   general$visual.check <- TRUE # plot for checking the first merging
