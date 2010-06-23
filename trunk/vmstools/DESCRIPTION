@@ -1,7 +1,7 @@
 Package: vmstools
 Type: Package
 Title: For analysing fisheries VMS (Vessel Monitoring System) data
-Version: 0.02
+Version: 0.03
 Date: 2010-02-15
 Author: Niels Hintzen <niels.hintzen@wur.nl>, Andy South <andy.south@cefas.co.uk>, Francois Bastardie <fba@aqua.dtu.dk>
 Maintainer: Niels Hintzen <niels.hintzen@wur.nl>
@@ -9,3 +9,4 @@ Description: To enable standardised analysis of fisheries VMS (Vessel Monitoring
 License: GPL (>= 2)
 Depends: R (>= 2.8.1), sp, maptools, foreign, ade4
 Suggests: fields, spam, mapdata, RColorBrewer, classInt
+LazyLoad: yes
