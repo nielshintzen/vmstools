@@ -69,10 +69,13 @@ Francois Bastardie
   general$sp.to.keep <- c("LE_KG_COD","LE_KG_PLE") 
   #=> caution: sp to keep for export check, but all species will be in 'merged' anyway.
 
-data(eflalo)
+  
+  # load data examples
+  data(eflalo)
+  data(tacsat)
 
- merge.vms.to.logbook.at.the.ping.scale (logbooks=eflalo, general=general, 
-                 a.vesselid=c("vessel1","vessel2"))
+  merge.vms.to.logbook.at.the.ping.scale (logbooks=eflalo, vms=tacsat, general=general, 
+                a.vesselid=c("vessel1","vessel2"))
   #=> per vessel, merge logbook with vms
 
 }
