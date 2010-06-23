@@ -22,7 +22,7 @@ vmsGridCreate <- function( dF
                          , legendx='bottomleft'
                          , legendncol = 1
                          , legendtitle = "fishing activity"
-                         , plotPoints = FALSE
+                         , plotPoints = TRUE
                          , outGridFile = ""  #name for output gridAscii
                          , outPlot = ""  #name for output png
                          , ... )
