@@ -7,6 +7,6 @@ Author: Niels Hintzen <niels.hintzen@wur.nl>, Andy South <andy.south@cefas.co.uk
 Maintainer: Niels Hintzen <niels.hintzen@wur.nl>
 Description: To enable standardised analysis of fisheries VMS (Vessel Monitoring System) data in Europe, to include identifying trips, linking to logbook data, estimating fishing, converting points to spatial coverages and estimating pressure indicators. 
 License: GPL (>= 2)
-Depends: R (>= 2.8.1), sp, maptools, foreign, ade4
+Depends: R (>= 2.8.1), sp, maptools, foreign, ade4, doBy
 Suggests: fields, spam, mapdata, RColorBrewer, classInt
 LazyLoad: yes
