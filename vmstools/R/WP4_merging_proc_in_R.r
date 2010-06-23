@@ -281,7 +281,7 @@ assign.points.to.a.spatial.grid <- function(xx, general){
            }
            if(a.case=="export.this.vessel"){
                    # export
-                  if(is.check) write.table(t(exported.vector), file= file.path(general$main.path,
+                  if(is.check) write.table(t(exported.vector), file= file.path(general$output.path,
                      paste("export-check-merging-quality-eflalo-",general$a.year,".txt",sep="")),
                        append=TRUE, row.names=FALSE, col.names=FALSE)
                    }
@@ -334,7 +334,7 @@ an <<- function(x) as.numeric(as.character(x)) # alias
                     paste("input.weight.meth3.",general$sp.to.keep,sep=''), "input.effort.state1.meth3", "input.effort.state2.meth3",
                    "effort.not.bk.state1", "effort.not.bk.state2",
                     paste("output.weight.merged.",general$sp.to.keep,sep=''), "output.effort.state1", "output.effort.state2")
-     write.table(t(general$nm.exported.vector), file=file.path(general$main.path,  # init
+     write.table(t(general$nm.exported.vector), file=file.path(general$output.path,  # init
                    paste("export-check-merging-quality-eflalo-",general$a.year,".txt",sep="")), append=FALSE, row.names=FALSE, col.names=FALSE)
      }
      # for exporting the merging quality check for this vessel
@@ -582,7 +582,7 @@ an <<- function(x) as.numeric(as.character(x)) # alias
           if(general$visual.check){
             ve <- as.character(.logbk$VE_REF[1])
             sov <- as.character(.logbk$VE_FLT[1])
-            savePlot(filename = file.path(general$main.path,
+            savePlot(filename = file.path(general$output.path,
                             paste("assign_bk.tripnum_to_vms_",ve,"-",sov,"-",general$a.year,".jpeg",sep="")),type ="jpeg")
            dev.off()
           }
@@ -1041,7 +1041,7 @@ an <<- function(x) as.numeric(as.character(x)) # alias
         names(merged)  [names(merged) %in% "which"] <- "SI_HARB"
 
        # save------------
-       save("merged",   file=file.path(general$main.path,
+       save("merged",   file=file.path(general$output.path,
              paste("merged.",  a.vesselid,".", general$landings.redistribution,".",general$a.year,".RData", sep='')))
        cat(paste("save 'merged'...OK\n\n",sep=""))
        } # end "mixture123"
@@ -1087,7 +1087,7 @@ return()
 
   # general settings
   general <- list()
-  general$main.path    <- file.path("C:", "delivery_WP4_merging_proc_in_R")
+  general$output.path    <- file.path("../data")
   general$metier.def   <- "gear_targetpca" # gear_meshsize, #gear_meshsize_targetpca, or NULL if LE_MET already exists
   general$a.year       <- '2008'
   general$visual.check <- TRUE # plot for checking the first merging
@@ -1100,11 +1100,11 @@ return()
 
 
   # load logbooks (eflalo)
-  load(file.path(general$main.path,
+  load(file.path(general$output.path,
      paste("eflalo.RData",sep=''))) 
 
   # load vms (tacsat)
-  load(file.path(general$main.path,
+  load(file.path(general$output.path,
      paste("tacsat.RData",sep=''))) 
 
 
@@ -1116,7 +1116,7 @@ return()
 
 
   # read the quality check table
-  qu <- read.table(file=file.path(general$main.path,
+  qu <- read.table(file=file.path(general$output.path,
                    paste("export-check-merging-quality-eflalo-",general$a.year,".txt",sep="")), header=TRUE)
  
 
