@@ -426,29 +426,32 @@ an <<- function(x) as.numeric(as.character(x)) # alias
 
          if(a.vesselid %in% unique(tacsat$VE_REF)){
          
-         tacsat <- tacsat[tacsat$VE_REF == a.vesselid,] # subset for this vessel
-         tacsat$VE_REF <- factor(tacsat$VE_REF)
+         tacsat.this.vessel <- tacsat[tacsat$VE_REF == a.vesselid,] # subset for this vessel
+         tacsat.this.vessel$VE_REF <- factor(tacsat.this.vessel$VE_REF)
          
          # convert TACSAT names in local names (if required)
-         colnames(tacsat)  [colnames(tacsat) %in% "VE_REF"]   <- "vesselid"
-         colnames(tacsat)  [colnames(tacsat) %in% "SI_FT"]    <- "tripnum"
-         colnames(tacsat)  [colnames(tacsat) %in% "SI_LATI"]  <- "lat"
-         colnames(tacsat)  [colnames(tacsat) %in% "SI_LONG"]  <- "long"
-         colnames(tacsat)  [colnames(tacsat) %in% "SI_STATE"] <- "state"
-         colnames(tacsat)  [colnames(tacsat) %in% "SI_HARB"]  <- "which"
+         colnames(tacsat.this.vessel)  [colnames(tacsat.this.vessel) %in% "VE_REF"]   <- "vesselid"
+         colnames(tacsat.this.vessel)  [colnames(tacsat.this.vessel) %in% "SI_FT"]    <- "tripnum"
+         colnames(tacsat.this.vessel)  [colnames(tacsat.this.vessel) %in% "SI_LATI"]  <- "lat"
+         colnames(tacsat.this.vessel)  [colnames(tacsat.this.vessel) %in% "SI_LONG"]  <- "long"
+         colnames(tacsat.this.vessel)  [colnames(tacsat.this.vessel) %in% "SI_STATE"] <- "state"
+         colnames(tacsat.this.vessel)  [colnames(tacsat.this.vessel) %in% "SI_HARB"]  <- "which"
 
          # if does not exist, add date.in.R for handling time
          if(!("date.in.R" %in% colnames(tacsat))){
            Sys.setlocale("LC_TIME", "english")
-           ctime <- strptime(  paste(tacsat$SI_DATE, tacsat$SI_TIME) ,  "%e/%m/%Y %H:%M" )
-           tacsat <- cbind.data.frame(tacsat, date.in.R=ctime)
+           ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) , 
+                                   "%e/%m/%Y %H:%M" )
+           tacsat.this.vessel <- cbind.data.frame(tacsat.this.vessel, date.in.R=ctime)
          }
 
          # keep only the essential
-         if("fuelcons" %in% colnames(tacsat)){
-            vms.this.vessel  <- tacsat [, c("vesselid","lat","long", "date.in.R","tripnum", "which", "state", "fuelcons")]
+         if("fuelcons" %in% colnames(tacsat.this.vessel)){
+            vms.this.vessel  <- tacsat.this.vessel [, c("vesselid","lat","long",
+                          "date.in.R","tripnum", "which", "state", "fuelcons")]
          }else{
-            vms.this.vessel  <- tacsat [, c("vesselid","lat","long", "date.in.R","tripnum", "which", "state")]
+            vms.this.vessel  <- tacsat.this.vessel [, c("vesselid","lat","long", 
+                          "date.in.R","tripnum", "which", "state")]
          }
 
 
@@ -1087,14 +1090,15 @@ return()
 
   # general settings
   general <- list()
-  general$output.path    <- file.path("../data")
-  general$metier.def   <- "gear_targetpca" # gear_meshsize, #gear_meshsize_targetpca, or NULL if LE_MET already exists
-  general$a.year       <- '2008'
-  general$visual.check <- TRUE # plot for checking the first merging
+  general$output.path             <- file.path("../data")
+  #general$output.path             <- file.path("C:","delivery_WP4_merging_proc_in_R")
+  general$metier.def              <- "gear_targetpca" # gear_meshsize, #gear_meshsize_targetpca, or NULL if LE_MET already exists
+  general$a.year                  <- '2008'
+  general$visual.check            <- TRUE # plot for checking the first merging
   general$export.check.merging.quality <- TRUE  # export in a file the info we can see also displayed on the console...
   general$landings.redistribution <- "mixture123" # AT THE PING SCALE
    # (optional) create the export file for checking the merging quality
-  general$sp.to.keep <- c("LE_KG_COD","LE_KG_PLE") 
+  general$sp.to.keep              <- c("LE_KG_COD","LE_KG_PLE") 
   #=> caution: sp to keep for export check, but all species will be in 'merged' anyway.
  
 
@@ -1113,6 +1117,19 @@ return()
                  a.vesselid=c("vessel1","vessel2"))
   #=> per vessel, merge logbook with vms
   gc(reset=TRUE)
+
+
+  # map landing of POK
+  df1<-merged[,colnames(merged)%in% c("SI_LATI","SI_LONG","LE_KG_POK")]
+  df1$SI_LONG<-as.numeric(as.character(df1$SI_LONG))
+  df1$SI_LATI<-as.numeric(as.character(df1$SI_LATI))
+  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+
+  # remove steaming points before gridding!
+  df2<-df1[-which(df1$LE_KG_POK==0),]
+  df3<-df2[-which(is.na(df2$ LE_KG_POK)),]
+  vmsGridCreate(df3,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+
 
 
   # read the quality check table
