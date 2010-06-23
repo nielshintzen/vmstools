@@ -24,26 +24,31 @@ this flag. Each pair of sub-blocks was then joined separately and all merged sub
 bound in one dataset afterwards.
 }
 \usage{
-merge.vms.to.logbook.at.the.ping.scale(logbooks, general = general, ...)
+merge.vms.to.logbook.at.the.ping.scale(logbooks, vms, general = general, ...)
 }
 
 \arguments{
   \item{logbooks}{
-%%     eflalo format
+%%     data.frame, eflalo format
+}
+  \item{tacsat}{
+%%     data.frame, tacsat format
 }
   \item{general}{
+%%     list, general settings to go through all functions
 }
   \item{\dots}{
+%%     character, a.vesselid = name of the vessel(s) in tacsat (and hopefully, in eflalo)
 }
 }
 \details{
 in tacsat SI_STAT, fishing should be coded 1 and non-fishing should be coded 2
 }
 \value{
-a merged data.frame is returned
+Nothing is returned but a merged data.frame per vessel in the output folder
 }
 \references{
-Bastardie et al. 2010
+Bastardie et al. 2010. Fisheries Research
 }
 \author{
 Francois Bastardie
@@ -53,6 +58,7 @@ Francois Bastardie
 
 
 \seealso{
+vmsGridCreate
 }
 
 \examples{
@@ -78,19 +84,23 @@ Francois Bastardie
                 a.vesselid=c("vessel1","vessel2"))
   #=> per vessel, merge logbook with vms
 
-
-  # map landing e.g. of POK
-  # load() # get the 'merged' object for a given vessel
-  df1<-merged[,colnames(merged)%in% c("SI_LATI","SI_LONG","LE_KG_POK")]
-  df1$SI_LONG<-as.numeric(as.character(df1$SI_LONG))
-  df1$SI_LATI<-as.numeric(as.character(df1$SI_LATI))
-  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+  
+  # map landing e.g. of COD
+  load(file.path("../data", "merged.vessel1.mixture123.2008.RData"))
+  # get the 'merged' object for a given vessel
+  df1 <-merged[,colnames(merged)%in% c("SI_LATI","SI_LONG","LE_KG_COD")]
+  df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
+  df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
+  vmsGridCreate(df1, nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =0.05, cellsizeY =0.05)
 
   # remove steaming points before gridding!
-  df2<-df1[-which(df1$LE_KG_POK==0),]
-  df3<-df2[-which(is.na(df2$ LE_KG_POK)),]
-  vmsGridCreate(df3,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+  df2 <-df1[-which(df1$LE_KG_COD==0),]
+  df3 <-df2[-which(is.na(df2$ LE_KG_COD)),]
+  vmsGridCreate(df3, nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =0.05, cellsizeY =0.05)
 
+  # add points
+   vmsGridCreate(df3, nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =0.05, cellsizeY =0.05,
+    nameVarToSum="LE_KG_COD",plotPoints=TRUE)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
