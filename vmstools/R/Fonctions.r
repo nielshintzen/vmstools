@@ -28,6 +28,13 @@ transformation_proportion=function(tab){
   return(data.frame(res))
 }
 
+#transformation_proportion=function(tab){
+#  res=as.matrix(tab)
+#  res=apply(tab,1, function(x) { if(sum(x)==0){ 0 }else{ x/sum(x)*100 } })
+#  res=t(res)
+#  return(data.frame(res))
+#}
+
 
 # Transposing data (changing variables into individuals)
 
@@ -93,9 +100,9 @@ building_tab_pca=function(data,especes){
 
 test.values=function(groupes,data){
                                                                          
-  n=length(data[,1])
-  p=length(data[1,])-1
-  noms_var=colnames(data[,1:p+1])
+  n=nrow(data)
+  p=ncol(data)
+  noms_var=colnames(data)
   nb_groupes=length(levels(as.factor(groupes)))
 
   noms_groupes=character(nb_groupes)
@@ -152,6 +159,7 @@ targetspecies=function(resval){
   tabnomesppascib=data.frame()
     
   for(i in 1:nbgp){
+    # qnorm(0.975,mean=0,sd=1)=1.96
     numespcib=which(resval[,i]>1.96)   
     numespcibdec=numespcib[order(resval[numespcib,i],decreasing=T)]           
     nomespcib=row.names(resval[numespcibdec,])
@@ -199,8 +207,9 @@ targetspecies=function(resval){
     }          
     
   }
-  return(list(tabnumespcib=tabnumespcib,tabnomespcib=tabnomespcib,tabnumesppascib=tabnumesppascib,tabnomesppascib=tabnomesppascib))
+  return(list(tabnumespcib=tabnumespcib,tabnomespcib=tabnomespcib))
 }
+
 
 
 # Calculation of the selection's threshold of main species for method "logevent"
