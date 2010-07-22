@@ -13,7 +13,7 @@ diffInter <- function(interpolation
       ref       <- reference[seq(interIdx[i,1],interIdx[i,2],1),]
 
         #Calculate the difference between each datapoint
-      distInt <- distance(int[3:(dim(int)[1]-2),1],  int[3:(dim(int)[1]-2),2],  int[2:(dim(int)[1]-1),1],      int[2:(dim(int)[1]-1),2])
+      distInt <- distance(int[3:dim(int)[1],1],  int[3:dim(int)[1],2],  int[2:(dim(int)[1]-1),1],      int[2:(dim(int)[1]-1),2])
       distRef <- distance(ref$declon[2:dim(ref)[1]], ref$declat[2:dim(ref)[1]], ref$declon[1:(dim(ref)[1]-1)], ref$declat[1:(dim(ref)[1]-1)])
         #To calculate the total distance travelled, sum all individual distances
       cumsumInt     <- cumsum(distInt)
