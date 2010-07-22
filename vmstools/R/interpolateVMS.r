@@ -5,6 +5,7 @@ function(VMS                          #VMS datapoints
                               ,res=100                  #Resolution of interpolation method (default = 100)
                               ,method="cHs"             #Specify the method to be used: Straight line (SL) of cubic Hermite spline (cHs)
                               ,params=list(fm=0.5,distscale=20,sigline=0.2)  #Specify the three parameters: fm, distscale, sigline.
+                              ,headingAdjustment=0
                               ){
 
 VMS. <- VMS
@@ -63,8 +64,8 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
       Hx0 <- sin(VMS.[startVMS,"heading"]/(180/pi))
       Hy0 <- cos(VMS.[startVMS,"heading"]/(180/pi))
         #Heading at end point in degrees
-      Hx1 <- sin(VMS.[endVMS,"heading"]/(180/pi))
-      Hy1 <- cos(VMS.[endVMS,"heading"]/(180/pi))
+      Hx1 <- sin(VMS.[endVMS-headingAdjustment,"heading"]/(180/pi))
+      Hy1 <- cos(VMS.[endVMS-headingAdjustment,"heading"]/(180/pi))
 
       Mx0 <- VMS.[startVMS, "declon"]
       Mx1 <- VMS.[endVMS,   "declon"]
