@@ -7,7 +7,7 @@ methods can be applied: the cubic Hermite spline method as developed in Hintzen 
 an interpolation of a straight line (on a x-y plane, not a sphere)
 }
 \usage{
-interpolateVMS(VMS, interval = 120, margin = 12, res = 100, method = "cHs", params = list(fm=0.2,distscale=20,sigline=0.2))
+interpolateVMS(VMS, interval = 120, margin = 12, res = 100, method = "cHs", params = list(fm=0.2,distscale=20,sigline=0.2),headingAdjustment=0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
