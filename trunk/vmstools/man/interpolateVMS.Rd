@@ -17,6 +17,7 @@ interpolateVMS(VMS, interval = 120, margin = 12, res = 100, method = "cHs", para
   \item{res}{Number of points to use to create interpolation (including start and end point), default = 100}
   \item{method}{"cHs" for cubic Hermite spline or "SL" for Straight Line interpolation, default = 0.2,20,0.2}
   \item{params}{Params needed for cHs method}
+  \item{headingAdjustment}{Parameter to adjust the choice of heading depending on its own or previous point}
 }
 \details{
 Interval: In most VMS datasets the succeeding datapoint can be found 1 or 2 hours appart. This interval time
@@ -29,6 +30,10 @@ high resolution interpolation.
 
 Params can be obtained from analyses (see Hintzen et al. 2010) or can be varied to explore the differences. To interpolate
 only first value needs to be specified.
+
+headingAdjustment can either be 0 or 1 in case the heading at the endpoint does not represent the heading of the arriving vessel to that
+point but the departing vessel. This is only of use when heading needs to be calculated outside the GPS dataset where heading is calculated
+at the bearing between two points. For the startpoint, the bearing is correct, for the endpoint however, the heading is incorrect. 
 
 The object returned is a list. Each list item contains in the first row the index of the succeeding VMS pionts interpolated.
 The second till last row contain the x (first column) and y (second column) interpolated values. The length of the list
@@ -48,5 +53,5 @@ VMS     <- filterVMS(VMS,st,hd,remDup)
 VMS     <- sortVMS(VMS)
 VMS     <- VMS[1:1000,]
   #Interpolate the VMS data
-interpolation <- interpolateVMS(VMS,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2))
+interpolation <- interpolateVMS(VMS,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2),headingAdjustment=0)
 }
