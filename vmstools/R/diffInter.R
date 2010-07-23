@@ -34,11 +34,11 @@ diffInter <- function(interpolation
         #Calculate the distance between the reference points and the points on the interpolated track that are matched
       res <- distance(matchPx,matchPy,ref$declon,ref$declat)
         #Store the differences for each interpolation
-      storeDiffs[i,]<- c( mean(res,na.rm=T),
-                          exp(mean(log(res)[which(is.finite(log(res))==T)],na.rm=T)),
-                          sd(res,na.rm=T),
-                          exp(sd(log(res)[which(is.finite(log(res))==T)],na.rm=T)),
-                          sum(res,na.rm=T))
+      storeDiffs[i,]<- c( mean(res[-c(1,length(res))],na.rm=T),
+                          exp(mean(log(res[-c(1,length(res))])[which(is.finite(log(res[-c(1,length(res))]))==T)],na.rm=T)),
+                          sd(res[-c(1,length(res))],na.rm=T),
+                          exp(sd(log(res[-c(1,length(res))])[which(is.finite(log(res[-c(1,length(res))]))==T)],na.rm=T)),
+                          sum(res[-c(1,length(res))],na.rm=T))
     }
 return(storeDiffs)}
 
