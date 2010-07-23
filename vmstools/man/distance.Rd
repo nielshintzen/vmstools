@@ -4,7 +4,7 @@
 \description{
 Compute the distance between two GPS locations defined in longitude and latitude notation
 on the earth. The earth is assumed to have a perfect spherical shape. Distance is
-returned in degrees.
+returned in km.
 }
 \usage{
 distance(lon, lat, lonRef, latRef)
@@ -18,10 +18,6 @@ distance(lon, lat, lonRef, latRef)
 }
 \references{EU Lot 2 project, based on the Haversine formula, see also: Hintzen et al. 2010 Fisheries Research }
 \author{Niels T. Hintzen}
-\note{
-Depends on function km2Degree, which computes the conversion of kilometers into degrees
-as an approximation of the longitude to latitude ratio at the 'reference' point (point 1)
-}
 \seealso{\code{km2Degree(), degree2Km(), lonLatRatio()}}
 \examples{
 lon <- -4
@@ -29,6 +25,6 @@ lat <- 50
 lonRef <- -4.2
 latRef <- 51
 
-distance(lon,lat,lonRef,latRef) #1.601833
+distance(lon,lat,lonRef,latRef) #112.09
 }
 
