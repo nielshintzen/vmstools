@@ -73,8 +73,8 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
       My1 <- VMS.[endVMS,   "declat"]
 
         #Corrected for longitude lattitude effect
-      Hx0 <- Hx0 * params$fm 
-      Hx1 <- Hx1 * params$fm 
+      Hx0 <- Hx0 * params$fm  
+      Hx1 <- Hx1 * params$fm  
       Hy0 <- Hy0 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"declon"],VMS.[c(startVMS,endVMS),"declat"])[1]
       Hy1 <- Hy1 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"declon"],VMS.[c(startVMS,endVMS),"declat"])[2]
 
@@ -83,7 +83,7 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
       fy <- numeric()
       fx <- F00*Mx0+F10*Hx0+F01*Mx1+F11*Hx1
       fy <- F00*My0+F10*Hy0+F01*My1+F11*Hy1
-      
+
         #Add one to list of successful interpolations
       iSuccess <- iSuccess + 1
       returnInterpolations[[iSuccess]] <- matrix(rbind(c(startVMS,endVMS),cbind(fx,fy)),ncol=2,dimnames=list(c("startendVMS",seq(1,res,1)),c("x","y")))

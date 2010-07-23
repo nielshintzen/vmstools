@@ -10,5 +10,5 @@ function(lon,lat,lonRef,latRef){
                                       c <- 2*atan2(sqrt(a),sqrt(1-a));
                                       R <- 6371;
                                       dx1 <- R*c
-                    res <- km2Degree(lonRef,latRef,dx1)
+                    res <- dx1
                     return(res)}
