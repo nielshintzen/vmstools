@@ -4,7 +4,7 @@ function(VMS                          #VMS datapoints
                               ,margin=12                #Specify the margin in minutes that the interval might deviate in a search for the next point
                               ,res=100                  #Resolution of interpolation method (default = 100)
                               ,method="cHs"             #Specify the method to be used: Straight line (SL) of cubic Hermite spline (cHs)
-                              ,params=list(fm=0.5,distscale=20,sigline=0.2)  #Specify the three parameters: fm, distscale, sigline.
+                              ,params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6))  #Specify the three parameters: fm, distscale, sigline, speedthreshold
                               ,headingAdjustment=0
                               ){
 
@@ -73,10 +73,10 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
       My1 <- VMS.[endVMS,   "declat"]
 
         #Corrected for longitude lattitude effect
-      Hx0 <- Hx0 * params$fm  
-      Hx1 <- Hx1 * params$fm  
-      Hy0 <- Hy0 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"declon"],VMS.[c(startVMS,endVMS),"declat"])[1]
-      Hy1 <- Hy1 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"declon"],VMS.[c(startVMS,endVMS),"declat"])[2]
+      Hx0 <- Hx0 * params$fm * VMS.[startVMS,"speed"] /((params$st[2]-params$st[1])/2+params$st[1])
+      Hx1 <- Hx1 * params$fm * VMS.[endVMS,"speed"]   /((params$st[2]-params$st[1])/2+params$st[1])
+      Hy0 <- Hy0 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"declon"],VMS.[c(startVMS,endVMS),"declat"])[1] * VMS.[startVMS,"speed"]/((params$st[2]-params$st[1])/2+params$st[1])
+      Hy1 <- Hy1 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"declon"],VMS.[c(startVMS,endVMS),"declat"])[2] * VMS.[endVMS,"speed"]/((params$st[2]-params$st[1])  /2+params$st[1])
 
         #Finalizing the interpolation based on cHs
       fx <- numeric()

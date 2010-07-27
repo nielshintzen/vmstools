@@ -1,7 +1,5 @@
 distanceVMS <- function(VMS,index){
 
-                            VMS[index[1,1]:index[1,2],]
-
                    res <- unlist(lapply(as.list(1:dim(index)[1]),function(x){
                               iS  <- index[x,1]
                               iE  <- index[x,2]
