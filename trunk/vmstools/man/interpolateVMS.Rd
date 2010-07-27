@@ -7,7 +7,7 @@ methods can be applied: the cubic Hermite spline method as developed in Hintzen 
 an interpolation of a straight line (on a x-y plane, not a sphere)
 }
 \usage{
-interpolateVMS(VMS, interval = 120, margin = 12, res = 100, method = "cHs", params = list(fm=0.2,distscale=20,sigline=0.2),headingAdjustment=0)
+interpolateVMS(VMS, interval = 120, margin = 12, res = 100, method = "cHs", params = list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -16,7 +16,7 @@ interpolateVMS(VMS, interval = 120, margin = 12, res = 100, method = "cHs", para
   \item{Deviation from specified interval to find succeeding datapoints}{}
   \item{res}{Number of points to use to create interpolation (including start and end point), default = 100}
   \item{method}{"cHs" for cubic Hermite spline or "SL" for Straight Line interpolation, default = 0.2,20,0.2}
-  \item{params}{Params needed for cHs method}
+  \item{params}{Params needed for cHs method, including the speed thresholds used}
   \item{headingAdjustment}{Parameter to adjust the choice of heading depending on its own or previous point}
 }
 \details{
@@ -29,7 +29,7 @@ The 'res' value defines the number of points to use to construct the interpolati
 high resolution interpolation.
 
 Params can be obtained from analyses (see Hintzen et al. 2010) or can be varied to explore the differences. To interpolate
-only first value needs to be specified.
+only first value needs to be specified and the speedtreshold needs to be given.
 
 headingAdjustment can either be 0 or 1 in case the heading at the endpoint does not represent the heading of the arriving vessel to that
 point but the departing vessel. This is only of use when heading needs to be calculated outside the GPS dataset where heading is calculated
@@ -53,5 +53,5 @@ VMS     <- filterVMS(VMS,st,hd,remDup)
 VMS     <- sortVMS(VMS)
 VMS     <- VMS[1:1000,]
   #Interpolate the VMS data
-interpolation <- interpolateVMS(VMS,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2),headingAdjustment=0)
+interpolation <- interpolateVMS(VMS,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 }
