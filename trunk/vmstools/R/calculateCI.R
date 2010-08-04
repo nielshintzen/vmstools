@@ -76,4 +76,4 @@ calculateCI <- function(intLon
   if(max(CI,na.rm=T) < 0.1) warning("Prediction max(tmpnew) is very small")
   if(length(zeroDistan)>0)  CI[zeroDistan]  <- pmax(CI[zeroDistan],1,na.rm=T)
   
-  return(list(CI,idx,res1,grid,sPDF,sp))}
+  return(list(CI,idx,res1,grid,sPDF,sP))}
