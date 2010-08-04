@@ -40,6 +40,9 @@ for(int in 1:length(interpolation)){
   resCI <- calculateCI(cc[c(iP1,iP2),1],cc[c(iP1,iP2),2],iPV1,iPV2,VMS.,grid,sPDF,interpolation,int,params)
   CI    <- resCI[[1]]
   idx   <- resCI[[2]]
+  grid  <- resCI[[4]]
+  sPDF  <- resCI[[5]]
+  sP    <- resCI[[6]]
     #Reset the new data set at 0
   sPDF@data[,2]                   <- data.frame(rep(0,length(sPDF@grid.index)))
   if(int == 1){ sPDF@data[idx,1]  <- CI; idxmin1 <- idx; sPDF@data[idx,3] <- CI

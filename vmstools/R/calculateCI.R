@@ -30,7 +30,20 @@ calculateCI <- function(intLon
 
     #Take the upper right and lower left values as setting the boundings of the smaller matrix
   cc2           <- cbind(boundx,boundy)
-  idx           <- na.omit(getGridIndex(cc2,grid,all.inside=T))
+  idx           <- getGridIndex(cc2,grid,all.inside=F)
+    #If grid is too small, then extend grid to fit
+  if(any(is.na(idx))){
+    grid                  <- createGrid(xrange=cc2[,"boundx"],yrange=cc2[,"boundy"],grid@cellsize[1],grid@cellsize[2])
+    spatialGrid           <- SpatialGrid(grid=grid)
+    gridded(spatialGrid) = TRUE
+    sP                    <- as(spatialGrid,"SpatialPixels")
+    sPDF                  <- as(sP,"SpatialPixelsDataFrame")
+    sPDF@data             <- data.frame(rep(0,length(sPDF@grid.index)))
+    sPDF@data[,2]         <- 0
+    colnames(sPDF@data)   <- c("data","tmpdata")
+    idx                   <- getGridIndex(cc2,grid,all.inside=T)
+  }
+    
 
     #Work out the other elements of the matrix
   row1          <- min(idx)%/%grid@cells.dim[1]+1;            col1          <- min(idx) - (grid@cells.dim[1]*(row1-1))
@@ -63,4 +76,4 @@ calculateCI <- function(intLon
   if(max(CI,na.rm=T) < 0.1) warning("Prediction max(tmpnew) is very small")
   if(length(zeroDistan)>0)  CI[zeroDistan]  <- pmax(CI[zeroDistan],1,na.rm=T)
   
-  return(list(CI,idx,res1))}
+  return(list(CI,idx,res1,grid,sPDF,sp))}
