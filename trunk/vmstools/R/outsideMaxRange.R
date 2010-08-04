@@ -14,6 +14,8 @@ res <- calculateCI(intLon,intLat,vmsIdx1,vmsIdx2,VMS.,grid,sPDF,interpolation,in
 CI  <- res[[1]] #computed CI
 idx <- res[[2]] #identifier of spatial data frame index
 mxR <- res[[3]] #max range
+grid<- res[[4]] #new defined grid if expanded
+sPDF<- res[[5]] #new defined grid if expanded
 
   #Write the confidence interval in the spatial data frame structure
 sPDF@data[idx,1]  <- CI
