@@ -9,6 +9,9 @@ library(cluster)
 require(graphics)
 require(stats)
 library(SOAR)
+library(amap)
+#library(spdep)   (function ssw)
+library(MASS)
 
 
 # Transform quantities to percents fished in the logevent
@@ -41,7 +44,9 @@ transformation_proportion=function(tab){
 table_variables=function(data){
   n=length(data[,1])
   p=length(data[1,])
-  res=t(as.matrix(data))
+  res1=t(as.matrix(data[1:round(n/2),]))
+  res2=t(as.matrix(data[(round(n/2)+1):n,]))
+  res=cbind(res1,res2)
   res=data.frame(res)
   row.names(res)=colnames(data)
   colnames(res)=row.names(data)
@@ -209,6 +214,17 @@ targetspecies=function(resval){
   }
   return(list(tabnumespcib=tabnumespcib,tabnomespcib=tabnomespcib))
 }
+
+
+# Calcule of within variance of a cluster (square distance between each row of the cluster and the cluster's center of gravity)
+# we calculate the distance row by row
+withinVar=function(oneRowOfCluster,centerOfGravityClusti){
+  CoGWithOneRow=numeric()
+  CoGWithOneRow=rbind(centerOfGravityClusti, oneRowOfCluster)
+  distRowCoG=dist(CoGWithOneRow)^2
+  return(distRowCoG)
+}
+
 
 
 
