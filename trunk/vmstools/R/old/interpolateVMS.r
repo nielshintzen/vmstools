@@ -1,5 +1,5 @@
 `interpolateVMS` <-
-function(VMS                          #VMS datapoints
+function(tacsat                          #VMS datapoints
                               ,interval=120             #Specify in minutes, NULL means use all points
                               ,margin=12                #Specify the margin in minutes that the interval might deviate in a search for the next point
                               ,res=100                  #Resolution of interpolation method (default = 100)
@@ -8,7 +8,9 @@ function(VMS                          #VMS datapoints
                               ,headingAdjustment=0
                               ){
 
-VMS. <- VMS
+VMS. <- tacsat
+colnames(VMS.) <- c("ship","lat","lon","date","time","speed","heading")
+VMS.$datim     <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
                               
   #Start interpolating the data
 if(!method %in% c("cHs","SL"))  stop("method selected that does not exist")
@@ -36,7 +38,7 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
 
 
   if(endDataSet != 2){
-    result      <- findEndVMS(VMS.,startVMS,interval,margin)
+    result      <- findEndTacsat(VMS.,startVMS,interval,margin)
     endVMS      <- result[1]
     endDataSet  <- result[2]
     if(is.na(endVMS)==T) int <- 0  #No interpolation possible
@@ -55,18 +57,18 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
       F00 <- 2*t^3 -3*t^2 + 1
       F10 <- t^3-2*t^2+t
       F01 <- -2*t^3+3*t^2
-      F11 <- t^3-t^2
+      F11 <- t^3-t^2          
 
       if (is.na(VMS.[startVMS,"heading"])=="TRUE") VMS.[startVMS,"heading"] <- 0
       if (is.na(VMS.[endVMS,  "heading"])=="TRUE") VMS.[endVMS,  "heading"] <- 0
-
+      
         #Heading at begin point in degrees
       Hx0 <- sin(VMS.[startVMS,"heading"]/(180/pi))
       Hy0 <- cos(VMS.[startVMS,"heading"]/(180/pi))
         #Heading at end point in degrees
       Hx1 <- sin(VMS.[endVMS-headingAdjustment,"heading"]/(180/pi))
       Hy1 <- cos(VMS.[endVMS-headingAdjustment,"heading"]/(180/pi))
-
+      
       Mx0 <- VMS.[startVMS, "declon"]
       Mx1 <- VMS.[endVMS,   "declon"]
       My0 <- VMS.[startVMS, "declat"]
@@ -83,9 +85,9 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
       fy <- numeric()
       fx <- F00*Mx0+F10*Hx0+F01*Mx1+F11*Hx1
       fy <- F00*My0+F10*Hy0+F01*My1+F11*Hy1
-
+      
         #Add one to list of successful interpolations
-      iSuccess <- iSuccess + 1
+      iSuccess <- iSuccess + 1 
       returnInterpolations[[iSuccess]] <- matrix(rbind(c(startVMS,endVMS),cbind(fx,fy)),ncol=2,dimnames=list(c("startendVMS",seq(1,res,1)),c("x","y")))
     }
     
