@@ -17,7 +17,7 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                           splitTa   <- split(Ta,Ta$VE_REF)
                           
                           #-link vessels in tacsat to eflalo
-                          tacefmatch <- pmatch(sort(unique(Ta$VE_REF)),sort(unique(Ef$VE_REF)))
+                          tacefmatch <- na.omit(pmatch(sort(unique(Ta$VE_REF)),sort(unique(Ef$VE_REF))))
                           
                           #-loop over all the vessels in tacsat
                           for(i in 1:length(tacefmatch)){
