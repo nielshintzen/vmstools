@@ -2,7 +2,7 @@ pointInHarbour <- function(lon,lat,harbours){
 
     inHarbour   <- numeric()
     for(hars in 1:length(harbours)){
-      print(hars)
+      #print(hars)
       lonDegree <- 0.1*(harbours[[hars]]$range/(11.2*lonLatRatio(lon=harbours[[hars]]$lon,lat=harbours[[hars]]$lat)[1]))
       latDegree <- 0.1*(harbours[[hars]]$range/11.2)
 
