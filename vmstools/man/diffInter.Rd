@@ -34,7 +34,7 @@ data(VMShf)
 VMShf   <- sortVMS(VMShf)
 VMShf   <- filterVMS(VMShf,c(2,6),NULL,T)
 
-interpolation <- interpolateVMS(VMShf,interval=120,margin=5,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2))
+interpolation <- interpolateVMS(VMShf,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
 cHs <- diffInter(interpolation,VMShf) #Returns a matrix with 38 rows (each row represents 1 interpolation) and 5 measures
 }
