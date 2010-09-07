@@ -17,7 +17,7 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                           splitTa   <- split(Ta,Ta$VE_REF)
                           
                           #-link vessels in tacsat to eflalo
-                          tacefmatch <- na.omit(pmatch(sort(unique(Ta$VE_REF)),sort(unique(Ef$VE_REF))))
+                          tacefmatch <- pmatch(sort(unique(Ta$VE_REF)),sort(unique(Ef$VE_REF)))
                           
                           #-loop over all the vessels in tacsat
                           for(i in 1:length(tacefmatch)){
@@ -28,31 +28,35 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                             stime <- splitTa[[i]]$SI_DATIM
                             tripn <- eftim[,3]
                             
-                            smdtime <- t(outer(stime,dtime,"-"))
-                            gtltime <- outer(ltime,stime,"-")
-                          
-                            #-Find first point where tacsat time is greater or equal to departure time and smaller than arrival time
-                            st <- apply(smdtime,1,function(x){which(x>=0)[1]})
-                            en <- apply(gtltime,1,function(x){rev(which(x>=0))[1]})
+                            if(is.na(tacefmatch[i])==T){ splitTa[[i]]$FT_REF <- 0
+                            } else {
+                              
+                              smdtime <- t(outer(stime,dtime,"-"))
+                              gtltime <- outer(ltime,stime,"-")
                             
-                            #-Make sure that values are within the interval of departure and arrival time
-                            subse <- which(is.na(st<=en)==F & (st<=en)==T)
-                            st <- st[subse]
-                            en <- en[subse]
-                            
-                            #-Assign Tacsat data with FT_REF from Eflalo2 dataset where they link
-                            if(length(st)!=1){
-                              idx   <- unlist(mapply(seq,st,en))
-                              reps  <- unlist(lapply(mapply(seq,st,en),length))
-                              splitTa[[i]]$FT_REF      <- 0
-                              splitTa[[i]]$FT_REF[idx] <- rep(tripn[subse],reps)
-                            } 
-                            if(length(st)==1){
-                              splitTa[[i]]$FT_REF <- 0
-                              splitTa[[i]]$FT_REF[seq(st,en)] <- rep(tripn[subse],length(seq(st,en)))
-                            }
-                            if(length(st)==0){
-                              splitTa[[i]]$FT_REF <- 0
+                              #-Find first point where tacsat time is greater or equal to departure time and smaller than arrival time
+                              st <- apply(smdtime,1,function(x){which(x>=0)[1]})
+                              en <- apply(gtltime,1,function(x){rev(which(x>=0))[1]})
+                              
+                              #-Make sure that values are within the interval of departure and arrival time
+                              subse <- which(is.na(st<=en)==F & (st<=en)==T)
+                              st <- st[subse]
+                              en <- en[subse]
+                              
+                              #-Assign Tacsat data with FT_REF from Eflalo2 dataset where they link
+                              if(length(st)!=1){
+                                idx   <- unlist(mapply(seq,st,en))
+                                reps  <- unlist(lapply(mapply(seq,st,en),length))
+                                splitTa[[i]]$FT_REF      <- 0
+                                splitTa[[i]]$FT_REF[idx] <- rep(tripn[subse],reps)
+                              } 
+                              if(length(st)==1){
+                                splitTa[[i]]$FT_REF <- 0
+                                splitTa[[i]]$FT_REF[seq(st,en)] <- rep(tripn[subse],length(seq(st,en)))
+                              }
+                              if(length(st)==0){
+                                splitTa[[i]]$FT_REF <- 0
+                              }
                             }
                           }
                           Ta$FT_REF <- unlist(lapply(splitTa,function(x){return(x$FT_REF)}))
