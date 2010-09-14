@@ -8,9 +8,9 @@ intervalTacsat <- function(tacsat,level="trip"){
                                                             return(unlist(res))}))
                     }
                     if(level=="vessel"){
-                      tacsat$timeint[2:nrow(tacsat)]  <- difftime(tacsat$DATIM[2:nrow(tacsat)],tacsat$DATIM[1:(nrow(tacsat)-1)])
+                      tacsat$INTV[2:nrow(tacsat)]  <- difftime(tacsat$DATIM[2:nrow(tacsat)],tacsat$DATIM[1:(nrow(tacsat)-1)])
                       vessels                         <- unique(tacsat$VE_REF)
                       first.vessels                   <- unlist(lapply(as.list(vessels),function(x){which(tacsat$VE_REF==x)[1]}))
-                      tacsat$timeint[first.vessels-1] <- NA
+                      tacsat$INTV[first.vessels-1] <- NA
                     }
                   return(tacsat)}
