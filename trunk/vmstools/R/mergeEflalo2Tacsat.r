@@ -21,6 +21,8 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                           
                           #-loop over all the vessels in tacsat
                           for(i in 1:length(tacefmatch)){
+                       
+                          
                             pm    <- tacefmatch[i]
                             eftim <- splitEf[[pm]][which(duplicated(splitEf[[pm]]$FT_REF)==F),c("D_DATIM","L_DATIM","FT_REF")]
                             dtime <- eftim[,1]
@@ -28,8 +30,14 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                             stime <- splitTa[[i]]$SI_DATIM
                             tripn <- eftim[,3]
                             
-                            if(is.na(tacefmatch[i])==T){ splitTa[[i]]$FT_REF <- 0
-                            } else {
+                            if(is.na(tacefmatch[i])==T)
+                            { 
+                            splitTa[[i]]$FT_REF <- 0
+                            } 
+                            
+                            
+                            
+                            else {
                               
                               smdtime <- t(outer(stime,dtime,"-"))
                               gtltime <- outer(ltime,stime,"-")
@@ -39,7 +47,8 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                               en <- apply(gtltime,1,function(x){rev(which(x>=0))[1]})
                               
                               #-Make sure that values are within the interval of departure and arrival time
-                              subse <- which(is.na(st<=en)==F & (st<=en)==T)
+                              subse <- which(is.na(st <= en) == F & (st <= en) == T)
+                              
                               st <- st[subse]
                               en <- en[subse]
                               
