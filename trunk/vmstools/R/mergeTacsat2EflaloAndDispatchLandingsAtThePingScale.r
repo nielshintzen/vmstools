@@ -712,7 +712,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
     
        # save------------
        save("merged",   file=file.path(general$output.path,
-             paste("merged.",  a.vesselid,".",general$a.year,".RData", sep='')))
+             paste("merged_",  a.vesselid,"_",general$a.year,".RData", sep='')))
        cat(paste("save 'merged'...OK\n\n",sep=""))
      
 
@@ -779,7 +779,7 @@ return()
   eflalo <- mergeEflaloSpecies (eflalo2, threshold=100000) 
   
   # TEST FOR A GIVEN SET OF VESSELS
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
+  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
@@ -789,23 +789,24 @@ return()
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
-  load(file.path("C:","output","merged_35_2009"))
+  load(file.path("C:","output","merged_35_2009.RData"))
   
   # ...or bind all vessels
   bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), what=character(), 
                       folder = file.path("C:","output"))
  
-               
-  # map landing of POK
-  df1<- merged[,colnames(merged)%in% c("SI_LATI","SI_LONG","LE_KG_POK")]
+   # load the merged output table for all vessels
+  load(file.path("C:","output","all_merged_2009.RData"))
+             
+  # map landing of sole from all studied vessels
+  df1<- all.merged[,colnames(all.merged)%in% c("SI_LATI","SI_LONG","LE_KG_SOL")]
   df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
   df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
   vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
 
   # remove steaming points before gridding!
-  df2<-df1[-which(df1$LE_KG_POK==0),]
-  df3<-df2[-which(is.na(df2$ LE_KG_POK)),]
-  vmsGridCreate(df3,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+  df2<-df1[-which(is.na(df1$LE_KG_SOL)),]
+  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
 
 
  

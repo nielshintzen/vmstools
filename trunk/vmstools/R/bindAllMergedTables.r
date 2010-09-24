@@ -44,7 +44,7 @@
    print(nrow(all.merged))
    }
    # save
-   save("all.merged", file = file.path(folder, paste('all.merged.',a.year,'.RData',sep='') ))
+   save("all.merged", file = file.path(folder, paste('all_merged_',a.year,'.RData',sep='') ))
 
  return(all.merged)
  }
