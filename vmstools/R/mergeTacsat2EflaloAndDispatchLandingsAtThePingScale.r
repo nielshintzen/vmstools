@@ -110,7 +110,8 @@ assign.points.to.a.spatial.grid <- function(xx, general){
 #!!!!!!!!!!!!!!!!!!!!!#
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
-           function(logbooks, vms, general=general, ...){
+           function(logbooks, vms, general=list(output.path=file.path("C:"),
+                    a.year=2009, visual.check=TRUE), ...){
 
   an <<- function(x) as.numeric(as.character(x)) # alias
 
@@ -128,7 +129,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
        # => IF ARG INFORMED, THEN KEEP ONLY ONE OR SEVERAL VESSELS AS NEEDED....
 
       for(a.vesselid in all.vesselid){  # PER VESSEL
-
+                cat(paste(a.vesselid,"\n", sep="" ))
+       
          #----------
          #----------
          #----------
@@ -329,9 +331,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
           if(general$visual.check){
             ve <- as.character(.logbk$VE_REF[1])
-            sov <- as.character(.logbk$VE_FLT[1])
             savePlot(filename = file.path(general$output.path,
-                            paste("assign_bk.tripnum_to_vms_",ve,"-",sov,"-",general$a.year,".jpeg",sep="")),type ="jpeg")
+                            paste("assign_eflalo_tripnum_to_vms_",ve,"_",general$a.year,".jpeg",sep="")),type ="jpeg")
            dev.off()
           }
 
@@ -535,7 +536,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
           
 
-              if(TRUE){
+              if(FALSE){
               # conservation of catches?
               # detect possible weight landed while no feffort detected from vms
                    # find bk.tripnum with some NA
@@ -752,16 +753,7 @@ return()
  if(FALSE) {
 
 
-  # general settings
-  general <- list(output.path=file.path("C:"),
-                    a.year=2009,
-                       visual.check=TRUE)
-
- 
- 
-  #load("C:\\Documents and Settings\\fba\\Desktop\\vmstools\\vmstools\\data\\eflalo2.rda")
-  #load("C:\\Documents and Settings\\fba\\Desktop\\vmstools\\vmstools\\data\\tacsat.rda")
-  #load("C:\\Documents and Settings\\fba\\Desktop\\vmstools\\vmstools\\data\\harbours.rda")
+  
   data(eflalo2)
   data(tacsat)
   data(harbours)
@@ -772,15 +764,30 @@ return()
   idx <- which(inHarb==0)
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
-  tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
+  tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
 
-  # TEST FOR GIVEN VESSELS
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, vms=tacsat, general=general, 
-                 a.vesselid=c("BR14:35"))
+  # debug: change funny names of vesselid
+  eflalo2$VE_REF <- matrix(unlist(strsplit(as.character(eflalo2$VE_REF),":")),ncol=2,byrow=T)[,2]
+  tacsat$VE_REF <- matrix(unlist(strsplit(as.character(tacsat$VE_REF),":")),ncol=2,byrow=T)[,2]
+
+  
+  # TEST FOR A GIVEN SET OF VESSELS
+  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, vms=tacsat, a.vesselid=c("35", "1518"),
+                                                             general=list(output.path=file.path("C:","output"),
+                                                                            a.year=2009, visual.check=TRUE))
+  # ...OR APPLY FOR ALL VESSELS IN eflalo2
+  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, vms=tacsat,
+                                                             general=list(output.path=file.path("C:","output"),
+                                                                            a.year=2009, visual.check=TRUE))
   gc(reset=TRUE)
 
-  # load the merged output table
-  # ...
+  # load the merged output table for one vessel
+  load(file.path("C:","output","merged_35_2009"))
+  
+  # ...or bind all vessels
+  bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), what=character(), 
+                      folder = file.path("C:","output"))
+ 
                
   # map landing of POK
   df1<- merged[,colnames(merged)%in% c("SI_LATI","SI_LONG","LE_KG_POK")]
