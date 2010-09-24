@@ -110,7 +110,7 @@ assign.points.to.a.spatial.grid <- function(xx, general){
 #!!!!!!!!!!!!!!!!!!!!!#
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
-           function(logbooks, vms, general=list(output.path=file.path("C:"),
+           function(logbooks, tacsat, general=list(output.path=file.path("C:"),
                     a.year=2009, visual.check=TRUE), ...){
 
   an <<- function(x) as.numeric(as.character(x)) # alias
@@ -772,11 +772,11 @@ return()
 
   
   # TEST FOR A GIVEN SET OF VESSELS
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, vms=tacsat, a.vesselid=c("35", "1518"),
+  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, vms=tacsat,
+  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE))
   gc(reset=TRUE)
