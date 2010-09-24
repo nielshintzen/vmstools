@@ -1,5 +1,5 @@
-\name{merge.vms.to.logbook.at.the.ping.scale}
-\alias{merge.vms.to.logbook.at.the.ping.scale}
+\name{mergeTacsat2EflaloAndDispatchLandingsAtThePingScale}
+\alias{mergeTacsat2EflaloAndDispatchLandingsAtThePingScale}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Coupling of VMS and logbooks data including landings dispatching between fishing pings.
@@ -24,7 +24,7 @@ this flag. Each pair of sub-blocks was then joined separately and all merged sub
 bound in one dataset afterwards.
 }
 \usage{
-merge.vms.to.logbook.at.the.ping.scale(logbooks, vms, general = general, ...)
+mergeTacsat2EflaloAndDispatchLandingsAtThePingScale(logbooks, vms, general = general, ...)
 }
 
 \arguments{
