@@ -287,6 +287,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               segments(as.POSIXct(table.midtime$date.in.R.dep[i]), 0.5, as.POSIXct(table.midtime$date.in.R.arr[i]), 0.5, col=1)
               points(as.POSIXct(table.midtime$mid.time[i]), 0.5, col=1)
               text(as.POSIXct(table.midtime$mid.time[i]), 0.52, table.midtime$SI_FT[i], cex=0.5, col=1)
+    
             }
             tmp <- .logbk[, c("date.in.R.dep","date.in.R.arr", "mid.time", "bk.tripnum")]
             tmp <- tmp[!duplicated(tmp$mid.time), ]
@@ -763,13 +764,19 @@ return()
   tacsat$SI_FT <- 1 # init
   idx <- which(inHarb==0)
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
+  tacsat <- tacsat[which(inHarb==0),] # keep out of harbour points only
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
 
+ 
+  
   # debug: change funny names of vesselid
   eflalo2$VE_REF <- matrix(unlist(strsplit(as.character(eflalo2$VE_REF),":")),ncol=2,byrow=T)[,2]
   tacsat$VE_REF <- matrix(unlist(strsplit(as.character(tacsat$VE_REF),":")),ncol=2,byrow=T)[,2]
 
+  
+  # reduce the size of the eflalo data by merging species (e.g. merge if <100 tons)
+  eflalo <- mergeEflaloSpecies (eflalo2, threshold=100000) 
   
   # TEST FOR A GIVEN SET OF VESSELS
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
