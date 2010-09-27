@@ -711,6 +711,9 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
         names(merged)  [names(merged) %in% "date.in.R.time"] <- "SI_TIME"
     
        # save------------
+       # create required folders for outputs
+       suppressWarnings(dir.create(file.path(general$output.path)))
+
        save("merged",   file=file.path(general$output.path,
              paste("merged_",  a.vesselid,"_",general$a.year,".RData", sep='')))
        cat(paste("save 'merged'...OK\n\n",sep=""))
