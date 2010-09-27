@@ -1,7 +1,7 @@
 \name{mergeEflaloSpecies}
 \alias{mergeEflaloSpecies}
 \docType{data}
-\title{ ~~ data name/kind ... ~~}
+\title{ merge species in eflalo to reduce the size of data according to a threshold in kg}
 \description{
 merge species in eflalo to reduce the size of data according to a threshold in kg
 }
