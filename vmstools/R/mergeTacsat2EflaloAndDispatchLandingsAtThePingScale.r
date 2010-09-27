@@ -792,10 +792,10 @@ return()
   load(file.path("C:","output","merged_35_2009.RData"))
   
   # ...or bind all vessels
-  bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), what=character(), 
+  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), what=character(), 
                       folder = file.path("C:","output"))
  
-   # load the merged output table for all vessels
+   # ...and load the merged output table for all vessels
   load(file.path("C:","output","all_merged_2009.RData"))
              
   # map landing of sole from all studied vessels
@@ -809,6 +809,23 @@ return()
   vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
 
 
- 
+  # TO FISHFRAME FORMAT:
+  # add a month code
+  all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m")) 
+  # add an area code
+  all.merged$CSquare <- CSquare (lon=as.numeric(as.character(all.merged$SI_LONG)), 
+                                   lat=as.numeric(as.character(all.merged$SI_LATI)),
+                                     degrees=0.05)
+  # TO DO : aggregate LE_EURO_SP, LE_KG_SP, and LE_EFF_VMS per level6, month and area code
+  nm         <- names(all.merged)
+  idx.col.w  <- grep('KG', nm) # index columns with species weight
+  idx.col.v  <- grep('EURO', nm) # index columns with species value
+  idx.col.vms  <- grep('VMS', nm) # index columns related to VMS calculation
+  idx.col    <- c(idx.col.w, idx.col.v, idx.col.vms)
+  all.merged.agg  <- aggregate(all.merged[,idx.col],
+                      list(all.merged$LE_MET_level6, all.merged$month, all.merged$CSquare), sum, na.rm=TRUE )
+       #=> but this piece of code likely to be inefficient with large data set?
+
+  # TO DO: a rountine to convert further toward the fishframe format 
 
 } # end main
