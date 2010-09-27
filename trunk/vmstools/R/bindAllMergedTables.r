@@ -12,7 +12,7 @@
        count <- count+1
       print(count/length(vessels)*100)
       cat(paste("load 'merged' for",a.vesselid,"\n"))
-      er <- try(load(file = file.path(folder, paste('merged.',a.vesselid,'.',a.year,'.RData',sep=''))) 
+      er <- try(load(file = file.path(folder, paste('merged_',a.vesselid,'_',a.year,'.RData',sep=''))) 
                         , silent=TRUE) # get the 'merged' table for this vessel
 
 
