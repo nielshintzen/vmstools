@@ -13,73 +13,6 @@
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#
 
 
-#!!!!!!!!!!!!!!!!!!!!!#
-#!!!!!!!!!!!!!!!!!!!!!#
-# utils--
-collapse.all.columns <- function (obj, columns= seq(ncol(obj)) ){
-            eval(parse(text=paste('paste(obj[,', paste(columns,collapse='] ,"#", obj[,'), '],sep=\'\')', sep='')))  }
-uncollapse.column <-  function(obj, column="coll"){
-            dd<- strsplit(as.character(obj[,column]),"#") ; nco <- length(dd[[1]]) ; dd<- unlist(dd)
-            res <- eval(parse(text=paste('data.frame(',paste('dd[seq(',1:nco,',nrow(obj)*nco,by=nco)]', collapse=','),')')))
-            colnames(res) <- paste("col",1:nco,sep='')
-            return(res)
-            }
-
-
-#!!!!!!!!!!!!!!!!!!!!!#
-#!!!!!!!!!!!!!!!!!!!!!#
-#!!!!!!!!!!!!!!!!!!!!!#
-#!!!!!!!!!!!!!!!!!!!!!#
-#utils--
-# FUNCTION TO CREATE A SPATIAL GRID
-# 'xx' have a 'SI_LATI' and a 'SI_LONG' columns
-assign.points.to.a.spatial.grid <- function(xx, general){
-
-  xx <- xx[,!colnames(xx) %in% c("icessquare","icessquare.vms") ]  # remove
-  xx <- cbind.data.frame(xx, icessquare= rep(0,nrow(xx)))
-
-
-  an <- function(x) as.numeric(as.character(x))
-  rlong      <- range(an(xx$SI_LONG),na.rm=T)
-  vect.long  <- signif(seq(floor(rlong[1]), ceiling(rlong[2]), by=1),4)   # long (x)
-  label.long <- rep(paste(rep(LETTERS,each=10),0:9,sep=""),each=1)
-  names(label.long) <- signif(seq(-50, 209, by=1),4)   # long (x)
-  label.long <- label.long[!is.na(names(label.long))]  # => correspondance long (-50 to 209) / sq letter (A0 to Z9)
-  label.long <- label.long[as.character(vect.long)]
-  rlat      <- range(an(xx$SI_LATI), na.rm=T)
-  vect.lat   <- signif(seq(floor(rlat[1]), ceiling(rlat[2]),by=0.5),4) # lat  (y)
-  label.lat  <- rep(paste(seq(1,75,1)),each=1)
-  names(label.lat) <-   paste(signif(seq(36,73, by=0.5),4))
-  label.lat <- label.lat[!is.na(names(label.lat))] # => correspondance lat (36 to 73) / sq number (1 to 75)
-  label.lat <- label.lat[as.character(vect.lat)]
-  vect.label <- paste(rep(label.lat,each=length(label.long)),"",label.long,sep="")
-  xx[,"icessquare"] <- paste(label.lat [findInterval(an(xx[,"SI_LATI"]), vect.lat)] , label.long [findInterval(an(xx[,"SI_LONG"]), vect.long)], sep="")
-
-  return(xx)
-  }
-
-
-#!!!!!!!!!!!!!!!!!!!!!#
-#!!!!!!!!!!!!!!!!!!!!!#
-#utils--
-# for managing NA on logbook side
-# (from vms trip.sq without corresponding logbook trip.sq e.g. because no declaration in sq because only steaming time inside)
-# we need to inform back the specificity of the vessel from logbook using info from the same trip i.e. vesselid+bk.tripnum
- retrieve.on.bk.side <- function(merged, type.data){
-      idx <- which(merged$LE_MET_level6=="NA")
-      merged.NA <- merged[idx,] # input (only the trip.sq with NA for the logbook part)
-
-      for (td in type.data){
-         map <- tapply(merged[, td ], paste(merged$VE_REF, merged$bk.tripnum),
-                             function(i) {ss<- unique(as.character(i)) ; ss[ss!="NA"][1]})
-         merged.NA[, td ] <- factor(paste(merged.NA$VE_REF,merged.NA$bk.tripnum))
-         levels(merged.NA[, td ]) <- map[levels(merged.NA[, td ])]
-         }
-      if(nrow(merged.NA)>0) merged.NA$flag <- 4 # flag on meth
-      merged[idx,] <- merged.NA # output
-      return(merged)
-      }
-
 
 
   
@@ -113,11 +46,72 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
            function(logbooks, tacsat, general=list(output.path=file.path("C:"),
                     a.year=2009, visual.check=TRUE), ...){
 
-  an <<- function(x) as.numeric(as.character(x)) # alias
-
   lstargs <- list(...)
 
+  #utils--
+  an <<- function(x) as.numeric(as.character(x)) # alias
   
+  
+ #!!!!!!!!!!!!!!!!!!!!!#
+ #!!!!!!!!!!!!!!!!!!!!!#
+ # utils--
+ collapse.all.columns <- function (obj, columns= seq(ncol(obj)) ){
+            eval(parse(text=paste('paste(obj[,', paste(columns,collapse='] ,"#", obj[,'), '],sep=\'\')', sep='')))  }
+ uncollapse.column <-  function(obj, column="coll"){
+            dd<- strsplit(as.character(obj[,column]),"#") ; nco <- length(dd[[1]]) ; dd<- unlist(dd)
+            res <- eval(parse(text=paste('data.frame(',paste('dd[seq(',1:nco,',nrow(obj)*nco,by=nco)]', collapse=','),')')))
+            colnames(res) <- paste("col",1:nco,sep='')
+            return(res)
+            }
+
+  #utils--
+  # FUNCTION TO CREATE A SPATIAL GRID
+  # 'xx' have a 'SI_LATI' and a 'SI_LONG' columns
+  assignPointsToSpatialGrid <- function(xx){
+
+    xx <- xx[,!colnames(xx) %in% c("icessquare","icessquare.vms") ]  # remove
+    xx <- cbind.data.frame(xx, icessquare= rep(0,nrow(xx)))
+
+
+    an <- function(x) as.numeric(as.character(x))
+    rlong      <- range(an(xx$SI_LONG),na.rm=T)
+    vect.long  <- signif(seq(floor(rlong[1]), ceiling(rlong[2]), by=1),4)   # long (x)
+    label.long <- rep(paste(rep(LETTERS,each=10),0:9,sep=""),each=1)
+    names(label.long) <- signif(seq(-50, 209, by=1),4)   # long (x)
+    label.long <- label.long[!is.na(names(label.long))]  # => correspondance long (-50 to 209) / sq letter (A0 to Z9)
+    label.long <- label.long[as.character(vect.long)]
+    rlat      <- range(an(xx$SI_LATI), na.rm=T)
+    vect.lat   <- signif(seq(floor(rlat[1]), ceiling(rlat[2]),by=0.5),4) # lat  (y)
+    label.lat  <- rep(paste(seq(1,75,1)),each=1)
+    names(label.lat) <-   paste(signif(seq(36,73, by=0.5),4))
+    label.lat <- label.lat[!is.na(names(label.lat))] # => correspondance lat (36 to 73) / sq number (1 to 75)
+    label.lat <- label.lat[as.character(vect.lat)]
+    vect.label <- paste(rep(label.lat,each=length(label.long)),"",label.long,sep="")
+    xx[,"SI_RECT"] <- paste(label.lat [findInterval(an(xx[,"SI_LATI"]), vect.lat)] , label.long [findInterval(an(xx[,"SI_LONG"]), vect.long)], sep="")
+
+   return(xx)
+   }
+
+
+   #!!!!!!!!!!!!!!!!!!!!!#
+   #utils--
+   # for managing NA on logbook side
+   # (from vms trip.sq without corresponding logbook trip.sq e.g. because no declaration in sq because only steaming time inside)
+   # we need to inform back the specificity of the vessel from logbook using info from the same trip i.e. vesselid+bk.tripnum
+   retrieveOnBkSide <- function(merged, type.data){
+      idx <- which(merged$LE_MET_level6=="NA")
+      merged.NA <- merged[idx,] # input (only the trip.sq with NA for the logbook part)
+
+      for (td in type.data){
+         map <- tapply(merged[, td ], paste(merged$VE_REF, merged$bk.tripnum),
+                             function(i) {ss<- unique(as.character(i)) ; ss[ss!="NA"][1]})
+         merged.NA[, td ] <- factor(paste(merged.NA$VE_REF,merged.NA$bk.tripnum))
+         levels(merged.NA[, td ]) <- map[levels(merged.NA[, td ])]
+         }
+      if(nrow(merged.NA)>0) merged.NA$flag <- 4 # flag on meth
+      merged[idx,] <- merged.NA # output
+      return(merged)
+      }
 
       #!#!##!#!##!#!##!#!##!#!##!#!#
       #!#!##!#!##!#!##!#!##!#!##!#!#
@@ -205,8 +199,11 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
          vms.this.vessel$idx  <- 1:nrow(vms.this.vessel) # label for each ping
 
-        
 
+         if(!any(vms.this.vessel$SI_STATE==1)) stop('the SI_STATE column has to be informed before making the merging')
+         if(length(unique(vms.this.vessel$SI_FT))<1) stop('need more than 1 trip in SI_FT')
+        
+ 
          # filter if vessel with a bad vms
          to.remove.because.deficient.vms <- any(is.na(vms.this.vessel$SI_FT))
          to.remove.because.not.enough.vms.trips <- length(table(vms.this.vessel$SI_FT))< 0  # nb vms trips < 1
@@ -397,7 +394,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # ASSIGN A RECTANGLE TO EACH PING #!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-         .vms   <- assign.points.to.a.spatial.grid(xx=.vms, general)
+         .vms   <- assignPointsToSpatialGrid(xx=.vms)
         
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # COMPUTE EFFORT.MINS      !#!#!#!#!#!#!#!#!#!#!#
@@ -419,8 +416,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          .logbk$bk.tripnum.sq <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT, sep='') # caution:redefine
          .logbk$bk.tripnum.sq.day <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT,".",.logbk$date.in.R.cat, sep='') # caution:redefine
          .vms$bk.tripnum <- factor(.vms$bk.tripnum)
-         .vms$bk.tripnum.sq <- paste(.vms$bk.tripnum, ".", .vms$icessquare, sep='') # caution:redefine
-         .vms$bk.tripnum.sq.day <- paste(.vms$bk.tripnum, ".", .vms$icessquare,".", format(.vms$date.in.R,  '%Y-%m-%d'), sep='') # caution:redefine
+         .vms$bk.tripnum.sq <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT, sep='') # caution:redefine
+         .vms$bk.tripnum.sq.day <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT,".", format(.vms$date.in.R,  '%Y-%m-%d'), sep='') # caution:redefine
 
          # for gear, if several gears inside a same trip,
          #  it is problematic because we have to assume a split of total effort or toal nb of ping between gears...
@@ -690,7 +687,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                      }
                    }
                  # if still 'not merging' part, retrieve on NA side i.e. occurs when pings in vms but not in bk
-                   merged <- retrieve.on.bk.side(merged, type.data=c( "VE_FLT","LE_MET_level6"))  # i.e. when metier=='NA'
+                   merged <- retrieveOnBkSide(merged, type.data=c( "VE_FLT","LE_MET_level6"))  # i.e. when metier=='NA'
 
      
 
@@ -711,9 +708,6 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
         names(merged)  [names(merged) %in% "date.in.R.time"] <- "SI_TIME"
     
        # save------------
-       # create required folders for outputs
-       suppressWarnings(dir.create(file.path(general$output.path)))
-
        save("merged",   file=file.path(general$output.path,
              paste("merged_",  a.vesselid,"_",general$a.year,".RData", sep='')))
        cat(paste("save 'merged'...OK\n\n",sep=""))
@@ -747,6 +741,9 @@ return()
 
 
 
+
+
+
   ##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##
   ##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##
   ##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##
@@ -772,7 +769,7 @@ return()
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
 
  
-  
+                       
   # debug: change funny names of vesselid
   eflalo2$VE_REF <- matrix(unlist(strsplit(as.character(eflalo2$VE_REF),":")),ncol=2,byrow=T)[,2]
   tacsat$VE_REF <- matrix(unlist(strsplit(as.character(tacsat$VE_REF),":")),ncol=2,byrow=T)[,2]
@@ -782,7 +779,7 @@ return()
   eflalo <- mergeEflaloSpecies (eflalo2, threshold=100000) 
   
   # TEST FOR A GIVEN SET OF VESSELS
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
+  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
