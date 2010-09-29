@@ -206,7 +206,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
  
          # filter if vessel with a bad vms
          to.remove.because.deficient.vms <- any(is.na(vms.this.vessel$SI_FT))
-         to.remove.because.not.enough.vms.trips <- length(table(vms.this.vessel$SI_FT))< 2  # nb vms trips < 2
+         to.remove.because.not.enough.vms.trips <- length(unique(vms.this.vessel$SI_FT))< 2  # nb vms trips < 2
          a.flag <- to.remove.because.deficient.vms ||  to.remove.because.not.enough.vms.trips
          
          ## remove bk.tripnum and mid.time if it exists
