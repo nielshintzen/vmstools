@@ -201,12 +201,12 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
 
          if(!any(vms.this.vessel$SI_STATE==1)) stop('the SI_STATE column has to be informed before making the merging')
-         if(length(unique(vms.this.vessel$SI_FT))<1) stop('need more than 1 trip in SI_FT')
+         if(length(unique(vms.this.vessel$SI_FT))<1) warning('need more than 1 trip in SI_FT')
         
  
          # filter if vessel with a bad vms
          to.remove.because.deficient.vms <- any(is.na(vms.this.vessel$SI_FT))
-         to.remove.because.not.enough.vms.trips <- length(table(vms.this.vessel$SI_FT))< 0  # nb vms trips < 1
+         to.remove.because.not.enough.vms.trips <- length(table(vms.this.vessel$SI_FT))< 2  # nb vms trips < 2
          a.flag <- to.remove.because.deficient.vms ||  to.remove.because.not.enough.vms.trips
          
          ## remove bk.tripnum and mid.time if it exists
