@@ -200,13 +200,12 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          vms.this.vessel$idx  <- 1:nrow(vms.this.vessel) # label for each ping
 
 
-         if(!any(vms.this.vessel$SI_STATE==1)) stop('the SI_STATE column has to be informed before making the merging')
-         if(length(unique(vms.this.vessel$SI_FT))<1) warning('need more than 1 trip in SI_FT')
         
  
          # filter if vessel with a bad vms
          to.remove.because.deficient.vms <- any(is.na(vms.this.vessel$SI_FT))
          to.remove.because.not.enough.vms.trips <- length(unique(vms.this.vessel$SI_FT))< 2  # nb vms trips < 2
+         if(length(unique(vms.this.vessel$SI_FT))<2) warning('need more than 1 trip in SI_FT')
          a.flag <- to.remove.because.deficient.vms ||  to.remove.because.not.enough.vms.trips
          
          ## remove bk.tripnum and mid.time if it exists
@@ -216,7 +215,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
         if(a.flag==FALSE) {  # i.e. vms-equipped
 
-
+           if(all(is.na(vms.this.vessel$SI_STATE))) stop('the SI_STATE column has to be informed before making the merging')
+     
          # alias
          .logbk <- logbk.this.vessel
          .vms   <- vms.this.vessel
