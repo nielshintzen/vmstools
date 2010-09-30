@@ -195,6 +195,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          # keep only the essential
          vms.this.vessel  <- tacsat.this.vessel [, c("VE_REF","SI_LATI","SI_LONG", 
                           "date.in.R","SI_FT", "SI_HARB", "SI_STATE")]
+         rm(tacsat.this.vessel); gc(reset=TRUE)                  
          vms.this.vessel$VE_REF   <- factor(vms.this.vessel$VE_REF)
 
          vms.this.vessel$idx  <- 1:nrow(vms.this.vessel) # label for each ping
@@ -294,7 +295,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               text(as.POSIXct(tmp$mid.time[i]), 0.0785, tmp$bk.tripnum[i], cex=0.5, col=1)
             }
           }
-
+          rm(table.midtime) ; gc(reset=TRUE)
 
           # THE CORE CODE: compare bk$mid.time and vms$mid.time
           # find the nearest bk$mid.time for each vms$mid.time
@@ -690,7 +691,10 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                    merged <- retrieveOnBkSide(merged, type.data=c( "VE_FLT","LE_MET_level6"))  # i.e. when metier=='NA'
 
      
-
+        # clean up
+        rm(a.table, merged1, merged2, merged3, merged.this.vessel,.vms, .logbk, logbk.this.vessel, vms.this.vessel)
+        gc(reset=TRUE)
+   
         # restore eflalo names
         names(merged)  [names(merged) %in% "bk.tripnum"] <- "FT_REF"
 
@@ -775,8 +779,8 @@ return()
   tacsat$VE_REF <- matrix(unlist(strsplit(as.character(tacsat$VE_REF),":")),ncol=2,byrow=T)[,2]
 
   
-  # reduce the size of the eflalo data by merging species (e.g. merge if <100 tons)
-  eflalo <- mergeEflaloSpecies (eflalo2, threshold=100000) 
+  # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
+  eflalo <- mergeEflaloSpecies (eflalo2, threshold=1e6) 
   
   # TEST FOR A GIVEN SET OF VESSELS
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
