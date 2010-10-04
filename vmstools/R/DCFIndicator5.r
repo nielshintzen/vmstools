@@ -3,7 +3,7 @@
 ## calculates the DCF5 indicator : for each month, the total area where fishing activity occurs
 
 DCFIndicator5 <- function ( tacsat,
-                            minThreshold=10,
+                            minThreshold=10,            # if time interval has been calculated (and named SI_INTV), it's a minimal nb of minutes, otherwise, it's minimal number of points
                             cellresX=0.05,
                             cellresY=0.05)
   {

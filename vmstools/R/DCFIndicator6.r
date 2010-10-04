@@ -3,7 +3,7 @@
 ## calculates the DCF6 indicator : for each month, the area where 90% of the pings were obtained
 
 DCFIndicator6 <- function ( tacsat,
-                            pctThreshold=90,
+                            pctThreshold=90,    # percentage of points to include
                             cellresX=0.05, 
                             cellresY=0.05)
   {
