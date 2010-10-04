@@ -3,11 +3,11 @@
 ## calculates the DCF7 indicator : area of cells not containing activity
 
 DCFIndicator7 <- function ( vmsWithGear,
-                            mobileBottomGear="",
+                            mobileBottomGear="",      # a list of gear code
                             inShapeArea="",           # the name of the shapefile without the .shp extension
                             cellresX=0.05,
                             cellresY=0.05,
-                            minThreshold=10)
+                            minThreshold=10)          # if time interval has been calculated (and named SI_INTV), it's a minimal nb of minutes, otherwise, it's minimal number of points
 
 { require(shapefiles)
   require(sp)
