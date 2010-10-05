@@ -5,11 +5,12 @@
 DCFIndicator6 <- function ( tacsat,
                             pctThreshold=90,    # percentage of points to include
                             cellresX=0.05, 
-                            cellresY=0.05)
+                            cellresY=0.05,
+                            plotMapTF = FALSE,
+                            exportTableName=""
+                            )
   {
 
-  #require("calcAreaOfCells.r")
-  
   #remove rows with NA
   tacsat<-tacsat[complete.cases(tacsat),]
   
@@ -27,8 +28,9 @@ DCFIndicator6 <- function ( tacsat,
     
     # grid the vms pings inside the MCP
     monthlyTacsat<-subset(monthlyTacsat, monthlyTacsat$INMCP!=0)
-    monthlyVmsGrid<-vmsGridCreate(monthlyTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum = "INMCP", plotMap = TRUE, plotPoints = FALSE)
-    plot_mcp(plotnew=FALSE, plotpoints=FALSE, titletxt=paste("Month", currMonth), xaxis= "Easting (m)", yaxis="Northing (m)")
+    if (plotMapTF) {windows(record=TRUE)}
+    monthlyVmsGrid<-vmsGridCreate(monthlyTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum = "INMCP", plotMap=plotMapTF, plotPoints = FALSE)
+    if (plotMapTF) {plot_mcp(plotnew=FALSE, plotpoints=FALSE, titletxt=paste("Month", currMonth))}
     
     # calculate the area of each cell in square km
     monthlyVmsGrid<-calcAreaOfCells(monthlyVmsGrid)
@@ -36,6 +38,6 @@ DCFIndicator6 <- function ( tacsat,
     
     }
 
+  if (exportTableName!="") {write.csv(tableResultDCF6, exportTableName)}
   return(tableResultDCF6)
-
 }
