@@ -5,7 +5,10 @@
 DCFIndicator5 <- function ( tacsat,
                             minThreshold=10,            # if time interval has been calculated (and named SI_INTV), it's a minimal nb of minutes, otherwise, it's minimal number of points
                             cellresX=0.05,
-                            cellresY=0.05)
+                            cellresY=0.05,
+                            plotMapTF=FALSE,
+                            exportTableName=""
+                            )
   {
 
   
@@ -23,13 +26,16 @@ DCFIndicator5 <- function ( tacsat,
       monthlyTacsat<-subset(tacsat, as.numeric(format(tacsat$SI_DATIM, format="%m"))==currMonth)
     
       if ("SI_INTV" %in% colnames(tacsat)) { nameVarToSum="SI_INTV"} else {nameVarToSum=""}
-
-      monthlyVmsGrid<-vmsGridCreate(monthlyTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum, plotMap = TRUE, plotPoints = FALSE)
+      
+      if (plotMapTF) {windows(record=TRUE)}
+      monthlyVmsGrid<-vmsGridCreate(monthlyTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum, plotMap=plotMapTF, plotPoints = FALSE)
+      
       # calculate the area of each cell in square km
       monthlyVmsGrid<-calcAreaOfCells(monthlyVmsGrid)
 
       filteredFishingValues<-subset(monthlyVmsGrid@data, monthlyVmsGrid@data$fishing>minThreshold)
       tableResultDCF5[x,2]<-sum(filteredFishingValues$fishing)
       }
+  if (exportTableName!="") {write.csv(tableResultDCF5, exportTableName)}
   return(tableResultDCF5)
 }
