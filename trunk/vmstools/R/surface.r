@@ -1,29 +1,34 @@
-surface <- function(lon1,lat1,lon2,lat2,res=10){
+surface <- function(vmsGrid,res=10){
+        if (class(vmsGrid)=='SpatialGridDataFrame') # not empty...
+          {
+             griddims <- summary(vmsGrid)$grid
+             bboxdims <- bbox(vmsGrid)
+             stlon    <- bboxdims[1,1]
+             stlat    <- bboxdims[2,1]
+             enlon    <- bboxdims[1,2]
+             enlat    <- bboxdims[2,2]
+             sizelon  <- griddims[1,2]
+             sizelat  <- griddims[2,2]
 
-            x1      <- lon1
-            x2      <- lon2
-            y1      <- lat1
-            y2      <- lat2
-            
-            if(length(x1) != length(x2) & length(y1) != length(y2) & length(x1) != length(y1)) stop("dimensions of longitudes and latitudes differ")
-            
-            if(length(x1) == 1){
-              sy      <- seq(y1,y2,length.out=res)
-              height  <- distance(rep(x1,res-1),sy[2:res],rep(x1,res-1),sy[1:(res-1)])
-              base    <- distance(rep(x1,res),sy,rep(x2,res),sy)
-              base1   <- base[1:(res-1)]
-              base2   <- base[2:res]
-              surface <- sum(height * (base1 + base2) / 2)
-            }
-            if(length(x1) > 1){
-              sy      <- mapply(seq,y1,y2,length.out=res)
-              sx1     <- mapply(rep,x1,res)
-              sx2     <- mapply(rep,x2,res)
-              height  <- distance(sx1[1:(res-1),],sy[2:res,],sx1[1:(res-1),],sy[1:(res-1),])
-              base    <- distance(sx1,sy,sx2,sy)
-              base1   <- base[1:(res-1),]
-              base2   <- base[2:res,]
-              surface <- apply(height * (base1 + base2) / 2,2,sum)
-            }
+             lons     <- seq(stlon,enlon,sizelon)
+             lats     <- seq(stlat,enlat,sizelat)
 
-         return(surface)}
+             heights  <- distance(lon=0,lat=stlat,lonRef=0,latRef=stlat+sizelat/(res-1))
+             seqlats  <- mapply(seq,lats[1:(length(lats)-1)],lats[2:length(lats)],length.out=res)
+
+             base     <- matrix(mapply(distance,lon=0,lat=c(seqlats),lonRef=sizelon,latRef=c(seqlats)),ncol=res,byrow=T)
+             if(dim(base)[1] == 1){
+                base1     <- base[1:(res-1)]
+                base2     <- base[2:res]
+                surface   <- rep(sum(heights * (base1 + base2)/2),each=length(seq(stlon,enlon-sizelon,sizelon)))
+             } else {
+                base1    <- base[,1:(res-1)]
+                base2    <- base[,2:res]
+                surface <- rep(apply(heights * (base1 + base2) / 2,1,sum),each=length(seq(stlon,enlon-sizelon,sizelon)))
+              }
+
+             vmsGrid@data$cellArea <- rev(surface)
+          }
+        return(vmsGrid)}
+         
+         
