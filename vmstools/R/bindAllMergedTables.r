@@ -37,7 +37,7 @@
          # KEEP THE ESSENTIAL
          merged <- merged[,c( "VE_REF", "FT_REF", "VE_FLT", "LE_MET_level6", "LE_GEAR",
                                   "SI_LATI","SI_LONG", "SI_STATE", "SI_DATE", "SI_TIME", "SI_HARB",
-                                     nm[idx.col],
+                                     nm[idx.col], 'LE_EFF_VMS', 'KW_HOURS',
                                          "flag")]
           all.merged <- rbind.data.frame(all.merged, merged)
       } else cat(paste("failure for",a.vesselid,"\n"))

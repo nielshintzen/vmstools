@@ -434,21 +434,21 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
              # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER BK.TRIPNUM
               agg.logbk.this.vessel.method.1  <- aggregate(.logbk[,idx.col],
                       list(.logbk$bk.tripnum, 
-                              .logbk$VE_REF, .logbk$VE_FLT,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
+                              .logbk$VE_REF, .logbk$VE_KW, .logbk$VE_FLT,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
               colnames(agg.logbk.this.vessel.method.1) <- 
-                           c("bk.tripnum", "VE_REF", "VE_FLT", "LE_MET_level6","LE_GEAR", nm[idx.col] )
+                           c("bk.tripnum", "VE_REF", "VE_KW", "VE_FLT", "LE_MET_level6","LE_GEAR", nm[idx.col] )
              # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER BK.TRIPNUM.SQ
               agg.logbk.this.vessel.method.2  <- aggregate(.logbk[,idx.col],
                       list(.logbk$bk.tripnum.sq, 
-                              .logbk$VE_REF, .logbk$VE_FLT,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
+                              .logbk$VE_REF, .logbk$VE_KW, .logbk$VE_FLT,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
               colnames(agg.logbk.this.vessel.method.2) <- 
-                           c("bk.tripnum.sq", "VE_REF", "VE_FLT","LE_MET_level6" ,"LE_GEAR", nm[idx.col])
+                           c("bk.tripnum.sq", "VE_REF", "VE_KW", "VE_FLT","LE_MET_level6" ,"LE_GEAR", nm[idx.col])
              # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER BK.TRIPNUM.SQ.DAY (NOTE: SO, 'LE_SEQNUM' IS AGGREGATED HERE)
               agg.logbk.this.vessel.method.3  <- aggregate(.logbk[,idx.col],
                       list(.logbk$bk.tripnum.sq.day, 
-                             .logbk$VE_REF, .logbk$VE_FLT,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
+                             .logbk$VE_REF, .logbk$VE_KW, .logbk$VE_FLT,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
               colnames(agg.logbk.this.vessel.method.3) <- 
-                          c("bk.tripnum.sq.day", "VE_REF", "VE_FLT","LE_MET_level6","LE_GEAR",  nm[idx.col])
+                          c("bk.tripnum.sq.day", "VE_REF", "VE_KW", "VE_FLT","LE_MET_level6","LE_GEAR",  nm[idx.col])
 
 
              #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
@@ -642,8 +642,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     idx.col <- c(idx.col.w, idx.col.v)
                     .logbk.for.meth1   <- aggregate(.logbk.for.meth1 [,idx.col],
                                  list(.logbk.for.meth1$VE_REF, .logbk.for.meth1$bk.tripnum,
-                                            .logbk.for.meth1$VE_FLT, .logbk.for.meth1$LE_MET_level6, .logbk.for.meth1$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth1) <- c("VE_REF", "bk.tripnum", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                                            .logbk.for.meth1$VE_FLT, .logbk.for.meth1$VE_KW, .logbk.for.meth1$LE_MET_level6, .logbk.for.meth1$LE_GEAR), sum, na.rm=TRUE)
+                    colnames(.logbk.for.meth1) <- c("VE_REF","VE_KW", "bk.tripnum", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
                     merged1  <- do.merging(method="bk.tripnum", .logbk.for.meth1, .vms.for.meth1, general)
                     # add meth flag
@@ -658,9 +658,9 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     idx.col.v <- grep('EURO', nm) # index columns with species value
                     idx.col <- c(idx.col.w, idx.col.v)
                     .logbk.for.meth2   <- aggregate(.logbk.for.meth2 [,idx.col],
-                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$bk.tripnum.sq,
+                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$VE_KW, .logbk.for.meth2$bk.tripnum.sq,
                                             .logbk.for.meth2$VE_FLT, .logbk.for.meth2$LE_MET_level6, .logbk.for.meth2$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth2) <- c("VE_REF", "bk.tripnum.sq", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                    colnames(.logbk.for.meth2) <- c("VE_REF", "VE_KW", "bk.tripnum.sq", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
                     merged2 <- do.merging(method="bk.tripnum.sq", .logbk.for.meth2, .vms.for.meth2, general)
                     # add meth flag
@@ -710,6 +710,12 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                                       substr(merged[idx,]$date.in.R , 15,16), sep='')
         names(merged)  [names(merged) %in% "date.in.R.date"] <- "SI_DATE"
         names(merged)  [names(merged) %in% "date.in.R.time"] <- "SI_TIME"
+    
+        # last calculation 
+        merged$KW_HOURS <- an(merged$KW) * an(merged$LE_EFF_VMS)
+    
+        # last clean up 
+        merged <- merged[, !colnames(merged) %in% c('idx', 'icessquare')]
     
        # save------------
        save("merged",   file=file.path(general$output.path,
