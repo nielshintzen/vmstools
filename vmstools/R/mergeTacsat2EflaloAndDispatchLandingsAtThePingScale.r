@@ -688,7 +688,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                      }
                    }
                  # if still 'not merging' part, retrieve on NA side i.e. occurs when pings in vms but not in bk
-                   merged <- retrieveOnBkSide(merged, type.data=c( "VE_FLT","LE_MET_level6"))  # i.e. when metier=='NA'
+                   merged <- retrieveOnBkSide(merged, type.data=c( "VE_FLT","VE_KW","LE_MET_level6"))  # i.e. when metier=='NA'
 
      
         # clean up
