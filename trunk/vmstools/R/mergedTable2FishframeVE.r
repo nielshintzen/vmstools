@@ -19,7 +19,7 @@
     nm <- colnames(all.merged)
     all.merged$c_square  <-CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05)
     all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
-    all.merged$LE_VMS_EFF <- an(all.merged$LE_EFF_VMS) / 24 # convert in hours
+    all.merged$LE_EFF_VMS <- an(all.merged$LE_EFF_VMS) / 24 # convert in hours
     all.merged <- all.merged[,c("LE_EFF_VMS","KW_HOURS","totvalue", "totweight", "LE_MET_level6","c_square","month")]
     all.merged$c_square <- factor(all.merged$c_square)
 
