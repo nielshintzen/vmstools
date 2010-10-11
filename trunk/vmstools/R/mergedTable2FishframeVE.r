@@ -1,7 +1,7 @@
 # create the VE table to upload in fishframe
 # require: data.table package
  mergedTable2FishframeVE <- function (general=list(output.path=file.path("C:","output"),
-                                          a.year=2009, a.country="DNK"){
+                                          a.year=2009, a.country="DNK")){
 
     for(what in c('value','weight')){
        load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,"_bysn.RData",sep='')))
@@ -38,4 +38,3 @@
 
   return(ff.ve)
  }
-
