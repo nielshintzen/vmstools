@@ -1,10 +1,11 @@
+ # TO FISHFRAME
 # create the VE table to upload in fishframe
 # require: data.table package
  mergedTable2FishframeVE <- function (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="DNK")){
 
     for(what in c('value','weight')){
-       load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,"_bysn.RData",sep='')))
+       load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
        nm <- colnames(all.merged)
        if (what=='value') idx.col  <- grep('EURO', nm) # index columns with species
        if (what=='weight') idx.col  <- grep('KG', nm) # index columns with species
@@ -19,7 +20,7 @@
     nm <- colnames(all.merged)
     all.merged$c_square  <-CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05)
     all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
-    all.merged$LE_EFF_VMS <- an(all.merged$LE_EFF_VMS) / 24 # convert in hours
+    all.merged$LE_VMS_EFF <- an(all.merged$LE_EFF_VMS) / 24 # convert in hours
     all.merged <- all.merged[,c("LE_EFF_VMS","KW_HOURS","totvalue", "totweight", "LE_MET_level6","c_square","month")]
     all.merged$c_square <- factor(all.merged$c_square)
 
@@ -36,5 +37,14 @@
     ff.ve$recordtype <- "VE"
 
 
+  # save
+  ff.ve$LE_MET_level6  <- as.character(ff.ve$LE_MET_level6) 
+  write.csv2(ff.ve, file=file.path(general$output.path, 
+         paste("ff_ve_", general$a.year, ".csv", sep='')),  row.names = FALSE)
+
   return(ff.ve)
  }
+
+  # call
+ #mergedTable2FishframeVE (general=list(output.path=file.path("H:","DIFRES","VMSanalysis","results_merged","DKWaters"),
+ #                                         a.year=2009, a.country="DNK"))
