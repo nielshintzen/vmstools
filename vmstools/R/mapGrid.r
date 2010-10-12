@@ -34,9 +34,9 @@ ylim=c(so,no)
 #dev.new()
 breaks <- pretty(sGDF[[gridValName]],n=numCats)
 cols <- rev(heat.colors((length(breaks)-1)))
-image(sGDF, attr=gridValName, axes=FALSE, breaks = breaks, col=cols, xlim=xlim, ylim=ylim   )
+image(sGDF, attr=gridValName, axes=FALSE,  col=cols, xlim=xlim, ylim=ylim,breaks=breaks)
 library(mapdata)
-map("worldHires", add=TRUE)
+map("worldHires", add=TRUE,col="darkgreen",fill=TRUE,bg="white")
 box() # to put a box around the plot
 #mtext(paste(gear,year),font=4,line=-1.5)
 
