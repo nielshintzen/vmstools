@@ -1,17 +1,17 @@
-\name{interpolateVMS}
-\alias{interpolateVMS}
+\name{interpolateTacsat}
+\alias{interpolateTacsat}
 \title{Find interpolated points between two succeeding GPS datapoints}
 \description{
-Method to find interpolated points between two succeeding VMS / GPS datapoints. Two different
+Method to find interpolated points between two succeeding Tacsat / GPS datapoints. Two different
 methods can be applied: the cubic Hermite spline method as developed in Hintzen et al. 2010 or
 an interpolation of a straight line (on a x-y plane, not a sphere)
 }
 \usage{
-interpolateVMS(VMS, interval = 120, margin = 12, res = 100, method = "cHs", params = list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolateTacsat(tacsat, interval = 120, margin = 12, res = 100, method = "cHs", params = list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{VMS}{VMS dataset with GPS points that need to be interpolated}
+  \item{tacsat}{Tacsat dataset with GPS points that need to be interpolated}
   \item{interval}{Time in minutes between the succeeding datapoints}
   \item{Deviation from specified interval to find succeeding datapoints}{}
   \item{res}{Number of points to use to create interpolation (including start and end point), default = 100}
@@ -20,8 +20,8 @@ interpolateVMS(VMS, interval = 120, margin = 12, res = 100, method = "cHs", para
   \item{headingAdjustment}{Parameter to adjust the choice of heading depending on its own or previous point}
 }
 \details{
-Interval: In most VMS datasets the succeeding datapoint can be found 1 or 2 hours appart. This interval time
-should be specified here. Interval can also be specified as e.g. 15 minutes if the VMS / GPS dataset allows this.
+Interval: In most Tacsat datasets the succeeding datapoint can be found 1 or 2 hours appart. This interval time
+should be specified here. Interval can also be specified as e.g. 15 minutes if the Tacsat / GPS dataset allows this.
 Margin: Hardly ever, the interval time is precise. To allow some deviation from the 1 or 2 hour interval
 the margin can be adjusted.
 
@@ -35,23 +35,23 @@ headingAdjustment can either be 0 or 1 in case the heading at the endpoint does 
 point but the departing vessel. This is only of use when heading needs to be calculated outside the GPS dataset where heading is calculated
 at the bearing between two points. For the startpoint, the bearing is correct, for the endpoint however, the heading is incorrect. 
 
-The object returned is a list. Each list item contains in the first row the index of the succeeding VMS pionts interpolated.
+The object returned is a list. Each list item contains in the first row the index of the succeeding Tacsat pionts interpolated.
 The second till last row contain the x (first column) and y (second column) interpolated values. The length of the list
 indicates the number of interpolations created.
 }
 \references{Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite spline interpolation
 of position registration data, EU lot 2 project }
 \author{Niels T. Hintzen}
-\seealso{\code{findEndVMS(),distance(),lonLatRatio(),plotInterpolation(),sortVMS(),filterVMS()}}
+\seealso{\code{findEndTacsat(),distance(),lonLatRatio(),plotInterpolation(),sortTacsat(),filterTacsat()}}
 \examples{
   #Load the VMS data
-data(VMS)
+data(tacsat)
   #Filter the VMS data
-VMS     <- filterVMS(VMS,st,hd,remDup)
+tacsat     <- filterTacsat(tacsat,st,hd,remDup)
 
   #Sort the VMS data
-VMS     <- sortVMS(VMS)
-VMS     <- VMS[1:1000,]
+tacsat     <- sortTacsat(tacsat)
+tacsat     <- tacsat[1:1000,]
   #Interpolate the VMS data
-interpolation <- interpolateVMS(VMS,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 }
