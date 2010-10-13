@@ -3,11 +3,12 @@
 ## calculates the DCF7 indicator : area of cells not containing activity
 
 DCFIndicator7 <- function ( vmsWithGear,
-                            mobileBottomGear="",      # a list of gear code
-                            inShapeArea="",           # the name of the shapefile without the .shp extension
+                            mobileBottomGear="",          # a list of gear code
+                            inShapeArea="",               # the name of the shapefile without the .shp extension
                             cellresX=0.05,
                             cellresY=0.05,
-                            minThreshold=10,          # if time interval has been calculated (and named SI_INTV), it's a minimal nb of minutes, otherwise, it's minimal number of points
+                            calcAreaMethod="trapezoid",   # "trapezoid" (fast and less accurate, good for small cellsizes) or "UTMproj" (accurate but slow, good for huge cellsizes)
+                            minThreshold=10,              # if time interval has been calculated (and named SI_INTV), it's a minimal nb of minutes, otherwise, it's minimal number of points
                             plotMapTF = FALSE
                             )          
 
@@ -27,7 +28,7 @@ DCFIndicator7 <- function ( vmsWithGear,
         
         polyCoord<-cbind(shapeAll$shp$shp[[x]]$points$X,shapeAll$shp$shp[[x]]$points$Y)
         if (x==1) {pointInOutByPoly<-point.in.polygon(vmsPingsCoord[,1], vmsPingsCoord[,2], polyCoord[,1], polyCoord[,2])} else { pointInOutByPoly <- pointInOutByPoly + (point.in.polygon(vmsPingsCoord[,1], vmsPingsCoord[,2], polyCoord[,1], polyCoord[,2]))}
-      }
+        }
         
 
       vmsWithGear$pointInOut<-pointInOutByPoly
@@ -39,7 +40,10 @@ DCFIndicator7 <- function ( vmsWithGear,
   vmsGrid<-vmsGridCreate(vmsWithGear, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum, plotMap=plotMapTF, plotPoints = FALSE)
   
   # calculate the area of each cell in square km
-  vmsGrid<-calcAreaOfCells(vmsGrid)
+  if (calcAreaMethod=="trapezoid") {vmsGrid<-surface(vmsGrid)} else 
+    {if (calcAreaMethod=="UTMproj") {vmsGrid<-calcAreaOfCells(vmsGrid, includeNA=TRUE)} else 
+      {stop("You must choose a cell area calculation method between 'trapezoid' and 'UTMproj'")}}
+                                                                     
   if (inShapeArea!="")
     { # read the shapefile   
       # specify which grid cell is in the polygon
@@ -48,7 +52,7 @@ DCFIndicator7 <- function ( vmsWithGear,
         
             polyCoord<-cbind(shapeAll$shp$shp[[x]]$points$X,shapeAll$shp$shp[[x]]$points$Y)
             if (x==1) {gridCellInOutByPoly<-point.in.polygon(gridPointsCoord[,1], gridPointsCoord[,2], polyCoord[,1], polyCoord[,2])} else { gridCellInOutByPoly <- gridCellInOutByPoly + (point.in.polygon(gridPointsCoord[,1], gridPointsCoord[,2], polyCoord[,1], polyCoord[,2]))}
-        }
+          }
   
       vmsGrid$inPolygon<-gridCellInOutByPoly
       areaInPolygon<-sum(vmsGrid@data$cellArea[vmsGrid@data$inPolygon>0])
