@@ -11,14 +11,18 @@
       # reshape in 'long' format
          # 1. load
          what <- "weight"
-         load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
+         load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,"_bysn.RData",sep='')))
          nm <- colnames(all.merged)
          idx.col  <- grep('KG', nm) # index columns with species
+         all.merged$SI_LONG <- an( all.merged$SI_LONG)
+         all.merged$SI_LATI <- an( all.merged$SI_LATI)
          if(length(lstargs$shape.file)==0) {
-         data(ICESareas)
-         all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
+         #   data(ICESareas)
+         #   all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
+         all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
          }else{
-         all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
+         #all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
+         all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
          }
          all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05))
          all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
@@ -28,15 +32,20 @@
          colnames(xx1) <- c('VE_REF', 'FT_REF',"LE_MET_level6","c_square","month", paste( "sp", 1:length(idx.col),sep='') )
          
          what <- "value"
-         load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
+         load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,"_bysn.RData",sep='')))
          nm <- colnames(all.merged)
          idx.col  <- grep('EURO', nm) # index columns with species
+         all.merged$SI_LONG <- an( all.merged$SI_LONG)
+         all.merged$SI_LATI <- an( all.merged$SI_LATI)
          if(length(lstargs$shape.file)==0) {
-         all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
+         #   data(ICESareas)
+         #   all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
+         all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
          }else{
-         all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
+         #all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
+         all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
          }
-         all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05))
+        all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05))
          all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
          nm2 <- colnames(all.merged)
          idx.c <- which (nm2 %in% c('VE_REF', 'FT_REF',"LE_MET_level6","c_square","month"))
@@ -87,7 +96,7 @@
   res$country     <- general$a.country
   res$nationalFAC <- NA
   res$recordtype  <- "VSL"
-  res$quarter <- ff.ve$month  # init
+  res$quarter <- ff.vsl$month  # init
   levels(res$quarter) <- c(1,1,1,2,2,2,3,3,3,4,4,4)
 
 
