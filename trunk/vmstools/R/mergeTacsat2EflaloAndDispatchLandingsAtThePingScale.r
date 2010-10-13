@@ -821,9 +821,11 @@ return()
 
   # CONVERT TO FISHFRAME FORMAT VE
   ff.ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","output"),
-                                          a.year=2009, a.country="NLD")
+                                          a.year=2009, a.country="NLD"))
   
   # TO FISHFRAME FORMAT VL
-  # to do...                                        
+  ff.vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","output"),
+                                          a.year=2009, a.country="NLD"))
+                                      
 
 } # end main
