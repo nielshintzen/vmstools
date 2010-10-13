@@ -1,4 +1,4 @@
-# TO FISHFRAME
+# TO FISHFRAME (author: F. Bastardie)
 # create the VE table to upload in fishframe
 # required: the data.table package
 # optional: the ICES_areas shape file (if not provided as arg then loaded from the vmstools library)
@@ -7,7 +7,7 @@
     lstargs <- list(...)
 
     for(what in c('value','weight')){
-       load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,"_bysn.RData",sep='')))
+       load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
        nm <- colnames(all.merged)
        if (what=='value') idx.col  <- grep('EURO', nm) # index columns with species
        if (what=='weight') idx.col  <- grep('KG', nm) # index columns with species
@@ -21,6 +21,7 @@
     all.merged <- all.merged[all.merged$SI_STATE==1,] # keep only fishing pings
     nm <- colnames(all.merged)
     if(length(lstargs$shape.file)==0) {
+       data(ICESareas)
        all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
     }else{
        all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
