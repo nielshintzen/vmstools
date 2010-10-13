@@ -4,7 +4,7 @@
 # optional: the ICES_areas shape file (if not provided as arg then loaded from the vmstools library)
  mergedTable2FishframeVE <- function (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="DNK"),...){
-    lstargs <- list(...)
+    lstargs <- list(...)   
 
     for(what in c('value','weight')){
        load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
