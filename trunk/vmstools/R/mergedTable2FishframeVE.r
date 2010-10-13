@@ -17,14 +17,18 @@
     all.merged$totweight <- weight
 
     an <- function(x) as.numeric(as.character(x))
+    all.merged$SI_LONG <- an( all.merged$SI_LONG)
+    all.merged$SI_LATI <- an( all.merged$SI_LATI)
     all.merged <- all.merged[, !colnames(all.merged) %in% c('fuelcons', 'flag')]
     all.merged <- all.merged[all.merged$SI_STATE==1,] # keep only fishing pings
     nm <- colnames(all.merged)
     if(length(lstargs$shape.file)==0) {
-       data(ICESareas)
-       all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
+    #   data(ICESareas)
+    #   all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
+    all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
     }else{
-       all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
+       #all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
+       all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
     }
     all.merged$c_square  <-CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05)
     all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
