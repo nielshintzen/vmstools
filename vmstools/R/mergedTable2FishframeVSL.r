@@ -11,7 +11,7 @@
       # reshape in 'long' format
          # 1. load
          what <- "weight"
-         load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,"_bysn.RData",sep='')))
+         load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
          nm <- colnames(all.merged)
          idx.col  <- grep('KG', nm) # index columns with species
          all.merged$SI_LONG <- an( all.merged$SI_LONG)
@@ -32,7 +32,7 @@
          colnames(xx1) <- c('VE_REF', 'FT_REF',"LE_MET_level6","c_square","month", paste( "sp", 1:length(idx.col),sep='') )
          
          what <- "value"
-         load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,"_bysn.RData",sep='')))
+         load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
          nm <- colnames(all.merged)
          idx.col  <- grep('EURO', nm) # index columns with species
          all.merged$SI_LONG <- an( all.merged$SI_LONG)
