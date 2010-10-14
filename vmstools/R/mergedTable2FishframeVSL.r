@@ -82,6 +82,7 @@
          
            # 5. aggregate with fast grouping
            library(data.table)
+           vsl.ff$ICES_area <- factor(vsl.ff$ICES_area)
            DT <- data.table(vsl.ff)
            qu = quote(list(sum(an(weight)),sum(an(value))))
            vsl.ff <- DT[,eval(qu), by=list(species,ICES_area,c_square,month,LE_MET_level6)]
