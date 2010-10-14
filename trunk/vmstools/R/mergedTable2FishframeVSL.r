@@ -86,7 +86,7 @@
             vsl.ff <- cbind.data.frame(vsl.ff1, vsl.ff2$value) 
          
             # 5. clean up
-            vsl.ff <- vsl.ff[!is.na(vsl.ff$weight),]
+            vsl.ff <- vsl.ff[!is.na(vsl.ff$weight) & vsl.ff$weight!=0,]
             vsl.ff <- vsl.ff[, !colnames(vsl.ff) %in% c('id')]
             colnames(vsl.ff) <-  c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area", "c_square","month", "species", "weight", "value")
      
