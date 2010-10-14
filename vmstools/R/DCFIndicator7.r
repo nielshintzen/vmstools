@@ -11,7 +11,7 @@ DCFIndicator7 <- function ( vmsWithGear,
                             minThreshold=10,              # if time interval has been calculated (and named SI_INTV), it's a minimal nb of minutes, otherwise, it's minimal number of points
                             plotMapTF = FALSE
                             )          
-
+                                                 
 { require(shapefiles)
   require(sp)
   vmsWithGear<-vmsWithGear[complete.cases(vmsWithGear),]
@@ -22,17 +22,22 @@ DCFIndicator7 <- function ( vmsWithGear,
 
       shapeAll<-read.shapefile(inShapeArea)
     
+      # clip the shape polygon with the land
+      clipShapeFromLand<-clipPolygons (shapeAll, europa)
+    
       vmsPingsCoord<-cbind(vmsWithGear$SI_LONG, vmsWithGear$SI_LATI)
+      pointInOutByPoly<-rep(0,length(vmsPingsCoord[,1]))
       
-      for (x in 1:length(shapeAll$shp$shp)){
-        
-        polyCoord<-cbind(shapeAll$shp$shp[[x]]$points$X,shapeAll$shp$shp[[x]]$points$Y)
-        if (x==1) {pointInOutByPoly<-point.in.polygon(vmsPingsCoord[,1], vmsPingsCoord[,2], polyCoord[,1], polyCoord[,2])} else { pointInOutByPoly <- pointInOutByPoly + (point.in.polygon(vmsPingsCoord[,1], vmsPingsCoord[,2], polyCoord[,1], polyCoord[,2]))}
+      ltPoly<-unique(clipShapeFromLand$PID)
+
+      # points in polygons
+      for (x in 1:length(ltPoly)){                                   
+        polyCoord<-cbind(clipShapeFromLand$X[clipShapeFromLand$PID==ltPoly[x]],clipShapeFromLand$Y[clipShapeFromLand$PID==ltPoly[x]])
+        pointInOutByPoly<-pointInOutByPoly + point.in.polygon(vmsPingsCoord[,1], vmsPingsCoord[,2], polyCoord[,1], polyCoord[,2])
         }
-        
 
       vmsWithGear$pointInOut<-pointInOutByPoly
-      vmsWithGear<-subset(vmsWithGear, pointInOut==1)
+      vmsWithGear<-subset(vmsWithGear, pointInOut!=0)
       }
   
   # Grid the points
@@ -45,29 +50,26 @@ DCFIndicator7 <- function ( vmsWithGear,
       {stop("You must choose a cell area calculation method between 'trapezoid' and 'UTMproj'")}}
                                                                      
   if (inShapeArea!="")
-    { # read the shapefile   
+    {    
       # specify which grid cell is in the polygon
       gridPointsCoord<-coordinates(vmsGrid)
-      for (x in 1:length(shapeAll$shp$shp)){
+      gridCellInOutByPoly<-rep(0,length(gridPointsCoord[,1]))
+      
+      # cells in polygon
+      for (x in 1:length(ltPoly)){
+        polyCoord<-cbind(clipShapeFromLand$X[clipShapeFromLand$PID==ltPoly[x]],clipShapeFromLand$Y[clipShapeFromLand$PID==ltPoly[x]])
+        gridCellInOutByPoly<-gridCellInOutByPoly + point.in.polygon(gridPointsCoord[,1], gridPointsCoord[,2], polyCoord[,1], polyCoord[,2])
+        }
         
-            polyCoord<-cbind(shapeAll$shp$shp[[x]]$points$X,shapeAll$shp$shp[[x]]$points$Y)
-            if (x==1) {gridCellInOutByPoly<-point.in.polygon(gridPointsCoord[,1], gridPointsCoord[,2], polyCoord[,1], polyCoord[,2])} else { gridCellInOutByPoly <- gridCellInOutByPoly + (point.in.polygon(gridPointsCoord[,1], gridPointsCoord[,2], polyCoord[,1], polyCoord[,2]))}
-          }
-  
       vmsGrid$inPolygon<-gridCellInOutByPoly
-      areaInPolygon<-sum(vmsGrid@data$cellArea[vmsGrid@data$inPolygon>0])
+      areaInPolygon<-sum(vmsGrid@data$cellArea[vmsGrid@data$inPolygon==1])
       } else {areaInPolygon<-sum(vmsGrid@data$cellArea)}
       
   # calculate the areas  
   areaFishing<-sum(vmsGrid@data$cellArea[!is.na(vmsGrid@data$fishing) & vmsGrid@data$fishing>minThreshold])
-
   
   # calculate the result
   resultDCF7<-areaInPolygon-areaFishing
   
   return(resultDCF7)
-}
-
-
-  
-  
+}  
