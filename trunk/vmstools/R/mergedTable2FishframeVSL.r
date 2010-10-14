@@ -59,13 +59,13 @@
          for(i in 1: (length(chunk)-1)){
             rm(vsl.ff1,vsl.ff2,vsl.ff) ; gc(reset=TRUE)
             cat(paste("lines",chunk[i],"to",chunk[i+1] ,"\n"))
-            vsl.ff1 <- reshape( xx1[ chunk[i]:chunk[i+1], ] , direction="long", varying=6:(5+length(idx.col)), sep="") # 'long' format
+            vsl.ff1 <- reshape( xx1[ chunk[i]:chunk[i+1], ] , direction="long", varying=7:(6+length(idx.col)), sep="") # 'long' format
             colnames(vsl.ff1) <- c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month", "species", "weight","id")
             vsl.ff1$species <- factor (vsl.ff1$species)
             get.sp <- function (nm) unlist(lapply(strsplit(nm, split="_"), function(x) x[3]))
             levels(vsl.ff1$species) <- get.sp(nm1[idx.col])
 
-            vsl.ff2 <- reshape( xx2[ chunk[i]:chunk[i+1], ] , direction="long", varying=6:(5+length(idx.col)), sep="") # 'long' format
+            vsl.ff2 <- reshape( xx2[ chunk[i]:chunk[i+1], ] , direction="long", varying=7:(6+length(idx.col)), sep="") # 'long' format
             colnames(vsl.ff2) <- c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month", "species", "value","id")
             vsl.ff2$species <- factor (vsl.ff2$species)
             nm <- colnames(xx2)
