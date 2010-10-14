@@ -1,9 +1,9 @@
-surface <- function(vmsGrid,method="Trapezoid"){  #Methods can be "Trapezoid" and "UTM"
+surface <- function(vmsGrid,method="Trapezoid",includeNA=T){  #Methods can be "Trapezoid" and "UTM"
         if (class(vmsGrid)=='SpatialGridDataFrame') # not empty...
           {
              if(method == "Trapezoid"){
-               res <- 10
-
+               res <- max(vmsGrid@grid@cellsize,na.rm=T)/0.1 * 10  #automatic scaling
+               if(res < 3) res <- 3
                griddims <- summary(vmsGrid)$grid
                bboxdims <- bbox(vmsGrid)
                stlon    <- bboxdims[1,1]
@@ -58,7 +58,7 @@ surface <- function(vmsGrid,method="Trapezoid"){  #Methods can be "Trapezoid" an
               vmsGrid@data$cellArea[x]<-singleCellArea
             }
           }
-
+        }
         return(vmsGrid)}
          
          
