@@ -6,7 +6,7 @@ DCFIndicator5 <- function ( tacsat,
                             minThreshold=10,            # if time interval has been calculated (and named SI_INTV), it's a minimal nb of minutes, otherwise, it's minimal number of points
                             cellresX=0.05,
                             cellresY=0.05,
-                            calcAreaMethod="trapezoid",   # "trapezoid" (fast and less accurate, good for small cellsizes) or "UTMproj" (accurate but slow, good for huge cellsizes)
+                            calcAreaMethod="Trapezoid",   # "Trapezoid" (fast and less accurate, good for small cellsizes) or "UTM" (accurate but slow, good for huge cellsizes)
                             plotMapTF=FALSE,
                             exportTableName=""
                             )
@@ -32,9 +32,7 @@ DCFIndicator5 <- function ( tacsat,
       monthlyVmsGrid<-vmsGridCreate(monthlyTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum, plotMap=plotMapTF, plotTitle=paste("Month ", currMonth), plotPoints = FALSE)
       
       # calculate the area of each cell in square km
-      if (calcAreaMethod=="trapezoid") {monthlyVmsGrid<-surface(monthlyVmsGrid)} else 
-        {if (calcAreaMethod=="UTMproj") {monthlyVmsGrid<-calcAreaOfCells(monthlyVmsGrid)} else 
-          {stop("You must choose a cell area calculation method between 'trapezoid' and 'UTMproj'")}}
+      monthlyVmsGrid<-surface(monthlyVmsGrid, method=calcAreaMethod, includeNA=FALSE)
             
       tableResultDCF5[x,2]<-sum(monthlyVmsGrid@data$cellArea[!is.na(monthlyVmsGrid@data$fishing) & monthlyVmsGrid@data$fishing>minThreshold])
       }

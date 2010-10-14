@@ -6,7 +6,7 @@ DCFIndicator6 <- function ( tacsat,
                             pctThreshold=90,              # percentage of points to include
                             cellresX=0.05, 
                             cellresY=0.05,
-                            calcAreaMethod="trapezoid",   # "trapezoid" (fast and less accurate, good for small cellsizes) or "UTMproj" (accurate but slow, good for huge cellsizes)
+                            calcAreaMethod="Trapezoid",   # "Trapezoid" (fast and less accurate, good for small cellsizes) or "UTM" (accurate but slow, good for huge cellsizes)
                             plotMapTF = FALSE,
                             exportTableName=""
                             )
@@ -34,9 +34,7 @@ DCFIndicator6 <- function ( tacsat,
     if (plotMapTF) {plot_mcp(plotnew=FALSE, plotpoints=FALSE)}
     
       # calculate the area of each cell in square km
-      if (calcAreaMethod=="trapezoid") {monthlyVmsGrid<-surface(monthlyVmsGrid)} else 
-        {if (calcAreaMethod=="UTMproj") {monthlyVmsGrid<-calcAreaOfCells(monthlyVmsGrid)} else 
-          {stop("You must choose a cell area calculation method between 'trapezoid' and 'UTMproj'")}}
+      monthlyVmsGrid<-surface(monthlyVmsGrid, method=calcAreaMethod, includeNA=FALSE)
             
     tableResultDCF6[x,2]<-sum(monthlyVmsGrid@data$cellArea[!is.na(monthlyVmsGrid@data$fishing) & monthlyVmsGrid@data$fishing!=0])
     }

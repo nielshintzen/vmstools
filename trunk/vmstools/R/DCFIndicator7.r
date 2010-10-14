@@ -7,7 +7,7 @@ DCFIndicator7 <- function ( vmsWithGear,
                             inShapeArea="",               # the name of the shapefile without the .shp extension
                             cellresX=0.05,
                             cellresY=0.05,
-                            calcAreaMethod="trapezoid",   # "trapezoid" (fast and less accurate, good for small cellsizes) or "UTMproj" (accurate but slow, good for huge cellsizes)
+                            calcAreaMethod="Trapezoid",   # "Trapezoid" (fast and less accurate, good for small cellsizes) or "UTM" (accurate but slow, good for huge cellsizes)
                             minThreshold=10,              # if time interval has been calculated (and named SI_INTV), it's a minimal nb of minutes, otherwise, it's minimal number of points
                             plotMapTF = FALSE
                             )          
@@ -45,9 +45,7 @@ DCFIndicator7 <- function ( vmsWithGear,
   vmsGrid<-vmsGridCreate(vmsWithGear, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum, plotMap=plotMapTF, plotPoints = FALSE)
   
   # calculate the area of each cell in square km
-  if (calcAreaMethod=="trapezoid") {vmsGrid<-surface(vmsGrid)} else 
-    {if (calcAreaMethod=="UTMproj") {vmsGrid<-calcAreaOfCells(vmsGrid, includeNA=TRUE)} else 
-      {stop("You must choose a cell area calculation method between 'trapezoid' and 'UTMproj'")}}
+  vmsGrid<-surface(vmsGrid, method=calcAreaMethod, includeNA=TRUE)
                                                                      
   if (inShapeArea!="")
     {    
