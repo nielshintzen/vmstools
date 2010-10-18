@@ -259,11 +259,14 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          mid.time <- rep(0, nrow(table.midtime))
          for(r in 1: nrow(table.midtime)){
            mid.time[r] <-  as.character(seq(from=table.midtime$date.in.R.dep[r], to=table.midtime$date.in.R.arr[r], length.out = 3)[2])
+         
          }
          table.midtime$mid.time <-  mid.time
          if(!any(colnames(.vms)%in%"mid.time")){ # here we are...
               .vms <- merge(.vms, table.midtime[,c("SI_FT","mid.time")], by.x="SI_FT", by.y="SI_FT")
          }
+
+
 
         #!!!!!!!!!!!!!!!!!!#
         #!!!!!!!!!!!!!!!!!!#
@@ -295,7 +298,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               text(as.POSIXct(tmp$mid.time[i]), 0.0785, tmp$bk.tripnum[i], cex=0.5, col=1)
             }
           }
-          rm(table.midtime) ; gc(reset=TRUE)
+         
 
           # THE CORE CODE: compare bk$mid.time and vms$mid.time
           # find the nearest bk$mid.time for each vms$mid.time
@@ -334,6 +337,21 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                             paste("assign_eflalo_tripnum_to_vms_",ve,"_",general$a.year,".jpeg",sep="")),type ="jpeg")
            dev.off()
           }
+
+     
+        ## ADD A WARNING IN CASE OF LONG (UNREALISTIC) TRIPS ##
+        idx <- which(((table.midtime$date.in.R.arr - table.midtime$date.in.R.dep ) /24) >30)   # if at least one trip >30 days
+        if (length( idx) >0){
+             cat(paste("at least one vms trip > 30 days detected! check harbours...", "\n", sep=""))
+            suspicious <- .vms[.vms$SI_FT %in%  table.midtime$SI_FT[idx] ,]
+            tmp <- table(suspicious$SI_LATI)
+            lat.suspicious <- names(tmp[tmp>5]) 
+            if(length(lat.suspicious)!=0) cat(paste("potential harbour likely near lat ",lat.suspicious,"\n",sep=""))
+            tmp <- table(suspicious$SI_LONG)
+            long.suspicious <- names(tmp[tmp>5]) 
+            if(length(long.suspicious)!=0) cat(paste("potential harbour likely near long ",long.suspicious,"\n",sep=""))
+            }  # if at least one trip >30 days
+        rm(table.midtime) ; gc(reset=TRUE)  
 
      
        
@@ -712,7 +730,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
         names(merged)  [names(merged) %in% "date.in.R.time"] <- "SI_TIME"
     
         # last calculation 
-        merged$KW_HOURS <- an(merged$KW) * an(merged$LE_EFF_VMS)
+        merged$KW_HOURS <- an(merged$VE_KW) * an(merged$LE_EFF_VMS)
     
         # last clean up 
         merged <- merged[, !colnames(merged) %in% c('idx', 'icessquare')]
@@ -767,10 +785,10 @@ return()
   
   data(eflalo2)
   data(tacsat)
-  data(harbours)
+  data(euharbours)
   tacsat$SI_HARB <- NA
   library(doBy)
-  inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=harbours,30)
+  inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours,30)
   tacsat$SI_FT <- 1 # init
   idx <- which(inHarb==0)
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
@@ -778,7 +796,8 @@ return()
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
 
- 
+  # add missing harbours?
+  #...
                        
   # debug: change funny names of vesselid
   eflalo2$VE_REF <- matrix(unlist(strsplit(as.character(eflalo2$VE_REF),":")),ncol=2,byrow=T)[,2]
@@ -826,6 +845,5 @@ return()
   # TO FISHFRAME FORMAT VL
   ff.vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD"))
-                                      
-
+ 
 } # end main
