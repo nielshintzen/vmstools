@@ -123,7 +123,7 @@
  
  return(ff.vsl)
  }
-}
+ #}
          
  # call
  #tmp <- mergedTable2FishframeVSL (general=list(output.path=file.path("H:","DIFRES","VMSanalysis","results_merged","DKWaters"),
