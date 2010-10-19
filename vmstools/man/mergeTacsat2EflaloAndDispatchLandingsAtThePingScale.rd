@@ -23,47 +23,35 @@ identifier. The initial datasets (both VMS and logbooks) were split into sub-blo
 this flag. Each pair of sub-blocks was then joined separately and all merged sub-blocks were
 bound in one dataset afterwards.
 }
+
 \usage{
 mergeTacsat2EflaloAndDispatchLandingsAtThePingScale(logbooks, vms, general = general, ...)
 }
 
 \arguments{
-  \item{logbooks}{
-%%     data.frame, eflalo format
+  \item{logbooks}{data.frame, eflalo format
 }
-  \item{tacsat}{
-%%     data.frame, tacsat format
+  \item{tacsat}{data.frame, tacsat format
 }
-  \item{general}{
-%%     list, general settings to go through all functions
+  \item{general}{list, general settings to go through all functions
 }
-  \item{\dots}{
-%%     character, a.vesselid = name of the vessel(s) in tacsat (and hopefully, in eflalo)
+  \item{\dots}{character, a.vesselid = name of the vessel(s) in tacsat (and hopefully, in eflalo)
 }
 }
-\details{
-in tacsat SI_STAT, fishing should be coded 1 and non-fishing should be coded 2
-}
+\details{in tacsat SI_STAT, fishing should be coded 1 and non-fishing should be coded 2}
+
 \value{
-Nothing is returned but a merged data.frame per vessel in the output folder
-}
-\references{
-Bastardie et al. 2010. Fisheries Research
-}
-\author{
-Francois Bastardie
-}
-\note{
-}
+Nothing is returned but a merged data.frame per vessel in the output folder}
+
+\references{Bastardie et al. 2010. Fisheries Research}
+\author{Francois Bastardie}
+\note{}
 
 
-\seealso{
-vmsGridCreate
-}
+\seealso{vmsGridCreate}
 
 \examples{
 
- 
   data(eflalo2)
   data(tacsat)
   data(harbours)
@@ -117,27 +105,9 @@ vmsGridCreate
   df2<-df1[-which(is.na(df1$LE_KG_SOL)),]
   vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
 
-   # TO FISHFRAME FORMAT:
-  # add a month code
-  all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m")) 
-  # add an area code
-  all.merged$CSquare <- CSquare (lon=as.numeric(as.character(all.merged$SI_LONG)), 
-                                   lat=as.numeric(as.character(all.merged$SI_LATI)),
-                                     degrees=0.05)
-  # TO DO : aggregate LE_EURO_SP, LE_KG_SP, and LE_EFF_VMS per level6, month and area code
-  nm         <- names(all.merged)
-  idx.col.w  <- grep('KG', nm) # index columns with species weight
-  idx.col.v  <- grep('EURO', nm) # index columns with species value
-  idx.col.vms  <- grep('VMS', nm) # index columns related to VMS calculation
-  idx.col    <- c(idx.col.w, idx.col.v, idx.col.vms)
-  all.merged.agg  <- aggregate(all.merged[,idx.col],
-                      list(all.merged$LE_MET_level6, all.merged$month, all.merged$CSquare), sum, na.rm=TRUE )
-       #=> but this piece of code likely to be inefficient with large data set?
-
-  # TO DO: a rountine to convert further toward the fishframe format 
-
 
 }
+
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }
