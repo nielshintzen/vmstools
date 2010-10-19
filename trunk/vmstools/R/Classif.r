@@ -9,9 +9,9 @@
 #  PARAMETERS TO FILL IN DEPENDING OF THE SELECTED METHODS  #
 #############################################################
 #
-# STEP 1 : Choose the method for the selection of species : 3 methods : CAH, total, logevent
+# STEP 1 : Choose the method for the selection of species : 3 methods : HAC, totale, logevent
 #
-# CAH : we view as main species, all species which are not belonging to the cluster with the smaller mean
+# HAC : we view as main species, all species which are not belonging to the cluster with the smaller mean
 # 2 parameters to fill in : param1 for the distance between individuals ("euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski")
 #                           param2 for the agregative distance (distance between clusters) ("ward", "single", "complete", "average", "mcquitty", "median" or "centroid")
 #
@@ -25,12 +25,15 @@
 # STEP 2 : PCA or not ?
 #
 # pca : we execute a PCA on the individuals "logevents", and compute the classification on the factorial coordinates of the logevents
+# 1 parameter to fill in : criterion for the criterion of number of factorial axis selection (70percents for taking all first factorial axis until having at least 70% of initial inertia)
+#                                                                                            (screetest for using the scree-test)
+#
 # nopca : we choose to work with the raw data to compute the classification of logevents
 #
 #
-# STEP 3 : Choose the method for the classification of logevents : CAH, KMEANS, PAM, CLARA ?
+# STEP 3 : Choose the method for the classification of logevents : HAC, KMEANS, PAM, CLARA ?
 #
-# CAH, 2 parameters to fill in : param3 for the distance between individuals ("euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski")
+# HAC, 2 parameters to fill in : param3 for the distance between individuals ("euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski")
 #                                param4 for the agregative distance (distance between clusters) ("ward", "single", "complete", "average", "mcquitty", "median" ou "centroid")
 #
 # KMEANS, no parameter to fill in
@@ -42,8 +45,8 @@
 
 
 
-# Classif : function for the selection of species (hac, total, logevent), PCA (pca, nopca), classification of logevents (hac, kmeans, pam, and clara) and métiers computation (thanks to test-values)
-classif=function(dat,methSpecies="hac",param1="euclidean",param2="ward",pcaYesNo="pca",methMetier="clara",param3="euclidean",param4=NULL){
+# Classif : function for the selection of species (hac, totale, logevent), PCA (pca, nopca), classification of logevents (hac, kmeans, pam, and clara) and métiers computation (thanks to test-values)
+classif=function(dat,analysisName="",methSpecies="hac",param1="euclidean",param2="ward",pcaYesNo="pca",criterion="70percents",methMetier="clara",param3="euclidean",param4=NULL){
 
 
 # First simplify the names of columns
@@ -64,16 +67,10 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
 
     toutfait=FALSE
     p=ncol(dat)   # Number of species
-
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
-    
+ 
     # Transform quantities to proportions of total quantity caught by logevent
     propdat=transformation_proportion(dat[,2:p])
     names(propdat)
-
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
     
     # Transposing data
     table_var=table_variables(propdat)
@@ -81,15 +78,7 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
     gc()
     
-#    list2=ls()
-#    list1=c("param1","param2","pcaYesNo","param3","param4","table_var")
-#    list3=list2[-which(list2 %in% list1)]
-#    rm(list=list3)
-#    rm(list1,list2)
-#    gc()
-
-    
-    # CAH
+#    CAH
 #    esp_dist=dist(table_var, method=param1)
 #    cah_var=hclust(esp_dist, method=param2)
 
@@ -153,8 +142,8 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
       }else{   # else we are stopping here and keeping the main species of the start
         toutfait=TRUE
       }
-      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-      gc()
+#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#      gc()
     }
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
@@ -165,14 +154,13 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
     #write.table(datSpecies, file="datSpecies.txt", quote=T, dec='.', sep=';', col.names=T, row.names=F)
     
   }
-  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-  gc()
   
   
   if(methSpecies=="totale"){
-
-    propdat=transformation_proportion(dat[,2:p])
+  
     p=length(dat[1,])   # Number of species
+    propdat=transformation_proportion(dat[,2:p])
+    
     # Total quantity caught species by species
     sumcol=numeric()
     for(i in 2:p){
@@ -205,49 +193,23 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
     datSpecies=building_tab_pca(propdat,nomespsel)
 
   }
-  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-  gc()
-  
+
 
   if(methSpecies=="logevent"){
 
     p=length(dat[1,])   # Number of species
     # Transform quantities to proportions of total quantity caught by logevent
     propdat=transformation_proportion(dat[,2:p])
- #   n=length(propdat[,1])       # Number of logevents
- #   nomespsel=numeric()
-    #seuil=seuillogevent(propdat)
     seuil=param1
     # Selection of species making up over param1% of logevent's captures
-    #  clu
     pourcent <- apply(propdat,1,function(x) which(x>seuil))   
     nomespsel <- names(propdat)[unique(unlist(pourcent))]  
-#    for(i in 1:n){
-#      # We are sorting the logevent by caught species decreasing order
-#      logeventdec=propdat[i,][order(propdat[i,],decreasing=T)]
-#      # We are recording the number of these species
-#      numesp=order(propdat[i,],decreasing=T)
-#      # We are selecting species making up over param1% of logevent's captures
-#      pourcent=which(logeventdec>seuil)
-#      # if some species are selected, we are recording their name
-#      if(length(pourcent)>0){
-#        espsel=numesp[1:length(pourcent)]
-#        nomespsel[i]=names(dat[,2:p][espsel])
-#      }else{      # else we are recording NA
-#        espsel=NULL
-#        nomespsel[i]="NA"
-#      }
-#    }
-
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
     
     # We are bulding the table with main species and aggregated other species
     datSpecies=building_tab_pca(propdat,nomespsel)
 
   }
-  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-  gc()
+
 
 
 
@@ -266,25 +228,39 @@ print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
     # PCA (Principal Component Analysis)
     log.pca <- PCA(datSpecies, graph=T)
     
-    savePlot(filename='Species projection on the two first factorial axis', type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'Species projection on the two first factorial axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
-    savePlot(filename='Individuals projection on the two first factorial axis', type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'Individuals projection on the two first factorial axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
     gc()
     
+    # Data frame given eigenvalues, inertia and cumulative inertia of factorial axis
+    tabInertia=data.frame(cbind(Axis=1:length(log.pca$eig[,1]), Eigenvalues=log.pca$eig[,1], Inertia=log.pca$eig[,2], CumulativeInertia=log.pca$eig[,3]))                  
+
+    # Determine the number of axis to keep
+    if(criterion=="70percents"){
+      nbaxes=which(log.pca$eig[,3]>70)[1]   # we are taking the axis until having 70% of total inertia
+    }
+    # OR
+    if(criterion=="screetest"){
+      nbaxes=which(scree(tabInertia[,3])$epsilon<0)[1]  # thanks to the scree-test
+    }
+      
     # Eigenvalues and relative graphics
     log.pca$eig                                                  
 
-    png("Eigen values.png", width = 1200, height = 800)
+    png(paste(analysisName,"Eigen values.png",sep="_"), width = 1200, height = 800)
     x=1:length(log.pca$eig[,1])
     barplot(log.pca$eig[,1],names.arg=x, main="Eigen values")
     dev.off()
-    png("Percentage of Inertia.png", width = 1200, height = 800)
-    barplot(log.pca$eig[,2],names.arg=x, main="Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
+    png(paste(analysisName,"Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
+    color=rep("grey",length(log.pca$eig[,1]))
+    color[1:nbaxes]="green"
+    barplot(log.pca$eig[,2],names.arg=x, col=color, main="Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
     dev.off()
-    png("Cumulative Percentage of Inertia.png", width = 1200, height = 800) 
+    png(paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
     color=rep("grey",length(log.pca$eig[,1]))
     numaxe=min(which(log.pca$eig[,3]>70))
     color[1:numaxe]="green"
@@ -292,12 +268,6 @@ print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
     abline(h=70, col="red")
     text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
     dev.off()   
-    
-    # Data frame given eigenvalues, inertia and cumulative inertia of factorial axis
-    tabInertia=data.frame(cbind(Axis=1:length(log.pca$eig[,1]), Eigenvalues=log.pca$eig[,1], Inertia=log.pca$eig[,2], CumulativeInertia=log.pca$eig[,3]))                  
-
-    # Determine the number of axis to keep
-    nbaxes=which(log.pca$eig[,3]>70)[1]   # we are taking the axis until having 70% of total inertia
     
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
     gc()
@@ -307,7 +277,7 @@ print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
     options(digits=6)       # significant digits
     
     # Projection of variables Species on the first factorial axis
-    png("Projection of Species on first factorial axis.png", width = 1200, height = 800)
+    png(paste(analysisName,"Projection of Species on first factorial axis.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(log.pca,choix="var",axes = c(1, 2),new.plot=FALSE,lim.cos2.var = 0.3)
     plot(log.pca,choix="var",axes = c(2, 3),new.plot=FALSE,lim.cos2.var = 0.3)
@@ -322,16 +292,14 @@ print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
     datLog=signif(log.coa$ind$coord, 5)
     #write.table(datLog, file="datLog.txt", quote=T, dec='.', sep=';', col.names=T, row.names=F)
   }
-  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-  gc()
+
 
 
   if(pcaYesNo=="nopca"){
     datLog=datSpecies
     tabInertia="No PCA"
   }
-  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-  gc()
+
 
 
 
@@ -428,24 +396,6 @@ print("######## STEP 3 CLUSTERING ########")
         sizeClusti=nrow(clusti)
         centerOfGravityClusti=colMeans(clusti)
         withinVarClustiPart=numeric()
-
-#        if(sizeClusti<10000){
-#          CoGWithClusti=rbind(centerOfGravityClusti,clusti)
-#          withinVarOneClust=1/sizeClusti*sum((dist(CoGWithClusti)[1:sizeClusti])^2)
-#        }else{
-#          for(j in 1:floor(sizeClusti/10000)){
-#            CoGWithClusti=rbind(centerOfGravityClusti,clusti[((j-1)*10000+1):(j*10000),])
-#            withinVarClustiPart[j]=1/10000*sum((dist(CoGWithClusti)[1:10000])^2)
-#          }
-#          CoGWithClusti=rbind(centerOfGravityClusti,clusti[((floor(sizeClusti/10000)*10000)+1):sizeClusti,])
-#          lastWithinVarClusti=1/(sizeClusti-floor(sizeClusti/10000)*10000)*sum(((dist(CoGWithClusti)[1:(sizeClusti-floor(sizeClusti/10000)*10000)])^2))
-#          withinVarClustiPart[(floor(sizeClusti/10000)+1)]=lastWithinVarClusti
-#
-#          withinVarOneClust=sum(withinVarClustiPart)
-#        }
-#
-#        withinVarClusters[k]=withinVarOneClust
-
         withinVarClusters[k]=1/sizeClusti*sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
 
       }
@@ -468,24 +418,6 @@ print("######## STEP 3 CLUSTERING ########")
       
     }
 
-    
-    
-    # Totale variance
-    #CoGDatLog=colMeans(datLog)
-    #
-    #for(j in 1:floor(nrow(datLog)/10000)){
-    #  CoGDatLogWithDatLog=rbind(CoGDatLog,datLog[((j-1)*10000+1):(j*10000),])
-    #  totaleVarPart[j]=sum(dist(CoGDatLogWithDatLog)[1:10001])
-    #}
-    #CoGDatLogWithDatLog=rbind(CoGDatLog,datLog[(floor(nrow(datLog)/10000)*10000):nrow(datLog),])
-    #lastTotaleVar=sum(dist(CoGDatLogWithDatLog)[1:((nrow(datLog)-floor(nrow(datLog)/10000)*10000)+1)])
-    #totaleVarPart[(floor(nrow(datLog)/10000)+1)]=lastTotaleVar
-    #totaleVar=sum(totaleVarPart)
-    #
-    #classifQuality[i]=classifWithinVar/totaleVar
-
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
     
     # Classification's quality
     classifQuality=classifWithinVar/classifBetweenVar
@@ -557,10 +489,6 @@ print("######## STEP 3 CLUSTERING ########")
     withinVarClusterOnTot=withinVarClusters/(classifBetweenVar+sum(withinVarClusters))*100
     betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+sum(withinVarClusters))*100
 
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
-
-
 
     # Calculation of each cluster size
     n=nrow(datLog)
@@ -579,7 +507,7 @@ print("######## STEP 3 CLUSTERING ########")
 
 
     # Projections on the first factorial plans
-    png("HAC_Projections.png", width = 1200, height = 800)
+    png(paste(analysisName,"HAC_Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
@@ -590,20 +518,9 @@ print("######## STEP 3 CLUSTERING ########")
     par(op)
     dev.off()
 
-
-#    png("OTB_HAC_Projections2.png", width = 1200, height = 800)
-#    op <- par(mfrow=c(2,3))
-#    plot(datLog[,1], datLog[,2], pch=21, bg=c("blue","red","green21","yellow","black")[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
-#    plot(datLog[,2], datLog[,3], pch=21, bg=c("blue","red","green","yellow","black")[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
-#    plot(datLog[,1], datLog[,3], pch=21, bg=c("blue","red","green","yellow","black")[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 1-3", xlab="axis 1", ylab="axis 3")
-#    plot(datLog[,1], datLog[,4], pch=21, bg=c("blue","red","green","yellow","black")[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 1-4", xlab="axis 1", ylab="axis 4")
-#    plot(datLog[,2], datLog[,4], pch=21, bg=c("blue","red","green","yellow","black")[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 2-4", xlab="axis 2", ylab="axis 4")
-#    plot(datLog[,3], datLog[,4], pch=21, bg=c("blue","red","green","yellow","black")[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 3-4", xlab="axis 3", ylab="axis 4")
-#    par(op)
-#    dev.off()
     
     # Rectangles plotting
-    png("HAC_Dendogram.png", width = 1200, height = 800)
+    png(paste(analysisName,"HAC_Dendogram.png",sep="_"), width = 1200, height = 800)
     plclust(log.hac,labels=F,hang=-1,ann=F)
     title(main="HAC dendogram",xlab="Logevents",ylab="Height")
     rect.hclust(log.hac, k=nbClust)
@@ -612,7 +529,7 @@ print("######## STEP 3 CLUSTERING ########")
 
     # Mean profile of the dataset
     meanprofile=mean(datSpecies)
-    png("Mean profile of the dataset.png", width = 1200, height = 800)
+    png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
     barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
@@ -627,7 +544,7 @@ print("######## STEP 3 CLUSTERING ########")
       mprofilclusti=mean(datSpecies[which(clusters==k),])
       mprofil=rbind(mprofil,mprofilclusti)
     }
-    png("Mean profile by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -646,7 +563,7 @@ print("######## STEP 3 CLUSTERING ########")
       sdprofilclusti=sd(datSpecies[which(clusters==i),])
       sdprofil=rbind(sdprofil,sdprofilclusti)
     }
-    png("Standard deviation profile by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -658,13 +575,13 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Standard deviation profile by cluster")
     dev.off()
 
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc()
     
     
     # Number of Logevents by cluster
     x=c(1:nbClust)
-    png("Number of Logevents by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
     coord=barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
     barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
     text(coord,sizeClusters-500,sizeClusters,font=2)
@@ -686,7 +603,7 @@ print("######## STEP 3 CLUSTERING ########")
       targetresval=rbind(targetresval,targetresvalclusti)
     }
 
-    png("Profile of target species by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Profile of target species by cluster.png",sep="_"), width = 1200, height = 800)
     #op <- par(mfrow=c(rep(ceiling(sqrt(nbClust)),2)))
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
@@ -699,11 +616,10 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Profile of target species by cluster")
     dev.off()
     
-    return(list(clusters=clusters, sizeClusters=sizeClusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, classifQuality=classifQuality, mProfilSample=mProfilSample))
+    return(list(clusters=clusters, sizeClusters=sizeClusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample))
 
   }
-  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-  gc()
+
 
 
 
@@ -718,7 +634,7 @@ print("######## STEP 3 CLUSTERING ########")
       clustersKmeans=kmeans(datLog, k, iter.max=20, nstart=5)
       varintra[k]=1/nbLog*sum(clustersKmeans$withinss)
     }
-    png("Within Variance Kmeans.png", width = 1200, height = 800)
+    png(paste(analysisName,"Within Variance Kmeans.png",sep="_"), width = 1200, height = 800)
     plot(varintra,main="Within clusters variance",xlab="Number of clusters",ylab="Within Variance")
     dev.off()
 
@@ -754,7 +670,7 @@ print("######## STEP 3 CLUSTERING ########")
 
 
     # Projections on the first factorial plans
-    png("KMEANS_Projections.png", width = 1200, height = 800)
+    png(paste(analysisName,"KMEANS_Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
@@ -768,7 +684,7 @@ print("######## STEP 3 CLUSTERING ########")
     
     # Mean profile of the dataset
     meanprofile=mean(datSpecies)
-    png("Mean profile of the dataset.png", width = 1200, height = 800)
+    png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
     barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
@@ -784,7 +700,7 @@ print("######## STEP 3 CLUSTERING ########")
       mprofilclusti=mean(datSpecies[which(clusters$cluster==i),])
       mprofil=rbind(mprofil,mprofilclusti)
     }
-    png("Mean profile by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -796,8 +712,8 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Mean profile by cluster")
     dev.off()
     
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc()
     
     
     # Standard deviation profiles by cluster
@@ -806,7 +722,7 @@ print("######## STEP 3 CLUSTERING ########")
       sdprofilclusti=sd(datSpecies[which(clusters$cluster==i),])
       sdprofil=rbind(sdprofil,sdprofilclusti)
     }
-    png("Standard deviation profile by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -821,7 +737,7 @@ print("######## STEP 3 CLUSTERING ########")
 
     # Number of Logevents by cluster
     x=c(1:nbClust)
-    png("Number of Logevents by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
     coord=barplot(clusters$size, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
     barplot(clusters$size, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
     text(coord,clusters$size-600,clusters$size,font=2)
@@ -844,7 +760,7 @@ print("######## STEP 3 CLUSTERING ########")
       targetresval=rbind(targetresval,targetresvalclusti)
     }
 
-    png("Profile of target species by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Profile of target species by cluster.png",sep="_"), width = 1200, height = 800)
     #op <- par(mfrow=c(rep(ceiling(sqrt(nbClust)),2)))
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
@@ -858,11 +774,10 @@ print("######## STEP 3 CLUSTERING ########")
     dev.off()
 
     
-    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib))
+    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot))
 
   }                                                                                                         
-  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-  gc()
+
 
 
 
@@ -878,7 +793,7 @@ print("######## STEP 3 CLUSTERING ########")
       clustersPam.silcoeff [k] <- clustersPam$silinfo$avg.width
     }
 
-    png("silcoeffpam.png", width = 1200, height = 800)
+    png(paste(analysisName,"silcoeffpam.png",sep="_"), width = 1200, height = 800)
     plot(clustersPam.silcoeff)     # k optimal corresponds to maximum of silhouette's coefficients
     dev.off()
 
@@ -904,6 +819,7 @@ print("######## STEP 3 CLUSTERING ########")
     gc()
     
     # Quality of classification
+    nbLog=nrow(datLog)
     centerOfGravityClassif=numeric()
     centerOfGravityDatLog=colMeans(datLog)
     centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
@@ -913,11 +829,13 @@ print("######## STEP 3 CLUSTERING ########")
       centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
     }
-    classifBetweenVar=1/nrow(datLog)*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
-    classifWithinVar=1/nrow(datLog)*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
+    classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
+    classifWithinVar=1/nbLog*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
     classifQuality=classifWithinVar/classifBetweenVar
+    withinVarClustersOnTot=(clusters$clusinfo[,1]*clusters$clusinfo[,3]/nbLog)*100/(classifWithinVar+classifBetweenVar)
+    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
     
-    
+
     # Compute the test-values for species
     resval=test.values(clusters$clustering,datSpecies)
     # Determine the target species
@@ -925,7 +843,7 @@ print("######## STEP 3 CLUSTERING ########")
 
     
     # Projections on the first factorial plans
-    png("PAM_Projections.png", width = 1200, height = 800)
+    png(paste(analysisName,"PAM_Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="Projection of PAM classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="Projection of PAM classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
@@ -939,7 +857,7 @@ print("######## STEP 3 CLUSTERING ########")
     
     # Mean profile of the dataset
     meanprofile=mean(datSpecies)
-    png("Mean profile of the dataset.png", width = 1200, height = 800)
+    png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
     barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
@@ -955,7 +873,7 @@ print("######## STEP 3 CLUSTERING ########")
       mprofilclusti=mean(datSpecies[which(clusters$clustering==i),])
       mprofil=rbind(mprofil,mprofilclusti)
     }
-    png("Mean profile by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -966,8 +884,8 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Mean profile by cluster")
     dev.off()
     
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc()
     
     
     # Standard deviation profile by cluster
@@ -976,7 +894,7 @@ print("######## STEP 3 CLUSTERING ########")
       sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])
       sdprofil=rbind(sdprofil,sdprofilclusti)
     }
-    png("Standard deviation profile by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -991,7 +909,7 @@ print("######## STEP 3 CLUSTERING ########")
 
     # Number of Logevents by cluster
     x=c(1:nbClust)
-    png("Number of Logevents by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
     coord=barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
     barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
     text(coord,clusters$clusinfo[,1]-600,clusters$clusinfo[,1],font=2)
@@ -1012,7 +930,7 @@ print("######## STEP 3 CLUSTERING ########")
       targetresval=rbind(targetresval,targetresvalclusti)
     }
 
-    png("Profile of target species by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Profile of target species by cluster.png",sep="_"), width = 1200, height = 800)
     #op <- par(mfrow=c(rep(ceiling(sqrt(nbClust)),2)))
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
@@ -1024,11 +942,10 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Profile of target species by cluster")
     dev.off()
 
-    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, classifQuality=classifQuality))
+    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot))
 
   }
-  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-  gc()
+
 
 
 
@@ -1036,16 +953,16 @@ print("######## STEP 3 CLUSTERING ########")
 ########################################################################################################################################   CLARA
 
   if(methMetier=="clara"){
-    n=nrow(datLog)
+    nbLog=nrow(datLog)
 
     # Calculation of optimal k thanks to the silhouette
     clustersClara.silcoeff=numeric()
     for (k in 2:15){
-      clustersClara=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(n,40+2*k))
+      clustersClara=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
 
-    png("silcoeffclara.png", width = 1200, height = 800)
+    png(paste(analysisName,"silcoeffclara.png",sep="_"), width = 1200, height = 800)
     plot(clustersClara.silcoeff, main="Silhouette of the classification", xlab="Number of clusters", ylab="Silhouette")               # k optimal corresponds to maximum of silhouette's coefficients
     dev.off()
     
@@ -1057,7 +974,7 @@ print("######## STEP 3 CLUSTERING ########")
     k=which(clustersClara.silcoeff==max)
     
     # CLARA with optimal k
-    clusters=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(n,40+2*k))  # CLARA with optimal k
+    clusters=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))  # CLARA with optimal k
     summary(clusters)
 
 #    #Silhouette of CLARA with optimal k
@@ -1084,13 +1001,15 @@ print("######## STEP 3 CLUSTERING ########")
       centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
     }
-    classifBetweenVar=1/nrow(datLog)*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
-    classifWithinVar=1/nrow(datLog)*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
+    classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
+    classifWithinVar=1/nbLog*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
     classifQuality=classifWithinVar/classifBetweenVar
+    withinVarClustersOnTot=(clusters$clusinfo[,1]*clusters$clusinfo[,3]/nbLog)*100/(classifWithinVar+classifBetweenVar)
+    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
 
 
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc()
 
 
     # Compute the test-values for species
@@ -1099,7 +1018,7 @@ print("######## STEP 3 CLUSTERING ########")
     target=targetspecies(resval)
     
     # Projections on the first factorial plans
-    png("CLARA_Projections.png", width = 1200, height = 800)
+    png(paste(analysisName,"CLARA_Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="Projection of CLARA classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="Projection of CLARA classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
@@ -1113,7 +1032,7 @@ print("######## STEP 3 CLUSTERING ########")
 
     # Mean profile of the dataset
     meanprofile=mean(datSpecies)
-    png("Mean profile of the dataset.png", width = 1200, height = 800)
+    png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
     barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
@@ -1129,7 +1048,7 @@ print("######## STEP 3 CLUSTERING ########")
       mprofilclusti=mean(datSpecies[which(clusters$clustering==i),])
       mprofil=rbind(mprofil,mprofilclusti)
     }
-    png("Mean profile by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -1148,7 +1067,7 @@ print("######## STEP 3 CLUSTERING ########")
       sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])
       sdprofil=rbind(sdprofil,sdprofilclusti)
     }
-    png("Standard deviation profile by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -1160,13 +1079,10 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Standard deviation profile by cluster")
     dev.off()
     
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
-    
 
     # Number of Logevents by cluster
     x=c(1:nbClust)
-    png("Number of Logevents by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
     coord=barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
     barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
     text(coord,clusters$clusinfo[,1]-600,clusters$clusinfo[,1],font=2)
@@ -1188,7 +1104,7 @@ print("######## STEP 3 CLUSTERING ########")
       targetresval=rbind(targetresval,targetresvalclusti)
     }
 
-    png("Profile of target species by cluster.png", width = 1200, height = 800)
+    png(paste(analysisName,"Profile of target species by cluster.png",sep="_"), width = 1200, height = 800)
     #op <- par(mfrow=c(rep(ceiling(sqrt(nbClust)),2)))
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
@@ -1201,13 +1117,9 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Profile of target species by cluster")
     dev.off()
     
-    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, classifQuality=classifQuality))
+    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot))
 
-  }
-  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-  gc()
-  
+  }  
   # end of the methods
 
 } # end of the function "classif"
-
