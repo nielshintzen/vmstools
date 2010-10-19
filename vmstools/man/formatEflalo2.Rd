@@ -1,8 +1,7 @@
 \name{formatEflalo2}
 \alias{formatEflalo2}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
+\title{Format eflalo2 data
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
