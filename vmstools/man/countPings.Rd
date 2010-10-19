@@ -7,7 +7,7 @@ This function counts the number of pings in the tacsat data for each trip and th
 \usage{
 countPings(tacsat = tacsat1f)
 \arguments{
-  \item{tacsat}{data.frame, tacsat typically with only fishing pings identified}
+  \item{data.frame, tacsat typically with only fishing pings identified}
 }
 \details{}
 \value{}
