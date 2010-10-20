@@ -52,12 +52,13 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
 
 \examples{
 
+ \dontrun{
   data(eflalo2)
   data(tacsat)
-  data(harbours)
+  data(euharbours)
   tacsat$SI_HARB <- NA
   library(doBy)
-  inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=harbours,30)
+  inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours,30)
   tacsat$SI_FT <- 1 # init
   idx <- which(inHarb==0)
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
@@ -65,18 +66,18 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
 
- 
+  # add missing harbours?
+  #...
+                       
   
-  # debug: change funny names of vesselid
-  eflalo2$VE_REF <- matrix(unlist(strsplit(as.character(eflalo2$VE_REF),":")),ncol=2,byrow=T)[,2]
-  tacsat$VE_REF <- matrix(unlist(strsplit(as.character(tacsat$VE_REF),":")),ncol=2,byrow=T)[,2]
-
+  # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
+  eflalo <- mergeEflaloSpecies (eflalo2, threshold=1e6) 
   
-  # reduce the size of the eflalo data by merging species (e.g. merge if <100 tons)
-  eflalo <- mergeEflaloSpecies (eflalo2, threshold=100000) 
+  # debug
+  eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA",]
   
   # TEST FOR A GIVEN SET OF VESSELS
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
+  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
@@ -89,10 +90,10 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   load(file.path("C:","output","merged_35_2009.RData"))
   
   # ...or bind all vessels
-  bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), what=character(), 
+  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), what=character(), 
                       folder = file.path("C:","output"))
  
-   # load the merged output table for all vessels
+   # ...and load the merged output table for all vessels
   load(file.path("C:","output","all_merged_2009.RData"))
              
   # map landing of sole from all studied vessels
@@ -104,6 +105,16 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   # remove steaming points before gridding!
   df2<-df1[-which(is.na(df1$LE_KG_SOL)),]
   vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+
+
+  # CONVERT TO FISHFRAME FORMAT VE
+  ff.ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","output"),
+                                          a.year=2009, a.country="NLD"))
+  
+  # TO FISHFRAME FORMAT VL
+  ff.vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","output"),
+                                          a.year=2009, a.country="NLD"))
+  }
 
 
 }
