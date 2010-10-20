@@ -19,8 +19,6 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                           #-link vessels in tacsat to eflalo
                           tacefmatch <- pmatch(sort(unique(Ta$VE_REF)),sort(unique(Ef$VE_REF)))
                                  
-                          
-                          
                           #-loop over all the vessels in tacsat
                           for(i in 1:length(tacefmatch)){
                           
@@ -35,8 +33,6 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                             { 
                             splitTa[[i]]$FT_REF <- 0
                             } 
-                            
-                            
                             
                             else {
                               
@@ -56,20 +52,18 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                               #-Assign Tacsat data with FT_REF from Eflalo2 dataset where they link
                               
                               if(length(st)!=1){
-                            
-                            
+                          
                                 idx   <- unlist(mapply(seq,st,en))
                                 reps  <- unlist(lapply(mapply(seq,st,en),length))
                                 splitTa[[i]]$FT_REF      <- 0
                                 splitTa[[i]]$FT_REF[idx] <- rep(tripn[subse],reps)
                               } 
                               if(length(st)==1){
-                              
                                 splitTa[[i]]$FT_REF <- 0
                                 splitTa[[i]]$FT_REF[seq(st,en)] <- rep(tripn[subse],length(seq(st,en)))
                               }
                               if(length(st)==0){
-                                  print(paste("4",i))
+                     
                                 splitTa[[i]]$FT_REF <- 0
                               }
                             }
