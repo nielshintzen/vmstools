@@ -58,7 +58,7 @@ vmsGridCreate(dF
 }
 \details{}
 \value{ a \code{SpatialGridDataFrame} object of the grid defined in package \code{sp} }
-\references{EU Lot 2 project}
+\references{EU VMS tools project}
 \author{Andy South}
 \note{}
 \seealso{\code{mapGrid()}}
