@@ -163,11 +163,10 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
     
     # Total quantity caught species by species
     sumcol=numeric()
-    for(i in 2:p){
-      sumcol[i]=sum(dat[,i])
-    }
-    #clu 
-    # sumcol <- apply(dat[,-1],2,sum)
+#    for(i in 2:p){
+#      sumcol[i]=sum(dat[,i])
+#    }
+    sumcol <- apply(dat[,-1],2,sum)
     
     # Total quantity caught
     sumtotale=sum(sumcol,na.rm=T)
@@ -957,7 +956,7 @@ print("######## STEP 3 CLUSTERING ########")
 
     # Calculation of optimal k thanks to the silhouette
     clustersClara.silcoeff=numeric()
-    for (k in 3:15){
+    for (k in 2:15){
       clustersClara=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
