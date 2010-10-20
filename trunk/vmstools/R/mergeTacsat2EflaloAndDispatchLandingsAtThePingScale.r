@@ -341,7 +341,10 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
      
         ## ADD A WARNING IN CASE OF LONG (UNREALISTIC) TRIPS ##
-        idx <- which(((table.midtime$date.in.R.arr - table.midtime$date.in.R.dep ) /24) >30)   # if at least one trip >30 days
+        diff.date <- table.midtime$date.in.R.arr - table.midtime$date.in.R.dep    # if at least one trip >30 days
+        if(attributes(diff.date)$units=="secs")  idx <- which((((diff.date)/3600)/24) >30)  
+        if(attributes(diff.date)$units=="hours")  idx <- which((((diff.date)/1)/24) >30)  
+        attributes((table.midtime$date.in.R.arr - table.midtime$date.in.R.dep ))
         if (length( idx) >0){
              cat(paste("at least one vms trip > 30 days detected! check harbours...", "\n", sep=""))
             suspicious <- .vms[.vms$SI_FT %in%  table.midtime$SI_FT[idx] ,]
@@ -783,7 +786,7 @@ return()
  if(FALSE) {
 
 
-  
+  #\dontrun{
   data(eflalo2)
   data(tacsat)
   data(euharbours)
@@ -800,13 +803,12 @@ return()
   # add missing harbours?
   #...
                        
-  # debug: change funny names of vesselid
-  eflalo2$VE_REF <- matrix(unlist(strsplit(as.character(eflalo2$VE_REF),":")),ncol=2,byrow=T)[,2]
-  tacsat$VE_REF <- matrix(unlist(strsplit(as.character(tacsat$VE_REF),":")),ncol=2,byrow=T)[,2]
-
   
   # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
   eflalo <- mergeEflaloSpecies (eflalo2, threshold=1e6) 
+  
+  # debug
+  eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA",]
   
   # TEST FOR A GIVEN SET OF VESSELS
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
@@ -846,5 +848,6 @@ return()
   # TO FISHFRAME FORMAT VL
   ff.vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD"))
+  #}
  
 } # end main
