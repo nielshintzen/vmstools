@@ -119,9 +119,10 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
       #!#!##!#!##!#!##!#!##!#!##!#!#
       #!#!##!#!##!#!##!#!##!#!##!#!#
       all.vesselid     <- as.character(unique(logbooks[an(logbooks$VE_LEN)>=0,]$VE_REF)) 
+      all.vesselid     <- all.vesselid[!is.na(all.vesselid)] # e.g. when VE_LEN at NA exists     
       if(length(lstargs$a.vesselid)!=0) all.vesselid <- lstargs$a.vesselid 
        # => IF ARG INFORMED, THEN KEEP ONLY ONE OR SEVERAL VESSELS AS NEEDED....
-
+browser()
       for(a.vesselid in all.vesselid){  # PER VESSEL
                 cat(paste(a.vesselid,"\n", sep="" ))
        
