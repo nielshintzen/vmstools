@@ -4,25 +4,19 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                           D_DATIM   <- as.POSIXct(paste(eflalo2$FT_DDAT, eflalo2$FT_DTIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S") 
                           L_DATIM   <- as.POSIXct(paste(eflalo2$FT_LDAT, eflalo2$FT_LTIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S") 
                           SI_DATIM  <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
-                          
                           Ta        <- cbind(tacsat,SI_DATIM)
                           Ef        <- cbind(eflalo2,D_DATIM,L_DATIM)
-                          
                           #-Order the data by time
                           Ef        <- orderBy(~VE_REF+D_DATIM+L_DATIM,data=Ef)
                           Ta        <- orderBy(~VE_REF+SI_DATIM,data=Ta)
-                          
                           #-Split the Eflalo and Tacsat data by vessel
                           splitEf   <- split(Ef,Ef$VE_REF)
                           splitTa   <- split(Ta,Ta$VE_REF)
-                          
                           #-link vessels in tacsat to eflalo
                           tacefmatch <- pmatch(sort(unique(Ta$VE_REF)),sort(unique(Ef$VE_REF)))
-                                 
                           #-loop over all the vessels in tacsat
                           for(i in 1:length(tacefmatch)){
-                          
-                            pm    <- tacefmatch[i]
+                          pm    <- tacefmatch[i]
                             eftim <- splitEf[[pm]][which(duplicated(splitEf[[pm]]$FT_REF)==F),c("D_DATIM","L_DATIM","FT_REF")]
                             dtime <- eftim[,1]
                             ltime <- eftim[,2]
