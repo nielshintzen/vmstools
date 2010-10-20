@@ -18,10 +18,11 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                           
                           #-link vessels in tacsat to eflalo
                           tacefmatch <- pmatch(sort(unique(Ta$VE_REF)),sort(unique(Ef$VE_REF)))
+                                 
+                          
                           
                           #-loop over all the vessels in tacsat
                           for(i in 1:length(tacefmatch)){
-                       
                           
                             pm    <- tacefmatch[i]
                             eftim <- splitEf[[pm]][which(duplicated(splitEf[[pm]]$FT_REF)==F),c("D_DATIM","L_DATIM","FT_REF")]
@@ -53,21 +54,28 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                               en <- en[subse]
                               
                               #-Assign Tacsat data with FT_REF from Eflalo2 dataset where they link
+                              
                               if(length(st)!=1){
+                            
+                            
                                 idx   <- unlist(mapply(seq,st,en))
                                 reps  <- unlist(lapply(mapply(seq,st,en),length))
                                 splitTa[[i]]$FT_REF      <- 0
                                 splitTa[[i]]$FT_REF[idx] <- rep(tripn[subse],reps)
                               } 
                               if(length(st)==1){
+                              
                                 splitTa[[i]]$FT_REF <- 0
                                 splitTa[[i]]$FT_REF[seq(st,en)] <- rep(tripn[subse],length(seq(st,en)))
                               }
                               if(length(st)==0){
+                                  print(paste("4",i))
                                 splitTa[[i]]$FT_REF <- 0
                               }
                             }
                           }
+                          
+                          
                           Ta$FT_REF <- unlist(lapply(splitTa,function(x){return(x$FT_REF)}))
                               
                       return(Ta)}
