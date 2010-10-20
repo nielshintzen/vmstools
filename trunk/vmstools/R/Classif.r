@@ -616,7 +616,7 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Profile of target species by cluster")
     dev.off()
     
-    return(list(clusters=clusters, sizeClusters=sizeClusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample))
+    return(list(clusters=clusters, sizeClusters=sizeClusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
   }
 
@@ -774,7 +774,7 @@ print("######## STEP 3 CLUSTERING ########")
     dev.off()
 
     
-    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot))
+    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
   }                                                                                                         
 
@@ -942,7 +942,7 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Profile of target species by cluster")
     dev.off()
 
-    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot))
+    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
   }
 
@@ -957,7 +957,7 @@ print("######## STEP 3 CLUSTERING ########")
 
     # Calculation of optimal k thanks to the silhouette
     clustersClara.silcoeff=numeric()
-    for (k in 2:15){
+    for (k in 3:15){
       clustersClara=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
@@ -1117,7 +1117,7 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Profile of target species by cluster")
     dev.off()
     
-    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot))
+    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
   }  
   # end of the methods
