@@ -1,8 +1,7 @@
 \name{shortenEflalo2}
 \alias{shortenEflalo2}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{
-%%  ~~function to do ... ~~
+\title{Cuts up eflalo according to any particular combination of species to make it more manageable
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
@@ -33,7 +32,7 @@ shortenEflalo2(data = eflalo2, which.species = c("ANE", "BIB", "BLL", "COD", "DA
 %% ~put references to the literature/web site here ~
 }
 \author{
-%%  ~~who you are~~
+Doug Beare
 }
 \note{
 %%  ~~further notes~~
