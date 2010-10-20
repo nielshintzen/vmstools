@@ -47,8 +47,8 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                               
                               if(length(st)!=1){
                           
-                                idx   <- unlist(mapply(seq,st,en))
-                                reps  <- unlist(lapply(mapply(seq,st,en),length))
+                                idx   <- unlist(mapply(seq,st,en,SIMPLIFY=FALSE))
+                                reps  <- unlist(lapply(mapply(seq,st,en,SIMPLIFY=FALSE),length))
                                 splitTa[[i]]$FT_REF      <- 0
                                 splitTa[[i]]$FT_REF[idx] <- rep(tripn[subse],reps)
                               } 
