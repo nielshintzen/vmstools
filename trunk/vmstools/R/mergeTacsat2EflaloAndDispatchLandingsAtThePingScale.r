@@ -206,8 +206,9 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          # filter if vessel with a bad vms
          to.remove.because.deficient.vms <- any(is.na(vms.this.vessel$SI_FT))
          to.remove.because.not.enough.vms.trips <- length(unique(vms.this.vessel$SI_FT))< 2  # nb vms trips < 2
+         to.remove.because.pble.lgbk <- length(unique(logbk.this.vessel$FT_REF))< 2  # nb logbk trips < 2
          if(length(unique(vms.this.vessel$SI_FT))<2) warning('need more than 1 trip in SI_FT')
-         a.flag <- to.remove.because.deficient.vms ||  to.remove.because.not.enough.vms.trips
+         a.flag <- to.remove.because.deficient.vms ||  to.remove.because.not.enough.vms.trips || to.remove.because.pble.lgbk
          
          ## remove bk.tripnum and mid.time if it exists
          vms.this.vessel <- vms.this.vessel[, !colnames(vms.this.vessel) %in% c("bk.tripnum", "mid.time")]
