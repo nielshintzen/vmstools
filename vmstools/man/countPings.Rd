@@ -1,11 +1,8 @@
 \name{countPings}
 \alias{countPings}
 \title{Ping counting over trips}
-\description{
-This function counts the number of pings in the tacsat data for each trip and then merges them with that same file.
-}
-\usage{
-countPings(tacsat = tacsat1f)}
+\description{This function counts the number of pings in the tacsat data for each trip and then merges them with that same file}
+\usage{countPings(tacsat = tacsat1f)}
 \arguments{
   \item{data.frame, tacsat typically with only fishing pings identified}
 }
@@ -15,15 +12,8 @@ countPings(tacsat = tacsat1f)}
 \author{Doug Beare}
 \note{
 }
-
-
-
-\seealso{
-}
-\examples{
-
-
-}
+\seealso{}
+\examples{}
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
 \keyword{ ~kwd1 }
