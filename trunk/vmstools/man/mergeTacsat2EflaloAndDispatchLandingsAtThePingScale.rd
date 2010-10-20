@@ -74,7 +74,7 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   eflalo <- mergeEflaloSpecies (eflalo2, threshold=1e6) 
   
   # debug
-  eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA", & !is.na(eflalo2$VE_REF),]
+  eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" & !is.na(eflalo2$VE_REF),]
   
   # TEST FOR A GIVEN SET OF VESSELS
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
