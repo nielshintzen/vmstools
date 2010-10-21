@@ -112,7 +112,8 @@
 
   # 9. convert species fao code to fishframe latin species names
   data(speciesLatinNames)
-  res$species <- speciesLatinNames$fao_code[match(res$species, speciesLatinNames$ff_species_latin)]
+  res$species <-  speciesLatinNames$ff_species_latin[match(as.character(res$species), as.character(speciesLatinNames$fao_code))]
+
 
   # 10. order colums
   ff.vsl <- res
