@@ -110,20 +110,23 @@
   res$quarter <- res$month  # init
   levels(res$quarter) <- c(1,1,1,2,2,2,3,3,3,4,4,4)
 
+  # 9. convert species fao code to fishframe latin species names
+  data(speciesLatinNames)
+  res$species <- speciesLatinNames$fao_code[match(res$species, speciesLatinNames$ff_species_latin)]
 
-  # 9. order colums
+  # 10. order colums
   ff.vsl <- res
   ff.vsl <- as.data.frame(ff.vsl)[, c('recordtype','country','year','quarter', 'month', 
                'ICES_area','c_square', 'nationalFAC', 'LE_MET_level6',
                  'species','weight','value')]
-  # 10. save
+  # 11. save
   write.table(ff.vsl, file=file.path(general$output.path, 
          paste("ff_vsl_", general$a.year, ".txt", sep='')),  dec=".", sep=";", quote=FALSE, row.names=FALSE)
 
  
  return(ff.vsl)
  }
- #}
+#}
          
  # call
  #tmp <- mergedTable2FishframeVSL (general=list(output.path=file.path("H:","DIFRES","VMSanalysis","results_merged","DKWaters"),
