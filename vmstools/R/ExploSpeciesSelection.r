@@ -1,18 +1,23 @@
 # Exploration of Step 1 : SELECTION OF SPECIES
 
-ExploSpeciesSelection=function(dat){
+ExploSpeciesSelection=function(dat,analysisName="",Val="EURO"){
+
+dat <- dat[,c("LE_ID",grep(Val,names(dat),value=T))]
+dat[is.na(dat)] <- 0  
+
 
     # First simplify the names of columns
     names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 
     # HAC
-    
     print("######## STEP 1 SELECTION OF MAIN SPECIES BY 'HAC' METHOD ########")
     
     toutfait=FALSE
     p=ncol(dat)   # Number of species
     n=nrow(dat)
     # Transform quantities to proportions of total quantity caught by logevent
+    print("calculating proportions...") 
+
     propdat=transformation_proportion(dat[,2:p])
     nameSpecies=names(propdat)
     nameSpecies
@@ -20,8 +25,9 @@ ExploSpeciesSelection=function(dat){
     table_var=table_variables(propdat)
 
     # HAC
+    print("cluster...")
     cah_var=hcluster(table_var, method="euclidean", link="ward")
-    
+
     # Select the number of clusters by scree-test
     inerties.vector=cah_var$height[order(cah_var$height,decreasing=T)]
     nb.finalclusters=which(scree(inerties.vector)$epsilon<0)[1]
@@ -32,6 +38,10 @@ ExploSpeciesSelection=function(dat){
     # Selection of main species
     nomespsel=select_species(dat[,2:p],cah_cluster_var)
     espdata=names(dat[,2:p])
+    cat("main species:",nomespsel,"\n")
+
+
+print("selection of possible residual species...")        
     
     while(toutfait==FALSE){
       ind_princ=which(is.element(espdata,nomespsel))
@@ -40,8 +50,7 @@ ExploSpeciesSelection=function(dat){
       resi=table_var[ind_autres,]
 
       # HAC on residual species group
-      resiesp_dist=dist(resi, method="euclidean")
-      resicah_var=hclust(resiesp_dist, method="ward")
+      resicah_var=hcluster(resi, method="euclidean", link="ward")
       # Select the number of clusters by scree-test
       resiinerties.vector=resicah_var$height[order(resicah_var$height,decreasing=T)]
       resinbclusters=which(scree(resiinerties.vector)$epsilon<0)[1]
@@ -64,6 +73,8 @@ ExploSpeciesSelection=function(dat){
       # if the cluster owns only one species, we are adding the species to the main species and restart the CAH with residuals species
       if(length(which(resicah_cluster_var==indclusmax))==1){
         nomespsel=c(nomespsel,names(which(resicah_cluster_var==indclusmax)))
+        print(paste("adding species", names(which(resicah_cluster_var==indclusmax)))) 
+
         toutfait=FALSE
       }else{   # else we are stopping here and keeping the main species of the start
         toutfait=TRUE
@@ -72,8 +83,9 @@ ExploSpeciesSelection=function(dat){
 
     # Return the dataset retaining only the main species
     #datSpecies=building_tab_pca(propdat,nomespsel)
-    datSpeciesWithoutProp=building_tab_pca(dat,nomespsel)
+    datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
     nbMainSpeciesHAC=length(nomespsel)
+    NamesMainSpeciesHAC <- nomespsel
 
     pourcentCatchMainSpeciesHAC=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
     #Delete logevents without catch
@@ -91,11 +103,11 @@ ExploSpeciesSelection=function(dat){
     
     # Total quantity caught by species
     sumcol=numeric()
-    for(i in 2:p){
-      sumcol[i]=sum(dat[,i])
-    }
-    #clu
-    # sumcol <- apply(dat[,-1],2,sum)
+#    for(i in 2:p){
+#      sumcol[i]=sum(dat[,i])
+#    }
+    
+    sumcol <- apply(dat[,-1],2,sum)
 
     # Total quantity caught
     sumtotale=sum(sumcol,na.rm=T)
@@ -113,6 +125,7 @@ ExploSpeciesSelection=function(dat){
     medianPourcentCatchMainSpeciesTotale=numeric()
 
     for(seuil in seq(5,100,5)){
+      cat("seuil:",seuil,"\n")
       pourcent=which(propespcum<seuil)
       espsel=numesp[1:(length(pourcent)+1)]
       # We are taking the name of selected species
@@ -136,6 +149,7 @@ ExploSpeciesSelection=function(dat){
     }
     nbMainSpeciesTotale=c(0,nbMainSpeciesTotale)
     medianPourcentCatchMainSpeciesTotale=c(0,medianPourcentCatchMainSpeciesTotale)
+    NamesMainSpeciesTotale <- nomespsel[1:nbMainSpeciesHAC]
 
 
     # LOGEVENT
@@ -145,14 +159,17 @@ ExploSpeciesSelection=function(dat){
     nbMainSpeciesLogevent=numeric()
     medianPourcentCatchMainSpeciesLogevent=numeric()
 
+    AllNamesSpeciesLogevent <- vector()
     for(seuil in seq(5,100,5)){
+    cat("seuil:",seuil,"\n")
       # Selection of species making up over seuil% of logevent's captures
       pourcent <- apply(propdat,1,function(x) which(x>seuil))
       nomespsel <- names(propdat)[unique(unlist(pourcent))]
+      AllNamesSpeciesLogevent <- c(AllNamesSpeciesLogevent,nomespsel)
 
       # We are bulding the table with main species and aggregated other species
       #datSpecies=building_tab_pca(propdat,nomespsel)
-      datSpeciesWithoutProp=building_tab_pca(dat,nomespsel)
+      datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
       nbMainSpeciesLogevent[seuil/5]=length(nomespsel)
       
       pourcentCatchMainSpeciesLogevent=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
@@ -168,30 +185,33 @@ ExploSpeciesSelection=function(dat){
     }
     nbMainSpeciesLogevent=c(p-1,nbMainSpeciesLogevent)
     medianPourcentCatchMainSpeciesLogevent=c(100,medianPourcentCatchMainSpeciesLogevent)
+    NamesMainSpeciesLogevent <- names(sort(table(AllNamesSpeciesLogevent),decreasing=T)[1:nbMainSpeciesHAC])
+    
 
 
     # GRAPHICS
     # Number of main species
-    png("Number of main species.png", width = 1200, height = 800)
+    png(paste(analysisName,"Number of main species.png",sep="_"), width = 1200, height = 800)
     plot(seq(0,100,5),nbMainSpeciesTotale,type='l',col="blue",lwd=2, main="Number of main species selected depending of the threshold", xlab="Threshold (%)",ylab="Number of species")
     lines(seq(0,100,5),nbMainSpeciesLogevent,col="green",lwd=2)
     abline(nbMainSpeciesHAC,0, col="red",lwd=2)
     mtext(paste(p-1," Species"),col='darkblue')
-    legend( 70, 150, c( "HAC", "Totale", "Logevent"),lwd=2,col=c("red", "blue", "green"))
+    legend(70, 150, c( "HAC", "Totale", "Logevent"),lwd=2,col=c("red", "blue", "green"))
     dev.off()
 
     # Median percentage of catch represented by main species by logevent
-    png("Median percentage of catch represented by main species by logevent.png", width = 1200, height = 800)
+    png(paste(analysisName,"Median percentage of catch represented by main species by logevent.png",sep="_"), width = 1200, height = 800)
     plot(seq(0,100,5),medianPourcentCatchMainSpeciesTotale,type='l',col="blue",lwd=2, main="Median percentage of catch represented by main species by logevent depending of the threshold", xlab="Threshold (%)",ylab="Median percentage of catch represented by main species by logevent")
     lines(seq(0,100,5),medianPourcentCatchMainSpeciesLogevent,col="green",lwd=2)
     abline(medianPourcentCatchMainSpeciesHAC,0, col="red",lwd=2)
     mtext(paste(p-1," Species"),col='darkblue')
-    legend( 70, 40, c( "HAC", "Totale", "Logevent"),lwd=2,col=c("red", "blue", "green"))
+    legend(70, 40, c("HAC", "Totale", "Logevent"),lwd=2,col=c("red", "blue", "green"))
     dev.off()
 
 
 
     return(list(nbMainSpeciesHAC=nbMainSpeciesHAC, nbMainSpeciesTotale=nbMainSpeciesTotale, nbMainSpeciesLogevent=nbMainSpeciesLogevent,
+    NamesMainSpeciesHAC=sort(NamesMainSpeciesHAC), NamesMainSpeciesTotale=sort(NamesMainSpeciesTotale), NamesMainSpeciesLogevent=sort(NamesMainSpeciesLogevent),
     medianPourcentCatchMainSpeciesHAC=medianPourcentCatchMainSpeciesHAC, medianPourcentCatchMainSpeciesTotale=medianPourcentCatchMainSpeciesTotale,
     medianPourcentCatchMainSpeciesLogevent=medianPourcentCatchMainSpeciesLogevent))
     
