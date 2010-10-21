@@ -20,9 +20,8 @@ ExploSpeciesSelection=function(dat){
     table_var=table_variables(propdat)
 
     # HAC
-    esp_dist=dist(table_var, method="euclidean")
-    cah_var=hclust(esp_dist, method="ward")
-
+    cah_var=hcluster(table_var, method="euclidean", link="ward")
+    
     # Select the number of clusters by scree-test
     inerties.vector=cah_var$height[order(cah_var$height,decreasing=T)]
     nb.finalclusters=which(scree(inerties.vector)$epsilon<0)[1]
