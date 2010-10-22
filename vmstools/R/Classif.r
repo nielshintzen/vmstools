@@ -629,7 +629,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Mean profile by cluster")
+    title(main=paste("Mean profile by cluster","\n","\n",sep=""))
     dev.off()
     
     
@@ -648,7 +648,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Standard deviation profile by cluster")
+    title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
     dev.off()
 
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
@@ -689,7 +689,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Profile of target species by cluster")
+    title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -792,7 +792,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       #mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Mean profile by cluster")
+    title(main=paste("Mean profile by cluster","\n","\n",sep=""))
     dev.off()
     
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
@@ -814,7 +814,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       #mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Standard deviation profile by cluster")
+    title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -853,7 +853,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       #mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Profile of target species by cluster")
+    title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -970,7 +970,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       par(op2)
     }
     par(op)
-    title(main="Mean profile by cluster")
+    title(main=paste("Mean profile by cluster","\n","\n",sep=""))
     dev.off()
     
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
@@ -992,7 +992,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Standard deviation profile by cluster")
+    title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -1028,7 +1028,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       par(op2)
     }
     par(op)
-    title(main="Profile of target species by cluster")
+    title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
     dev.off()
 
     
@@ -1153,7 +1153,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Mean profile by cluster")
+    title(main=paste("Mean profile by cluster","\n","\n",sep=""))
     dev.off()
     
     
@@ -1172,7 +1172,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Standard deviation profile by cluster")
+    title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
     dev.off()
     
 
@@ -1210,7 +1210,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main="Profile of target species by cluster")
+    title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
     dev.off()
     
 
