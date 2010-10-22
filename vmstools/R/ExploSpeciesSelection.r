@@ -126,10 +126,10 @@ print("selection of possible residual species...")
 
     for(seuil in seq(5,100,5)){
       cat("seuil:",seuil,"\n")
-      pourcent=which(propespcum<seuil)
+      pourcent=which(propespcum<=seuil)
       espsel=numesp[1:(length(pourcent)+1)]
       # We are taking the name of selected species
-      nomespsel=nameSpecies[espsel-1]
+      nomespsel=nameSpecies[espsel]
       # We are bulding the table with main species and aggregated other species
       #datSpecies=building_tab_pca(propdat,nomespsel)
       datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
@@ -159,13 +159,13 @@ print("selection of possible residual species...")
     nbMainSpeciesLogevent=numeric()
     medianPourcentCatchMainSpeciesLogevent=numeric()
 
-    AllNamesSpeciesLogevent <- vector()
+    #AllNamesSpeciesLogevent <- vector()
     for(seuil in seq(5,100,5)){
     cat("seuil:",seuil,"\n")
       # Selection of species making up over seuil% of logevent's captures
-      pourcent <- apply(propdat,1,function(x) which(x>seuil))
+      pourcent <- apply(propdat,1,function(x) which(x>=seuil))
       nomespsel <- names(propdat)[unique(unlist(pourcent))]
-      AllNamesSpeciesLogevent <- c(AllNamesSpeciesLogevent,nomespsel)
+      #AllNamesSpeciesLogevent <- c(AllNamesSpeciesLogevent,nomespsel)
 
       # We are bulding the table with main species and aggregated other species
       #datSpecies=building_tab_pca(propdat,nomespsel)
@@ -185,7 +185,8 @@ print("selection of possible residual species...")
     }
     nbMainSpeciesLogevent=c(p-1,nbMainSpeciesLogevent)
     medianPourcentCatchMainSpeciesLogevent=c(100,medianPourcentCatchMainSpeciesLogevent)
-    NamesMainSpeciesLogevent <- names(sort(table(AllNamesSpeciesLogevent),decreasing=T)[1:nbMainSpeciesHAC])
+    #NamesMainSpeciesLogevent <- names(sort(table(AllNamesSpeciesLogevent),decreasing=T)[1:nbMainSpeciesHAC])
+    NamesMainSpeciesLogevent <- nomespsel
     
 
 
@@ -196,7 +197,7 @@ print("selection of possible residual species...")
     lines(seq(0,100,5),nbMainSpeciesLogevent,col="green",lwd=2)
     abline(nbMainSpeciesHAC,0, col="red",lwd=2)
     mtext(paste(p-1," Species"),col='darkblue')
-    legend(70, 150, c( "HAC", "Totale", "Logevent"),lwd=2,col=c("red", "blue", "green"))
+    legend(70, p*0.9, c( "HAC", "Totale", "Logevent"),lwd=2,col=c("red", "blue", "green"))
     dev.off()
 
     # Median percentage of catch represented by main species by logevent
