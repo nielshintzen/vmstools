@@ -46,10 +46,15 @@
 
 
 # Classif : function for the selection of species (hac, totale, logevent), PCA (pca, nopca), classification of logevents (hac, kmeans, pam, and clara) and métiers computation (thanks to test-values)
-classif=function(dat,analysisName="",methSpecies="hac",param1="euclidean",param2="ward",pcaYesNo="pca",criterion="70percents",methMetier="clara",param3="euclidean",param4=NULL){
+classif_step1 <-function(dat,Val="EURO",methSpecies="hac",param1="euclidean",param2="ward")
+#,pcaYesNo="pca",criterion="70percents",methMetier="clara",param3="euclidean",param4=NULL)
+{
 
+# clu : first select the appropriate columns
+dat <- dat[,c("LE_ID",grep(Val,names(dat),value=T))]
+dat[is.na(dat)] <- 0  
 
-# First simplify the names of columns
+# then simplify the names of columns
 names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 names(dat)
 
@@ -63,32 +68,41 @@ names(dat)
 
 print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
 
+t1 <- Sys.time()
+  print(paste(" --- selected method :",methSpecies, "---")) 
+
+  p=ncol(dat)   # Number of species +1
+
   if(methSpecies=="hac"){
 
     toutfait=FALSE
-    p=ncol(dat)   # Number of species
  
-    # Transform quantities to proportions of total quantity caught by logevent
-    propdat=transformation_proportion(dat[,2:p])
-    names(propdat)
+    # Transform quantities to proportions of total quantity caught by logevent    
+    print("calculating proportions...")
+    
+    propdat=transformation_proportion(dat[,2:p]) # clu - cf the alternative with sweep, a bit quicker but not much
+    #names(propdat)
     
     # Transposing data
     table_var=table_variables(propdat)
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
 #    CAH
 #    esp_dist=dist(table_var, method=param1)
 #    cah_var=hclust(esp_dist, method=param2)
 
     # HAC
+    print("cluster...")
+    
     cah_var=hcluster(table_var, method=param1, link=param2)
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
     # Select the number of clusters by scree-test
+    print("scree test and dendrogram...")    
     inerties.vector=cah_var$height[order(cah_var$height,decreasing=T)]
     nb.finalclusters=which(scree(inerties.vector)$epsilon<0)[1]
 
@@ -96,13 +110,16 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
     cah_cluster_var=cutree(cah_var,k=nb.finalclusters)
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
     # Selection of main species
     espprinc=select_species(dat[,2:p],cah_cluster_var)
     espdata=names(dat[,2:p])
+    cat("main species:",sort(espprinc),"\n")
+    
     
     # Selection of possible main species among residuals species
+    print("selection of possible residual species...")        
     while(toutfait==FALSE){
       ind_princ=which(is.element(espdata,espprinc))
       ind_autres=setdiff(espdata,espprinc)
@@ -127,6 +144,7 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
       somclus=numeric()
       moyclus=numeric()
       for(i in 1:resinbclusters){
+      #print(i)
         long[i]=length(which(resicah_cluster_var==i))
         nomclus=names(which(resicah_cluster_var==i))
         somclus[i]=sum(resi[nomclus,])
@@ -138,34 +156,38 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
       # if the cluster owns only one species, we are adding the species to the main species and restart the CAH with residuals species
       if(length(which(resicah_cluster_var==indclusmax))==1){
         espprinc=c(espprinc,names(which(resicah_cluster_var==indclusmax)))
+        print(paste("adding species", names(which(resicah_cluster_var==indclusmax))))
         toutfait=FALSE
       }else{   # else we are stopping here and keeping the main species of the start
         toutfait=TRUE
       }
 #      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#      gc()
+#      gc(reset=TRUE)
     }
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
+    #eventually removing MZZ
+    espprinc <- espprinc[!espprinc=="MZZ"]  
+
     # Return only the main species of the dataset
     datSpecies=building_tab_pca(propdat,espprinc)
     #write.table(datSpecies, file="datSpecies.txt", quote=T, dec='.', sep=';', col.names=T, row.names=F)
     
-  }
+  } else 
   
   
   if(methSpecies=="totale"){
   
-    p=length(dat[1,])   # Number of species
+    print("calculating proportions...")    
     propdat=transformation_proportion(dat[,2:p])
     
     # Total quantity caught species by species
     sumcol=numeric()
-#    for(i in 2:p){
-#      sumcol[i]=sum(dat[,i])
-#    }
+    #for(i in 2:p){
+     # sumcol[i]=sum(dat[,i])
+    #}
     sumcol <- apply(dat[,-1],2,sum)
     
     # Total quantity caught
@@ -180,34 +202,60 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
     propespcum=cumsum(propespdec)
     
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
     # We are taking all species until having at least param1% of total catch
+    if (is.null(param1) | !is.numeric(param1)) stop("param1 must be numeric between 0 and 100")
     seuil=param1
-    pourcent=which(propespcum<seuil)
+    pourcent=which(propespcum<=seuil)
     espsel=numesp[1:(length(pourcent)+1)]
     # We are taking the name of selected species
     nomespsel=names(dat[espsel])
+
+    #eventually removing MZZ
+    nomespsel <- nomespsel[!nomespsel=="MZZ"]      
+    cat("main species:",sort(nomespsel),"\n")
+    
     # We are bulding the table with main species and aggregated other species
     datSpecies=building_tab_pca(propdat,nomespsel)
 
-  }
+  } else 
 
 
   if(methSpecies=="logevent"){
 
-    p=length(dat[1,])   # Number of species
     # Transform quantities to proportions of total quantity caught by logevent
+    print("calculating proportions...")
+
     propdat=transformation_proportion(dat[,2:p])
+    
+    if (is.null(param1) | !is.numeric(param1)) stop("param1 must be numeric between 0 and 100")
+    
     seuil=param1
     # Selection of species making up over param1% of logevent's captures
-    pourcent <- apply(propdat,1,function(x) which(x>seuil))   
-    nomespsel <- names(propdat)[unique(unlist(pourcent))]  
+    pourcent <- apply(propdat,1,function(x) which(x>=seuil))   
+    nomespsel <- names(propdat)[unique(unlist(pourcent))] 
     
+    #eventually removing MZZ
+    nomespsel <- nomespsel[!nomespsel=="MZZ"]  
+    cat("main species:",sort(nomespsel),"\n")
+
     # We are bulding the table with main species and aggregated other species
     datSpecies=building_tab_pca(propdat,nomespsel)
 
-  }
+  } else stop("methSpecies must be hac, totale or logevent")
+  
+  
+datSpecies <- cbind(LE_ID=dat$LE_ID,datSpecies)
+  
+
+print(" --- end of step 1 ---")
+print(Sys.time()-t1)
+
+
+return(datSpecies)
+
+}
 
 
 
@@ -219,11 +267,20 @@ print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
 #                                                          STEP 2 : PCA OR NOT                                                               #
 ##############################################################################################################################################
 
+classif_step2 <-function(datSpecies,analysisName="",pcaYesNo="pca",criterion="70percents",methMetier="clara",param3="euclidean",param4=NULL)
+{
 
+LE_ID <- datSpecies[1]
+datSpecies <- datSpecies[,-1]
 
 print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
 
+t1 <- Sys.time()
+print(paste(" --- selected method :",pcaYesNo, "---"))
+
+
   if(pcaYesNo=="pca"){
+    print("running PCA on all axes...")  
     # PCA (Principal Component Analysis)
     log.pca <- PCA(datSpecies, graph=T)
     
@@ -233,7 +290,7 @@ print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
     dev.off()
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
     # Data frame given eigenvalues, inertia and cumulative inertia of factorial axis
     tabInertia=data.frame(cbind(Axis=1:length(log.pca$eig[,1]), Eigenvalues=log.pca$eig[,1], Inertia=log.pca$eig[,2], CumulativeInertia=log.pca$eig[,3]))                  
@@ -245,7 +302,7 @@ print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
     # OR
     if(criterion=="screetest"){
       nbaxes=which(scree(tabInertia[,3])$epsilon<0)[1]  # thanks to the scree-test
-    }
+    } else stop("Criterion for PCA must be 70percents or screetest")
       
     # Eigenvalues and relative graphics
     log.pca$eig                                                  
@@ -269,9 +326,10 @@ print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
     dev.off()   
     
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
     # PCA with the good number of axis
+    print("running PCA on selected axes...")    
     log.coa=PCA(datSpecies, graph=F, ncp=nbaxes)
     options(digits=6)       # significant digits
     
@@ -290,16 +348,20 @@ print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
     # log.coa = results of PCA limited to the nbaxes first factorial axis
     datLog=signif(log.coa$ind$coord, 5)
     #write.table(datLog, file="datLog.txt", quote=T, dec='.', sep=';', col.names=T, row.names=F)
-  }
 
+  } else 
 
 
   if(pcaYesNo=="nopca"){
     datLog=datSpecies
     tabInertia="No PCA"
-  }
+  }  else stop("pcaYesNo must be pca or nopca")
 
+  Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+  gc(reset=TRUE)
 
+print(" --- end of step 2 ---")
+print(Sys.time()-t1)
 
 
 
@@ -314,6 +376,10 @@ print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
 ########################################################################################################################################   HAC
 
 print("######## STEP 3 CLUSTERING ########")
+
+t1 <- Sys.time()
+print(paste(" --- selected method :",methMetier, "---"))  
+
 
   if(methMetier=="hac"){
   
@@ -331,7 +397,10 @@ print("######## STEP 3 CLUSTERING ########")
     centerOfGravityDatLog=colMeans(datLog)
     
     # HAC like CLARA (HAC on sample, affectation of each logevent to a cluster, quality of classification, do it 5 times, choose the sample which gives the best quality of classification)
+    print("hac on subsets...")
+    
     for(i in 1:5){
+      print(paste("sample",i))
       # Sample of size 15000 logevents
       sam=sample(1:nbLog,size=15000,replace=F)
       # Record the 5 samples
@@ -348,7 +417,7 @@ print("######## STEP 3 CLUSTERING ########")
       sampleClusters=cutree(log.hac,k=nbClust)
 
       Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-      gc()
+      gc(reset=TRUE)
 
       # Add the cluster to each logevent of the sample
       sampleDatLogWithClusters=cbind(sampleDatLog,sampleClusters)
@@ -373,6 +442,7 @@ print("######## STEP 3 CLUSTERING ########")
       clusters=datLogWithClusters[,ncol(datLogWithClusters)]
 
       # Between variance of classification
+      print("between and within variance classification...")
       sizeClusters=numeric()
       centerOfGravityClassif=numeric()
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
@@ -385,7 +455,7 @@ print("######## STEP 3 CLUSTERING ########")
       classifBetweenVar=cbind(classifBetweenVar,1/nbLog*sum(sizeClusters*((dist(centerOfGravityClassif)[1:nbClust])^2)))
 
       Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-      gc()
+      gc(reset=TRUE)
     
       # Within variance of classification
       withinVarClusters=numeric()
@@ -413,12 +483,13 @@ print("######## STEP 3 CLUSTERING ########")
       mProfilSample=rbind(mProfilSample,mprofil)
 
       Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-      gc()
+      gc(reset=TRUE)
       
     }
 
     
     # Classification's quality
+    print("choosing the best sample...")
     classifQuality=classifWithinVar/classifBetweenVar
     which.min(classifQuality)
 
@@ -428,7 +499,7 @@ print("######## STEP 3 CLUSTERING ########")
     sampleDatLog=datLog[sam,]
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
     # HAC with the best sample
     log.hac=hcluster(sampleDatLog, method=param3, link=param4)
@@ -441,7 +512,7 @@ print("######## STEP 3 CLUSTERING ########")
     sampleClusters=cutree(log.hac,k=nbClust)
     
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
 
     sampleDatLogWithClusters=cbind(sampleDatLog,sampleClusters)
 
@@ -464,7 +535,7 @@ print("######## STEP 3 CLUSTERING ########")
     clusters=datLogWithClusters[,ncol(datLogWithClusters)]
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
     # Within and between variance of clusters and classification
     centerOfGravityClassif=numeric()
@@ -500,20 +571,26 @@ print("######## STEP 3 CLUSTERING ########")
     resval=test.values(clusters,datSpecies)
     # Determine the target species
     target=targetspecies(resval)
+    #cat("target species:", target,"\n")
+    print(target$tabnomespcib)
+    
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
 
 
     # Projections on the first factorial plans
     png(paste(analysisName,"HAC_Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
+    if(dim(datLog)[2]>2) {
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
     plot(datLog[,1], datLog[,3], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 1-3", xlab="axis 1", ylab="axis 3")
+    if(dim(datLog)[2]>3) {
     plot(datLog[,1], datLog[,4], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 1-4", xlab="axis 1", ylab="axis 4")
     plot(datLog[,2], datLog[,4], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 2-4", xlab="axis 2", ylab="axis 4")
     plot(datLog[,3], datLog[,4], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 3-4", xlab="axis 3", ylab="axis 4")
+    }}
     par(op)
     dev.off()
 
@@ -575,7 +652,7 @@ print("######## STEP 3 CLUSTERING ########")
     dev.off()
 
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#    gc()
+#    gc(reset=TRUE)
     
     
     # Number of Logevents by cluster
@@ -614,10 +691,14 @@ print("######## STEP 3 CLUSTERING ########")
     par(op)
     title(main="Profile of target species by cluster")
     dev.off()
+
+
+    print(" --- end of step 3 ---")
+    print(Sys.time()-t1)
     
     return(list(clusters=clusters, sizeClusters=sizeClusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
-  }
+  }   else 
 
 
 
@@ -638,7 +719,7 @@ print("######## STEP 3 CLUSTERING ########")
     dev.off()
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
 
     diffvarintra=diff(varintra,na.rm=T)
     diffdiffvar=diff(diffvarintra,na.rm=T)
@@ -665,18 +746,21 @@ print("######## STEP 3 CLUSTERING ########")
     target=targetspecies(resval)
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
 
 
     # Projections on the first factorial plans
     png(paste(analysisName,"KMEANS_Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
+    if(dim(datLog)[2]>2) {
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
     plot(datLog[,1], datLog[,3], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 1-3", xlab="axis 1", ylab="axis 3")
+    if(dim(datLog)[2]>3) {
     plot(datLog[,1], datLog[,4], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 1-4", xlab="axis 1", ylab="axis 4")
     plot(datLog[,2], datLog[,4], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 2-4", xlab="axis 2", ylab="axis 4")
-    plot(datLog[,3], datLog[,4], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 3-4", xlab="axis 3", ylab="axis 4")
+    plot(datLog[,3], datLog[,4], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 3-4", xlab="axis 3", ylab="axis 4")    
+    }}
     par(op)
     dev.off()
     
@@ -712,7 +796,7 @@ print("######## STEP 3 CLUSTERING ########")
     dev.off()
     
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#    gc()
+#    gc(reset=TRUE)
     
     
     # Standard deviation profiles by cluster
@@ -772,10 +856,13 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Profile of target species by cluster")
     dev.off()
 
+
+    print(" --- end of step 3 ---")
+    print(Sys.time()-t1)
     
     return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
-  }                                                                                                         
+  } else                                                                                                        
 
 
 
@@ -801,7 +888,7 @@ print("######## STEP 3 CLUSTERING ########")
     k=which(clustersPam.silcoeff==max)
     
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
     # PAM with optimal k
     clusters=pam(datLog,k)
@@ -815,7 +902,7 @@ print("######## STEP 3 CLUSTERING ########")
 #    dev.off()
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
     
     # Quality of classification
     nbLog=nrow(datLog)
@@ -845,11 +932,14 @@ print("######## STEP 3 CLUSTERING ########")
     png(paste(analysisName,"PAM_Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="Projection of PAM classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
+    if(dim(datLog)[2]>2) {
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="Projection of PAM classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
     plot(datLog[,1], datLog[,3], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="Projection of PAM classification on the factorial plan 1-3", xlab="axis 1", ylab="axis 3")
+    if(dim(datLog)[2]>3) {
     plot(datLog[,1], datLog[,4], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="Projection of PAM classification on the factorial plan 1-4", xlab="axis 1", ylab="axis 4")
     plot(datLog[,2], datLog[,4], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="Projection of PAM classification on the factorial plan 2-4", xlab="axis 2", ylab="axis 4")
     plot(datLog[,3], datLog[,4], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="Projection of PAM classification on the factorial plan 3-4", xlab="axis 3", ylab="axis 4")
+    }}
     par(op)
     dev.off()
 
@@ -884,7 +974,7 @@ print("######## STEP 3 CLUSTERING ########")
     dev.off()
     
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#    gc()
+#    gc(reset=TRUE)
     
     
     # Standard deviation profile by cluster
@@ -941,9 +1031,13 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Profile of target species by cluster")
     dev.off()
 
+    
+    print(" --- end of step 3 ---")
+    print(Sys.time()-t1)
+
     return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
-  }
+  } else 
 
 
 
@@ -956,7 +1050,7 @@ print("######## STEP 3 CLUSTERING ########")
 
     # Calculation of optimal k thanks to the silhouette
     clustersClara.silcoeff=numeric()
-    for (k in 2:15){
+    for (k in 3:15){
       clustersClara=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
@@ -966,7 +1060,7 @@ print("######## STEP 3 CLUSTERING ########")
     dev.off()
     
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
 
     clustersClara.silcoeff
     max=max(clustersClara.silcoeff, na.rm=T)
@@ -987,7 +1081,7 @@ print("######## STEP 3 CLUSTERING ########")
 #  clusplot(clustersClara,col.p = clustersClara$clustering)
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc()
+    gc(reset=TRUE)
 
 
     # Quality of classification
@@ -1008,7 +1102,7 @@ print("######## STEP 3 CLUSTERING ########")
 
 
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#    gc()
+#    gc(reset=TRUE)
 
 
     # Compute the test-values for species
@@ -1020,11 +1114,14 @@ print("######## STEP 3 CLUSTERING ########")
     png(paste(analysisName,"CLARA_Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="Projection of CLARA classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
+    if(dim(datLog)[2]>2) {
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="Projection of CLARA classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
     plot(datLog[,1], datLog[,3], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="Projection of CLARA classification on the factorial plan 1-3", xlab="axis 1", ylab="axis 3")
+    if(dim(datLog)[2]>3) {
     plot(datLog[,1], datLog[,4], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="Projection of CLARA classification on the factorial plan 1-4", xlab="axis 1", ylab="axis 4")
     plot(datLog[,2], datLog[,4], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="Projection of CLARA classification on the factorial plan 2-4", xlab="axis 2", ylab="axis 4")
     plot(datLog[,3], datLog[,4], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="Projection of CLARA classification on the factorial plan 3-4", xlab="axis 3", ylab="axis 4")
+    }}
     par(op)
     dev.off()
 
@@ -1116,9 +1213,15 @@ print("######## STEP 3 CLUSTERING ########")
     title(main="Profile of target species by cluster")
     dev.off()
     
+
+    print(" --- end of step 3 ---")
+    print(Sys.time()-t1)
+
     return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
-  }  
+  }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
+  
+  
 
-} # end of the function "classif"
+} # end of the function "classif step2"
