@@ -1050,7 +1050,7 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     # Calculation of optimal k thanks to the silhouette
     clustersClara.silcoeff=numeric()
-    for (k in 3:15){
+    for (k in 2:15){
       clustersClara=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
