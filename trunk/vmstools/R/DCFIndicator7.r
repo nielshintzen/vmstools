@@ -2,7 +2,7 @@
 ## by Fabrizio Manco, 23/09/2010
 ## calculates the DCF7 indicator : area of cells not containing activity
 
-DCFIndicator7 <- function ( vmsWithGear,
+DCFIndicator7 <- function ( tacsat,
                             mobileBottomGear="",          # a list of gear code
                             inShapeArea="",               # the name of the shapefile without the .shp extension
                             cellresX=0.05,
@@ -14,8 +14,9 @@ DCFIndicator7 <- function ( vmsWithGear,
                                                  
 { require(shapefiles)
   require(sp)
-  vmsWithGear<-vmsWithGear[complete.cases(vmsWithGear),]
-  if (mobileBottomGear!="") {vmsWithGear<-subset(vmsWithGear, vmsWithGear$SI_GEAR %in% mobileBottomGear)}
+  require(PBSmapping)
+  tacsat<-tacsat[complete.cases(tacsat),]
+  if (mobileBottomGear!="") {tacsat<-subset(tacsat, tacsat$LE_GEAR %in% mobileBottomGear)}
 
   if (inShapeArea!="")
     { # read the shapefile 
@@ -25,7 +26,7 @@ DCFIndicator7 <- function ( vmsWithGear,
       # clip the shape polygon with the land
       clipShapeFromLand<-clipPolygons (shapeAll, europa)
     
-      vmsPingsCoord<-cbind(vmsWithGear$SI_LONG, vmsWithGear$SI_LATI)
+      vmsPingsCoord<-cbind(tacsat$SI_LONG, tacsat$SI_LATI)
       pointInOutByPoly<-rep(0,length(vmsPingsCoord[,1]))
       
       ltPoly<-unique(clipShapeFromLand$PID)
@@ -36,13 +37,13 @@ DCFIndicator7 <- function ( vmsWithGear,
         pointInOutByPoly<-pointInOutByPoly + point.in.polygon(vmsPingsCoord[,1], vmsPingsCoord[,2], polyCoord[,1], polyCoord[,2])
         }
 
-      vmsWithGear$pointInOut<-pointInOutByPoly
-      vmsWithGear<-subset(vmsWithGear, pointInOut!=0)
+      tacsat$pointInOut<-pointInOutByPoly
+      tacsat<-subset(tacsat, pointInOut!=0)
       }
   
   # Grid the points
-  if ("SI_INTV" %in% colnames(vmsWithGear)) { nameVarToSum="SI_INTV"} else {nameVarToSum=""}
-  vmsGrid<-vmsGridCreate(vmsWithGear, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum, plotMap=plotMapTF, plotPoints = FALSE)
+  if ("SI_INTV" %in% colnames(tacsat)) { nameVarToSum="SI_INTV"} else {nameVarToSum=""}
+  vmsGrid<-vmsGridCreate(tacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum, plotMap=plotMapTF, plotPoints = FALSE)
   
   # calculate the area of each cell in square km
   vmsGrid<-surface(vmsGrid, method=calcAreaMethod, includeNA=TRUE)
@@ -57,10 +58,12 @@ DCFIndicator7 <- function ( vmsWithGear,
       for (x in 1:length(ltPoly)){
         polyCoord<-cbind(clipShapeFromLand$X[clipShapeFromLand$PID==ltPoly[x]],clipShapeFromLand$Y[clipShapeFromLand$PID==ltPoly[x]])
         gridCellInOutByPoly<-gridCellInOutByPoly + point.in.polygon(gridPointsCoord[,1], gridPointsCoord[,2], polyCoord[,1], polyCoord[,2])
+
         }
         
       vmsGrid$inPolygon<-gridCellInOutByPoly
       areaInPolygon<-sum(vmsGrid@data$cellArea[vmsGrid@data$inPolygon==1])
+      
       } else {areaInPolygon<-sum(vmsGrid@data$cellArea)}
       
   # calculate the areas  

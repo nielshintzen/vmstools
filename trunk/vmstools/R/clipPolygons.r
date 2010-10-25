@@ -20,7 +20,7 @@ clipPolygons <- function ( shapeAll,
 
   colnames(allSourcePoly)<-c("PID","POS","X","Y")
   allPolyFromShape<-as.PolySet(allSourcePoly)
-
+  
   # clip the polygons
   clipShapeFromLand<-joinPolys(allPolyFromShape,europa, operation="DIFF",maxVert=1e+06)
   
