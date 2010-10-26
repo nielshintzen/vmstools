@@ -842,13 +842,10 @@ return()
   vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
 
 
-  # CONVERT TO FISHFRAME FORMAT VE
-  ff.ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","output"),
-                                          a.year=2009, a.country="NLD"))
-  
-  # TO FISHFRAME FORMAT VL
-  ff.vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","output"),
-                                          a.year=2009, a.country="NLD"))
+  # CONVERT TO FISHFRAME FORMAT (might take some time running)
+  ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
+                                          a.year=2009, a.country="NLD") )
+
   #}
  
 } # end main
