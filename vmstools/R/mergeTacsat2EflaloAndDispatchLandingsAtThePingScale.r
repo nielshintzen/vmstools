@@ -791,8 +791,13 @@ return()
   data(eflalo2)
   data(tacsat)
   data(euharbours)
-  tacsat$SI_HARB <- NA
+  # add missing harbours?
+  euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10')))
+  euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1')))
+
+ 
   library(doBy)
+  tacsat$SI_HARB <- NA
   inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours,30)
   tacsat$SI_FT <- 1 # init
   idx <- which(inHarb==0)
@@ -801,8 +806,7 @@ return()
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
 
-  # add missing harbours?
-  #...
+
                        
   
   # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
