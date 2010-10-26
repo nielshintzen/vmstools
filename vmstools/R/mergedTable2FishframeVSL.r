@@ -20,10 +20,10 @@
          if(length(lstargs$shape.file)==0) {
          #   data(ICESareas)
          #   all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
-         all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+         all.merged$ICES_area <- ffarea (all.merged[,c('SI_LONG','SI_LATI')])
          }else{
          #all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
-         all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+         all.merged$ICES_area <- ffarea (all.merged[,c('SI_LONG','SI_LATI')])
          }
          all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05))
          all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
@@ -42,10 +42,10 @@
          if(length(lstargs$shape.file)==0) {
          #   data(ICESareas)
          #   all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
-         all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+         all.merged$ICES_area <- ffarea (all.merged[,c('SI_LONG','SI_LATI')])
          }else{
          #all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
-         all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+         all.merged$ICES_area <- ffarea (all.merged[,c('SI_LONG','SI_LATI')])
          }
         all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05))
          all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
@@ -89,8 +89,8 @@
             vsl.ff <- vsl.ff[!is.na(vsl.ff$weight) & vsl.ff$weight!=0,]
             vsl.ff <- vsl.ff[, !colnames(vsl.ff) %in% c('id')]
             colnames(vsl.ff) <-  c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area", "c_square","month", "species", "weight", "value")
-     
-           # 6. aggregate with fast grouping 
+    
+           # 6. aggregate with fast grouping (caution: > R.2.11.0) 
            library(data.table)
            vsl.ff$ICES_area <- factor(vsl.ff$ICES_area)
            DT <- data.table(vsl.ff)
@@ -114,7 +114,7 @@
   data(speciesLatinNames)
   res$species <-  speciesLatinNames$ff_species_latin[match(as.character(res$species), as.character(speciesLatinNames$fao_code))]
 
-
+   
   # 10. order colums
   ff.vsl <- res
   ff.vsl <- as.data.frame(ff.vsl)[, c('recordtype','country','year','quarter', 'month', 

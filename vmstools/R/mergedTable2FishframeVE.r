@@ -4,7 +4,7 @@
 # optional: the ICES_areas shape file (if not provided as arg then loaded from the vmstools library)
  mergedTable2FishframeVE <- function (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="DNK"),...){
-    lstargs <- list(...)   
+    lstargs <- list(...)
 
     for(what in c('value','weight')){
        load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
@@ -25,10 +25,10 @@
     if(length(lstargs$shape.file)==0) {
     #   data(ICESareas)
     #   all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI) # DEADLY SLOW!
-    all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+    all.merged$ICES_area <- ffarea (all.merged[,c('SI_LONG','SI_LATI')])
     }else{
        #all.merged$ICES_area <- ICESarea(long= all.merged$SI_LONG, lat= all.merged$SI_LATI,shape.file=lstargs$shape.file) # DEADLY SLOW!
-       all.merged$ICES_area <- get.ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+       all.merged$ICES_area <- ffarea (all.merged[,c('SI_LONG','SI_LATI')])
     }
     all.merged$c_square  <-CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05)
     all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
@@ -54,6 +54,7 @@
     levels(ff.ve$quarter) <- c(1,1,1,2,2,2,3,3,3,4,4,4)
 
 
+  
   #order colums
   ff.ve <- as.data.frame(ff.ve)[, c('recordtype','country','year','quarter', 'month', 
                'ICES_area','c_square', 'nationalFAC', 'LE_MET_level6',
