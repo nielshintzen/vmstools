@@ -48,7 +48,7 @@
     # additional
     ff.ve$year        <- general$a.year
     ff.ve$country     <- general$a.country
-    ff.ve$nationalFAC <- NA
+    ff.ve$nationalFAC <- " "
     ff.ve$recordtype  <- "VE"
     ff.ve$quarter <- ff.ve$month  # init
     levels(ff.ve$quarter) <- c(1,1,1,2,2,2,3,3,3,4,4,4)

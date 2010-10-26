@@ -1,17 +1,14 @@
 
 
- mergedTable2Fishframe <- function(general=general=list(output.path=
+ mergedTable2Fishframe <- function(general=list(output.path=
              file.path("H:","DIFRES","VMSanalysis","results_merged","DKWaters"),
                                           a.year=2009, a.country="DNK")){
                                           
   ve   <- mergedTable2FishframeVE  (general=general)
   vsl  <- mergedTable2FishframeVSL (general=general)
 
-  # replace NA by " "
-  #...
-  
+
   # add a fake column to get the same ncol()
-  #...
   vsl <- cbind(vsl, 0)
   colnames(ve) <- paste('col', 1:ncol(ve), sep='')
   colnames(vsl) <- paste('col', 1:ncol(vsl), sep='')
@@ -26,7 +23,7 @@
   # save
   write.table(ff, file=file.path(general$output.path,
          paste("ff_", general$a.year, ".txt", sep='')),  dec=".", sep=";",
-          quote=FALSE, row.names=FALSE)
+          quote=FALSE, row.names=FALSE, col.names=FALSE)
 
 
   return(ff)
@@ -38,5 +35,5 @@
 #                                          a.year=2009, a.country="DNK") )
 # ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","VMSanalysis","results_merged","DKWaters"),
 #                                          a.year=2009, a.country="DNK") )
-# ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","VMSanalysis","results_merged","DKWaters"),
-#                                          a.year=2009, a.country="DNK") )
+ #ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","VMSanalysis","results_merged","DKWaters"),
+ #                                         a.year=2009, a.country="DNK") )

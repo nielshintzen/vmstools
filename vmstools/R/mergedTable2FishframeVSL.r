@@ -105,7 +105,7 @@
   # 8. additional
   res$year        <- general$a.year
   res$country     <- general$a.country
-  res$nationalFAC <- NA
+  res$nationalFAC <- " "
   res$recordtype  <- "VSL"
   res$quarter <- res$month  # init
   levels(res$quarter) <- c(1,1,1,2,2,2,3,3,3,4,4,4)
