@@ -44,151 +44,42 @@
 
 
 
-
 # Classif : function for the selection of species (hac, totale, logevent), PCA (pca, nopca), classification of logevents (hac, kmeans, pam, and clara) and métiers computation (thanks to test-values)
-classif_step1 <-function(dat,Val="EURO",methSpecies="hac",param1="euclidean",param2="ward")
+classif_step1 <-function(dat,NamesMainSpeciesHAC,Val="EURO",
+                          paramTotal=95,paramLogevent=100)
 #,pcaYesNo="pca",criterion="70percents",methMetier="clara",param3="euclidean",param4=NULL)
 {
 
+print("######## STEP 1 COMBINATION OF MAIN SPECIES FROM THE THREE EXPLORATORY METHODS ########")
+
+
+t1 <- Sys.time()
 # clu : first select the appropriate columns
 dat <- dat[,c("LE_ID",grep(Val,names(dat),value=T))]
-dat[is.na(dat)] <- 0  
+
+dat[is.na(dat)] <- 0
+  
 
 # then simplify the names of columns
 names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 names(dat)
 
+#list Species Totale
+    p=ncol(dat)   # Number of species +1
+for (i in 2:p) dat[is.na(dat[,i]),i] <-0
 
-
-
-##############################################################################################################################################
-#                                                STEP 1 : SELECTION OF SPECIES                                                               #
-##############################################################################################################################################
-
-
-print("######## STEP 1 SELECTION OF MAIN SPECIES ########")
-
-t1 <- Sys.time()
-  print(paste(" --- selected method :",methSpecies, "---")) 
-
-  p=ncol(dat)   # Number of species +1
-
-  if(methSpecies=="hac"){
-
-    toutfait=FALSE
- 
-    # Transform quantities to proportions of total quantity caught by logevent    
-    print("calculating proportions...")
     
-    propdat=transformation_proportion(dat[,2:p]) # clu - cf the alternative with sweep, a bit quicker but not much
-    #names(propdat)
+print("calculating proportions...") #clu
     
-    # Transposing data
-    table_var=table_variables(propdat)
-
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
-    
-#    CAH
-#    esp_dist=dist(table_var, method=param1)
-#    cah_var=hclust(esp_dist, method=param2)
-
-    # HAC
-    print("cluster...")
-    
-    cah_var=hcluster(table_var, method=param1, link=param2)
-
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
-    
-    # Select the number of clusters by scree-test
-    print("scree test and dendrogram...")    
-    inerties.vector=cah_var$height[order(cah_var$height,decreasing=T)]
-    nb.finalclusters=which(scree(inerties.vector)$epsilon<0)[1]
-
-    # Dendogram cutting at the selected level
-    cah_cluster_var=cutree(cah_var,k=nb.finalclusters)
-
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
-    
-    # Selection of main species
-    espprinc=select_species(dat[,2:p],cah_cluster_var)
-    espdata=names(dat[,2:p])
-    cat("main species:",sort(espprinc),"\n")
-    
-    
-    # Selection of possible main species among residuals species
-    print("selection of possible residual species...")        
-    while(toutfait==FALSE){
-      ind_princ=which(is.element(espdata,espprinc))
-      ind_autres=setdiff(espdata,espprinc)
-      princ=table_var[ind_princ,]
-      resi=table_var[ind_autres,]
-
-      # CAH on residual species group
-#      resiesp_dist=dist(resi, method=param1)
-#      resicah_var=hclust(resiesp_dist, method=param2)
-
-      # HAC on residual species group
-      resicah_var=hcluster(resi, method=param1, link=param2)
-      
-      # Select the number of clusters by scree-test
-      resiinerties.vector=resicah_var$height[order(resicah_var$height,decreasing=T)]
-      resinbclusters=which(scree(resiinerties.vector)$epsilon<0)[1]
-      # Cut the dendogram at the selected level
-      resicah_cluster_var=cutree(resicah_var,k=resinbclusters)
-
-      # Number and names of species by cluster, mean of capture by species for each cluster
-      long=numeric()
-      somclus=numeric()
-      moyclus=numeric()
-      for(i in 1:resinbclusters){
-      #print(i)
-        long[i]=length(which(resicah_cluster_var==i))
-        nomclus=names(which(resicah_cluster_var==i))
-        somclus[i]=sum(resi[nomclus,])
-        moyclus[i]=somclus[i]/long[i]
-      }
-      # we are taking the cluster which represents the greatest part of capture
-      indclusmax=which.max(moyclus)
-      names(which(resicah_cluster_var==indclusmax))
-      # if the cluster owns only one species, we are adding the species to the main species and restart the CAH with residuals species
-      if(length(which(resicah_cluster_var==indclusmax))==1){
-        espprinc=c(espprinc,names(which(resicah_cluster_var==indclusmax)))
-        print(paste("adding species", names(which(resicah_cluster_var==indclusmax))))
-        toutfait=FALSE
-      }else{   # else we are stopping here and keeping the main species of the start
-        toutfait=TRUE
-      }
-#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#      gc(reset=TRUE)
-    }
-
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
-    
-    #eventually removing MZZ
-    espprinc <- espprinc[!espprinc=="MZZ"]  
-
-    # Return only the main species of the dataset
-    datSpecies=building_tab_pca(propdat,espprinc)
-    #write.table(datSpecies, file="datSpecies.txt", quote=T, dec='.', sep=';', col.names=T, row.names=F)
-    
-  } else 
-  
-  
-  if(methSpecies=="totale"){
-  
-    print("calculating proportions...")    
     propdat=transformation_proportion(dat[,2:p])
     
     # Total quantity caught species by species
-    sumcol=numeric()
-    #for(i in 2:p){
-     # sumcol[i]=sum(dat[,i])
-    #}
-    sumcol <- apply(dat[,-1],2,sum)
+    sumcol=rep(as.numeric(NA),p) #numeric()
+    for(i in 2:p){
+      sumcol[i]=sum(dat[,i])
+    }
+    #clu 
+    #sumcol <- apply(dat[,-1],2,sum)
     
     # Total quantity caught
     sumtotale=sum(sumcol,na.rm=T)
@@ -201,49 +92,39 @@ t1 <- Sys.time()
     # Cumulative percent of catch
     propespcum=cumsum(propespdec)
     
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+    Store(objects())#[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
     gc(reset=TRUE)
     
     # We are taking all species until having at least param1% of total catch
-    if (is.null(param1) | !is.numeric(param1)) stop("param1 must be numeric between 0 and 100")
-    seuil=param1
+    if (is.null(paramTotal) | !is.numeric(paramTotal)) stop("param1 must be numeric between 0 and 100")
+    seuil=paramTotal
     pourcent=which(propespcum<=seuil)
     espsel=numesp[1:(length(pourcent)+1)]
     # We are taking the name of selected species
-    nomespsel=names(dat[espsel])
+    nomespselTotal=names(dat[espsel+1])
 
-    #eventually removing MZZ
-    nomespsel <- nomespsel[!nomespsel=="MZZ"]      
-    cat("main species:",sort(nomespsel),"\n")
+#    #eventually removing MZZ
+#    nomespselTotal <- nomespsel[!nomespsel=="MZZ"]      
+#    #cat("main species:",sort(nomespsel),"\n")
+
+#LogEvent
+        if (is.null(paramLogevent) | !is.numeric(paramLogevent)) stop("paramLogevent must be numeric between 0 and 100")
     
-    # We are bulding the table with main species and aggregated other species
-    datSpecies=building_tab_pca(propdat,nomespsel)
-
-  } else 
-
-
-  if(methSpecies=="logevent"){
-
-    # Transform quantities to proportions of total quantity caught by logevent
-    print("calculating proportions...")
-
-    propdat=transformation_proportion(dat[,2:p])
-    
-    if (is.null(param1) | !is.numeric(param1)) stop("param1 must be numeric between 0 and 100")
-    
-    seuil=param1
+    seuil=paramLogevent
     # Selection of species making up over param1% of logevent's captures
     pourcent <- apply(propdat,1,function(x) which(x>=seuil))   
-    nomespsel <- names(propdat)[unique(unlist(pourcent))] 
+    nomespselLogevent <- names(propdat)[unique(unlist(pourcent))] 
     
     #eventually removing MZZ
-    nomespsel <- nomespsel[!nomespsel=="MZZ"]  
-    cat("main species:",sort(nomespsel),"\n")
+   # nomespselLogevent <- nomespsel[!nomespsel=="MZZ"]  
+
+   #merge with explospecies
+   ListSpeciesAll <- sort(unique(c(NamesMainSpeciesHAC,nomespselTotal,nomespselLogevent)))
+   ListSpeciesAll <- ListSpeciesAll[!ListSpeciesAll=="MZZ"]
 
     # We are bulding the table with main species and aggregated other species
-    datSpecies=building_tab_pca(propdat,nomespsel)
+    datSpecies=building_tab_pca(propdat,ListSpeciesAll)
 
-  } else stop("methSpecies must be hac, totale or logevent")
   
   
 datSpecies <- cbind(LE_ID=dat$LE_ID,datSpecies)
@@ -298,7 +179,7 @@ print(paste(" --- selected method :",pcaYesNo, "---"))
     # Determine the number of axis to keep
     if(criterion=="70percents"){
       nbaxes=which(log.pca$eig[,3]>70)[1]   # we are taking the axis until having 70% of total inertia
-    }
+    } else 
     # OR
     if(criterion=="screetest"){
       nbaxes=which(scree(tabInertia[,3])$epsilon<0)[1]  # thanks to the scree-test
@@ -388,6 +269,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     classifQuality=numeric()
     sampleList=numeric()
     mProfilSample=numeric()
+    classifVarExplain=numeric()
 
     #totaleVarPart=numeric()   #(used for the calcul of totale variance)
     nbLog=nrow(datLog)
@@ -400,6 +282,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     print("hac on subsets...")
     
     for(i in 1:5){
+      
+      numSample=i
       print(paste("sample",i))
       # Sample of size 15000 logevents
       sam=sample(1:nbLog,size=15000,replace=F)
@@ -407,94 +291,284 @@ print(paste(" --- selected method :",methMetier, "---"))
       sampleList=rbind(sampleList,sam)
       outofsam=setdiff(1:nbLog,sam)
       sampleDatLog=datLog[sam,]
-
+      sampleDatSpecies=datSpecies[sam,]
+      
       # HAC on the sample
       log.hac=hcluster(sampleDatLog, method=param3, link=param4)
       inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
-      nbClust=which(scree(inerties.vector)$epsilon<0)[1]
+      nbClust=which(scree(inerties.vector)$epsilon<0)[2]
     
       # Cut the dendogram at the selected level
       sampleClusters=cutree(log.hac,k=nbClust)
 
-      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-      gc(reset=TRUE)
+#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#      gc(reset=TRUE)
 
       # Add the cluster to each logevent of the sample
       sampleDatLogWithClusters=cbind(sampleDatLog,sampleClusters)
 
-      # Discriminante analysis on the learning dataset "sampleDatLogWithClusters"
-      learning.lda=lda(sampleDatLogWithClusters[,1:nbDim],sampleDatLogWithClusters[,ncol(sampleDatLogWithClusters)])
-
-      # Other Logevents (which aren't belonging to the sample)
-      otherLog=datLog[outofsam,]
-
-      # Predict the cluster for each logevent of "otherLog" thanks to a discriminante analysis
-      result.lda=predict(learning.lda,otherLog)
-
-      # Add the cluster to each logevent of "otherLog"
-      otherDatLogWithClusters=cbind(otherLog, result.lda$class)
-      colnames(otherDatLogWithClusters)=colnames(sampleDatLogWithClusters)
-
-      # Rebuilt datLog with clusters
-      datLogWithClusters=rbind(sampleDatLogWithClusters,otherDatLogWithClusters)
-
-      # Clusters for logevents
-      clusters=datLogWithClusters[,ncol(datLogWithClusters)]
-
-      # Between variance of classification
-      print("between and within variance classification...")
-      sizeClusters=numeric()
+      sampleClusters=sampleDatLogWithClusters[,ncol(sampleDatLogWithClusters)]
+      
+      # Within and between variance of clusters and classification
       centerOfGravityClassif=numeric()
-      centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
-      for(k in 1:nbClust){
-        clusti=datLogWithClusters[which(clusters==k),1:nbDim]
-        sizeClusters[k]=nrow(clusti)
+      withinVarClusters=numeric()
+      centerOfGravitySampleDatLog=colMeans(sampleDatLog)
+      centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravitySampleDatLog)
+      for(k in 1:nbClust){  # Within variance by cluster
+  
+        clusti=sampleDatLogWithClusters[which(sampleClusters==k),1:nbDim]
         centerOfGravityClusti=colMeans(clusti)
         centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-      }
-      classifBetweenVar=cbind(classifBetweenVar,1/nbLog*sum(sizeClusters*((dist(centerOfGravityClassif)[1:nbClust])^2)))
-
-      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-      gc(reset=TRUE)
-    
-      # Within variance of classification
-      withinVarClusters=numeric()
-      for(k in 1:nbClust){  # Within variance by cluster
-
-        clusti=datLogWithClusters[which(clusters==k),1:nbDim]
         sizeClusti=nrow(clusti)
         centerOfGravityClusti=colMeans(clusti)
         withinVarClustiPart=numeric()
         withinVarClusters[k]=1/sizeClusti*sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
-
+  
       }
-      classifWithinVar=cbind(classifWithinVar,1/nbLog*sum(sizeClusters*withinVarClusters))   # Within variance of classification
-      
+      # Between variance
+      classifBetweenVar=1/nbLog*sum(sizeClusti*((dist(centerOfGravityClassif)[1:nbClust])^2))
+      # Within variance of clusters on totale variance (pourcent) and between variance on totale variance of classification
+      withinVarClusterOnTot=withinVarClusters/(classifBetweenVar+sum(withinVarClusters))*100
+      betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+sum(withinVarClusters))*100
+      classifVarExplain=c(classifVarExplain,betweenVarClassifOnTot)
+
       # Mean profiles by cluster for each sample
       nbSpec=ncol(datSpecies)
       mprofil=numeric()
       blank=rep(00000000000,nbSpec)
       for(k in 1:nbClust){
-        mprofilclusti=mean(datSpecies[which(clusters==k),])
+        mprofilclusti=mean(sampleDatSpecies[which(sampleClusters==k),])
         mprofil=rbind(mprofil,mprofilclusti)
       }
       mprofil=rbind(mprofil,blank)
       
       mProfilSample=rbind(mProfilSample,mprofil)
 
-      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-      gc(reset=TRUE)
+
+      # Graphics
       
-    }
+      # Calculation of each cluster size
+      sizeClusters=numeric()
+      for(k in 1:nbClust){
+        sizeClusters[k]=length(which(sampleClusters==k))
+      }
+  
+      # Compute the test-values for species
+      resval=test.values(sampleClusters,sampleDatSpecies)
+      # Determine the target species
+      target=targetspecies(resval)
+      #cat("target species:", target,"\n")
+      print(target$tabnomespcib)
+      
+  
+#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#      gc(reset=TRUE)
+  
+  
+      # Projections on the first factorial plans
+      png(paste(analysisName,numSample,"Sample_HAC_Projections.png",sep="_"), width = 1200, height = 800)
+      op <- par(mfrow=c(2,3))
+      plot(sampleDatLog[,1], sampleDatLog[,2], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(sampleClusters)], main="Projection of HAC classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
+      if(dim(datLog)[2]>2) {
+      plot(sampleDatLog[,2], sampleDatLog[,3], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(sampleClusters)], main="Projection of HAC classification on the factorial plan 2-3", xlab="axis 2", ylab="axis 3")
+      plot(sampleDatLog[,1], sampleDatLog[,3], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(sampleClusters)], main="Projection of HAC classification on the factorial plan 1-3", xlab="axis 1", ylab="axis 3")
+      if(dim(datLog)[2]>3) {
+      plot(sampleDatLog[,1], sampleDatLog[,4], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(sampleClusters)], main="Projection of HAC classification on the factorial plan 1-4", xlab="axis 1", ylab="axis 4")
+      plot(sampleDatLog[,2], sampleDatLog[,4], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(sampleClusters)], main="Projection of HAC classification on the factorial plan 2-4", xlab="axis 2", ylab="axis 4")
+      plot(sampleDatLog[,3], sampleDatLog[,4], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(sampleClusters)], main="Projection of HAC classification on the factorial plan 3-4", xlab="axis 3", ylab="axis 4")
+      }}
+      par(op)
+      dev.off()
+  
+      
+      # Rectangles plotting
+      png(paste(analysisName,numSample,"Sample_HAC_Dendogram.png",sep="_"), width = 1200, height = 800)
+      plclust(log.hac,labels=F,hang=-1,ann=F)
+      title(main="HAC dendogram",xlab="Logevents",ylab="Height")
+      rect.hclust(log.hac, k=nbClust)
+      dev.off()
+  
+  
+      # Mean profile of the dataset
+      meanprofile=mean(sampleDatSpecies)
+      png(paste(analysisName,numSample,"Sample_Mean profile of the sample.png",sep="_"), width = 1200, height = 800)
+      op <- par(las=2)
+      barplot(meanprofile, main="Mean profile of the sample", xlab="Species", ylab="Percentage of catch")
+      par(op)
+      mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      dev.off()
+      
+  
+      # Mean profiles by cluster
+      nbSpec=ncol(sampleDatSpecies)
+      mprofil=numeric()
+      for(k in 1:nbClust){
+        mprofilclusti=mean(sampleDatSpecies[which(sampleClusters==k),])
+        mprofil=rbind(mprofil,mprofilclusti)
+      }
+      png(paste(analysisName,numSample,"Sample_Mean profile by cluster of the sample.png",sep="_"), width = 1200, height = 800)
+      op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
+      for(k in 1:nbClust){
+        op2 <- par(las=2)
+        barplot(mprofil[k,], cex.names=1, xlab="Species", ylab="Percentage of catch")
+        par(op2)
+        mtext(paste("Cluster",k), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      }
+      par(op)
+      title(main=paste("Mean profile by cluster of the sample","\n","\n",sep=""))
+      dev.off()
+      
+      
+      # Standard deviation profile by cluster
+      sdprofil=numeric()
+      for(k in 1:nbClust){
+        sdprofilclusti=sd(sampleDatSpecies[which(sampleClusters==k),])
+        sdprofil=rbind(sdprofil,sdprofilclusti)
+      }
+      png(paste(analysisName,numSample,"Sample_Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
+      op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
+      for(k in 1:nbClust){
+        op2 <- par(las=2)
+        barplot(sdprofil[k,], cex.names=1, xlab="Species", ylab="Percentage of catch")
+        par(op2)
+        mtext(paste("Cluster",k), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      }
+      par(op)
+      title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
+      dev.off()
+  
 
-    
-    # Classification's quality
-    print("choosing the best sample...")
-    classifQuality=classifWithinVar/classifBetweenVar
-    which.min(classifQuality)
+      
+      
+      # Number of Logevents by cluster
+      x=c(1:nbClust)
+      png(paste(analysisName,numSample,"Sample_Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
+      coord=barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
+      barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
+      text(coord,sizeClusters-500,sizeClusters,font=2)
+      text(coord,sizeClusters+500,sizeClusters,font=2)
+      dev.off()
+  
+  
+      # Target Species profiles (test-value)
+      targetresval=numeric()
+      nameTargetPlot=character()
+      for(k in 1:nbClust){
+        nomtargeti=as.character(target$tabnomespcib[k,which(!is.na(target$tabnumespcib[k,]))])
+        numtargeti=as.numeric(target$tabnumespcib[k,which(!is.na(target$tabnumespcib[k,]))])
+        nameTargetPloti=rep("",nbSpec)
+        nameTargetPloti[numtargeti]=nomtargeti
+        nameTargetPlot=rbind(nameTargetPlot,nameTargetPloti)
+        targetresvalclusti=rep(0,nbSpec)
+        targetresvalclusti[numtargeti]=resval[nomtargeti,k]
+        targetresval=rbind(targetresval,targetresvalclusti)
+      }
+  
+      png(paste(analysisName,numSample,"Sample_Profile of target species by cluster.png",sep="_"), width = 1200, height = 800)
+      #op <- par(mfrow=c(rep(ceiling(sqrt(nbClust)),2)))
+      op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
+      for(k in 1:nbClust){
+        op2 <- par(las=2)
+        barplot(targetresval[k,],names.arg=nameTargetPlot[k,], cex.names=1, xlab="Species", ylab="Test-value")
+        par(op2)
+        mtext(paste("Cluster",k), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      }
+      par(op)
+      title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
+      dev.off()
 
+#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#      gc(reset=TRUE)
+
+    } # end of for(i in 1:5)
+      
+      
+      
+      
+      
+      
+      
+      
+#      # Discriminante analysis on the learning dataset "sampleDatLogWithClusters"
+#      learning.lda=lda(sampleDatLogWithClusters[,1:nbDim],sampleDatLogWithClusters[,ncol(sampleDatLogWithClusters)])
+#
+#      # Other Logevents (which aren't belonging to the sample)
+#      otherLog=datLog[outofsam,]
+#
+#      # Predict the cluster for each logevent of "otherLog" thanks to a discriminante analysis
+#      result.lda=predict(learning.lda,otherLog)
+#
+#      # Add the cluster to each logevent of "otherLog"
+#      otherDatLogWithClusters=cbind(otherLog, result.lda$class)
+#      colnames(otherDatLogWithClusters)=colnames(sampleDatLogWithClusters)
+#
+#      # Rebuilt datLog with clusters
+#      datLogWithClusters=rbind(sampleDatLogWithClusters,otherDatLogWithClusters)
+#
+#      # Clusters for logevents
+#      clusters=datLogWithClusters[,ncol(datLogWithClusters)]
+#
+
+                
+      
+#      # Between variance of classification
+#      print("between and within variance classification...")
+#      sizeClusters=numeric()
+#      centerOfGravityClassif=numeric()
+#      centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
+#      for(k in 1:nbClust){
+#        clusti=sampleDatLogWithClusters[which(sampleClusters==k),1:nbDim]
+#        sizeClusters[k]=nrow(clusti)
+#        centerOfGravityClusti=colMeans(clusti)
+#        centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
+#      }
+#      classifBetweenVar=cbind(classifBetweenVar,1/nbLog*sum(sizeClusters*((dist(centerOfGravityClassif)[1:nbClust])^2)))
+#
+#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#      gc(reset=TRUE)
+#    
+#      # Within variance of classification
+#      withinVarClusters=numeric()
+#      for(k in 1:nbClust){  # Within variance by cluster
+#
+#        clusti=sampleDatLogWithClusters[which(sampleClusters==k),1:nbDim]
+#        sizeClusti=nrow(clusti)
+#        centerOfGravityClusti=colMeans(clusti)
+#        withinVarClustiPart=numeric()
+#        withinVarClusters[k]=1/sizeClusti*sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+#
+#      }
+#      classifWithinVar=cbind(classifWithinVar,1/nbLog*sum(sizeClusters*withinVarClusters))   # Within variance of classification
+#      
+#      # Mean profiles by cluster for each sample
+#      nbSpec=ncol(datSpecies)
+#      mprofil=numeric()
+#      blank=rep(00000000000,nbSpec)
+#      for(k in 1:nbClust){
+#        mprofilclusti=mean(sampleDatSpecies[which(sampleClusters==k),])
+#        mprofil=rbind(mprofil,mprofilclusti)
+#      }
+#      mprofil=rbind(mprofil,blank)
+#      
+#      mProfilSample=rbind(mProfilSample,mprofil)
+#
+#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#      gc(reset=TRUE)
+#      
+#    }
+#
+#    
+#    # Classification's quality
+#    print("choosing the best sample...")
+#    classifQuality=classifWithinVar/classifBetweenVar
+#    which.min(classifQuality)
+#
+  
+  
+  
+  
     # Select the sample which gives the smaller classification's quality (the best sample)
-    sam=sampleList[which.min(classifQuality),]
+    sam=sampleList[which.min(classifVarExplain),]
     outofsam=setdiff(1:nbLog,sam)
     sampleDatLog=datLog[sam,]
 
@@ -577,7 +651,7 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
     gc(reset=TRUE)
-
+    
 
     # Projections on the first factorial plans
     png(paste(analysisName,"HAC_Projections.png",sep="_"), width = 1200, height = 800)
@@ -696,7 +770,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
-    return(list(clusters=clusters, sizeClusters=sizeClusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
+    return(list(clusters=clusters, sizeClusters=sizeClusters, tabInertia=tabInertia, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
   }   else 
 
@@ -860,7 +934,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
-    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
+    return(list(clusters=clusters, tabInertia=tabInertia, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
   } else                                                                                                        
 
@@ -1035,7 +1109,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
+    return(list(clusters=clusters, tabInertia=tabInertia,  nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
   } else 
 
@@ -1217,7 +1291,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(clusters=clusters, datSpecies=datSpecies, tabInertia=tabInertia, datLog=datLog, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
+    return(list(clusters=clusters, tabInertia=tabInertia, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
