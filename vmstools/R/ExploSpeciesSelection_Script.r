@@ -1,28 +1,28 @@
 mem <- ls()
+t1 <- Sys.time()
 # Exploration of Step 1 : SELECTION OF SPECIES
 
 #ExploSpeciesSelection=function(dat,analysisName="",Val="EURO"){
 Val <- "EURO";analysisName<-"OTB2008_NS";dat <- efl_comb
 
 dat <- dat[,c("LE_ID",grep(Val,names(dat),value=TRUE))]
-dat[is.na(dat)] <- 0  
 
 
     # First simplify the names of columns
     names(dat)[-1] <- unlist(lapply(strsplit(names(dat)[-1],"_"),function(x) x[[3]]))
-
-    # HAC
-    print("######## STEP 1 SELECTION OF MAIN SPECIES BY 'HAC' METHOD ########")
     
-    toutfait=FALSE
     p=ncol(dat)   # Number of species
     n=nrow(dat)
     # Transform quantities to proportions of total quantity caught by logevent
     print("calculating proportions...") 
 
     propdat=transformation_proportion(dat[,2:p])
-    nameSpecies=names(propdat)
-    nameSpecies
+
+
+    # HAC
+    print("######## STEP 1 SELECTION OF MAIN SPECIES BY 'HAC' METHOD ########")
+    
+    toutfait=FALSE
     # Transposing data
     table_var=table_variables(propdat)
 
@@ -91,10 +91,10 @@ print("selection of possible residual species... (please be patient!!)")
 
     pourcentCatchMainSpeciesHAC=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
     #Delete logevents without catch
-    logWithoutCatch=which(is.na(pourcentCatchMainSpeciesHAC))
-    logWithCatch=setdiff(1:n,logWithoutCatch)
+    #logWithoutCatch=which(is.na(pourcentCatchMainSpeciesHAC))
+    #logWithCatch=setdiff(1:n,logWithoutCatch)
 
-    pourcentCatchMainSpeciesHAC=apply(datSpeciesWithoutProp[logWithCatch,],1,sum)/apply(dat[logWithCatch,2:p],1,sum)*100
+    #pourcentCatchMainSpeciesHAC=apply(datSpeciesWithoutProp[logWithCatch,],1,sum)/apply(dat[logWithCatch,2:p],1,sum)*100
     medianPourcentCatchMainSpeciesHAC=median(pourcentCatchMainSpeciesHAC)
     mean(pourcentCatchMainSpeciesHAC)
 
@@ -105,22 +105,13 @@ print("selection of possible residual species... (please be patient!!)")
     
     # Total quantity caught by species
     sumcol=numeric()
-#    for(i in 2:p){
-#      sumcol[i]=sum(dat[,i])
-#    }
     
     sumcol <- apply(dat[,-1],2,sum)
 
-    # Total quantity caught
-    sumtotale=sum(sumcol,na.rm=T)
     # Percent of each species in the total catch
-    propesp=sumcol/sumtotale*100
-    # by decreasing order
-    propespdec=propesp[order(propesp,decreasing=T)]
-    # Columns number of each species by decreasing order of capture
-    numesp=order(propesp,decreasing=T)
-    # Cumulative percent of catch
-    propespcum=cumsum(propespdec)
+    propesp=sumcol/sum(sumcol,na.rm=T)*100
+    # by cumulated decreasing order
+    propesp=cumsum(propesp[order(propesp,decreasing=T)])
     # We are taking all species until having at least seuil% of total catch
 
     nbMainSpeciesTotale=numeric()
@@ -129,9 +120,9 @@ print("selection of possible residual species... (please be patient!!)")
     for(seuil in seq(5,100,5)){
       cat("seuil:",seuil,"\n")
       pourcent=which(propespcum<=seuil)
-      espsel=numesp[1:(length(pourcent)+1)]
       # We are taking the name of selected species
-      nomespsel=nameSpecies[espsel]
+      nomespsel=names(pourcent)
+      
       # We are bulding the table with main species and aggregated other species
       #datSpecies=building_tab_pca(propdat,nomespsel)
       datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
@@ -139,13 +130,13 @@ print("selection of possible residual species... (please be patient!!)")
 
       pourcentCatchMainSpeciesTotale=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
       #Delete logevents without catch
-      logWithoutCatch=which(is.na(pourcentCatchMainSpeciesTotale))
-      logWithCatch=setdiff(1:n,logWithoutCatch)
-      if(length(nomespsel)==1){
-        vectorNul=rep(0,n)
-        datSpeciesWithoutProp=cbind(datSpeciesWithoutProp,vectorNul)
-      }
-      pourcentCatchMainSpeciesTotale=apply(datSpeciesWithoutProp[logWithCatch,],1,sum)/apply(dat[logWithCatch,2:p],1,sum)*100
+      #logWithoutCatch=which(is.na(pourcentCatchMainSpeciesTotale))
+      #logWithCatch=setdiff(1:n,logWithoutCatch)
+      #if(length(nomespsel)==1){
+      #  vectorNul=rep(0,n)
+      #  datSpeciesWithoutProp=cbind(datSpeciesWithoutProp,vectorNul)
+      #}
+      #pourcentCatchMainSpeciesTotale=apply(datSpeciesWithoutProp[logWithCatch,],1,sum)/apply(dat[logWithCatch,2:p],1,sum)*100
       medianPourcentCatchMainSpeciesTotale[seuil/5]=median(pourcentCatchMainSpeciesTotale)
       mean(pourcentCatchMainSpeciesTotale)
     }
@@ -161,13 +152,11 @@ print("selection of possible residual species... (please be patient!!)")
     nbMainSpeciesLogevent=numeric()
     medianPourcentCatchMainSpeciesLogevent=numeric()
 
-    #AllNamesSpeciesLogevent <- vector()
     for(seuil in seq(5,100,5)){
     cat("seuil:",seuil,"\n")
       # Selection of species making up over seuil% of logevent's captures
       pourcent <- apply(propdat,1,function(x) which(x>=seuil))
       nomespsel <- names(propdat)[unique(unlist(pourcent))]
-      #AllNamesSpeciesLogevent <- c(AllNamesSpeciesLogevent,nomespsel)
 
       # We are bulding the table with main species and aggregated other species
       #datSpecies=building_tab_pca(propdat,nomespsel)
@@ -176,18 +165,17 @@ print("selection of possible residual species... (please be patient!!)")
       
       pourcentCatchMainSpeciesLogevent=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
       #Delete logevents without catch
-      logWithoutCatch=which(is.na(pourcentCatchMainSpeciesLogevent))
-      logWithCatch=setdiff(1:n,logWithoutCatch)
-      if(length(nomespsel)==1){
-        vectorNul=rep(0,n)
-        datSpeciesWithoutProp=cbind(datSpeciesWithoutProp,vectorNul)
-      }
-      pourcentCatchMainSpeciesLogevent=apply(datSpeciesWithoutProp[logWithCatch,],1,sum)/apply(dat[logWithCatch,2:p],1,sum)*100
+      #logWithoutCatch=which(is.na(pourcentCatchMainSpeciesLogevent))
+      #logWithCatch=setdiff(1:n,logWithoutCatch)
+      #if(length(nomespsel)==1){
+      #  vectorNul=rep(0,n)
+      #  datSpeciesWithoutProp=cbind(datSpeciesWithoutProp,vectorNul)
+      #}
+      #pourcentCatchMainSpeciesLogevent=apply(datSpeciesWithoutProp[logWithCatch,],1,sum)/apply(dat[logWithCatch,2:p],1,sum)*100
       medianPourcentCatchMainSpeciesLogevent[seuil/5]=median(pourcentCatchMainSpeciesLogevent)
     }
     nbMainSpeciesLogevent=c(p-1,nbMainSpeciesLogevent)
     medianPourcentCatchMainSpeciesLogevent=c(100,medianPourcentCatchMainSpeciesLogevent)
-    #NamesMainSpeciesLogevent <- names(sort(table(AllNamesSpeciesLogevent),decreasing=T)[1:nbMainSpeciesHAC])
     NamesMainSpeciesLogevent <- nomespsel
     
 
@@ -225,6 +213,8 @@ print("selection of possible residual species... (please be patient!!)")
     save(explo_species,file="explo_species.Rdata")
     
 #}
+print ("---- end of explo species----")
+print(Sys.time()-t1)
 
 mem.new <- ls()
 rm(list=mem.new[!mem.new %in% c(mem,explo_species)])
