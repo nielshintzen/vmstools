@@ -10,15 +10,17 @@
   # replace NA by " "
   #...
   
-  # add fake columns to get the same ncol()
+  # add a fake column to get the same ncol()
   #...
-
+  vsl <- cbind(vsl, 0)
+  colnames(ve) <- paste('col', 1:ncol(ve), sep='')
+  colnames(vsl) <- paste('col', 1:ncol(vsl), sep='')
 
   # bind and order
   #(to get a VE line and then VSL lines, VE and then VSL lines, etc.)
   ff <- rbind(ve,vsl)
   library(doBy)
-  ff <- orderBy(~c_square+LE_MET_level6+month+recordtype, data=ff)
+  ff <- orderBy(~col7+col9+col5+col1, data=ff)
 
 
   # save
