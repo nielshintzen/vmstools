@@ -13,3 +13,5 @@ bearing <- function(lon,lat,lonRef,latRef){
 
                     
 #bearing(3.15,51.64,3.15,51.65)
+
+#hello world
