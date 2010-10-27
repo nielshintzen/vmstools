@@ -25,10 +25,12 @@ The method returns tacsat (a subset if vessels informed) with the SI_STATE infor
 \author{Francois Bastardie}
 \seealso{\code{}}
 \examples{
+
+\dontrun{
 data(tacsat)
 tacsat <- segmentSpeedTacsat (tacsat=tacsat, vessels="35", force.lower.bound=0.5,
               general=list(output.path=file.path('C:','output'),
                        visual.check=TRUE))
-
+}
 
 }
