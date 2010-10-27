@@ -3,7 +3,8 @@
 # required: library 'segmented'
 # F. Bastardie
 
-segmentSpeedTacsat <- function(tacsat, vessels="DNK100"){
+segmentSpeedTacsat <- function(tacsat, vessels="35",
+                         general=list(output.path=file.path('C:','output'))){
 
   tacsat[,"bound1"] <- NA
   tacsat[,"bound2"] <- NA
