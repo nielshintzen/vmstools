@@ -1,6 +1,7 @@
 # do the distinction between fishing and non-fishing
 # by automatic detection of the fishing peak
 # required: library 'segmented'
+# F. Bastardie
 
 segmentSpeedTacsat <- function(tacsat, vessels="DNK100"){
 
@@ -42,13 +43,16 @@ segmentSpeedTacsat <- function(tacsat, vessels="DNK100"){
   # add a apparent speed colunm (nautical miles per hour)
   tacsat.this.vessel$apparent.speed <- signif(
             c(0, distAB.f(A= tacsat.this.vessel[-nrow(tacsat.this.vessel),c("SI_LATI","SI_LONG")],
-              B= tacsat.this.vessel[-1,c("SI_LATI","SI_LONG")], .unit="nm") / (abs(xx[-1,]$diff.time.mins)/60)),
+              B= tacsat.this.vessel[-1,c("SI_LATI","SI_LONG")], .unit="nm") / (abs(tacsat.this.vessel[-1,]$diff.time.mins)/60)),
               3)
 
   # cleaning irrealistic points
   tacsat.this.vessel$apparent.speed <-
      replace(tacsat.this.vessel$apparent.speed, is.na(tacsat.this.vessel$apparent.speed), 0)
   tacsat.this.vessel <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed < 30,]
+
+  if(is.null(levels(tacsat$LE_GEAR)))
+      stop('you need first to assign a gear LE_GEAR to each ping')
 
   for (gr in levels(tacsat$LE_GEAR)){
     xxx <- tacsat.this.vessel$LE_GEAR[tacsat.this.vessel$LE_GEAR==gr,] # input
