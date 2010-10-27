@@ -3,9 +3,16 @@
 # required: library 'segmented'
 # F. Bastardie
 
-segmentSpeedTacsat <- function(tacsat, vessels="35",
-                         general=list(output.path=file.path('C:','output'))){
+segmentSpeedTacsat <- function(tacsat,
+                         general=list(output.path=file.path('C:','output'),
+                                       visual.check=TRUE), ...){
 
+  lstargs <- list(...)
+  if(length(lstargs$vessels)!=0) {
+     vessels <- lstargs$vessels
+  } else{
+  vessels <- unique(tacsat$VE_REF)
+  }
   tacsat[,"bound1"] <- NA
   tacsat[,"bound2"] <- NA
 
@@ -282,7 +289,7 @@ segmentSpeedTacsat <- function(tacsat, vessels="35",
   if(is.null(bound1)) bound1 <- o$psi[order(o$psi[,"Est."])[1],"Est."] -20 # -20 hard to justify...
   if(is.null(bound2)) bound2 <- o$psi[order(o$psi[,"Est."])[2],"Est."] +20
 
- if(TRUE){
+ if(general$visual.check){
    windows()
    par(mfrow=c(3,1))
    if(class(o)!="try-error"){
