@@ -430,6 +430,16 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
           .vms[start.trip!=0, "LE_EFF_VMS"] <- 0  # just correct for the trip change points
 
 
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         # ASSIGN FISHING/NON-FISHING (optional)!#!#!#!#!#
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         if(FALSE) .vms <- segmentSpeedTacsat (tacsat=.vms, vessels=a.vesselid, 
+                                  force.lower.bound=0.5, general=list(
+                                   output.path=general$output.path,visual.check=TRUE))
+                #=> (semi)automatic detection of the fishing peak
+                # (put here because the LE_GEAR need to be informed)
+
+
 
          rm(er); rm(xx) ; gc(reset=TRUE)
                                            
@@ -791,9 +801,9 @@ return()
   data(eflalo2)
   data(tacsat)
   data(euharbours)
-  # add missing harbours?
-  euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10')))
-  euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1')))
+  # add missing harbours? (still to be fix...)
+  #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10')))
+  #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1')))
 
  
   library(doBy)
