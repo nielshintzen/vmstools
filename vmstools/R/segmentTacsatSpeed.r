@@ -4,7 +4,8 @@
 # F. Bastardie
 
 segmentSpeedTacsat <- function(tacsat,
-                         general=list(output.path=file.path('C:','output'),
+                         general=list(
+                           output.path=file.path('C:','output'),
                                        visual.check=TRUE), ...){
 
   lstargs <- list(...)
@@ -15,6 +16,8 @@ segmentSpeedTacsat <- function(tacsat,
   }
   tacsat[,"bound1"] <- NA
   tacsat[,"bound2"] <- NA
+
+
 
    # utils---
   distAB.f <- function(A,B, .unit="km"){
@@ -318,8 +321,15 @@ segmentSpeedTacsat <- function(tacsat,
   bound2 <- bound2  / 100   # re-transform
   xxx$apparent.speed <- replace(xxx$apparent.speed, is.na(xxx$apparent.speed), 0) # debug 0/0
 
-  if(gr %in% c('GNS','GND','GNC','GNF',
-             'GTR','GTN','GEN','GN')) bound1 <- 0.5 # special case for gillnetters= no lower bound
+  # maybe you want to only keep the upper bound
+  # and then set the lower one for particular gear?
+  if(length(lstargs$force.low.bound)!=0) {
+     if(gr %in% c('GNS','GND','GNC','GNF',
+             'GTR','GTN','GEN','GN')) bound1 <- lstargs$force.lower.bound
+             # special case for gillnetters= set a lower bound
+     if(gr %in% c('SDN') bound1 <- lstargs$force.lower.bound
+  }
+  
   xxx[xxx$apparent.speed < bound1, "SI_STATE"]                       <- 2 # steaming
   xxx[xxx$apparent.speed >= bound1 & xxx$apparent.speed < bound2, "SI_STATE"]  <- 1 # fishing
   xxx[xxx$apparent.speed >= bound2 , "SI_STATE"]                     <- 2 # steaming
