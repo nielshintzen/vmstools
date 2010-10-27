@@ -139,16 +139,13 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
          #   add mid-time and bk.tripnum in eflalo
            # departure time
-           Sys.setlocale("LC_TIME", "english")
-           ctime <- strptime(  paste(logbk.this.vessel$FT_DDAT, logbk.this.vessel$FT_DTIME) ,  "%e/%m/%Y %H:%M" )
+           ctime <- strptime(  paste(logbk.this.vessel$FT_DDAT, logbk.this.vessel$FT_DTIME) , tz='GTM',  "%e/%m/%Y %H:%M" )
            logbk.this.vessel <- cbind.data.frame(logbk.this.vessel, date.in.R.dep=ctime)
            # arrival time
-           Sys.setlocale("LC_TIME", "english")
-           ctime <- strptime(  paste(logbk.this.vessel$FT_LDAT, logbk.this.vessel$FT_LTIME) ,  "%e/%m/%Y %H:%M" )
+           ctime <- strptime(  paste(logbk.this.vessel$FT_LDAT, logbk.this.vessel$FT_LTIME) , tz='GTM',  "%e/%m/%Y %H:%M" )
            logbk.this.vessel <- cbind.data.frame(logbk.this.vessel, date.in.R.arr=ctime)
            # catch.date
-           Sys.setlocale("LC_TIME", "english")
-           ctime <- strptime(  paste(logbk.this.vessel$LE_CDAT) ,  "%e/%m/%Y" )
+           ctime <- strptime(  paste(logbk.this.vessel$LE_CDAT) , tz='GTM',  "%e/%m/%Y" )
            logbk.this.vessel <- cbind.data.frame(logbk.this.vessel, date.in.R.cat=ctime)
 
            # mid time bk trips
@@ -187,9 +184,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
  
          # if does not exist, add date.in.R for handling the time in R
          if(!("date.in.R" %in% colnames(tacsat))){
-           Sys.setlocale("LC_TIME", "english")
            ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) , 
-                                   "%e/%m/%Y %H:%M" )
+                                 tz='GTM',   "%e/%m/%Y %H:%M" )
            tacsat.this.vessel <- cbind.data.frame(tacsat.this.vessel, date.in.R=ctime)
          }
 
