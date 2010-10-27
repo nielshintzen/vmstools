@@ -17,7 +17,7 @@ formatEflalo2 <- function(x){
   x$LE_CDAT       <- ac(x$LE_CDAT)
   x$LE_STIME      <- ac(x$LE_STIME)
   x$LE_ETIME      <- ac(x$LE_ETIME)
-  x$LE_SEQNUM     <- an(ac(x$LE_SEQNUM))
+  x$LE_ID         <- ac(x$LE_ID)
   x$LE_GEAR       <- ac(x$LE_GEAR)
   x$LE_MSZ        <- an(ac(x$LE_MSZ))
   x$LE_RECT       <- ac(x$LE_RECT)
