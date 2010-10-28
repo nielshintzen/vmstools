@@ -51,6 +51,10 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
   #utils--
   an <<- function(x) as.numeric(as.character(x)) # alias
   
+  # create required folders for outputs
+  cat("if it still doesn't exist, 'results' folder is created in ",general$output.path,"\n")    
+  system(paste("mkdir ",file.path(general$output.path),sep=""),intern=TRUE)
+
   
  #!!!!!!!!!!!!!!!!!!!!!#
  #!!!!!!!!!!!!!!!!!!!!!#
@@ -829,11 +833,13 @@ return()
   # TEST FOR A GIVEN SET OF VESSELS
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE))
+                                                                            a.year=2009, visual.check=TRUE,
+                                                                             do.wp3=FALSE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
                                                              general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE))
+                                                                            a.year=2009, visual.check=TRUE,
+                                                                             do.wp3=FALSE, speed="segment"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
