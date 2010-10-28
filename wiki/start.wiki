@@ -1,15 +1,10 @@
-#summary One-sentence summary of this page.
-
 
 = Mission =
 
-development of R scripts to setup the workflow of vms and logbook data to compute pressure indicators
+Development of R scripts to setup the workflow of *vms* and *logbooks* data to compute pressure indicators
 	
 
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+a suite of tools written in R for i) analysing and interpreting VMS raw data, ii) assign a metier level 6 (EU DCF) to each logbook declaration, iii) coupling both information, iv) mapping fishing effort and landings (weight and value) at fine scale resolution, v) computing pressure indicators on the marine habitats vi) uploading in the fishframe data wharehouse.  
