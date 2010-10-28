@@ -44,7 +44,7 @@
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
            function(logbooks, tacsat, general=list(output.path=file.path("C:"),
-                    a.year=2009, visual.check=TRUE), ...){
+                    a.year=2009, visual.check=TRUE, do.wp3=FALSE, speed="segment"), ...){
 
   lstargs <- list(...)
 
@@ -214,7 +214,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
         if(a.flag==FALSE) {  # i.e. vms-equipped
 
-           if(all(is.na(vms.this.vessel$SI_STATE))) stop('the SI_STATE column has to be informed before making the merging')
+           if(all(is.na(vms.this.vessel$SI_STATE)) && general$do.wp3==FALSE)
+                  stop('the SI_STATE column has to be informed before making the merging')
      
          # alias
          .logbk <- logbk.this.vessel
@@ -429,11 +430,15 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # ASSIGN FISHING/NON-FISHING (optional)!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-         if(FALSE) .vms <- segmentSpeedTacsat (tacsat=.vms, vessels=a.vesselid, 
+         if(general$do.wp3 && general$speed=="segment")
+            .vms <- segmentSpeedTacsat (tacsat=.vms, vessels=a.vesselid, 
                                   force.lower.bound=0.5, general=list(
                                    output.path=general$output.path,visual.check=TRUE))
                 #=> (semi)automatic detection of the fishing peak
                 # (put here because the LE_GEAR need to be informed)
+         # alternative TO DO:
+         #if(general$do.wp3 && general$speed=="lookuptable")
+         #   .vms <- lookupSpeedTacsat (tacsat=.vms, vessels=a.vesselid)
 
 
 

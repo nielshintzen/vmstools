@@ -226,9 +226,8 @@ segmentSpeedTacsat <- function(tacsat,
 
   tacsat.this.vessel <- tacsat[tacsat$VE_REF %in% a.vesselid, ]
   
-  Sys.setlocale("LC_TIME", "english")
   ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) ,
-                                   "%e/%m/%Y %H:%M" )
+                            tz='GMT',       "%e/%m/%Y %H:%M" )
   tacsat.this.vessel <- cbind.data.frame(tacsat.this.vessel, date.in.R=ctime)
 
   diff.time <- tacsat.this.vessel[-nrow(tacsat.this.vessel),"date.in.R"] -
@@ -254,7 +253,7 @@ segmentSpeedTacsat <- function(tacsat,
     xxx <- tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr,] # input
 
     x <- as.numeric(as.character(sort(xxx$apparent.speed))) *100   # multiply by factor 100 because integer needed
-    hi <- hist(x, nclass=30,plot=FALSE) # remove irealistic speed at the mean time
+    hi <- hist(x, nclass=30,plot=FALSE) 
 
     y <- c(1:length(sort(xxx$apparent.speed))) # sort in increasing order
     y <- y[x>100 & x<1000] # just removing the 0, and the larger speeds we 100% know it is steaming
@@ -262,11 +261,11 @@ segmentSpeedTacsat <- function(tacsat,
     dati   <- data.frame(x=x,y=y)
     dati$x <- as.integer(dati$x) # integer needed
     psi    <- list(x= quantile(dati$x,probs=c(0.05,0.5))  )
-    assign('dati', dati, env=.GlobalEnv) # DEBUG segmented()...pfff! this function looks in the global env to get dati!!
+    assign('dati', dati, env=.GlobalEnv) # DEBUG segmented()...this function looks in the global env to get dati!!
     # get good start guesses
     hi$counts <- hi$counts[-1]
     idx       <- which(hi$counts==max(hi$counts))[1]
-    more.frequent.speed <- hi$mids[idx] # assumed to be for fishnig
+    more.frequent.speed <- hi$mids[idx] # assumed to be for fishing
     while(more.frequent.speed > 700 || more.frequent.speed < 100){
       hi$counts <- hi$counts[-idx]
       hi$mids <-  hi$mids[-idx]
@@ -286,7 +285,7 @@ segmentSpeedTacsat <- function(tacsat,
     o <- try(
          segmented(lm(y~x, data=dati) , seg.Z=~x , psi=psi, control= seg.control(display = FALSE, it.max=50, h=1)), # with 2 starting guesses
          silent=TRUE) # the second breakpoint is quite uncertain and could lead to failure so...
-   if(class(o)!="try-error") break else psi <- list(x=c(psi$x[1],psi$x[2]-20)) # searching decreasing by 100 each time
+   if(class(o)!="try-error") break else psi <- list(x=c(psi$x[1],psi$x[2]-20)) # searching decreasing by 20 each time
    if(count>10) {bound1 <- start.lower.bound; bound2 <- start.upper.bound ; cat(paste("failure of the segmented regression for",a.vesselid,gr,"\n...")); break}
    }
   if(is.null(bound1)) bound1 <- o$psi[order(o$psi[,"Est."])[1],"Est."] -20 # -20 hard to justify...
@@ -330,6 +329,7 @@ segmentSpeedTacsat <- function(tacsat,
      if(gr %in% c('SDN') bound1 <- lstargs$force.lower.bound
   }
   
+  # then, assign...
   xxx[xxx$apparent.speed < bound1, "SI_STATE"]                       <- 2 # steaming
   xxx[xxx$apparent.speed >= bound1 & xxx$apparent.speed < bound2, "SI_STATE"]  <- 1 # fishing
   xxx[xxx$apparent.speed >= bound2 , "SI_STATE"]                     <- 2 # steaming
