@@ -31,6 +31,8 @@ for the catch date and area, and no fishing position remained.
 
 = Details =
 
+{{{
+
   data(eflalo2)
   data(tacsat)
   data(euharbours)
@@ -56,22 +58,20 @@ for the catch date and area, and no fishing position remained.
   
   # TEST FOR A GIVEN SET OF VESSELS
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
-                                                             general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE,
-                                                                              do.wp3=FALSE, speed="segment"))
+                                                           general=list(output.path=file.path("C:","output"),
+                  a.year=2009, visual.check=TRUE,do.wp3=FALSE, speed="segment"))
+  
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
-                                                             general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE,
-                                                                              do.wp3=FALSE, speed="segment"))
+                                                        general=list(output.path=file.path("C:","output"), a.year=2009, visual.check=TRUE,
+                          do.wp3=FALSE, speed="segment"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
   load(file.path("C:","output","merged_35_2009.RData"))
   
   # ...or bind all vessels
-  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), what=character(), 
-                      folder = file.path("C:","output"))
+  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), what=character(), folder = file.path("C:","output"))
  
    # ...and load the merged output table for all vessels
   load(file.path("C:","output","all_merged_2009.RData"))
@@ -94,4 +94,12 @@ for the catch date and area, and no fishing position remained.
   # TO FISHFRAME FORMAT VL
   ff.vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD"))
-  }
+
+  # CONVERT TO FISHFRAME FORMAT (might take some time running)
+  ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
+                                          a.year=2009, a.country="NLD") )
+
+ 
+
+}}}
+
