@@ -79,11 +79,13 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   # TEST FOR A GIVEN SET OF VESSELS
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE))
+                                                                            a.year=2009, visual.check=TRUE,
+                                                                              do.wp3=FALSE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
                                                              general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE))
+                                                                            a.year=2009, visual.check=TRUE,
+                                                                              do.wp3=FALSE, speed="segment"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
