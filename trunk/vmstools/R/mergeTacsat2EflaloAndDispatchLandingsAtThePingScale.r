@@ -53,7 +53,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
   
   # create required folders for outputs
   cat("if it still doesn't exist, 'results' folder is created in ",general$output.path,"\n")    
-  system(paste("mkdir ",file.path(general$output.path),sep=""),intern=TRUE)
+  dir.create(general$output.path, showWarnings = TRUE, recursive = TRUE, mode = "0777")
 
   
  #!!!!!!!!!!!!!!!!!!!!!#
