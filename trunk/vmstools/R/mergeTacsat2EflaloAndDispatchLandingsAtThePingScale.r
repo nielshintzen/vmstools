@@ -1,4 +1,4 @@
-#hello
+
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#
@@ -143,13 +143,13 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
          #   add mid-time and bk.tripnum in eflalo
            # departure time
-           ctime <- strptime(  paste(logbk.this.vessel$FT_DDAT, logbk.this.vessel$FT_DTIME) , tz='GTM',  "%e/%m/%Y %H:%M" )
+           ctime <- strptime(  paste(logbk.this.vessel$FT_DDAT, logbk.this.vessel$FT_DTIME) , tz='GMT',  "%e/%m/%Y %H:%M" )
            logbk.this.vessel <- cbind.data.frame(logbk.this.vessel, date.in.R.dep=ctime)
            # arrival time
-           ctime <- strptime(  paste(logbk.this.vessel$FT_LDAT, logbk.this.vessel$FT_LTIME) , tz='GTM',  "%e/%m/%Y %H:%M" )
+           ctime <- strptime(  paste(logbk.this.vessel$FT_LDAT, logbk.this.vessel$FT_LTIME) , tz='GMT',  "%e/%m/%Y %H:%M" )
            logbk.this.vessel <- cbind.data.frame(logbk.this.vessel, date.in.R.arr=ctime)
            # catch.date
-           ctime <- strptime(  paste(logbk.this.vessel$LE_CDAT) , tz='GTM',  "%e/%m/%Y" )
+           ctime <- strptime(  paste(logbk.this.vessel$LE_CDAT) , tz='GMT',  "%e/%m/%Y" )
            logbk.this.vessel <- cbind.data.frame(logbk.this.vessel, date.in.R.cat=ctime)
 
            # mid time bk trips
@@ -189,7 +189,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          # if does not exist, add date.in.R for handling the time in R
          if(!("date.in.R" %in% colnames(tacsat))){
            ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) , 
-                                 tz='GTM',   "%e/%m/%Y %H:%M" )
+                                 tz='GMT',   "%e/%m/%Y %H:%M" )
            tacsat.this.vessel <- cbind.data.frame(tacsat.this.vessel, date.in.R=ctime)
          }
 
@@ -809,8 +809,8 @@ return()
   # add missing harbours? (still to be fix...)
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1')))
-  
-  
+
+ 
   library(doBy)
   tacsat$SI_HARB <- NA
   inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours,30)
