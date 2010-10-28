@@ -1,4 +1,4 @@
-
+#hello
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#
 #!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!#
@@ -809,8 +809,8 @@ return()
   # add missing harbours? (still to be fix...)
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1')))
-
- 
+  
+  
   library(doBy)
   tacsat$SI_HARB <- NA
   inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours,30)
