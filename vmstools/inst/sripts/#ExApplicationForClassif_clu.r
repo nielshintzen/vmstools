@@ -2,7 +2,7 @@
 rm(list=ls(all=TRUE))
 gc(reset=TRUE)
 #setwd("C:/CLARA/VMSTools_sandbox/")
-setwd("Z:/VMSTools_sandbox/")    
+#setwd("Z:/VMSTools_sandbox/")
 source("FunctionsForClassif.r")
 source("Classif.r")
 source("ExploSpeciesSelection.r")
