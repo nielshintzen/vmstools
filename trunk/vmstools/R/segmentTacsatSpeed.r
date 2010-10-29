@@ -326,7 +326,7 @@ segmentSpeedTacsat <- function(tacsat,
      if(gr %in% c('GNS','GND','GNC','GNF',
              'GTR','GTN','GEN','GN')) bound1 <- lstargs$force.lower.bound
              # special case for gillnetters= set a lower bound
-     if(gr %in% c('SDN') bound1 <- lstargs$force.lower.bound
+     if(gr %in% c('SDN')) bound1 <- lstargs$force.lower.bound
   }
   
   # then, assign...
