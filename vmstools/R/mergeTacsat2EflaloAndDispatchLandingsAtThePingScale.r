@@ -220,6 +220,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
            if(all(is.na(vms.this.vessel$SI_STATE)) && general$do.wp3==FALSE)
                   stop('the SI_STATE column has to be informed before making the merging')
+           if(all(is.na(logbk.this.vessel$VE_FLT)))
+                  stop('the VE_FLT column has to be informed before making the merging')
      
          # alias
          .logbk <- logbk.this.vessel
