@@ -1,15 +1,20 @@
 # these 3 DCF Indicators decribes the impact of fishing activity
 
-*Describing the spatial distribution of fishing activity*
+= Describing the spatial distribution of fishing activity =
+
+== Summary ==
 
 The EU Data Collection Framework (DCF) standardize three indicators to analyse the fishing activity. They are summarised as follow:
 
-- DCF Indicator 5: Distribution of fishing activities. The spatial extent of fishing activity based on the total areaof grids within which VMS records were obtained, each month;
+ * DCF Indicator 5: Distribution of fishing activities. The spatial extent of fishing activity based on the total areaof grids within which VMS records were obtained, each month; 
 
-- DCF Indicator 6: Aggregation of fishing activities.The extent to which fishing activity is aggregated based on the total area of grids within which 90% of VMS records were obtained, each month.
+ * DCF Indicator 6: Aggregation of fishing activities.The extent to which fishing activity is aggregated based on the total area of grids within which 90% of VMS records were obtained, each month.
 
-- DCF Indicator 7: Areas not impacted by mobile bottom gears The area of seabed that has not been impacted by mobile bottom fishing gears in the last year. Could be reported annually and would state the total proportion of the area by depth strata in each marine region.
+ * DCF Indicator 7: Areas not impacted by mobile bottom gears The area of seabed that has not been impacted by mobile bottom fishing gears in the last year. Could be reported annually and would state the total proportion of the area by depth strata in each marine region.
 
+== Method ==
+
+*DCF 5* calculates the total area of a grid of cells with fishing activity which is above a minimum threshold of number of pings or number of fishing hours (if the tacsat data contains a field with time interval between two points called SI_INTV, then the threshold will be a minimal number of hours, otherwise it will be a minimal number of points). The area of each cell is calculated either via a fast and rought method using a trapezoid  approximation (option "Trapezoid"), either via a more precise but slow method using a Universal Transverse Mercator projection (option "UTM").
 
 
 
