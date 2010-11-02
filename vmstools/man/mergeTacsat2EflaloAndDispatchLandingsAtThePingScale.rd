@@ -109,6 +109,13 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
 
 
+  # BEFORE CONVERTING TO FISHFRAME FORMAT (might take some time running)
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.merge=character(), what="weight", 
+                      folder = file.path("C:","output"))
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.merge=character(), what="value", 
+                      folder = file.path("C:","output"))
+
+
   # CONVERT TO FISHFRAME FORMAT VE
   ff.ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD"))
@@ -116,6 +123,11 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   # TO FISHFRAME FORMAT VL
   ff.vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD"))
+  
+  # but this one will do both in one shoot:
+  ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
+                                          a.year=2009, a.country="NLD") )
+
   }
 
 
