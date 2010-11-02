@@ -1,0 +1,21 @@
+# these 3 DCF Indicators decribes the impact of fishing activity
+
+*Describing the spatial distribution of fishing activity*
+
+The EU Data Collection Framework (DCF) standardize three indicators to analyse the fishing activity. They are summarised as follow:
+
+- DCF Indicator 5: Distribution of fishing activities. The spatial extent of fishing activity based on the total areaof grids within which VMS records were obtained, each month;
+
+- DCF Indicator 6: Aggregation of fishing activities.The extent to which fishing activity is aggregated based on the total area of grids within which 90% of VMS records were obtained, each month.
+
+- DCF Indicator 7: Areas not impacted by mobile bottom gears The area of seabed that has not been impacted by mobile bottom fishing gears in the last year. Could be reported annually and would state the total proportion of the area by depth strata in each marine region.
+
+
+
+
+= Details =
+
+Add your content here.  Format your content with:
+  * Text in *bold* or _italic_
+  * Headings, paragraphs, and lists
+  * Automatic links to other wiki pages
