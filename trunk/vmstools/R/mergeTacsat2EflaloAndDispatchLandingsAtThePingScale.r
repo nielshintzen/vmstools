@@ -866,6 +866,11 @@ return()
 
 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.merge=character(), what="weight", 
+                      folder = file.path("C:","output"))
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.merge=character(), what="value", 
+                      folder = file.path("C:","output"))
+ 
   ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD") )
 
