@@ -188,7 +188,9 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
  
          # if does not exist, add date.in.R for handling the time in R
          if(!("date.in.R" %in% colnames(tacsat))){
-           ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) , 
+          tacsat.this.vessel$SI_TIME <- as.character(tacsat.this.vessel$SI_TIME)
+          tacsat.this.vessel[tacsat.this.vessel$SI_TIME=="24:00", "SI_TIME"] <- "00:00"  # debug
+          ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) , 
                                  tz='GMT',   "%e/%m/%Y %H:%M" )
            tacsat.this.vessel <- cbind.data.frame(tacsat.this.vessel, date.in.R=ctime)
          }
