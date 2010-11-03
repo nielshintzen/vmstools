@@ -20,7 +20,7 @@ These indicators agregate the tacsat points data into a gridded data frame using
 
 *DCF 6* also calculates the total area of a grid with fishing activity but keeps only the 90% of the points by discarding the outter 10% points (or any other specified percentage). It uses the function _tacsatMinimumConvexPolygon.r_ adapted from the _aspace_ library. This function draws a minimum convex polygon around the central points to keep. Then these points are gridded and the total area of the cells is calculated with the _surface.r_ function with the same optional methods as DCF 5. This total fishing area is processed by month.
 
-*DCF 7* calculates the total area of a specified polygon not impacted by mobile bottom gear. It therefore needs that the tacsat data has been merged with the logbooks in order to have a gear code (or others) for each vms point. The indicator needs a list of gear code to include as mobile bottom gears (if empty, all the points will be included). The specified area to be processed is a polygon shapefile. This polygon (or group of polygons) If no shapefile is defined, the area of the bounding box containing all the vms points will be considered. The result is the area of the polygon less the area of the grid where fishing activity occurs. The vms pings are gridded with an optional threshold in either minimal of fishing hours or minimal number of points (see DCF 5). The area of each grid cell is calculated with the _surface.r_ function (see DCF 5 or DCF 6).
+*DCF 7* calculates the total area of a specified polygon not impacted by mobile bottom gear. It therefore needs that the tacsat data has been merged with the logbooks in order to have a gear code (or others) for each vms point. The indicator needs a list of gear code to include as mobile bottom gears (if empty, all the points will be included). The specified area to be processed is a polygon shapefile. This polygon (or group of polygons) is then clipped with the europe polygon to be sure that the indicator won't include land in its area calculation. If no shapefile is defined, the area of the bounding box containing all the vms points will be considered. The result is the area of the polygon less the area of the grid where fishing activity occurs. The vms pings are gridded with an optional threshold in either minimal of fishing hours or minimal number of points (see DCF 5). The area of each grid cell is calculated with the _surface.r_ function (see DCF 5 or DCF 6).
 
 
 = Functions =
@@ -82,3 +82,16 @@ data(eflalo2)
 tacsat   <- mergeEflalo2Tacsat(eflalo2,tacsat)
 # add gear code
 tacsat$LE_GEAR <- eflalo2$LE_GEAR[match(tacsat$FT_REF,eflalo2$FT_REF)]
+
+# load the europe polygon
+data(europa)
+
+# run the indicator
+DCFIndicator7(tacsat,                      # tacsat data
+              mobileBottomGear="",         # list of mobile bottom gear codes to consider (exemple: c("TBB","OTB","PTB","DRB","DRH"))
+              inShapeArea=shapeFileArea,   # path and name of the shapefile (without the .shp extention) whose area will be calculated
+              cellresX=0.05,               # grid cell size 
+              cellresY=0.05,               # grid cell size 
+              calcAreaMethod="Trapezoid",  # method for cell area caculation ("Trapezoid" or "UTM")
+              minThreshold=0,              # threshold for defining the cell as "fishing", in hours if a ping interval has been calculated otherwise in number of points
+              plotMapTF=TRUE)              # plot the map
