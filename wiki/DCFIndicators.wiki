@@ -1,4 +1,4 @@
-# these 3 DCF Indicators describe the impact of fishing activity
+# these 3 DCF Indicators describe the spatial impact of fishing activity
 
 = Describing the spatial distribution of fishing activity =
 
