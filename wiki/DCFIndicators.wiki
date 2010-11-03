@@ -79,6 +79,7 @@ DCFIndicator6(tacsat,                      # tacsat data
 data(eflalo2)
 
 # merge eflalo and tacsat
+# one option:
 tacsat   <- mergeEflalo2Tacsat(eflalo2,tacsat)
 # add gear code
 tacsat$LE_GEAR <- eflalo2$LE_GEAR[match(tacsat$FT_REF,eflalo2$FT_REF)]
