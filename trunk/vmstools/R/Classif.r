@@ -1130,7 +1130,7 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     # Calculation of optimal k thanks to the silhouette
     clustersClara.silcoeff=numeric()
-    for (k in 2:15){
+    for (k in 3:15){
       clustersClara=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
@@ -1143,8 +1143,11 @@ print(paste(" --- selected method :",methMetier, "---"))
     gc(reset=TRUE)
 
     cat("silcoeff",clustersClara.silcoeff,"\n")
-   # max=max(clustersClara.silcoeff, na.rm=T)
-    k=which.max(clustersClara.silcoeff[-(1:2)]) #we do not account for the first two k
+    # max=max(clustersClara.silcoeff, na.rm=T)
+   
+    # k=which.max(clustersClara.silcoeff[-(1:2)]) #we do not account for the first two k    caution ! index problem due to -(1:2) 
+    # use the following instruction and execute CLARA for k in 3:15 instead of 2:15 
+    k=which.max(clustersClara.silcoeff)
     
     # CLARA with optimal k
     clusters=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))  # CLARA with optimal k
@@ -1232,7 +1235,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     }
     # Species names for mean profile plots
     nameSpPlot=character()
-    catchMeanThreshold=0.1
+    catchMeanThreshold=2
     for(i in 1:nbClust){
       #namSpi=names(which(mprofil[i,]>catchMeanThreshold))
       #numSpi=which(mprofil[i,]>catchMeanThreshold)
@@ -1246,7 +1249,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(t(summaryClusters["Mean",,i]), names.arg=nameSpPlot[i,], xlab="Species", ylab="Percentage of catch")
+      barplot(t(summaryClusters["Mean",,i]), names.arg=nameSpPlot[i,], xlab="Species", ylab="Percentage of catch", col="gray")
       par(op2)
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
@@ -1257,16 +1260,23 @@ print(paste(" --- selected method :",methMetier, "---"))
     
     # Standard deviation profile by cluster
     sdprofil=matrix(0,nrow=nbClust,ncol=nbSpec)
+    namSdPlot=character()
+    SdThreshold=5
     for(i in 1:nbClust){
       sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])
-      sdprofil [i,] <- sd(datSpecies[which(clusters$clustering==i),])
+      namSDi=names(which(sdprofilclusti>SdThreshold))
+      numSDi=which(sdprofilclusti>SdThreshold)
+      namSdPloti=rep("",nbSpec)
+      namSdPloti[numSDi]=namSDi
+      sdprofil[i,]=sdprofilclusti
+      namSdPlot=rbind(namSdPlot,namSdPloti)
     }
-rownames(sdprofil) <- 1:nrow(sdprofil)
+    rownames(sdprofil) <- 1:nrow(sdprofil)
     png(paste(analysisName,"Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(sdprofil[i,], xlab="Species", ylab="Percentage of catch")
+      barplot(sdprofil[i,], names.arg=namSdPlot[i,], xlab="Species", ylab="Percentage of catch")
       par(op2)
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
@@ -1294,8 +1304,8 @@ rownames(sdprofil) <- 1:nrow(sdprofil)
     for(i in 1:nbClust){
       nomtargeti=as.character(target$tabnomespcib[i,which(!is.na(target$tabnumespcib[i,]))])
       numtargeti=as.numeric(target$tabnumespcib[i,which(!is.na(target$tabnumespcib[i,]))])
-     # nameTargetPloti=rep("",nbSpec)
-     nameTargetPlot[i,numtargeti]=nomtargeti
+      # nameTargetPloti=rep("",nbSpec)
+      nameTargetPlot[i,numtargeti]=nomtargeti
       #nameTargetPlot=rbind(nameTargetPlot,nameTargetPloti)
       #targetresvalclusti=rep(0,nbSpec)
       targetresval[i,numtargeti]=resval[nomtargeti,i]
@@ -1315,7 +1325,8 @@ rownames(sdprofil) <- 1:nrow(sdprofil)
     title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
     dev.off()
     
-le_id_clust <- cbind(LE_ID=LE_ID,clust=clusters$clustering)
+
+    le_id_clust <- cbind(LE_ID=LE_ID,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
@@ -1325,5 +1336,4 @@ le_id_clust <- cbind(LE_ID=LE_ID,clust=clusters$clustering)
   # end of the methods
   
   
-
 } # end of the function "classif step2"
