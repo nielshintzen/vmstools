@@ -2,31 +2,50 @@
 SplitLandingsAmongPings <- function(tacsat=tacsat, eflalo2=eflalo2, which.species="COD")
 {
 #This function uses the output from count pings to distribute the catches of ONE chosen species recorded in eflalo over the pings in tacsat.
-#It then adds on the total weight and total landing values of all species in eflalo2
+#It then adds on the total weight and total landing values of ALL species in eflalo2
 
-#First sum logbook landings over the trips
-
-
-
+#Get index for the chosen species
 dn <- dimnames(eflalo2)[[2]]
 yp <- NULL
 for(ss in which.species){yp <- c(yp,grep(ss,dn)) }
 
-data <- aggregate(list(kgs=eflalo2[,yp[1]],cash=eflalo2[,yp[1]]), list(FT_REF=eflalo2$FT_REF), sum,na.rm=T)
+#Sum logbook landings over trip id
 
-kgs <- eflalo2[,yp[1]][match(tacsat$FT_REF,eflalo2$FT_REF)]
+eflalo.by.species <- aggregate(list(kgs=eflalo2[,yp[1]],cash=eflalo2[,yp[2]]), list(FT_REF=eflalo2$FT_REF), sum,na.rm=T)
+
+#Match landings to tacsat using trip id
+
+kgs <- eflalo.by.species$kgs[match(tacsat$FT_REF,eflalo.by.species$FT_REF)]
+
+#Divide the landings among the pings
+
 tacsat$kgs.by.ping <- kgs/tacsat$npings
-cash <- eflalo2[,yp[2]][match(tacsat$FT_REF,eflalo2$FT_REF)]
+
+#Match cash value to tacsat using trip id
+
+cash <- eflalo.by.species$cash[match(tacsat$FT_REF,eflalo.by.species$FT_REF)]
+
+#Divide cash values among the pings
+
 tacsat$cash.by.ping <- cash/tacsat$npings
+
 #All species
 #KGS
-yp <- grep("_KG_",dn)
-eflalo2$kgs <- apply(eflalo2[,yp],1,sum,na.rm=T)
-tacsat$total.kgs <- eflalo2$kgs[ match(tacsat$FT_REF,eflalo2$FT_REF)]
+nyp <- grep("_KG_",dn)
+eflalo2$kgs <- apply(eflalo2[,nyp],1,sum,na.rm=T)
+eflalo.totals  <- aggregate(list(kgs=eflalo2$kgs),list(FT_REF=eflalo2$FT_REF),sum,na.rm=T)
+total.kgs <- eflalo.totals$kgs[ match(tacsat$FT_REF,eflalo.totals$FT_REF)]
+tacsat$total.kgs.by.ping <- total.kgs/tacsat$npings
 #VALUES
-yp <- grep("_EURO_",dn)
-eflalo2$cash <- apply(eflalo2[,yp],1,sum,na.rm=T)
-tacsat$total.cash <- eflalo2$cash[ match(tacsat$FT_REF,eflalo2$FT_REF)]
+#Identify cash columns
+nyp <- grep("_EURO_",dn)
+#Sum cash for all species
+eflalo2$cash <- apply(eflalo2[,nyp],1,sum,na.rm=T)
+#Sum over trip
+eflalo.totals  <- aggregate(list(cash=eflalo2$cash),list(FT_REF=eflalo2$FT_REF),sum,na.rm=T)
+total.cash <- eflalo.totals$cash[ match(tacsat$FT_REF,eflalo.totals$FT_REF)]
+tacsat$total.cash.by.ping <- total.cash/tacsat$npings
+
 tacsat
 
 }
