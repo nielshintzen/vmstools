@@ -56,8 +56,13 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   data(eflalo2)
   data(tacsat)
   data(euharbours)
-  tacsat$SI_HARB <- NA
+  # add missing harbours? (still to be fix...)
+  #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10')))
+  #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1')))
+
+ 
   library(doBy)
+  tacsat$SI_HARB <- NA
   inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours,30)
   tacsat$SI_FT <- 1 # init
   idx <- which(inHarb==0)
@@ -66,34 +71,33 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
 
-  # add missing harbours?
-  #...
+
                        
   
   # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
   eflalo <- mergeEflaloSpecies (eflalo2, threshold=1e6) 
   
   # debug
-  eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" & !is.na(eflalo2$VE_REF),]
+  eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" &!is.na(eflalo2$VE_REF),]
   
   # TEST FOR A GIVEN SET OF VESSELS
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE,
-                                                                              do.wp3=FALSE, speed="segment"))
+                                                                             do.wp3=FALSE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE,
-                                                                              do.wp3=FALSE, speed="segment"))
+                                                                             do.wp3=FALSE, speed="segment"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
   load(file.path("C:","output","merged_35_2009.RData"))
   
   # ...or bind all vessels
-  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), what=character(), 
-                      folder = file.path("C:","output"))
+  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), 
+                      folder = file.path("C:","output"), all.in.one.table=TRUE)
  
    # ...and load the merged output table for all vessels
   load(file.path("C:","output","all_merged_2009.RData"))
@@ -109,27 +113,14 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
 
 
-  # BEFORE CONVERTING TO FISHFRAME FORMAT (might take some time running)
-  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.merge=character(), what="weight", 
-                      folder = file.path("C:","output"))
-  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.merge=character(), what="value", 
-                      folder = file.path("C:","output"))
-
-
-  # CONVERT TO FISHFRAME FORMAT VE
-  ff.ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","output"),
-                                          a.year=2009, a.country="NLD"))
+  # CONVERT TO FISHFRAME FORMAT (might take some time running)
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.merge=character(), 
+                      folder = file.path("C:","output"), all.in.one.table=FALSE)
   
-  # TO FISHFRAME FORMAT VL
-  ff.vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","output"),
-                                          a.year=2009, a.country="NLD"))
-  
-  # but this one will do both in one shoot:
   ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD") )
 
   }
-
 
 }
 
