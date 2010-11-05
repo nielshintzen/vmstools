@@ -2,7 +2,7 @@ rectangle.lon.lat <- function(Rectangle, midpoint = TRUE){
 
                     lat  <- (as.numeric(substr(Rectangle, 1, 2)) / 2) +35.5
 
-                    lon  <- seq(-40, 40, by=10)[match(substr(Rectangle, 3, 3), 
+                    lon  <- seq(-50, 50, by=10)[match(substr(Rectangle, 3, 3), 
                                c("A", "B", "C", "D", "E", "F", "G", "H", "I"))] +
                                (as.numeric(substr(Rectangle, 4, 4)) %% 10)
                     
