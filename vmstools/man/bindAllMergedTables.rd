@@ -89,8 +89,9 @@ Francois Bastardie
 
 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
-  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.merge=character(), 
-                      folder = file.path("C:","output"), all.in.one.table=FALSE)
+  # (by default, will keep all the species in the output table)
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.keep=character(), 
+                      folder = file.path("C:","output"), all.in.one.table=FALSE) 
   
   ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD") )
