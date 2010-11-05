@@ -26,4 +26,4 @@ iv) mapping fishing effort and landings (weight and value) at fine scale resolut
 v) computing pressure indicators on the marine habitats (http://code.google.com/p/vmstools/wiki/DCFIndicators)
 
 
-vi) uploading in the fishframe data wharehouse.  
+vi) uploading in the fishframe data wharehouse (http://code.google.com/p/vmstools/wiki/examples_coupling).  
