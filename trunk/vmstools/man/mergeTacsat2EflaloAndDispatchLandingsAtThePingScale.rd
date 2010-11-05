@@ -96,7 +96,7 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   load(file.path("C:","output","merged_35_2009.RData"))
   
   # ...or bind all vessels
-  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), 
+  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"), 
                       folder = file.path("C:","output"), all.in.one.table=TRUE)
  
    # ...and load the merged output table for all vessels

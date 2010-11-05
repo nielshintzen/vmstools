@@ -456,11 +456,11 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          # SET UP PRIMARY KEYS FOR MERGING!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          .logbk$bk.tripnum <- factor(.logbk$bk.tripnum )
-         .logbk$bk.tripnum.sq <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT, sep='') # caution:redefine
-         .logbk$bk.tripnum.sq.day <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT,".",.logbk$date.in.R.cat, sep='') # caution:redefine
+         .logbk$bk.tripnum.sq <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT, sep='') 
+         .logbk$bk.tripnum.sq.day <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT,".",.logbk$date.in.R.cat, sep='') 
          .vms$bk.tripnum <- factor(.vms$bk.tripnum)
-         .vms$bk.tripnum.sq <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT, sep='') # caution:redefine
-         .vms$bk.tripnum.sq.day <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT,".", format(.vms$date.in.R,  '%Y-%m-%d'), sep='') # caution:redefine
+         .vms$bk.tripnum.sq <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT, sep='') 
+         .vms$bk.tripnum.sq.day <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT,".", format(.vms$date.in.R,  '%Y-%m-%d'), sep='') 
 
          # for gear, if several gears inside a same trip,
          #  it is problematic because we have to assume a split of total effort or toal nb of ping between gears...
@@ -642,7 +642,6 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                                                  my.split(as.character(.logbk$bk.tripnum.sq.day),a.sep="\\.",idx=2),sep='.')
                  # reduce the level
                  .logbk$bk.tripnum     <-        my.split(as.character(.logbk$bk.tripnum.sq),a.sep="\\.",idx=1)
-                 # verbose & export
                  # find common keys
                  tripnum.sq.day.logbk            <- .logbk$bk.tripnum.sq.day
                  tripnum.sq.day.vms              <- .vms$bk.tripnum.sq.day
@@ -850,7 +849,7 @@ return()
   load(file.path("C:","output","merged_35_2009.RData"))
   
   # ...or bind all vessels
-  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.merge=character(), 
+  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"), 
                       folder = file.path("C:","output"), all.in.one.table=TRUE)
  
    # ...and load the merged output table for all vessels
