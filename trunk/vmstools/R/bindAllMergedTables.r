@@ -3,11 +3,11 @@
 ##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##
 ##!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!##
   bindAllMergedTables <- 
-    function (vessels=character(), a.year='2009',species.to.merge=character(), 
+    function (vessels=character(), a.year='2009',species.to.keep=character(), 
                       folder = file.path(), all.in.one.table=FALSE){
 
   
-      bindAll <- function(vessels, a.year, species.to.merge, what, folder){
+      bindAll <- function(vessels, a.year, species.to.keep, what, folder){
                     
         all.merged <- NULL # init
         count <- 0
@@ -20,7 +20,12 @@
 
 
          if(class(er)!="try-error")   {
-           if(length(species.to.merge)!=0){
+           if(length(species.to.keep)!=0){
+              get.sp            <- function (nm) unlist(lapply(strsplit(nm, split="_"), function(x) x[3]))
+              nm                <- names(merged)
+              idx.col.w         <- grep('KG', nm) # index columns weight
+              all.sp            <- get.sp(nm[idx.col.w])
+              species.to.merged <- all.sp[!all.sp %in% species.to.keep]
               # merge to other sp
               merged$LE_EURO_MZZ <-  replace(merged$LE_EURO_MZZ, is.na(merged$LE_EURO_MZZ), 0)
               merged$LE_EURO_MZZ <-  merged$LE_EURO_MZZ + apply(merged[, paste('LE_EURO_',species.to.merge,sep='')], 1, sum, na.rm=TRUE)
@@ -53,9 +58,9 @@
     }
     
     # calls
-    bindAll (vessels, a.year, species.to.merge, what='weight', folder)
-    bindAll (vessels,a.year, species.to.merge, what='value', folder)
-    if(all.in.one.table) bindAll (vessels,a.year, species.to.merge, what=character(), folder)
+    bindAll (vessels, a.year, species.to.keep, what='weight', folder)
+    bindAll (vessels,a.year, species.to.keep, what='value', folder)
+    if(all.in.one.table) bindAll (vessels, a.year, species.to.keep, what=character(), folder)
 
 
 

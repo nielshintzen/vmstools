@@ -114,7 +114,8 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
 
 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
-  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.merge=character(), 
+  # (by default, will keep all the species in the output table)
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.keep=character(), 
                       folder = file.path("C:","output"), all.in.one.table=FALSE)
   
   ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
