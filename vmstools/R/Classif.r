@@ -80,13 +80,13 @@ print("calculating proportions...") #clu
     #sumcol <- apply(dat[,-1],2,sum)
     
     # Total quantity caught
-   # sumtotale=sum(sumcol,na.rm=T)
+    # sumtotale=sum(sumcol,na.rm=T)
     # Percent of each species in the total catch
     propesp=sumcol/sum(sumcol,na.rm=T)*100
     # by decreasing order
     propesp=cumsum(propesp[order(propesp,decreasing=T)])
     # Columns number of each species by decreasing order of capture
-   # numesp=order(propesp,decreasing=T)
+    # numesp=order(propesp,decreasing=T)
     # Cumulative percent of catch
     #propespcum=cumsum(propespdec)
     
@@ -106,7 +106,7 @@ print("calculating proportions...") #clu
 #    #cat("main species:",sort(nomespsel),"\n")
 
 #LogEvent
-        if (is.null(paramLogevent) | !is.numeric(paramLogevent)) stop("paramLogevent must be numeric between 0 and 100")
+    if (is.null(paramLogevent) | !is.numeric(paramLogevent)) stop("paramLogevent must be numeric between 0 and 100")
     
     seuil=paramLogevent
     # Selection of species making up over param1% of logevent's captures
@@ -116,9 +116,9 @@ print("calculating proportions...") #clu
     #eventually removing MZZ
    # nomespselLogevent <- nomespsel[!nomespsel=="MZZ"]  
 
-   #merge with explospecies
-   ListSpeciesAll <- sort(unique(c(NamesMainSpeciesHAC,nomespselTotal,nomespselLogevent)))
-   ListSpeciesAll <- ListSpeciesAll[!ListSpeciesAll=="MZZ"]
+    #merge with explospecies
+    ListSpeciesAll <- sort(unique(c(NamesMainSpeciesHAC,nomespselTotal,nomespselLogevent)))
+    ListSpeciesAll <- ListSpeciesAll[!ListSpeciesAll=="MZZ"]
 
     # We are bulding the table with main species and aggregated other species
     datSpecies=building_tab_pca(propdat,ListSpeciesAll)
@@ -292,7 +292,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       numSample=i
       print(paste("sample",i))
       # Sample of size 15000 logevents
-      sam=sample(1:nbLog,size=15000,replace=F)
+      sam=sample(1:nbLog,size=5000,replace=F)
       # Record the 5 samples
       sampleList=rbind(sampleList,sam)
       outofsam=setdiff(1:nbLog,sam)
@@ -490,132 +490,71 @@ print(paste(" --- selected method :",methMetier, "---"))
       
       
       
-      
-      
-      
-      
-      
-#      # Discriminante analysis on the learning dataset "sampleDatLogWithClusters"
-#      learning.lda=lda(sampleDatLogWithClusters[,1:nbDim],sampleDatLogWithClusters[,ncol(sampleDatLogWithClusters)])
-#
-#      # Other Logevents (which aren't belonging to the sample)
-#      otherLog=datLog[outofsam,]
-#
-#      # Predict the cluster for each logevent of "otherLog" thanks to a discriminante analysis
-#      result.lda=predict(learning.lda,otherLog)
-#
-#      # Add the cluster to each logevent of "otherLog"
-#      otherDatLogWithClusters=cbind(otherLog, result.lda$class)
-#      colnames(otherDatLogWithClusters)=colnames(sampleDatLogWithClusters)
-#
-#      # Rebuilt datLog with clusters
-#      datLogWithClusters=rbind(sampleDatLogWithClusters,otherDatLogWithClusters)
-#
-#      # Clusters for logevents
-#      clusters=datLogWithClusters[,ncol(datLogWithClusters)]
-#
-
-                
-      
-#      # Between variance of classification
-#      print("between and within variance classification...")
-#      sizeClusters=numeric()
-#      centerOfGravityClassif=numeric()
-#      centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
-#      for(k in 1:nbClust){
-#        clusti=sampleDatLogWithClusters[which(sampleClusters==k),1:nbDim]
-#        sizeClusters[k]=nrow(clusti)
-#        centerOfGravityClusti=colMeans(clusti)
-#        centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-#      }
-#      classifBetweenVar=cbind(classifBetweenVar,1/nbLog*sum(sizeClusters*((dist(centerOfGravityClassif)[1:nbClust])^2)))
-#
-#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#      gc(reset=TRUE)
-#    
-#      # Within variance of classification
-#      withinVarClusters=numeric()
-#      for(k in 1:nbClust){  # Within variance by cluster
-#
-#        clusti=sampleDatLogWithClusters[which(sampleClusters==k),1:nbDim]
-#        sizeClusti=nrow(clusti)
-#        centerOfGravityClusti=colMeans(clusti)
-#        withinVarClustiPart=numeric()
-#        withinVarClusters[k]=1/sizeClusti*sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
-#
-#      }
-#      classifWithinVar=cbind(classifWithinVar,1/nbLog*sum(sizeClusters*withinVarClusters))   # Within variance of classification
-#      
-#      # Mean profiles by cluster for each sample
-#      nbSpec=ncol(datSpecies)
-#      mprofil=numeric()
-#      blank=rep(00000000000,nbSpec)
-#      for(k in 1:nbClust){
-#        mprofilclusti=mean(sampleDatSpecies[which(sampleClusters==k),])
-#        mprofil=rbind(mprofil,mprofilclusti)
-#      }
-#      mprofil=rbind(mprofil,blank)
-#      
-#      mProfilSample=rbind(mProfilSample,mprofil)
-#
-#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#      gc(reset=TRUE)
-#      
-#    }
-#
-#    
-#    # Classification's quality
-#    print("choosing the best sample...")
-#    classifQuality=classifWithinVar/classifBetweenVar
-#    which.min(classifQuality)
-#
-  
-  
-  
-  
+ 
     # Select the sample which gives the smaller classification's quality (the best sample)
     sam=sampleList[which.min(classifVarExplain),]
     outofsam=setdiff(1:nbLog,sam)
     sampleDatLog=datLog[sam,]
-
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
+    
+    nbLogSample=nrow(sampleDatLog)
+    nbDim=ncol(sampleDatLog)
+    
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc(reset=TRUE)
     
     # HAC with the best sample
     log.hac=hcluster(sampleDatLog, method=param3, link=param4)
     
     # Determine the number of cluster thanks to the scree-test
     inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
-    nbClust=which(scree(inerties.vector)$epsilon<0)[1]
+    nbClust=which(scree(inerties.vector)$epsilon<0)[2]
 
     # Cut the dendogram at the selected level
     sampleClusters=cutree(log.hac,k=nbClust)
+    sampleClusters=as.factor(sampleClusters)
     
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
-
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc(reset=TRUE)
+    sampleDatLogWithClusters=data.frame()
     sampleDatLogWithClusters=cbind(sampleDatLog,sampleClusters)
+    
+    
 
-    nbLogSample=nrow(sampleDatLog)
-    nbDim=ncol(sampleDatLog)
 
     # Discriminante analysis on the learning dataset
-    learning.lda=lda(sampleDatLogWithClusters[,1:nbDim],sampleDatLogWithClusters[,ncol(sampleDatLogWithClusters)])
-
+    #learning.lda=lda(sampleDatLogWithClusters[,1:nbDim],as.character(sampleDatLogWithClusters[,ncol(sampleDatLogWithClusters)]))
+    learning=lda(sampleClusters~.,data=sampleDatLogWithClusters)
+    
     otherLog=datLog[outofsam,]
-
+                                  
     # Predict the cluster for the other logevent
-    result.lda=predict(learning.lda,otherLog)
+    pred=predict(learning,otherLog)
 
-    otherDatLogWithClusters=cbind(otherLog, result.lda$class)
+    #otherDatLogWithClusters=cbind(otherLog, result.lda$class)
+    otherDatLogWithClusters=cbind(otherLog,pred$class)
     colnames(otherDatLogWithClusters)=colnames(sampleDatLogWithClusters)
 
-    # Rebuilt complete datLog with clusters
-    datLogWithClusters=rbind(sampleDatLogWithClusters,otherDatLogWithClusters)
-    clusters=datLogWithClusters[,ncol(datLogWithClusters)]
 
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
+    ####  OR
+#    library(mda)
+#    discrim=fda(sampleClusters~., data=sampleDatLogWithClusters)
+#    otherLog=datLog[outofsam,]
+#    pred=predict(discrim,otherLog)
+#    otherDatLogWithClusters=cbind(otherLog,pred)
+#    colnames(otherDatLogWithClusters)=colnames(sampleDatLogWithClusters)
+#
+    
+    
+    # Rebuilt complete datLog with clusters
+    #datLogWithClusters=rbind(sampleDatLogWithClusters,otherDatLogWithClusters)
+    clusters=numeric(length=nbLog)
+    clusters[sam]=sampleClusters
+    clusters[outofsam]=pred$class
+    datLogWithClusters=cbind(datLog,clusters)
+    #clusters=datLogWithClusters[,ncol(datLogWithClusters)]
+
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc(reset=TRUE)
     
     # Within and between variance of clusters and classification
     centerOfGravityClassif=numeric()
@@ -628,8 +567,8 @@ print(paste(" --- selected method :",methMetier, "---"))
       centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
       sizeClusti=nrow(clusti)
-      centerOfGravityClusti=colMeans(clusti)
-      withinVarClustiPart=numeric()
+#      centerOfGravityClusti=colMeans(clusti)
+#      withinVarClustiPart=numeric()
       withinVarClusters[k]=1/sizeClusti*sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
 
     }
@@ -655,8 +594,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(target$tabnomespcib)
     
 
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc(reset=TRUE)
     
 
     # Projections on the first factorial plans
