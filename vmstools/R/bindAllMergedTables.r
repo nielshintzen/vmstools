@@ -25,7 +25,7 @@
               nm                <- names(merged)
               idx.col.w         <- grep('KG', nm) # index columns weight
               all.sp            <- get.sp(nm[idx.col.w])
-              species.to.merged <- all.sp[!all.sp %in% species.to.keep]
+              species.to.merge <- all.sp[!all.sp %in% species.to.keep]
               # merge to other sp
               merged$LE_EURO_MZZ <-  replace(merged$LE_EURO_MZZ, is.na(merged$LE_EURO_MZZ), 0)
               merged$LE_EURO_MZZ <-  merged$LE_EURO_MZZ + apply(merged[, paste('LE_EURO_',species.to.merge,sep='')], 1, sum, na.rm=TRUE)
