@@ -8,7 +8,7 @@ DCFIndicator6 <- function ( tacsat,
                             cellresY=0.05,
                             calcAreaMethod="Trapezoid",   # "Trapezoid" (fast and less accurate, good for small cellsizes) or "UTM" (accurate but slow, good for huge cellsizes)
                             plotMapTF = FALSE,
-                            exportTableName="",
+                            exportTableName=""
                             )
   {
 
