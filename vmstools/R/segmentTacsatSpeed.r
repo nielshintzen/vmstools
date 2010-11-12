@@ -235,6 +235,7 @@ segmentSpeedTacsat <- function(tacsat,
           if(!any(colnames(tacsat.this.vessel) %in% 'date.in.R')) stop('you need either to inform a date.in.R or a SI_DATE')
           }
           
+
   diff.time <- tacsat.this.vessel[-nrow(tacsat.this.vessel),"date.in.R"] -
                        tacsat.this.vessel[-1,"date.in.R"]
   tacsat.this.vessel$diff.time.mins <- c(0, as.numeric(diff.time, units="mins"))
@@ -248,16 +249,17 @@ segmentSpeedTacsat <- function(tacsat,
   # cleaning irrealistic points
   tacsat.this.vessel$apparent.speed <-
      replace(tacsat.this.vessel$apparent.speed, is.na(tacsat.this.vessel$apparent.speed), 0)
-   idx <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed >= 30 |
-                is.infinite(tacsat.this.vessel$apparent.speed),"idx"]
-  tacsat <- tacsat[!tacsat$idx %in% idx,] # just remove! (mainly coming from replicated lines in vms that led to 0 in diff.time...)
-  tacsat.this.vessel <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed < 30,]
 
+ 
+  idx <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed >= 30 |
+                is.infinite(tacsat.this.vessel$apparent.speed),"idx"]
+  tacsat <- tacsat[!tacsat$idx %in% idx,] # just remove!
+  tacsat.this.vessel <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed < 30,]
+ 
   if(is.null(levels(tacsat.this.vessel$LE_GEAR)))
       stop('you need first to assign a gear LE_GEAR to each ping')
 
   for (gr in levels(factor(tacsat.this.vessel$LE_GEAR))){ # BY GEAR
-
     xxx <- tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr,] # input
 
     x <- as.numeric(as.character(sort(xxx$apparent.speed))) *100   # multiply by factor 100 because integer needed
@@ -274,12 +276,19 @@ segmentSpeedTacsat <- function(tacsat,
     hi$counts <- hi$counts[-1]
     idx       <- which(hi$counts==max(hi$counts))[1]
     more.frequent.speed <- hi$mids[idx] # assumed to be for fishing
-    while(more.frequent.speed > 700 || more.frequent.speed < 100){
+ 
+   a.flag <- FALSE
+   while(more.frequent.speed > 700 || more.frequent.speed < 100){
       hi$counts <- hi$counts[-idx]
       hi$mids <-  hi$mids[-idx]
       idx       <- which(hi$counts==max(hi$counts))[1]
       more.frequent.speed <- hi$mids[idx]
+      if(is.na(more.frequent.speed)){
+          #=> for very few cases we have no speed found within 100-700 e.g. for the UNK gear
+          a.flag <- TRUE ; break 
+         }
       }
+    if(!a.flag){  
     start.lower.bound <- ifelse(more.frequent.speed-200<= min(dati$x),
                                          min(dati$x)+100, more.frequent.speed-200)
     start.upper.bound <- ifelse(more.frequent.speed+200>= max(dati$x),
@@ -318,7 +327,7 @@ segmentSpeedTacsat <- function(tacsat,
    if(!is.null(bound2)) text(bound2/100, 1, signif(bound2,3), col=2)
    # save the panel plot
    savePlot(filename = file.path(general$output.path,
-      paste(unique(a.vesselid),"_speed_boundaries_feffort_", general$a.year,"_",gr, sep="")),
+      paste(unique(a.vesselid),"-detected_speed_span_for_feffort-", general$a.year,"-",a.vesselid,"-",gr, sep="")),
           type = c("wmf"), device = dev.cur(), restoreConsole = TRUE)
   dev.off()
   }
@@ -346,6 +355,10 @@ segmentSpeedTacsat <- function(tacsat,
   tacsat.this.vessel[,"bound2"] <- bound2
   cat(paste(gr," lower(apparent)speed bound:",round(bound1,1),"nm\n"))
   cat(paste(gr," upper(apparent)speed bound:",round(bound2,1),"nm\n"))
+  } else{
+     tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr, "SI_STATE"] <- 2
+     #=> end a.flag: in case of very few records for this gear...
+     } 
   } # end gr
 
 
