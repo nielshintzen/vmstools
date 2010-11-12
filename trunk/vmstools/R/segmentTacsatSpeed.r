@@ -318,7 +318,7 @@ segmentSpeedTacsat <- function(tacsat,
    if(!is.null(bound2)) text(bound2/100, 1, signif(bound2,3), col=2)
    # save the panel plot
    savePlot(filename = file.path(general$output.path,
-      paste(unique(a.vesselid),"-detected_speed_span_for_feffort-", general$a.year,"-",a.vesselid,"-",gr, sep="")),
+      paste(unique(a.vesselid),"_speed_boundaries_feffort_", general$a.year,"_",gr, sep="")),
           type = c("wmf"), device = dev.cur(), restoreConsole = TRUE)
   dev.off()
   }
