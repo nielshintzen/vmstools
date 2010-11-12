@@ -333,12 +333,12 @@ segmentSpeedTacsat <- function(tacsat,
              # special case for gillnetters= set a lower bound
      if(gr %in% c('SDN')) bound1 <- lstargs$force.lower.bound
   }
-  
+
   # then, assign...
   xxx[xxx$apparent.speed < bound1, "SI_STATE"]                       <- 2 # steaming
   xxx[xxx$apparent.speed >= bound1 & xxx$apparent.speed < bound2, "SI_STATE"]  <- 1 # fishing
   xxx[xxx$apparent.speed >= bound2 , "SI_STATE"]                     <- 2 # steaming
-  tacsat.this.vessel[tacsat.this.vessel$gear==gr, "SI_STATE"] <- xxx$SI_STATE # output
+  tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr, "SI_STATE"] <- xxx$SI_STATE # output
   tacsat.this.vessel[,"bound1"] <- bound1
   tacsat.this.vessel[,"bound2"] <- bound2
   cat(paste(gr," lower(apparent)speed bound:",round(bound1,1),"nm\n"))
