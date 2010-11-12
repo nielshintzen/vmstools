@@ -14,8 +14,6 @@ segmentSpeedTacsat <- function(tacsat,
   } else{
   vessels <- unique(tacsat$VE_REF)
   }
-  tacsat[,"bound1"] <- NA
-  tacsat[,"bound2"] <- NA
 
 
 
@@ -223,13 +221,20 @@ segmentSpeedTacsat <- function(tacsat,
 
   # hereafter, the core code...
   for(a.vesselid in vessels){ # BY VESSEL
-
   tacsat.this.vessel <- tacsat[tacsat$VE_REF %in% a.vesselid, ]
   
-  ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) ,
-                            tz='GMT',       "%e/%m/%Y %H:%M" )
-  tacsat.this.vessel <- cbind.data.frame(tacsat.this.vessel, date.in.R=ctime)
+  tacsat.this.vessel[,"bound1"] <- NA
+  tacsat.this.vessel[,"bound2"] <- NA
 
+  if(any(colnames(tacsat.this.vessel) %in% 'SI_DATE'))
+          {
+           ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) ,
+                            tz='GMT',       "%e/%m/%Y %H:%M" )
+           tacsat.this.vessel <- cbind.data.frame(tacsat.this.vessel, date.in.R=ctime)
+          } else{
+          if(!any(colnames(tacsat.this.vessel) %in% 'date.in.R')) stop('you need either to inform a date.in.R or a SI_DATE')
+          }
+          
   diff.time <- tacsat.this.vessel[-nrow(tacsat.this.vessel),"date.in.R"] -
                        tacsat.this.vessel[-1,"date.in.R"]
   tacsat.this.vessel$diff.time.mins <- c(0, as.numeric(diff.time, units="mins"))
@@ -245,10 +250,10 @@ segmentSpeedTacsat <- function(tacsat,
      replace(tacsat.this.vessel$apparent.speed, is.na(tacsat.this.vessel$apparent.speed), 0)
   tacsat.this.vessel <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed < 30,]
 
-  if(is.null(levels(tacsat$LE_GEAR)))
+  if(is.null(levels(tacsat.this.vessel$LE_GEAR)))
       stop('you need first to assign a gear LE_GEAR to each ping')
 
-  for (gr in levels(factor(tacsat$LE_GEAR))){ # BY GEAR
+  for (gr in levels(factor(tacsat.this.vessel$LE_GEAR))){ # BY GEAR
 
     xxx <- tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr,] # input
 
@@ -333,14 +338,17 @@ segmentSpeedTacsat <- function(tacsat,
   xxx[xxx$apparent.speed < bound1, "SI_STATE"]                       <- 2 # steaming
   xxx[xxx$apparent.speed >= bound1 & xxx$apparent.speed < bound2, "SI_STATE"]  <- 1 # fishing
   xxx[xxx$apparent.speed >= bound2 , "SI_STATE"]                     <- 2 # steaming
-  xxx[,"bound1"] <- bound1
-  xxx[,"bound2"] <- bound2
-  tacsat.this.vessel[tacsat.this.vessel$gear==gr,] <- xxx # output
+  tacsat.this.vessel[tacsat.this.vessel$gear==gr, "SI_STATE"] <- xxx$SI_STATE # output
+  tacsat.this.vessel[,"bound1"] <- bound1
+  tacsat.this.vessel[,"bound2"] <- bound2
+  cat(paste(gr," lower(apparent)speed bound:",round(bound1,1),"nm\n"))
+  cat(paste(gr," upper(apparent)speed bound:",round(bound2,1),"nm\n"))
   } # end gr
+
 
   # clean up by removing no longer used columns
   tacsat.this.vessel <- tacsat.this.vessel[, !colnames(tacsat.this.vessel) %in%
-                         c('date.in.R','apparent.speed','diff.time.mins')]
+                         c('apparent.speed','diff.time.mins','bound1','bound2')]
 
   tacsat[tacsat$VE_REF==a.vesselid,] <- tacsat.this.vessel # output
   } # end of a.vesselid
