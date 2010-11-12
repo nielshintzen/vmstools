@@ -438,16 +438,34 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # ASSIGN FISHING/NON-FISHING (optional)!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-         if(general$do.wp3 && general$speed=="segment")
+         if(general$do.wp3 && general$speed=="segment") {
+             ## add a gear form tacsat from the logbook info (after the first merging)
+             ## because the assignement of a state is gear-specific.
+             ## caution here: we assume only one gear used inside a trip...
+             # because note that we remove 'logevent' and keep only one duplicate of tripnum
+             .vms$LE_GEAR <- .vms$bk.tripnum # init
+             tmp <- .logbk[,c("LE_GEAR","bk.tripnum")]
+             tmp <- tmp[!duplicated(tmp$bk.tripnum),] #remove logevent and keep only one duplicate of tripnum
+             tmp <- tmp[tmp$bk.tripnum %in% unique(.vms$LE_GEAR),]
+             idx <- match(levels(.vms$LE_GEAR), as.character(tmp$bk.tripnum))
+             levels(.vms$LE_GEAR) <- as.character(tmp$LE_GEAR)  [idx]
+
+             # then do the assignement of the state 
+             #according to a segemented regression on the (apparent) speed histogram
             .vms <- segmentSpeedTacsat (tacsat=.vms, vessels=a.vesselid, 
                                   force.lower.bound=0.5, general=list(
                                    output.path=general$output.path,visual.check=TRUE))
                 #=> (semi)automatic detection of the fishing peak
                 # (put here because the LE_GEAR need to be informed)
-         # alternative TO DO:
+            
+            .vms <- .vms[, !colnames(.vms) %in% "LE_GEAR"] # remove after use to avoid future conflict.
+         }
+         # some alternatives TO DO:
          #if(general$do.wp3 && general$speed=="lookuptable")
          #   .vms <- lookupSpeedTacsat (tacsat=.vms, vessels=a.vesselid)
-
+         #if(general$do.wp3 && general$speed=="bayesian")
+         #   .vms <- bayesianFiltering (tacsat=.vms, vessels=a.vesselid)
+         
 
 
          rm(er); rm(xx) ; gc(reset=TRUE)
@@ -837,7 +855,7 @@ return()
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE,
-                                                                             do.wp3=FALSE, speed="segment"))
+                                                                             do.wp3=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
                                                              general=list(output.path=file.path("C:","output"),
