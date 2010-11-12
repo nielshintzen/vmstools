@@ -248,6 +248,9 @@ segmentSpeedTacsat <- function(tacsat,
   # cleaning irrealistic points
   tacsat.this.vessel$apparent.speed <-
      replace(tacsat.this.vessel$apparent.speed, is.na(tacsat.this.vessel$apparent.speed), 0)
+   idx <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed >= 30 |
+                is.infinite(tacsat.this.vessel$apparent.speed),"idx"]
+  tacsat <- tacsat[!tacsat$idx %in% idx,] # just remove! (mainly coming from replicated lines in vms that led to 0 in diff.time...)
   tacsat.this.vessel <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed < 30,]
 
   if(is.null(levels(tacsat.this.vessel$LE_GEAR)))
