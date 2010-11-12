@@ -702,7 +702,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     .logbk.for.meth1   <- aggregate(.logbk.for.meth1 [,idx.col],
                                  list(.logbk.for.meth1$VE_REF, .logbk.for.meth1$bk.tripnum,
                                             .logbk.for.meth1$VE_FLT, .logbk.for.meth1$VE_KW, .logbk.for.meth1$LE_MET_level6, .logbk.for.meth1$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth1) <- c("VE_REF","VE_KW", "bk.tripnum", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                    colnames(.logbk.for.meth1) <- c("VE_REF", "bk.tripnum", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
                     merged1  <- do.merging(method="bk.tripnum", .logbk.for.meth1, .vms.for.meth1, general)
                     # add meth flag
@@ -717,9 +717,9 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     idx.col.v <- grep('EURO', nm) # index columns with species value
                     idx.col <- c(idx.col.w, idx.col.v)
                     .logbk.for.meth2   <- aggregate(.logbk.for.meth2 [,idx.col],
-                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$VE_KW, .logbk.for.meth2$bk.tripnum.sq,
-                                            .logbk.for.meth2$VE_FLT, .logbk.for.meth2$LE_MET_level6, .logbk.for.meth2$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth2) <- c("VE_REF", "VE_KW", "bk.tripnum.sq", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$bk.tripnum.sq,
+                                            .logbk.for.meth2$VE_FLT,.logbk.for.meth2$VE_KW,  .logbk.for.meth2$LE_MET_level6, .logbk.for.meth2$LE_GEAR), sum, na.rm=TRUE)
+                    colnames(.logbk.for.meth2) <- c("VE_REF", "bk.tripnum.sq","VE_KW",  "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
                     merged2 <- do.merging(method="bk.tripnum.sq", .logbk.for.meth2, .vms.for.meth2, general)
                     # add meth flag
@@ -749,7 +749,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                  # if still 'not merging' part, retrieve on NA side i.e. occurs when pings in vms but not in bk
                    merged <- retrieveOnBkSide(merged, type.data=c( "VE_FLT","VE_KW","LE_MET_level6"))  # i.e. when metier=='NA'
 
-     
+ browser()    
         # clean up
         rm(a.table, merged1, merged2, merged3, merged.this.vessel,.vms, .logbk, logbk.this.vessel, vms.this.vessel)
         gc(reset=TRUE)
@@ -855,7 +855,7 @@ return()
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE,
-                                                                             do.wp3=TRUE, speed="segment"))
+                                                                             do.wp3=FALSE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
                                                              general=list(output.path=file.path("C:","output"),
