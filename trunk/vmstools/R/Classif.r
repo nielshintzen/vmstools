@@ -407,44 +407,66 @@ print(paste(" --- selected method :",methMetier, "---"))
   
       # Mean profiles by cluster
       nbSpec=ncol(sampleDatSpecies)
-      mprofil=numeric()
+#      mprofil=numeric()
+      summarySampleClusters=array(0,dim=c(6,nbSpec,nbClust))
+      dimnames(summarySampleClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
+      dimnames(summarySampleClusters)[[2]]=names(meanprofile)
+      dimnames(summarySampleClusters)[[3]]=paste("Cluster ",1:nbClust)
       for(k in 1:nbClust){
-        mprofilclusti=mean(sampleDatSpecies[which(sampleClusters==k),])
-        mprofil=rbind(mprofil,mprofilclusti)
+#        mprofilclusti=mean(sampleDatSpecies[which(sampleClusters==k),])
+#        mprofil=rbind(mprofil,mprofilclusti)
+        summarySampleClusters[,,k]=apply(sampleDatSpecies[which(sampleClusters==k),],2, 
+          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
       }
+      # Species names for mean profile plots
+      nameSpPlot=character()
+      catchMeanThreshold=2
+      for(k in 1:nbClust){
+        namSpi=names(meanprofile[which(t(summarySampleClusters["Mean",,k])>catchMeanThreshold)])
+        numSpi=which(t(summarySampleClusters["Mean",,k])>catchMeanThreshold)
+        nameSpPloti=rep("",nbSpec)
+        nameSpPloti[numSpi]=namSpi
+        nameSpPlot=rbind(nameSpPlot,nameSpPloti)
+      }      
       png(paste(analysisName,numSample,"Sample_Mean profile by cluster of the sample.png",sep="_"), width = 1200, height = 800)
       op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
       for(k in 1:nbClust){
         op2 <- par(las=2)
-        barplot(mprofil[k,], cex.names=1, xlab="Species", ylab="Percentage of catch")
+        barplot(t(summarySampleClusters["Mean",,k]), names.arg=nameSpPlot[k,], xlab="Species", ylab="Percentage of catch", col="gray")
         par(op2)
         mtext(paste("Cluster",k), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
       }
-      par(op)
+      par(op)    
       title(main=paste("Mean profile by cluster of the sample","\n","\n",sep=""))
       dev.off()
       
-      
+     
       # Standard deviation profile by cluster
-      sdprofil=numeric()
+      sdprofil=matrix(0,nrow=nbClust,ncol=nbSpec)
+      namSdPlot=character()
+      SdThreshold=2
       for(k in 1:nbClust){
         sdprofilclusti=sd(sampleDatSpecies[which(sampleClusters==k),])
-        sdprofil=rbind(sdprofil,sdprofilclusti)
+        namSDi=names(which(sdprofilclusti>SdThreshold))
+        numSDi=which(sdprofilclusti>SdThreshold)
+        namSdPloti=rep("",nbSpec)
+        namSdPloti[numSDi]=namSDi
+        sdprofil[k,]=sdprofilclusti
+        namSdPlot=rbind(namSdPlot,namSdPloti)
       }
+      rownames(sdprofil) <- 1:nrow(sdprofil)
       png(paste(analysisName,numSample,"Sample_Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
       op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
       for(k in 1:nbClust){
         op2 <- par(las=2)
-        barplot(sdprofil[k,], cex.names=1, xlab="Species", ylab="Percentage of catch")
+        barplot(sdprofil[k,], names.arg=namSdPlot[k,], xlab="Species", ylab="Percentage of catch")
         par(op2)
         mtext(paste("Cluster",k), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
       }
       par(op)
       title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
-      dev.off()
-  
+      dev.off()  
 
-      
       
       # Number of Logevents by cluster
       x=c(1:nbClust)
@@ -634,42 +656,69 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     # Mean profiles by cluster
     nbSpec=ncol(datSpecies)
-    mprofil=numeric()
-    for(k in 1:nbClust){
-      mprofilclusti=mean(datSpecies[which(clusters==k),])
-      mprofil=rbind(mprofil,mprofilclusti)
+#    mprofil=numeric()
+    summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
+    dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
+    dimnames(summaryClusters)[[2]]=names(meanprofile)
+    dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)
+    for(i in 1:nbClust){
+#      mprofilclusti=mean(datSpecies[which(clusters==k),])
+#      mprofil=rbind(mprofil,mprofilclusti)
+      summaryClusters[,,i]=apply(datSpecies[which(clusters==i),],2, 
+        function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+    }
+    # Species names for mean profile plots
+    nameSpPlot=character()
+    catchMeanThreshold=2
+    for(i in 1:nbClust){
+      #namSpi=names(which(mprofil[i,]>catchMeanThreshold))
+      #numSpi=which(mprofil[i,]>catchMeanThreshold)
+      namSpi=names(meanprofile[which(t(summaryClusters["Mean",,i])>catchMeanThreshold)])
+      numSpi=which(t(summaryClusters["Mean",,i])>catchMeanThreshold)
+      nameSpPloti=rep("",nbSpec)
+      nameSpPloti[numSpi]=namSpi
+      nameSpPlot=rbind(nameSpPlot,nameSpPloti)
     }
     png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(mprofil[i,], cex.names=1, xlab="Species", ylab="Percentage of catch")
+      barplot(t(summaryClusters["Mean",,i]), names.arg=nameSpPlot[i,], xlab="Species", ylab="Percentage of catch", col="gray")
       par(op2)
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Mean profile by cluster","\n","\n",sep=""))
-    dev.off()
+    dev.off()    
     
     
     # Standard deviation profile by cluster
-    sdprofil=numeric()
+    sdprofil=matrix(0,nrow=nbClust,ncol=nbSpec)
+    namSdPlot=character()
+    SdThreshold=2
     for(i in 1:nbClust){
       sdprofilclusti=sd(datSpecies[which(clusters==i),])
-      sdprofil=rbind(sdprofil,sdprofilclusti)
+      namSDi=names(which(sdprofilclusti>SdThreshold))
+      numSDi=which(sdprofilclusti>SdThreshold)
+      namSdPloti=rep("",nbSpec)
+      namSdPloti[numSDi]=namSDi
+      sdprofil[i,]=sdprofilclusti
+      namSdPlot=rbind(namSdPlot,namSdPloti)
     }
+    rownames(sdprofil) <- 1:nrow(sdprofil)
     png(paste(analysisName,"Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(sdprofil[i,], cex.names=1, xlab="Species", ylab="Percentage of catch")
+      barplot(sdprofil[i,], names.arg=namSdPlot[i,], xlab="Species", ylab="Percentage of catch")
       par(op2)
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
     dev.off()
-
+    
+    
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
     
@@ -710,6 +759,85 @@ print(paste(" --- selected method :",methMetier, "---"))
     par(op)
     title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
     dev.off()
+    
+    
+    
+    
+    # Descriptive and summary tables of clusters
+    clusterDesc=matrix(0,nrow=7,ncol=nbClust)
+    for(i in 1:nbClust){
+      clusterDesc[,i]=c(sizeClusters[i], 
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
+                        length(which(resval[,i]>1.98)),
+                        length(which(resval[,i]>3.29)),
+                        length(which(apply(datSpecies,2,function (x) (sizeClusters[i]-length(which(x[clusters==i]==0)))/sizeClusters[i]*100)>50)),
+                        length(which(apply(datSpecies,2,function (x) (sizeClusters[i]-length(which(x[clusters==i]==0)))/sizeClusters[i]*100)>90)))
+    }
+    rownames(clusterDesc)=c("Clusters size","to have 50% of catch", "to have 90% of catch",
+                            "with a test-value > 1.98", "with a test-value > 3.29",
+                            "catch in 50% of the logevents", "catch in 90% of the logevents")
+    colnames(clusterDesc)=1:nbClust                        
+    clusterDesc2=as.data.frame(clusterDesc)
+    
+    
+    namesSpecies=matrix(NA,nrow=nbClust,ncol=10)
+    namesCapt=matrix(NA,nrow=nbClust,ncol=5)
+    nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
+    namesTarget=matrix(NA,nrow=nbClust,ncol=5)
+    nbSpeciesVT = min(5,dim(target$tabnomespcib)[[2]])
+    
+    for(i in 1:nbClust){
+      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
+      a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
+      colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
+      namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+      namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
+    }
+    
+    tabPropCatch=matrix(NA,nrow=nbClust,ncol=10)
+    tabTestVal=matrix(NA,nrow=nbClust,ncol=10)
+    tabPropLog=matrix(NA,nrow=nbClust,ncol=10)
+    
+    for(i in 1:nbClust){
+      print("-----------------------------------------------------------------")
+      print(paste("Cluster ",i))
+      propCatch=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
+      tabPropCatch[i,1:length(propCatch)]=propCatch
+      print(propCatch)
+      testVal=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) resval[x,i]),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
+      tabTestVal[i,1:length(testVal)]=testVal
+      print(testVal)
+      propLog=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) (sizeClusters[i]-length(which(datSpecies[clusters==i,x]==0)))/sizeClusters[i]*100),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) (sizeClusters[i]-length(which(datSpecies[clusters==i,x]==0)))/sizeClusters[i]*100),digits=1)>=0.1)]
+      tabPropLog[i,1:length(propLog)]=propLog
+      print(propLog)
+    }
+    
+    tabClusters=array(0,dim=c(10,4,nbClust))
+    dimnames(tabClusters)[[2]]=c("FAO","Test-value","% Catch","% Logevents")
+    dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
+    for(i in 1:nbClust){
+      tabClusters[,,i]=cbind(namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
+    }
+    
+    sizeTabClusters=numeric()
+    for(i in 1:nbClust){
+      sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
+    }
+    
+    db <- paste(analysisName,"_tables.xls",sep="")
+    channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
+    sqlSave(channel, clusterDesc2, tablename = "DescClust")
+    
+    for(i in 1:nbClust){
+      tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
+      #tabClusti=as.data.frame(tabClusters[,,i])
+      sqlSave(channel, tabClusti, tablename = paste("Clust",i,sep=""),rownames = TRUE, colnames = TRUE)
+    }
+    odbcClose(channel)
+    
+    
+    
 
 
     print(" --- end of step 3 ---")
@@ -797,18 +925,36 @@ print(paste(" --- selected method :",methMetier, "---"))
     # Mean profiles by cluster
     nbClust=length(clusters$size)
     nbSpec=ncol(datSpecies)
-    mprofil=numeric()
+#    mprofil=numeric()
+    summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
+    dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
+    dimnames(summaryClusters)[[2]]=names(meanprofile)
+    dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)
     for(i in 1:nbClust){
-      mprofilclusti=mean(datSpecies[which(clusters$cluster==i),])
-      mprofil=rbind(mprofil,mprofilclusti)
+#      mprofilclusti=mean(datSpecies[which(clusters$cluster==i),])
+#      mprofil=rbind(mprofil,mprofilclusti)
+      summaryClusters[,,i]=apply(datSpecies[which(clusters$cluster==i),],2, 
+        function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+    }
+    # Species names for mean profile plots
+    nameSpPlot=character()
+    catchMeanThreshold=2
+    for(i in 1:nbClust){
+      #namSpi=names(which(mprofil[i,]>catchMeanThreshold))
+      #numSpi=which(mprofil[i,]>catchMeanThreshold)
+      namSpi=names(meanprofile[which(t(summaryClusters["Mean",,i])>catchMeanThreshold)])
+      numSpi=which(t(summaryClusters["Mean",,i])>catchMeanThreshold)
+      nameSpPloti=rep("",nbSpec)
+      nameSpPloti[numSpi]=namSpi
+      nameSpPlot=rbind(nameSpPlot,nameSpPloti)
     }
     png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(mprofil[i,], cex.names=1, main=paste("Cluster",i), xlab="Species", ylab="Percentage of catch")
+      barplot(t(summaryClusters["Mean",,i]), names.arg=nameSpPlot[i,], xlab="Species", ylab="Percentage of catch", col="gray")
       par(op2)
-      #mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Mean profile by cluster","\n","\n",sep=""))
@@ -817,20 +963,28 @@ print(paste(" --- selected method :",methMetier, "---"))
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
     
-    
-    # Standard deviation profiles by cluster
-    sdprofil=numeric()
+      
+    # Standard deviation profile by cluster
+    sdprofil=matrix(0,nrow=nbClust,ncol=nbSpec)
+    namSdPlot=character()
+    SdThreshold=2
     for(i in 1:nbClust){
       sdprofilclusti=sd(datSpecies[which(clusters$cluster==i),])
-      sdprofil=rbind(sdprofil,sdprofilclusti)
+      namSDi=names(which(sdprofilclusti>SdThreshold))
+      numSDi=which(sdprofilclusti>SdThreshold)
+      namSdPloti=rep("",nbSpec)
+      namSdPloti[numSDi]=namSDi
+      sdprofil[i,]=sdprofilclusti
+      namSdPlot=rbind(namSdPlot,namSdPloti)
     }
+    rownames(sdprofil) <- 1:nrow(sdprofil)
     png(paste(analysisName,"Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(sdprofil[i,], cex.names=1, main=paste("Cluster",i), xlab="Species", ylab="Percentage of catch")
+      barplot(sdprofil[i,], names.arg=namSdPlot[i,], xlab="Species", ylab="Percentage of catch")
       par(op2)
-      #mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
@@ -867,13 +1021,92 @@ print(paste(" --- selected method :",methMetier, "---"))
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(targetresval[i,], cex.names=1, main=paste("Cluster",i), names.arg=nameTargetPlot[i,], xlab="Species", ylab="Test-value")
+      barplot(targetresval[i,], cex.names=1, names.arg=nameTargetPlot[i,], xlab="Species", ylab="Test-value")
       par(op2)
-      #mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
     dev.off()
+    
+    
+    
+        
+    # Descriptive and summary tables of clusters
+    clusterDesc=matrix(0,nrow=7,ncol=nbClust)
+    for(i in 1:nbClust){
+      clusterDesc[,i]=c(clusters$size[i], 
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
+                        length(which(resval[,i]>1.98)),
+                        length(which(resval[,i]>3.29)),
+                        length(which(apply(datSpecies,2,function (x) (clusters$size[i]-length(which(x[clusters$cluster==i]==0)))/clusters$size[i]*100)>50)),
+                        length(which(apply(datSpecies,2,function (x) (clusters$size[i]-length(which(x[clusters$cluster==i]==0)))/clusters$size[i]*100)>90)))
+    }
+    rownames(clusterDesc)=c("Clusters size","to have 50% of catch", "to have 90% of catch",
+                            "with a test-value > 1.98", "with a test-value > 3.29",
+                            "catch in 50% of the logevents", "catch in 90% of the logevents")
+    colnames(clusterDesc)=1:nbClust                        
+    clusterDesc2=as.data.frame(clusterDesc)
+    
+    
+    namesSpecies=matrix(NA,nrow=nbClust,ncol=10)
+    namesCapt=matrix(NA,nrow=nbClust,ncol=5)
+    nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
+    namesTarget=matrix(NA,nrow=nbClust,ncol=5)
+    nbSpeciesVT = min(5,dim(target$tabnomespcib)[[2]])
+    
+    for(i in 1:nbClust){
+      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
+      a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
+      colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
+      namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+      namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
+    }
+    
+    tabPropCatch=matrix(NA,nrow=nbClust,ncol=10)
+    tabTestVal=matrix(NA,nrow=nbClust,ncol=10)
+    tabPropLog=matrix(NA,nrow=nbClust,ncol=10)
+    
+    for(i in 1:nbClust){
+      print("-----------------------------------------------------------------")
+      print(paste("Cluster ",i))
+      propCatch=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
+      tabPropCatch[i,1:length(propCatch)]=propCatch
+      print(propCatch)
+      testVal=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) resval[x,i]),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
+      tabTestVal[i,1:length(testVal)]=testVal
+      print(testVal)
+      propLog=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) (clusters$size[i]-length(which(datSpecies[clusters$cluster==i,x]==0)))/clusters$size[i]*100),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) (clusters$size[i]-length(which(datSpecies[clusters$cluster==i,x]==0)))/clusters$size[i]*100),digits=1)>=0.1)]
+      tabPropLog[i,1:length(propLog)]=propLog
+      print(propLog)
+    }
+    
+    tabClusters=array(0,dim=c(10,4,nbClust))
+    dimnames(tabClusters)[[2]]=c("FAO","Test-value","% Catch","% Logevents")
+    dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
+    for(i in 1:nbClust){
+      tabClusters[,,i]=cbind(namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
+    }
+    
+    sizeTabClusters=numeric()
+    for(i in 1:nbClust){
+      sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
+    }
+    
+    db <- paste(analysisName,"_tables.xls",sep="")
+    channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
+    sqlSave(channel, clusterDesc2, tablename = "DescClust")
+    
+    for(i in 1:nbClust){
+      tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
+      #tabClusti=as.data.frame(tabClusters[,,i])
+      sqlSave(channel, tabClusti, tablename = paste("Clust",i,sep=""),rownames = TRUE, colnames = TRUE)
+    }
+    odbcClose(channel)
+
+
+
 
 
     print(" --- end of step 3 ---")
@@ -892,17 +1125,17 @@ print(paste(" --- selected method :",methMetier, "---"))
   if(methMetier=="pam"){
 
     # Calculation of optimal k thanks to the silhouette
-    clustersPam.silcoeff <- numeric()
-    for (k in 2:10){
+    clustersPam.silcoeff=numeric()
+    for (k in 2:15){
       clustersPam=pam(datLog,k)
-      clustersPam.silcoeff [k] <- clustersPam$silinfo$avg.width
+      clustersPam.silcoeff[k]=clustersPam$silinfo$avg.width
     }
 
     png(paste(analysisName,"silcoeffpam.png",sep="_"), width = 1200, height = 800)
     plot(clustersPam.silcoeff)     # k optimal corresponds to maximum of silhouette's coefficients
     dev.off()
 
-    clustersPam.silcoeff
+    clustersPam.silcoeff                                           
     max=max(clustersPam.silcoeff, na.rm=T)
     k=which(clustersPam.silcoeff==max)
     
@@ -976,43 +1209,72 @@ print(paste(" --- selected method :",methMetier, "---"))
     # Mean profile by cluster
     nbClust=length(clusters$id.med)
     nbSpec=ncol(datSpecies)
-    mprofil=numeric()
+#    mprofil=numeric()
+    summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
+    dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
+    dimnames(summaryClusters)[[2]]=names(meanprofile)
+    dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)  
     for(i in 1:nbClust){
-      mprofilclusti=mean(datSpecies[which(clusters$clustering==i),])
-      mprofil=rbind(mprofil,mprofilclusti)
+#      mprofilclusti=mean(datSpecies[which(clusters$clustering==i),])
+#      mprofil=rbind(mprofil,mprofilclusti)
+        summaryClusters[,,i]=apply(datSpecies[which(clusters$clustering==i),],2, 
+          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+    }
+    # Species names for mean profile plots
+    nameSpPlot=character()
+    catchMeanThreshold=2
+    for(i in 1:nbClust){
+      #namSpi=names(which(mprofil[i,]>catchMeanThreshold))
+      #numSpi=which(mprofil[i,]>catchMeanThreshold)
+      namSpi=names(meanprofile[which(t(summaryClusters["Mean",,i])>catchMeanThreshold)])
+      numSpi=which(t(summaryClusters["Mean",,i])>catchMeanThreshold)
+      nameSpPloti=rep("",nbSpec)
+      nameSpPloti[numSpi]=namSpi
+      nameSpPlot=rbind(nameSpPlot,nameSpPloti)
     }
     png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(mprofil[i,], main=paste("Cluster",i), xlab="Species", ylab="Percentage of catch")
+      barplot(t(summaryClusters["Mean",,i]), names.arg=nameSpPlot[i,], xlab="Species", ylab="Percentage of catch", col="gray")
       par(op2)
+      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Mean profile by cluster","\n","\n",sep=""))
     dev.off()
     
+    
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
     
-    
+      
     # Standard deviation profile by cluster
-    sdprofil=numeric()
+    sdprofil=matrix(0,nrow=nbClust,ncol=nbSpec)
+    namSdPlot=character()
+    SdThreshold=2
     for(i in 1:nbClust){
       sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])
-      sdprofil=rbind(sdprofil,sdprofilclusti)
+      namSDi=names(which(sdprofilclusti>SdThreshold))
+      numSDi=which(sdprofilclusti>SdThreshold)
+      namSdPloti=rep("",nbSpec)
+      namSdPloti[numSDi]=namSDi
+      sdprofil[i,]=sdprofilclusti
+      namSdPlot=rbind(namSdPlot,namSdPloti)
     }
+    rownames(sdprofil) <- 1:nrow(sdprofil)
     png(paste(analysisName,"Standard deviation profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(sdprofil[i,], xlab="Species", ylab="Percentage of catch")
+      barplot(sdprofil[i,], names.arg=namSdPlot[i,], xlab="Species", ylab="Percentage of catch")
       par(op2)
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
     dev.off()
+    
 
 
     # Number of Logevents by cluster
@@ -1043,13 +1305,90 @@ print(paste(" --- selected method :",methMetier, "---"))
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
-      barplot(targetresval[i,],names.arg=nameTargetPlot[i,], main=paste("Cluster",i), xlab="Species", ylab="Test-value")
+      barplot(targetresval[i,],names.arg=nameTargetPlot[i,], xlab="Species", ylab="Test-value")
       par(op2)
+      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
     dev.off()
 
+
+
+    # Descriptive and summary tables of clusters
+    clusterDesc=matrix(0,nrow=7,ncol=nbClust)
+    for(i in 1:nbClust){
+      clusterDesc[,i]=c(clusters$clusinfo[i,1], 
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
+                        length(which(resval[,i]>1.98)),
+                        length(which(resval[,i]>3.29)),
+                        length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>50)),
+                        length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)))
+    }
+    rownames(clusterDesc)=c("Clusters size","to have 50% of catch", "to have 90% of catch",
+                            "with a test-value > 1.98", "with a test-value > 3.29",
+                            "catch in 50% of the logevents", "catch in 90% of the logevents")
+    colnames(clusterDesc)=1:nbClust                        
+    clusterDesc2=as.data.frame(clusterDesc)
+    
+    
+    namesSpecies=matrix(NA,nrow=nbClust,ncol=10)
+    namesCapt=matrix(NA,nrow=nbClust,ncol=5)
+    nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
+    namesTarget=matrix(NA,nrow=nbClust,ncol=5)
+    nbSpeciesVT = min(5,dim(target$tabnomespcib)[[2]])
+    
+    for(i in 1:nbClust){
+      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
+      a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
+      colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
+      namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+      namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
+    }
+    
+    tabPropCatch=matrix(NA,nrow=nbClust,ncol=10)
+    tabTestVal=matrix(NA,nrow=nbClust,ncol=10)
+    tabPropLog=matrix(NA,nrow=nbClust,ncol=10)
+    
+    for(i in 1:nbClust){
+      print("-----------------------------------------------------------------")
+      print(paste("Cluster ",i))
+      propCatch=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
+      tabPropCatch[i,1:length(propCatch)]=propCatch
+      print(propCatch)
+      testVal=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) resval[x,i]),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
+      tabTestVal[i,1:length(testVal)]=testVal
+      print(testVal)
+      propLog=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) (clusters$clusinfo[i,1]-length(which(datSpecies[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) (clusters$clusinfo[i,1]-length(which(datSpecies[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)>=0.1)]
+      tabPropLog[i,1:length(propLog)]=propLog
+      print(propLog)
+    }
+    
+    tabClusters=array(0,dim=c(10,4,nbClust))
+    dimnames(tabClusters)[[2]]=c("FAO","Test-value","% Catch","% Logevents")
+    dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
+    for(i in 1:nbClust){
+      tabClusters[,,i]=cbind(namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
+    }
+    
+    sizeTabClusters=numeric()
+    for(i in 1:nbClust){
+      sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
+    }
+    
+    db <- paste(analysisName,"_tables.xls",sep="")
+    channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
+    sqlSave(channel, clusterDesc2, tablename = "DescClust")
+    
+    for(i in 1:nbClust){
+      tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
+      #tabClusti=as.data.frame(tabClusters[,,i])
+      sqlSave(channel, tabClusti, tablename = paste("Clust",i,sep=""),rownames = TRUE, colnames = TRUE)
+    }
+    odbcClose(channel)
+    
+    
     
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
@@ -1264,7 +1603,86 @@ print(paste(" --- selected method :",methMetier, "---"))
     title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
     dev.off()
     
+    
+    
+    # Descriptive and summary tables of clusters
+    clusterDesc=matrix(0,nrow=7,ncol=nbClust)
+    for(i in 1:nbClust){
+      clusterDesc[,i]=c(clusters$clusinfo[i,1], 
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
+                        length(which(resval[,i]>1.98)),
+                        length(which(resval[,i]>3.29)),
+                        length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>50)),
+                        length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)))
+    }
+    rownames(clusterDesc)=c("Clusters size","to have 50% of catch", "to have 90% of catch",
+                            "with a test-value > 1.98", "with a test-value > 3.29",
+                            "catch in 50% of the logevents", "catch in 90% of the logevents")
+    colnames(clusterDesc)=1:nbClust                        
+    clusterDesc2=as.data.frame(clusterDesc)
+    
+    
+    namesSpecies=matrix(NA,nrow=nbClust,ncol=10)
+    namesCapt=matrix(NA,nrow=nbClust,ncol=5)
+    nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
+    namesTarget=matrix(NA,nrow=nbClust,ncol=5)
+    nbSpeciesVT = min(5,dim(target$tabnomespcib)[[2]])
+    
+    for(i in 1:nbClust){
+      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
+      a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
+      colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
+      namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+      namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
+    }
+    
+    tabPropCatch=matrix(NA,nrow=nbClust,ncol=10)
+    tabTestVal=matrix(NA,nrow=nbClust,ncol=10)
+    tabPropLog=matrix(NA,nrow=nbClust,ncol=10)
+    
+    for(i in 1:nbClust){
+      print("-----------------------------------------------------------------")
+      print(paste("Cluster ",i))
+      propCatch=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
+      tabPropCatch[i,1:length(propCatch)]=propCatch
+      print(propCatch)
+      testVal=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) resval[x,i]),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
+      tabTestVal[i,1:length(testVal)]=testVal
+      print(testVal)
+      propLog=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) (clusters$clusinfo[i,1]-length(which(datSpecies[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) (clusters$clusinfo[i,1]-length(which(datSpecies[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)>=0.1)]
+      tabPropLog[i,1:length(propLog)]=propLog
+      print(propLog)
+    }
+    
+    tabClusters=array(0,dim=c(10,4,nbClust))
+    dimnames(tabClusters)[[2]]=c("FAO","Test-value","% Catch","% Logevents")
+    dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
+    for(i in 1:nbClust){
+      tabClusters[,,i]=cbind(namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
+    }
+    
+    sizeTabClusters=numeric()
+    for(i in 1:nbClust){
+      sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
+    }
+    
+    db <- paste(analysisName,"_tables.xls",sep="")
+    channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
+    sqlSave(channel, clusterDesc2, tablename = "DescClust")
+    
+    for(i in 1:nbClust){
+      tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
+      #tabClusti=as.data.frame(tabClusters[,,i])
+      sqlSave(channel, tabClusti, tablename = paste("Clust",i,sep=""),rownames = TRUE, colnames = TRUE)
+    }
+    odbcClose(channel)
 
+
+
+    
+    
+    
     le_id_clust <- cbind(LE_ID=LE_ID,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
