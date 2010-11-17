@@ -4,25 +4,26 @@
 
 
 library(FactoMineR)
-library(ade4)
+#library(ade4)
 library(cluster)
-require(graphics)
-require(stats)
+library(graphics)
+library(stats)
 library(SOAR)
 library(amap)
 library(MASS)
+library(RODBC)
 
 
 # Transform quantities to percents fished in the logevent
 
 transformation_proportion=function(tab){
   res=as.matrix(tab)
-  n=length(tab[,1])
-  p=length(tab[1,])
+  n=nrow(tab)
+  p=ncol(tab)
   for (i in 1:n){
     sommeligne=sum(res[i,])
     if(sommeligne==0){
-      res[i,]=0
+      res[i,]=rep(0,p)
     }else{
       res[i,]=res[i,]*(100/sommeligne)
     }
@@ -34,8 +35,8 @@ transformation_proportion=function(tab){
 # Transposing data (changing variables into individuals)
 
 table_variables=function(data){
-  n=length(data[,1])
-  p=length(data[1,])
+  n=nrow(data)
+  #p=ncol(data)
   res1=t(as.matrix(data[1:round(n/2),]))
   res2=t(as.matrix(data[(round(n/2)+1):n,]))
   res=cbind(res1,res2)
@@ -75,8 +76,9 @@ select_species=function(data,groupes_cah){
   }
   indice.autre=which.min(moyennes)
   noms=names(which(groupes_cah!=indice.autre))
-  return(noms)
+  return(list(noms,indice.autre))
 }
+
 
 
 # Building the table with main species
@@ -85,9 +87,9 @@ building_tab_pca=function(data,especes){
   p=ncol(data)
   noms=names(data)
   ind_princ=which(is.element(noms,especes))
-  ind_autres=setdiff(1:p,ind_princ)
+  #ind_autres=setdiff(1:p,ind_princ)
   princ=data[,ind_princ]
-  autres=apply(data[,ind_autres],1,sum)
+  #autres=apply(data[,ind_autres],1,sum)
   return(data.frame(princ))
 }
 
