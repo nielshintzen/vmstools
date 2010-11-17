@@ -45,7 +45,7 @@
 
 
 # Classif : function for the selection of species (hac, totale, logevent), PCA (pca, nopca), classification of logevents (hac, kmeans, pam, and clara) and métiers computation (thanks to test-values)
-classif_step1 <-function(dat,NamesMainSpeciesHAC, paramTotal=95,paramLogevent=100)
+classif_step1 <-function(dat,NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
 #,pcaYesNo="pca",criterion="70percents",methMetier="clara",param3="euclidean",param4=NULL)
 {
 
@@ -71,11 +71,12 @@ t1 <- Sys.time()
 print("calculating proportions...") #clu
     
     propdat=transformation_proportion(dat[,2:p])
+    nameSpecies=names(propdat)
     
     # Total quantity caught species by species
     sumcol=rep(as.numeric(NA),p-1) #numeric()
     for(i in 2:p) sumcol[i]=sum(dat[,i])
-   # } names(sumcol) <- names(dat)[-1]
+    # } names(sumcol) <- names(dat)[-1]
     #clu 
     #sumcol <- apply(dat[,-1],2,sum)
     
@@ -83,10 +84,11 @@ print("calculating proportions...") #clu
     # sumtotale=sum(sumcol,na.rm=T)
     # Percent of each species in the total catch
     propesp=sumcol/sum(sumcol,na.rm=T)*100
-    # by decreasing order
-    propesp=cumsum(propesp[order(propesp,decreasing=T)])
     # Columns number of each species by decreasing order of capture
-    # numesp=order(propesp,decreasing=T)
+    numesp=order(propesp,decreasing=T)
+    # Percent of each species in the total catch by decreasing order
+    propesp=cumsum(propesp[order(propesp,decreasing=T)])
+
     # Cumulative percent of catch
     #propespcum=cumsum(propespdec)
     
@@ -97,10 +99,11 @@ print("calculating proportions...") #clu
     if (is.null(paramTotal) | !is.numeric(paramTotal)) stop("param1 must be numeric between 0 and 100")
     seuil=paramTotal
     pourcent=which(propesp<=seuil)
-    #espsel=numesp[1:(length(pourcent)+1)]
     # We are taking the name of selected species
-    nomespselTotal=names(pourcent)
-
+    espsel=numesp[1:(length(pourcent)+1)]
+    nomespselTotal=nameSpecies[espsel]
+    #nomespselTotal=names(pourcent)
+    
 #    #eventually removing MZZ
 #    nomespselTotal <- nomespsel[!nomespsel=="MZZ"]      
 #    #cat("main species:",sort(nomespsel),"\n")
@@ -110,8 +113,10 @@ print("calculating proportions...") #clu
     
     seuil=paramLogevent
     # Selection of species making up over param1% of logevent's captures
-    pourcent <- apply(propdat,1,function(x) which(x>=seuil))   
-    nomespselLogevent <- names(propdat)[unique(unlist(pourcent))] 
+#    pourcent <- apply(propdat,1,function(x) which(x>=seuil))   
+#    nomespselLogevent <- names(propdat)[unique(unlist(pourcent))] 
+    nomespselLogevent=character()
+    for (i in nameSpecies) if (any(propdat[,i]>=seuil)) nomespselLogevent=c(nomespselLogevent,i)
     
     #eventually removing MZZ
    # nomespselLogevent <- nomespsel[!nomespsel=="MZZ"]  
@@ -194,13 +199,12 @@ datSpecies <- datSpecies[,-1]
     dev.off()
     png(paste(analysisName,"Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
     color=rep("grey",length(log.pca$eig[,1]))
-    color[1:nbaxes]="green"
+    if(criterion=="screetest") color[1:nbaxes]="green" 
     barplot(log.pca$eig[,2],names.arg=x, col=color, main="Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
     dev.off()
     png(paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
     color=rep("grey",length(log.pca$eig[,1]))
-    numaxe=min(which(log.pca$eig[,3]>70))
-    color[1:numaxe]="green"
+    if(criterion=="70percents") color[1:nbaxes]="green"
     barplot(log.pca$eig[,3],names.arg=x, col=color, main="Cumulative Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
     abline(h=70, col="red")
     text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
