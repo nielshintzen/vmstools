@@ -58,7 +58,7 @@ t1 <- Sys.time()
 
 #dat[is.na(dat)] <- 0
   
-
+                                                         
 # then simplify the names of columns
 #names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 #names(dat)
@@ -265,6 +265,8 @@ datSpecies <- datSpecies[,-1]
 
 classif_step3 <-function(datSpecies, datLog, analysisName="",methMetier="clara",param3="euclidean",param4=NULL){
 
+LE_ID <- datSpecies[1]
+datSpecies <- datSpecies[,-1]
 
 print("######## STEP 3 CLUSTERING ########")
 
@@ -296,7 +298,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       numSample=i
       print(paste("sample",i))
       # Sample of size 15000 logevents
-      sam=sample(1:nbLog,size=5000,replace=F)
+      sam=sample(1:nbLog,size=15000,replace=F)
       # Record the 5 samples
       sampleList=rbind(sampleList,sam)
       outofsam=setdiff(1:nbLog,sam)
@@ -450,7 +452,8 @@ print(paste(" --- selected method :",methMetier, "---"))
       namSdPlot=character()
       SdThreshold=2
       for(k in 1:nbClust){
-        sdprofilclusti=sd(sampleDatSpecies[which(sampleClusters==k),])
+        if(length(which(sampleClusters==k))==1){ sdprofilclusti=rep(0,nbSpec)
+        }else{sdprofilclusti=sd(sampleDatSpecies[which(sampleClusters==k),])}
         namSDi=names(which(sdprofilclusti>SdThreshold))
         numSDi=which(sdprofilclusti>SdThreshold)
         namSdPloti=rep("",nbSpec)
@@ -477,8 +480,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       png(paste(analysisName,numSample,"Sample_Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
       coord=barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
       barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
-      text(coord,sizeClusters-500,sizeClusters,font=2)
-      text(coord,sizeClusters+500,sizeClusters,font=2)
+      text(coord,sizeClusters+200,sizeClusters,font=2,xpd=NA)
       dev.off()
   
   
@@ -514,7 +516,7 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     } # end of for(i in 1:5)
       
-      
+
       
  
     # Select the sample which gives the smaller classification's quality (the best sample)
@@ -543,16 +545,15 @@ print(paste(" --- selected method :",methMetier, "---"))
 #    gc(reset=TRUE)
     sampleDatLogWithClusters=data.frame()
     sampleDatLogWithClusters=cbind(sampleDatLog,sampleClusters)
-    
-    
-
+    sampleDatLogWithClusters=as.data.frame(sampleDatLogWithClusters)
 
     # Discriminante analysis on the learning dataset
     #learning.lda=lda(sampleDatLogWithClusters[,1:nbDim],as.character(sampleDatLogWithClusters[,ncol(sampleDatLogWithClusters)]))
     learning=lda(sampleClusters~.,data=sampleDatLogWithClusters)
     
     otherLog=datLog[outofsam,]
-                                  
+    otherLog=as.data.frame(otherLog)                              
+    
     # Predict the cluster for the other logevent
     pred=predict(learning,otherLog)
 
@@ -582,6 +583,7 @@ print(paste(" --- selected method :",methMetier, "---"))
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
     
+   
     # Within and between variance of clusters and classification
     centerOfGravityClassif=numeric()
     withinVarClusters=numeric()
@@ -622,7 +624,6 @@ print(paste(" --- selected method :",methMetier, "---"))
 
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
-    
 
     # Projections on the first factorial plans
     png(paste(analysisName,"HAC_Projections.png",sep="_"), width = 1200, height = 800)
@@ -701,7 +702,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     namSdPlot=character()
     SdThreshold=2
     for(i in 1:nbClust){
-      sdprofilclusti=sd(datSpecies[which(clusters==i),])
+      if(length(which(clusters==i))==1){ sdprofilclusti=rep(0,nbSpec)
+      }else{sdprofilclusti=sd(datSpecies[which(clusters==i),])}
       namSDi=names(which(sdprofilclusti>SdThreshold))
       numSDi=which(sdprofilclusti>SdThreshold)
       namSdPloti=rep("",nbSpec)
@@ -732,8 +734,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
     coord=barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
     barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
-    text(coord,sizeClusters-500,sizeClusters,font=2)
-    text(coord,sizeClusters+500,sizeClusters,font=2)
+    text(coord,sizeClusters+400,sizeClusters,font=2,xpd=NA)
     dev.off()
 
 
@@ -847,7 +848,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
-    return(list(clusters=clusters, sizeClusters=sizeClusters, tabInertia=tabInertia, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
+    return(list(clusters=clusters, sizeClusters=sizeClusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   }   else 
 
@@ -869,8 +870,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     plot(varintra,main="Within clusters variance",xlab="Number of clusters",ylab="Within Variance")
     dev.off()
 
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc(reset=TRUE)
 
     diffvarintra=diff(varintra,na.rm=T)
     diffdiffvar=diff(diffvarintra,na.rm=T)
@@ -896,8 +897,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     #Determine the target species
     target=targetspecies(resval)
 
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc(reset=TRUE)
 
 
     # Projections on the first factorial plans
@@ -973,7 +974,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     namSdPlot=character()
     SdThreshold=2
     for(i in 1:nbClust){
-      sdprofilclusti=sd(datSpecies[which(clusters$cluster==i),])
+      if(length(which(clusters$cluster==i))==1){ sdprofilclusti=rep(0,nbSpec)
+      }else{sdprofilclusti=sd(datSpecies[which(clusters$cluster==i),])}
       namSDi=names(which(sdprofilclusti>SdThreshold))
       numSDi=which(sdprofilclusti>SdThreshold)
       namSdPloti=rep("",nbSpec)
@@ -1000,8 +1002,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
     coord=barplot(clusters$size, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
     barplot(clusters$size, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
-    text(coord,clusters$size-600,clusters$size,font=2)
-    text(coord,clusters$size+600,clusters$size,font=2)
+    text(coord,clusters$size+400,clusters$size,font=2,xpd=NA)
     dev.off()
 
 
@@ -1116,7 +1117,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
-    return(list(clusters=clusters, tabInertia=tabInertia, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
+    return(list(clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   } else                                                                                                        
 
@@ -1143,8 +1144,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     max=max(clustersPam.silcoeff, na.rm=T)
     k=which(clustersPam.silcoeff==max)
     
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-    gc(reset=TRUE)
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    gc(reset=TRUE)
     
     # PAM with optimal k
     clusters=pam(datLog,k)
@@ -1258,7 +1259,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     namSdPlot=character()
     SdThreshold=2
     for(i in 1:nbClust){
-      sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])
+      if(length(which(clusters$clustering==i))==1){ sdprofilclusti=rep(0,nbSpec)
+      }else{sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])}
       namSDi=names(which(sdprofilclusti>SdThreshold))
       numSDi=which(sdprofilclusti>SdThreshold)
       namSdPloti=rep("",nbSpec)
@@ -1286,7 +1288,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
     coord=barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
     barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
-    text(coord,clusters$clusinfo[,1]-600,clusters$clusinfo[,1],font=2)
+    text(coord,clusters$clusinfo[,1]+200,clusters$clusinfo[,1],font=2,xpd=NA)
     dev.off()
 
 
@@ -1397,7 +1399,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(clusters=clusters, tabInertia=tabInertia,  nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=mprofil, resval=resval, target=target))
+    return(list(clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   } else 
 
@@ -1545,7 +1547,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     namSdPlot=character()
     SdThreshold=5
     for(i in 1:nbClust){
-      sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])
+      if(length(which(clusters$clustering==i))==1){ sdprofilclusti=rep(0,nbSpec)
+      }else{sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])}
       namSDi=names(which(sdprofilclusti>SdThreshold))
       numSDi=which(sdprofilclusti>SdThreshold)
       namSdPloti=rep("",nbSpec)
@@ -1572,8 +1575,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
     coord=barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
     barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
-    text(coord,clusters$clusinfo[,1]-600,clusters$clusinfo[,1],font=2)
-    text(coord,clusters$clusinfo[,1]+800,clusters$clusinfo[,1],font=2)
+    text(coord,clusters$clusinfo[,1]+400,clusters$clusinfo[,1],font=2,xpd=NA)
     dev.off()
 
 
@@ -1691,7 +1693,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(le_id_clust=le_id_clust,clusters=clusters, tabInertia=tabInertia, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, mprofil=t(summaryClusters["Mean",,]), resval=resval, target=target))
+    return(list(le_id_clust=le_id_clust,clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
