@@ -30,7 +30,7 @@ DCFIndicator6 <- function ( tacsat,
     # grid the vms pings inside the MCP
     monthlyTacsat<-subset(monthlyTacsat, monthlyTacsat$INMCP!=0)
     if (plotMapTF) {windows(record=TRUE)}
-    monthlyVmsGrid<-vmsGridCreate(monthlyTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum = "INMCP", plotMap=plotMapTF, plotTitle=paste("Month ", currMonth), plotPoints = FALSE, outGridFile=exportGridName)
+    monthlyVmsGrid<-vmsGridCreate(monthlyTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum = "INMCP", plotMap=plotMapTF, plotTitle=paste("Month ", currMonth), plotPoints = FALSE)
     if (plotMapTF) {plot_mcp(plotnew=FALSE, plotpoints=FALSE, titletxt="")}
     
       # calculate the area of each cell in square km
