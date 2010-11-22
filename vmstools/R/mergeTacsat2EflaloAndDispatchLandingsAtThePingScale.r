@@ -702,7 +702,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     .logbk.for.meth1   <- aggregate(.logbk.for.meth1 [,idx.col],
                                  list(.logbk.for.meth1$VE_REF, .logbk.for.meth1$bk.tripnum,
                                             .logbk.for.meth1$VE_FLT, .logbk.for.meth1$VE_KW, .logbk.for.meth1$LE_MET_level6, .logbk.for.meth1$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth1) <- c("VE_REF", "bk.tripnum", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                    colnames(.logbk.for.meth1) <- c("VE_REF","VE_KW", "bk.tripnum", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
                     merged1  <- do.merging(method="bk.tripnum", .logbk.for.meth1, .vms.for.meth1, general)
                     # add meth flag
@@ -717,9 +717,9 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     idx.col.v <- grep('EURO', nm) # index columns with species value
                     idx.col <- c(idx.col.w, idx.col.v)
                     .logbk.for.meth2   <- aggregate(.logbk.for.meth2 [,idx.col],
-                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$bk.tripnum.sq,
-                                            .logbk.for.meth2$VE_FLT,.logbk.for.meth2$VE_KW,  .logbk.for.meth2$LE_MET_level6, .logbk.for.meth2$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth2) <- c("VE_REF", "bk.tripnum.sq","VE_KW",  "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$VE_KW, .logbk.for.meth2$bk.tripnum.sq,
+                                            .logbk.for.meth2$VE_FLT, .logbk.for.meth2$LE_MET_level6, .logbk.for.meth2$LE_GEAR), sum, na.rm=TRUE)
+                    colnames(.logbk.for.meth2) <- c("VE_REF", "VE_KW", "bk.tripnum.sq", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
                     merged2 <- do.merging(method="bk.tripnum.sq", .logbk.for.meth2, .vms.for.meth2, general)
                     # add meth flag
@@ -749,7 +749,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                  # if still 'not merging' part, retrieve on NA side i.e. occurs when pings in vms but not in bk
                    merged <- retrieveOnBkSide(merged, type.data=c( "VE_FLT","VE_KW","LE_MET_level6"))  # i.e. when metier=='NA'
 
-  
+     
         # clean up
         rm(a.table, merged1, merged2, merged3, merged.this.vessel,.vms, .logbk, logbk.this.vessel, vms.this.vessel)
         gc(reset=TRUE)
@@ -828,8 +828,8 @@ return()
   data(tacsat)
   data(euharbours)
   # add missing harbours? (still to be fix...)
-  #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10')))
-  #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1')))
+  #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
+  #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
  
   library(doBy)
@@ -846,7 +846,8 @@ return()
                        
   
   # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
-  eflalo <- mergeEflaloSpecies (eflalo2, threshold=1e6) 
+  # (assuming that the other species is MZZ)
+  eflalo <- mergeEflaloSpecies (eflalo2, threshold=1e6, code="MZZ") 
   
   # debug
   eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" &!is.na(eflalo2$VE_REF),]
@@ -855,7 +856,7 @@ return()
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
                                                                             a.year=2009, visual.check=TRUE,
-                                                                             do.wp3=FALSE, speed="segment"))
+                                                                             do.wp3=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
                                                              general=list(output.path=file.path("C:","output"),
@@ -874,14 +875,16 @@ return()
   load(file.path("C:","output","all_merged_2009.RData"))
              
   # map landing of sole from all studied vessels
-  df1<- all.merged[,colnames(all.merged)%in% c("SI_LATI","SI_LONG","LE_KG_SOL")]
+  df1<- all.merged[,colnames(all.merged)%in% c("SI_LATI","SI_LONG","LE_KG_COD")]
   df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
   df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
-  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", 
+            cellsizeX =0.05, cellsizeY =0.05, legendtitle = "landings (kg)")
 
   # remove steaming points before gridding!
-  df2<-df1[-which(is.na(df1$LE_KG_SOL)),]
-  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",cellsizeX =0.05,cellsizeY =0.05)
+  df2<-df1[-which(is.na(df1$LE_KG_COD)),]
+  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", 
+             cellsizeX =0.05,cellsizeY =0.05, legendtitle = "landings (kg)")
 
 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
