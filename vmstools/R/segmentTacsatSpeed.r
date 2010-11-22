@@ -278,7 +278,9 @@ segmentSpeedTacsat <- function(tacsat,
     more.frequent.speed <- hi$mids[idx] # assumed to be for fishing
  
    a.flag <- FALSE
-   while(more.frequent.speed > 700 || more.frequent.speed < 100){
+   if(is.na(more.frequent.speed)){ a.flag <- TRUE 
+    } else {
+    while(more.frequent.speed > 700 || more.frequent.speed < 100){
       hi$counts <- hi$counts[-idx]
       hi$mids <-  hi$mids[-idx]
       idx       <- which(hi$counts==max(hi$counts))[1]
@@ -288,6 +290,7 @@ segmentSpeedTacsat <- function(tacsat,
           a.flag <- TRUE ; break 
          }
       }
+    }  
     if(!a.flag){  
     start.lower.bound <- ifelse(more.frequent.speed-200<= min(dati$x),
                                          min(dati$x)+100, more.frequent.speed-200)
