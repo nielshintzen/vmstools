@@ -833,7 +833,7 @@ return()
 
    # order
   library(doBy)
-  tacsat <- orderBy (~VE_REF+SI_DATE+SI_TIME, data=tacsat)
+  tacsat <- orderBy (~VE_REF, data=tacsat)
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
