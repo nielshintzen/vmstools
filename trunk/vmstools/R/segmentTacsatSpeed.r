@@ -6,7 +6,7 @@
 segmentSpeedTacsat <- function(tacsat,
                          general=list(
                            output.path=file.path('C:','output'),
-                                       visual.check=TRUE), ...){
+                                       visual.check=TRUE, a.year=2009), ...){
 
   lstargs <- list(...)
   if(length(lstargs$vessels)!=0) {
@@ -278,7 +278,7 @@ segmentSpeedTacsat <- function(tacsat,
     more.frequent.speed <- hi$mids[idx] # assumed to be for fishing
  
    a.flag <- FALSE
-   if(is.na(more.frequent.speed)){ a.flag <- TRUE 
+   if(is.na(more.frequent.speed) | length(x)==0){ a.flag <- TRUE 
     } else {
     while(more.frequent.speed > 700 || more.frequent.speed < 100){
       hi$counts <- hi$counts[-idx]
@@ -330,7 +330,7 @@ segmentSpeedTacsat <- function(tacsat,
    if(!is.null(bound2)) text(bound2/100, 1, signif(bound2,3), col=2)
    # save the panel plot
    savePlot(filename = file.path(general$output.path,
-      paste(unique(a.vesselid),"-detected_speed_span_for_feffort-", general$a.year,"-",a.vesselid,"-",gr, sep="")),
+      paste(unique(a.vesselid),"-detected_speed_span_for_feffort-", general$a.year,"-",gr, sep="")),
           type = c("wmf"), device = dev.cur(), restoreConsole = TRUE)
   dev.off()
   }
@@ -346,7 +346,7 @@ segmentSpeedTacsat <- function(tacsat,
      if(gr %in% c('GNS','GND','GNC','GNF',
              'GTR','GTN','GEN','GN')) bound1 <- lstargs$force.lower.bound
              # special case for gillnetters= set a lower bound
-     if(gr %in% c('SDN')) bound1 <- lstargs$force.lower.bound
+     if(gr %in% c('SDN','SSC')) bound1 <- lstargs$force.lower.bound
   }
 
   # then, assign...
