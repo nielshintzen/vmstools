@@ -897,13 +897,14 @@ return()
   df1<- all.merged[,colnames(all.merged)%in% c("SI_LATI","SI_LONG","LE_KG_COD")]
   df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
   df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
-  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", 
-            cellsizeX =0.05, cellsizeY =0.05, legendtitle = "landings (kg)")
+  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
+                                 cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)")
 
-  # but need to remove steaming points before gridding!
+  # remove steaming points before gridding!
   df2<-df1[-which(is.na(df1$LE_KG_COD)),]
-  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", 
-             cellsizeX =0.05,cellsizeY =0.05, legendtitle = "landings (kg)")
+  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
+                                cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)")
+
 
 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
