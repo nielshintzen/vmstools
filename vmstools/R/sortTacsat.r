@@ -9,3 +9,4 @@ tacsat    <- cbind(tacsat,SI_DATIM)
 tacsat <- orderBy(~VE_REF+SI_DATIM,data=tacsat)
 return(tacsat[,-grep("SI_DATIM",colnames(tacsat))])}
 
+                                                
