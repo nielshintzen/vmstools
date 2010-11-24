@@ -60,9 +60,16 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
-   # order
+  
+  # create one column 'date.in.R' from pasting date and time 
+  # (to order tacsat if needed)
+  ctime <- strptime(  paste(tacsat$SI_DATE, tacsat$SI_TIME) , 
+                                 tz='GMT',   "%e/%m/%Y %H:%M" )
+  tacsat <- cbind.data.frame(tacsat, date.in.R=ctime)
+     
+  # order tacsat
   library(doBy)
-  tacsat <- orderBy (~VE_REF+SI_DATE+SI_TIME, data=tacsat)
+  tacsat <- orderBy (~VE_REF+date.in.R, data=tacsat)
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
@@ -93,12 +100,12 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   # that will overwrite the existing SI_STATE)
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE,
+                                                                             visual.check=TRUE,
                                                                              do.wp3=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
                                                              general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE,
+                                                                             visual.check=TRUE,
                                                                              do.wp3=FALSE, speed="segment"))
   gc(reset=TRUE)
 
@@ -116,13 +123,14 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   df1<- all.merged[,colnames(all.merged)%in% c("SI_LATI","SI_LONG","LE_KG_COD")]
   df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
   df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
-  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", 
-            cellsizeX =0.05, cellsizeY =0.05, legendtitle = "landings (kg)")
+  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
+                                 cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)")
 
-  # but need to remove steaming points before gridding!
+  # remove steaming points before gridding!
   df2<-df1[-which(is.na(df1$LE_KG_COD)),]
-  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", 
-             cellsizeX =0.05,cellsizeY =0.05, legendtitle = "landings (kg)")
+  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
+                                cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)")
+
 
 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
@@ -133,6 +141,27 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD") )
 
+ 
+ 
+  # Use the interpolation routine to improve the location of the effort
+  #interpolations      <- interpolateTacsat( all.merged, 
+  #                            ,interval=60             
+  #                            ,margin=12               
+  #                            ,res=100                
+  #                            ,method="cHs"           
+  #                            ,params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)) 
+  #                            ,headingAdjustment=0
+  #                            )
+  #interpolationsED <- equalDistance(interpolations,res=10)
+  # make sure that the 'res' statement in the interpolateTacsat is significantly bigger 
+  # than the 'res' statement in the equalDistance function.
+   
+  # then map again...
+  #vmsGridCreate(interpolationsED,nameLon="SI_LONG",nameLat="SI_LATI", 
+  #          cellsizeX =0.05, cellsizeY =0.05, legendtitle = "landings (kg)")
+
+  
+ 
   }
 
 }
