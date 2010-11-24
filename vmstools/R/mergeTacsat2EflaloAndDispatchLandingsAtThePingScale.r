@@ -831,9 +831,16 @@ return()
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
-   # order
+  
+  # create one column 'date.in.R' from pasting date and time 
+  # (to order tacsat if needed)
+  ctime <- strptime(  paste(tacsat$SI_DATE, tacsat$SI_TIME) , 
+                                 tz='GMT',   "%e/%m/%Y %H:%M" )
+  tacsat <- cbind.data.frame(tacsat, date.in.R=ctime)
+     
+  # order tacsat
   library(doBy)
-  tacsat <- orderBy (~VE_REF, data=tacsat)
+  tacsat <- orderBy (~VE_REF+date.in.R, data=tacsat)
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
@@ -904,6 +911,27 @@ return()
   ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="NLD") )
 
+ 
+ 
+  # Use the interpolation routine to improve the location of the effort
+  #interpolations      <- interpolateTacsat( all.merged, 
+  #                            ,interval=60             
+  #                            ,margin=12               
+  #                            ,res=100                
+  #                            ,method="cHs"           
+  #                            ,params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)) 
+  #                            ,headingAdjustment=0
+  #                            )
+  #interpolationsED <- equalDistance(interpolations,res=10)
+  # make sure that the 'res' statement in the interpolateTacsat is significantly bigger 
+  # than the 'res' statement in the equalDistance function.
+   
+  # then map again...
+  #vmsGridCreate(interpolationsED,nameLon="SI_LONG",nameLat="SI_LATI", 
+  #          cellsizeX =0.05, cellsizeY =0.05, legendtitle = "landings (kg)")
+
+  
+ 
   #}
  
 } # end main
