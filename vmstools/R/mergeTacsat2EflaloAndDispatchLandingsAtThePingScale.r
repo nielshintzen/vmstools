@@ -44,7 +44,7 @@
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
            function(logbooks, tacsat, general=list(output.path=file.path("C:"),
-                    a.year=2009, visual.check=TRUE, do.wp3=FALSE, speed="segment"), ...){
+                     visual.check=TRUE, do.wp3=FALSE, speed="segment"), ...){
 
   lstargs <- list(...)
 
@@ -141,6 +141,9 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          logbk.this.vessel$LE_RECT    <- factor(logbk.this.vessel$LE_RECT)
          logbk.this.vessel$VE_REF     <- factor(logbk.this.vessel$VE_REF)
 
+         # automatic detection of a.year
+         general$a.year <-   format(strptime(  paste(logbk.this.vessel$FT_DDAT[1]) , tz='GMT',  "%e/%m/%Y" ), "%Y")
+         
          #   add mid-time and bk.tripnum in eflalo
            # departure time
            ctime <- strptime(  paste(logbk.this.vessel$FT_DDAT, logbk.this.vessel$FT_DTIME) , tz='GMT',  "%e/%m/%Y %H:%M" )
@@ -453,8 +456,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
              # then do the assignement of the state 
              #according to a segemented regression on the (apparent) speed histogram
             .vms <- segmentSpeedTacsat (tacsat=.vms, vessels=a.vesselid, 
-                                  force.lower.bound=0.5, general=list(
-                                   output.path=general$output.path,visual.check=TRUE))
+                                  force.lower.bound=0.5, general=list(a.year=general$a.year,
+                                   output.path=general$output.path, visual.check=TRUE))
                 #=> (semi)automatic detection of the fishing peak
                 # (put here because the LE_GEAR need to be informed)
             
@@ -871,12 +874,12 @@ return()
   # that will overwrite the existing SI_STATE)
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                                              general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE,
+                                                                             visual.check=TRUE,
                                                                              do.wp3=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
   mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
                                                              general=list(output.path=file.path("C:","output"),
-                                                                            a.year=2009, visual.check=TRUE,
+                                                                             visual.check=TRUE,
                                                                              do.wp3=FALSE, speed="segment"))
   gc(reset=TRUE)
 
