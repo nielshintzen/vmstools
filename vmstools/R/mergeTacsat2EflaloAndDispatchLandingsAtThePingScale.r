@@ -843,7 +843,7 @@ return()
      
   # order tacsat
   library(doBy)
-  tacsat <- orderBy (~VE_REF+date.in.R, data=tacsat)
+  tacsat <- sortTacsat(tacsat)
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
@@ -894,7 +894,7 @@ return()
   load(file.path("C:","output","all_merged__2009.RData"))
              
   # map landing of cod from all studied vessels
-  df1<- all.merged[,colnames(all.merged)%in% c("SI_LATI","SI_LONG","LE_KG_COD")]
+  df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD")]
   df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
   df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
   df1 <-   df1[ !is.na(df1$SI_LATI),]
