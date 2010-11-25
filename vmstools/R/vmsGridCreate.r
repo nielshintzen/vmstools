@@ -31,6 +31,8 @@ vmsGridCreate <- function( dF
 require(sp)
 require(maptools)
 
+lstargs <- list(...)
+
 #only create grids when num records >0 (otherwise generates error)
 if ( nrow(dF) > 0 )
    {
@@ -103,7 +105,7 @@ if ( nrow(dF) > 0 )
                ,numCats = numCats, addLegend = addLegend
                ,legendx=legendx, legendncol = legendncol
                ,legendtitle = legendtitle, plotPoints = plotPoints
-               ,outGridFile = outGridFile, outPlot = outPlot )
+               ,outGridFile = outGridFile, outPlot = outPlot, breaks0=lstargs$breaks0 )
        } #end of plotMap
 
     #to output spatialGridDataFrame to a gridascii file

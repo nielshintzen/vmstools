@@ -31,8 +31,14 @@ require(maptools)
 xlim0=c(we,ea)
 ylim0=c(so,no)
 
+lstargs <- list(...)
+
 #dev.new()
-breaks0 <- pretty(sGDF[[gridValName]],n=numCats)
+if(length(lstargs$breaks0)==0) {
+      breaks0 <- pretty(sGDF[[gridValName]],n=numCats)
+      } else{
+      breaks0 <- lstargs$breaks0
+      }
 cols <- rev(rainbow((length(breaks0)-1)))
 image(sGDF, attr=gridValName, axes=FALSE,  col=cols, xlim=xlim0, ylim=ylim0,breaks=breaks0)
 
