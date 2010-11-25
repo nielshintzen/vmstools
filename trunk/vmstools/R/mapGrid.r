@@ -28,20 +28,21 @@ require(sp)
 require(maptools)
 
 
-xlim=c(we,ea)
-ylim=c(so,no)
+xlim0=c(we,ea)
+ylim0=c(so,no)
 
 #dev.new()
-breaks <- pretty(sGDF[[gridValName]],n=numCats)
-cols <- rev(rainbow((length(breaks)-1)))
-image(sGDF, attr=gridValName, axes=FALSE,  col=cols, xlim=xlim, ylim=ylim,breaks=breaks)
+breaks0 <- pretty(sGDF[[gridValName]],n=numCats)
+cols <- rev(rainbow((length(breaks0)-1)))
+image(sGDF, attr=gridValName, axes=FALSE,  col=cols, xlim=xlim0, ylim=ylim0,breaks=breaks0)
+
 library(mapdata)
 map("worldHires", add=TRUE,col="darkgreen",fill=TRUE,bg="white")
 box() # to put a box around the plot
 #mtext(paste(gear,year),font=4,line=-1.5)
 
 #legend(x='bottomleft', legend=breaks[1:(length(breaks)-1)], pch = 22, pt.bg=cols, title="fishing activity",bg="white",pt.cex=2 )
-legend(x=legendx, legend=breaks[1:(length(breaks)-1)], pch = 22, pt.bg=cols, title=legendtitle, ncol=legendncol, bg="white",pt.cex=2 )
+legend(x=legendx, legend=breaks0[1:(length(breaks0)-1)], pch = 22, pt.bg=cols, title=legendtitle, ncol=legendncol, bg="white",pt.cex=2 )
 
 #to add points (can obscure grid)
 if (plotPoints) points(sPDF, pch=".")
