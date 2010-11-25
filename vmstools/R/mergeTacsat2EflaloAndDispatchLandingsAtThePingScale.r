@@ -200,7 +200,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
          # keep only the essential
          vms.this.vessel  <- tacsat.this.vessel [, c("VE_REF","SI_LATI","SI_LONG", 
-                          "date.in.R","SI_FT", "SI_HARB", "SI_STATE")]
+                          "date.in.R","SI_FT", "SI_SP", "SI_HE", "SI_HARB", "SI_STATE")]
          rm(tacsat.this.vessel); gc(reset=TRUE)                  
          vms.this.vessel$VE_REF   <- factor(vms.this.vessel$VE_REF)
 
@@ -497,21 +497,21 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
              # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER BK.TRIPNUM
               agg.logbk.this.vessel.method.1  <- aggregate(.logbk[,idx.col],
                       list(.logbk$bk.tripnum, 
-                              .logbk$VE_REF, .logbk$VE_KW, .logbk$VE_FLT,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
+                              .logbk$VE_REF,  .logbk$VE_FLT,.logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
               colnames(agg.logbk.this.vessel.method.1) <- 
-                           c("bk.tripnum", "VE_REF", "VE_KW", "VE_FLT", "LE_MET_level6","LE_GEAR", nm[idx.col] )
+                           c("bk.tripnum", "VE_REF",  "VE_FLT", "VE_KW","LE_MET_level6","LE_GEAR", nm[idx.col] )
              # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER BK.TRIPNUM.SQ
               agg.logbk.this.vessel.method.2  <- aggregate(.logbk[,idx.col],
                       list(.logbk$bk.tripnum.sq, 
-                              .logbk$VE_REF, .logbk$VE_KW, .logbk$VE_FLT,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
+                              .logbk$VE_REF,  .logbk$VE_FLT,.logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
               colnames(agg.logbk.this.vessel.method.2) <- 
-                           c("bk.tripnum.sq", "VE_REF", "VE_KW", "VE_FLT","LE_MET_level6" ,"LE_GEAR", nm[idx.col])
+                           c("bk.tripnum.sq", "VE_REF",  "VE_FLT","VE_KW","LE_MET_level6" ,"LE_GEAR", nm[idx.col])
              # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER BK.TRIPNUM.SQ.DAY (NOTE: SO, 'LE_SEQNUM' IS AGGREGATED HERE)
               agg.logbk.this.vessel.method.3  <- aggregate(.logbk[,idx.col],
                       list(.logbk$bk.tripnum.sq.day, 
-                             .logbk$VE_REF, .logbk$VE_KW, .logbk$VE_FLT,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
+                             .logbk$VE_REF,  .logbk$VE_FLT,.logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
               colnames(agg.logbk.this.vessel.method.3) <- 
-                          c("bk.tripnum.sq.day", "VE_REF", "VE_KW", "VE_FLT","LE_MET_level6","LE_GEAR",  nm[idx.col])
+                          c("bk.tripnum.sq.day", "VE_REF", "VE_FLT","VE_KW", "LE_MET_level6","LE_GEAR",  nm[idx.col])
 
 
              #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
@@ -705,7 +705,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     .logbk.for.meth1   <- aggregate(.logbk.for.meth1 [,idx.col],
                                  list(.logbk.for.meth1$VE_REF, .logbk.for.meth1$bk.tripnum,
                                             .logbk.for.meth1$VE_FLT, .logbk.for.meth1$VE_KW, .logbk.for.meth1$LE_MET_level6, .logbk.for.meth1$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth1) <- c("VE_REF","VE_KW", "bk.tripnum", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                    colnames(.logbk.for.meth1) <- c("VE_REF", "bk.tripnum", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
                     merged1  <- do.merging(method="bk.tripnum", .logbk.for.meth1, .vms.for.meth1, general)
                     # add meth flag
@@ -720,9 +720,9 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     idx.col.v <- grep('EURO', nm) # index columns with species value
                     idx.col <- c(idx.col.w, idx.col.v)
                     .logbk.for.meth2   <- aggregate(.logbk.for.meth2 [,idx.col],
-                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$VE_KW, .logbk.for.meth2$bk.tripnum.sq,
-                                            .logbk.for.meth2$VE_FLT, .logbk.for.meth2$LE_MET_level6, .logbk.for.meth2$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth2) <- c("VE_REF", "VE_KW", "bk.tripnum.sq", "VE_FLT", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$bk.tripnum.sq,
+                                            .logbk.for.meth2$VE_FLT, .logbk.for.meth2$VE_KW, .logbk.for.meth2$LE_MET_level6, .logbk.for.meth2$LE_GEAR), sum, na.rm=TRUE)
+                    colnames(.logbk.for.meth2) <- c("VE_REF",  "bk.tripnum.sq", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
                     merged2 <- do.merging(method="bk.tripnum.sq", .logbk.for.meth2, .vms.for.meth2, general)
                     # add meth flag
@@ -887,7 +887,7 @@ return()
   load(file.path("C:","output","merged_35_2009.RData"))
   
   # ...or bind all vessels (keeping only some given species here)
-  tmp <- bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"), 
+  bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"), 
                       folder = file.path("C:","output"), all.in.one.table=TRUE)
  
    # ...and load the merged output table for all vessels
@@ -905,7 +905,8 @@ return()
   # remove steaming points before gridding!
   df2<-df1[-which(is.na(df1$LE_KG_COD)),]
   vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
-                                cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)")
+                                cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)", 
+                                 breaks0=c(1,2,4,8,16,32,64,100000))
 
 
 
@@ -919,8 +920,9 @@ return()
 
  
  
+  # TO DO....
   # Use the interpolation routine to improve the location of the effort
-  #interpolations      <- interpolateTacsat( all.merged, 
+  #interpolations      <- interpolateTacsat( all.merged 
   #                            ,interval=60             
   #                            ,margin=12               
   #                            ,res=100                
@@ -937,7 +939,7 @@ return()
   #          cellsizeX =0.05, cellsizeY =0.05, legendtitle = "landings (kg)")
 
   
- 
+               
   #}
  
 } # end main
