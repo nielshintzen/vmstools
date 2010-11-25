@@ -920,10 +920,15 @@ return()
 
  
  
+  
   # TO DO....
   # Use the interpolation routine to improve the location of the effort
-  #interpolations      <- interpolateTacsat( all.merged 
-  #                            ,interval=60             
+  #all.merged$SI_SP <- as.numeric(as.character( all.merged$SI_SP))
+  #all.merged$SI_HE <- as.numeric(as.character( all.merged$SI_HE))
+  #all.merged$SI_LONG <-as.numeric(as.character(all.merged$SI_LONG))
+  #all.merged$SI_LATI <-as.numeric(as.character(all.merged$SI_LATI))
+  #interpolations      <- interpolateTacsat( all.merged [,c("VE_REF","SI_LATI","SI_LONG","SI_DATE","SI_TIME","SI_SP","SI_HE")]
+  #                            ,interval=120             
   #                            ,margin=12               
   #                            ,res=100                
   #                            ,method="cHs"           
