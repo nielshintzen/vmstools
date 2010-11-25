@@ -90,13 +90,12 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   
   # create one column 'date.in.R' from pasting date and time 
   # (to order tacsat if needed)
-  ctime <- strptime(  paste(tacsat$SI_DATE, tacsat$SI_TIME) , 
-                                 tz='GMT',   "%e/%m/%Y %H:%M" )
+  #ctime <- strptime(  paste(tacsat$SI_DATE, tacsat$SI_TIME) , tz='GMT',   "%e/%m/%Y %H:%M" )
   tacsat <- cbind.data.frame(tacsat, date.in.R=ctime)
      
   # order tacsat
   library(doBy)
-  tacsat <- orderBy (~VE_REF+date.in.R, data=tacsat)
+  tacsat <- sortTacsat(tacsat)
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
@@ -147,7 +146,7 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   load(file.path("C:","output","all_merged__2009.RData"))
              
   # map landing of cod from all studied vessels
-  df1<- all.merged[,colnames(all.merged)%in% c("SI_LATI","SI_LONG","LE_KG_COD")]
+  df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD")]
   df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
   df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
   df1 <-   df1[ !is.na(df1$SI_LATI),]
