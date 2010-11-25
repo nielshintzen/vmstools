@@ -897,6 +897,8 @@ return()
   df1<- all.merged[,colnames(all.merged)%in% c("SI_LATI","SI_LONG","LE_KG_COD")]
   df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
   df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
+  df1 <-   df1[ !is.na(df1$SI_LATI),]
+  df1 <-   df1[ !is.na(df1$SI_LONG),]
   vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
                                  cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)")
 
