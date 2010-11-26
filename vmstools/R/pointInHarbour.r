@@ -47,9 +47,10 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE){
           if(returnNames) res[idx] <- rownames(harb)[hars]  # overwrite '1' with the port names
           
 
-          if(chunks==nChunks){ store[(chunks*rowSize-rowSize+1):length(lon)]  <- res
-          } else { store[(chunks*rowSize-rowSize+1):(chunks*rowSize)]         <- res}
-        }
+          if(chunks==nChunks){ store[(chunks*rowSize-rowSize+1):length(lon)]  <- pmax(store[(chunks*rowSize-rowSize+1):length(lon)],res,na.rm=T)
+          } else { store[(chunks*rowSize-rowSize+1):(chunks*rowSize)]         <- pmax(store[(chunks*rowSize-rowSize+1):(chunks*rowSize)],res,na.rm=T)}
+
+          }
       }
     }
 
