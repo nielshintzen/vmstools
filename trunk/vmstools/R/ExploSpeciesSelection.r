@@ -16,7 +16,7 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     print("calculating proportions...") 
 
     propdat=transformation_proportion(dat[,2:p])
-    nameSpecies=names(propdat)
+    nameSpecies=colnames(propdat)
     #Store(dat)
     
     t1=Sys.time()           
@@ -35,13 +35,13 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
   
       # Select the number of clusters by scree-test
       inerties.vector=cah_var$height[order(cah_var$height,decreasing=T)]
-      nb.finalclusters=which(scree(inerties.vector)$epsilon<0)[1]
+      nb.finalclusters=which(scree(inerties.vector)[,"epsilon"]<0)[1]
   
   
       # Dendogram cutting at the selected level
       cah_cluster_var=cutree(cah_var,k=nb.finalclusters)
   
-      png(paste(analysisName,"_HAC_Dendogram.png",sep="_"), width = 1200, height = 800)
+      png(paste(analysisName,"HAC_Dendogram.png",sep="_"), width = 1200, height = 800)
       plclust(cah_var,labels=F,hang=-1,ann=F)
       title(main="HAC dendogram",xlab="Species",ylab="Height")
       rect.hclust(cah_var, k=nb.finalclusters)
@@ -70,8 +70,8 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
             fait = TRUE # then I stop
           }else{
             print("------ Updating residual species -----")
-            nb_cut = nb_cut+1;  # si seule alors on coupe dessous et on met nameResidualSpecies à jour pour recommencer
-            numGroupeEspeceSeule =  as.numeric(names(sort(nbSpeciesClusters)[1]))
+            nb_cut = nb_cut+1;  # if alone then cutting below and updating nameResidualSpecies to start again
+            numGroupeEspeceSeule = as.numeric(names(sort(nbSpeciesClusters)[1]))
             namesEspeceSeule = names(cah_cluster_var_step)[which(cah_cluster_var_step==numGroupeEspeceSeule)]
             namesResidualSpecies = namesResidualSpecies[ - which(namesResidualSpecies==namesEspeceSeule)]
             print(paste("---- Adding new species ---",namesEspeceSeule))
@@ -81,7 +81,7 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
   
   
       # Dendogram of the first cut in the residual species cluster
-      png(paste(analysisName,"_HAC_Dendogram_Step.png",sep="_"), width = 1200, height = 800)
+      png(paste(analysisName,"HAC_Dendogram_Step.png",sep="_"), width = 1200, height = 800)
       plclust(cah_var,labels=F,hang=-1,ann=F)
       title(main="HAC dendogram - Step",xlab="Species",ylab="Height")
       rect.hclust(cah_var, k=(nb.finalclusters+nb_cut))
@@ -171,7 +171,7 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     for(seuil in seq(5,100,5)){
       cat("seuil:",seuil,"\n")
       nomespsel=character()
-      for (i in names(propdat)) if (any(propdat[,i]>=seuil)) nomespsel <- c(nomespsel,i)
+      for (i in nameSpecies) if (any(propdat[,i]>=seuil)) nomespsel <- c(nomespsel,i)
       nbMainSpeciesLogevent[seuil/5]=length(nomespsel)
    
       # We are bulding the table with main species and aggregated other species
