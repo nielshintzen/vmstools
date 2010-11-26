@@ -838,20 +838,13 @@ return()
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
-  
-  # create one column 'date.in.R' from pasting date and time 
-  # (to order tacsat if needed)
-  ctime <- strptime(  paste(tacsat$SI_DATE, tacsat$SI_TIME) , 
-                                 tz='GMT',   "%e/%m/%Y %H:%M" )
-  tacsat <- cbind.data.frame(tacsat, date.in.R=ctime)
-     
-  # order tacsat
+  # order tacsat chronologically
   library(doBy)
   tacsat <- sortTacsat(tacsat)
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
-  tacsat$SI_HARB <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours, rowSize=30, returnNames=TRUE)
+  tacsat$SI_HARB <- pointInHarbour(lon=tacsat$SI_LONG, lat=tacsat$SI_LATI, harbours=euharbours, rowSize=30, returnNames=TRUE)
   inHarb <- tacsat$SI_HARB 
   inHarb <- replace(inHarb, !is.na(inHarb), 1)
   inHarb <- replace(inHarb, is.na(inHarb), 0)
@@ -862,7 +855,7 @@ return()
   idx <- which(inHarb==0)
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
   
-  # keep out of harbour points only
+  # keep 'out of harbour' points only
   # (but keep the departure point lying in the harbour)
   startTrip <- c(diff(tacsat[,"SI_FT"]),0)
   tacsat[which(startTrip>0),"SI_FT"] <-  tacsat[which(startTrip>0)+1,"SI_FT"] # tricky here 
