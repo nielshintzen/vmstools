@@ -1,4 +1,4 @@
-pointInHarbour <- function(lon,lat,harbours,rowSize=30){
+pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE){
 
     xharb     <- unlist(lapply(harbours,function(x){return(x[,"lon"])}))
     yharb     <- unlist(lapply(harbours,function(x){return(x[,"lat"])}))
@@ -7,7 +7,7 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30){
     harb      <- orderBy(~xharb+yharb,data=harb)
 
     nChunks   <- ceiling(length(lon)/rowSize)
-    store     <- numeric(length(lon))
+     store     <- rep(0, length(lon))
     for(chunks in 1:nChunks){
       if(chunks == nChunks){
         x1    <- lon[(chunks*rowSize-rowSize+1):length(lon)]
@@ -42,13 +42,18 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30){
           dx1 <- R*c
 
           res <- numeric(length(x1))
-          res[which(dx1<=harb[hars,"rharb"])] <- 1
+          idx <- which(dx1<=harb[hars,"rharb"])
+          res[idx] <- 1 
+          if(returnNames) res[idx] <- rownames(harb)[hars][idx]  # overwrite '1' with the port names
+          
 
-          if(chunks==nChunks){ store[(chunks*rowSize-rowSize+1):length(lon)]  <- pmax(store[(chunks*rowSize-rowSize+1):length(lon)],res,na.rm=T)
-          } else { store[(chunks*rowSize-rowSize+1):(chunks*rowSize)]         <- pmax(store[(chunks*rowSize-rowSize+1):(chunks*rowSize)],res,na.rm=T)}
+          if(chunks==nChunks){ store[(chunks*rowSize-rowSize+1):length(lon)]  <- res
+          } else { store[(chunks*rowSize-rowSize+1):(chunks*rowSize)]         <- res}
         }
       }
     }
+
+    if(returnNames) store <- replace(store, store=="0", NA)
 
 return(store)}
     
