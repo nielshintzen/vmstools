@@ -71,7 +71,7 @@ t1 <- Sys.time()
 print("calculating proportions...") #clu
     
     propdat=transformation_proportion(dat[,2:p])
-    nameSpecies=names(propdat)
+    nameSpecies=colnames(propdat)
     
     # Total quantity caught species by species
     sumcol=rep(as.numeric(NA),p-1) #numeric()
@@ -162,32 +162,48 @@ datSpecies <- datSpecies[,-1]
   print(paste(" --- selected method :",pcaYesNo, "---"))
 
 
-  if(pcaYesNo=="pca"){
+  if(pcaYesNo=="pca"){                                                                 
     print("running PCA on all axes...")  
     # PCA (Principal Component Analysis)
     log.pca <- PCA(datSpecies, graph=T, ncp=ncol(datSpecies))
-    
+    #log.pca=acp(datSpecies,center=TRUE,reduce=TRUE),wI=rep(1,nrow(datSpecies)),wV=rep(1,ncol(datSpecies)))
+
     savePlot(filename=paste(analysisName,'Species projection on the two first factorial axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
     savePlot(filename=paste(analysisName,'Individuals projection on the two first factorial axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
-
+    
+#    png(paste(analysisName,"Species projection on the two first factorial axis.png",sep="_"), width = 900, height = 900)
+#    biplot(log.pca,i=1,j=2,main="",col='black')
+#    title(main="Species projection on the two first factorial axis")
+#    dev.off()
+#    png(paste(analysisName,"Individuals projection on the two first factorial axis.png",sep="_"), width = 1200, height = 800)
+#    plot.acp(log.pca,i=1,j=2,text=F,label='Composants',main="",col='black',variables=F,labels=NULL)
+#    title(main="Individuals projection on the two first factorial axis")
+#    dev.off()
+    
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
     
     # Data frame given eigenvalues, inertia and cumulative inertia of factorial axis
-    tabInertia=data.frame(cbind(Axis=1:length(log.pca$eig[,1]), Eigenvalues=log.pca$eig[,1], Inertia=log.pca$eig[,2], CumulativeInertia=log.pca$eig[,3]))                  
-
+    #tabInertia=data.frame(cbind(Axis=1:length(log.pca$eig[,1]), Eigenvalues=log.pca$eig[,1], Inertia=log.pca$eig[,2], CumulativeInertia=log.pca$eig[,3]))                  
+    #tabInertia=as.matrix(log.pca$eig)
+    
     # Determine the number of axis to keep
     if(criterion=="70percents"){
       nbaxes=which(log.pca$eig[,3]>70)[1]   # we are taking the axis until having 70% of total inertia
+      #nbaxes=which(cumsum(log.pca$eig/sum(log.pca$eig)*100)>70)[1]
       cat("--- number of axes:",nbaxes,"\n")
+      cat("--- percentage inertia explained:",log.pca$eig[nbaxes,3],"\n")
+      #cat("--- percentage inertia explained:",cumsum(log.pca$eig/sum(log.pca$eig)*100)[nbaxes],"\n")
     } else 
     # OR
     if(criterion=="screetest"){
-      nbaxes=which(scree(tabInertia[,3])$epsilon<0)[1]  # thanks to the scree-test
+      nbaxes=which(scree(log.pca$eig[,1])[,"epsilon"]<0)[1]  # thanks to the scree-test
+      #nbaxes=which(scree(log.pca$eig)[,"epsilon"]<0)[1]
       cat("--- number of axes:",nbaxes,"\n")
       cat("--- percentage inertia explained:",log.pca$eig[nbaxes,3],"\n")
+      #cat("--- percentage inertia explained:",cumsum(log.pca$eig/sum(log.pca$eig)*100)[nbaxes],"\n")
     } else stop("Criterion for PCA must be 70percents or screetest")
       
     # Eigenvalues and relative graphics
@@ -208,39 +224,74 @@ datSpecies <- datSpecies[,-1]
     barplot(log.pca$eig[,3],names.arg=x, col=color, main="Cumulative Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
     abline(h=70, col="red")
     text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
-    dev.off()   
+    dev.off()       
+    
+   # png(paste(analysisName,"Eigen values.png",sep="_"), width = 1200, height = 800)
+#    x=1:length(log.pca$eig)
+#    barplot(log.pca$eig,names.arg=x, main="Eigen values")
+#    dev.off()
+#    png(paste(analysisName,"Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
+#    color=rep("grey",length(log.pca$eig))
+#    if(criterion=="screetest") color[1:nbaxes]="green" 
+#    barplot(log.pca$eig/sum(log.pca$eig)*100,names.arg=x, col=color, main="Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
+#    dev.off()
+#    png(paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
+#    color=rep("grey",length(log.pca$eig))
+#    if(criterion=="70percents") color[1:nbaxes]="green"
+#    barplot(cumsum(log.pca$eig/sum(log.pca$eig)*100),names.arg=x, col=color, main="Cumulative Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
+#    abline(h=70, col="red")
+#    text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
+#    dev.off()   
     
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
     
-    # PCA with the good number of axis
-    log.pca=log.pca$ind$coord[,1:nbaxes]
-    print("running PCA on selected axes...")    
-#    log.coa2=PCA(datSpecies, graph=F, ncp=nbaxes)
-#    options(digits=6)       # significant digits
     
     # Projection of variables Species on the first factorial axis
     png(paste(analysisName,"Projection of Species on first factorial axis.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
-    plot(log.pca[,c(1,2)],choix="var",axes = c(1, 2),new.plot=FALSE,lim.cos2.var = 0.3)
-    plot(log.pca[,c(2,3)],choix="var",axes = c(2, 3),new.plot=FALSE,lim.cos2.var = 0.3)
-    plot(log.pca[,c(1,3)],choix="var",axes = c(1, 3),new.plot=FALSE,lim.cos2.var = 0.3)
-    plot(log.pca[,c(1,4)],choix="var",axes = c(1, 4),new.plot=FALSE,lim.cos2.var = 0.3)
-    plot(log.pca[,c(2,4)],choix="var",axes = c(2, 4),new.plot=FALSE,lim.cos2.var = 0.3)
-    plot(log.pca[,c(3,4)],choix="var",axes = c(3, 4),new.plot=FALSE,lim.cos2.var = 0.3)
+    plot(log.pca,choix="var",axes = c(1, 2),new.plot=FALSE,lim.cos2.var = 0.3)
+    plot(log.pca,choix="var",axes = c(2, 3),new.plot=FALSE,lim.cos2.var = 0.3)
+    plot(log.pca,choix="var",axes = c(1, 3),new.plot=FALSE,lim.cos2.var = 0.3)
+    plot(log.pca,choix="var",axes = c(1, 4),new.plot=FALSE,lim.cos2.var = 0.3)
+    plot(log.pca,choix="var",axes = c(2, 4),new.plot=FALSE,lim.cos2.var = 0.3)
+    plot(log.pca,choix="var",axes = c(3, 4),new.plot=FALSE,lim.cos2.var = 0.3)
     par(op)
+    title(main=paste("Projection of Species on first factorial axis","\n","\n",sep=""))
     dev.off()
 
+    # Projection of variables Species on the first factorial axis
+   # png(paste(analysisName,"Projection of Species on first factorial axis.png",sep="_"), width = 1200, height = 800)
+#    op <- par(mfrow=c(2,3))
+#    biplot(log.pca,i=1,j=2,main="",col='black')
+#    biplot(log.pca,i=2,j=3,main="",col='black')
+#    biplot(log.pca,i=1,j=3,main="",col='black')
+#    biplot(log.pca,i=1,j=4,main="",col='black')
+#    biplot(log.pca,i=2,j=4,main="",col='black')
+#    biplot(log.pca,i=3,j=4,main="",col='black')
+#    par(op)
+#    title(main=paste("Projection of Species on first factorial axis","\n","\n",sep=""))
+#    dev.off()
+
+
+    # PCA with the good number of axis
+    print("running PCA on selected axes...")
+    log.pca=log.pca$ind$coord[,1:nbaxes]
+    #log.pca=log.pca$scores[,1:nbaxes]    
+#    options(digits=6)       # significant digits
+
     # log.pca = results of PCA limited to the nbaxes first factorial axis
-    datLog=signif(log.pca, 5)
-    #write.table(datLog, file="datLog.txt", quote=T, dec='.', sep=';', col.names=T, row.names=F)
+    #datLog=signif(log.pca, 5)
+    datLog=round(log.pca,4)
+    
+    #write.table(datLog, file="datLog_OTB2008euroNA_26_11_10.txt", quote=T, dec='.', sep=';', col.names=T, row.names=F)
 
   } else 
 
 
   if(pcaYesNo=="nopca"){
     datLog=datSpecies
-    tabInertia="No PCA"
+    #tabInertia="No PCA"
   }  else stop("pcaYesNo must be pca or nopca")
 
   Store(objects())
@@ -308,7 +359,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       # HAC on the sample
       log.hac=hcluster(sampleDatLog, method=param3, link=param4)
       inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
-      nbClust=which(scree(inerties.vector)$epsilon<0)[2]
+      nbClust=which(scree(inerties.vector)[,"epsilon"]<0)[2]
     
       # Cut the dendogram at the selected level
       sampleClusters=cutree(log.hac,k=nbClust)
@@ -347,9 +398,9 @@ print(paste(" --- selected method :",methMetier, "---"))
       # Mean profiles by cluster for each sample
       nbSpec=ncol(datSpecies)
       mprofil=numeric()
-      blank=rep(00000000000,nbSpec)
+      blank=rep(00,nbSpec)
       for(k in 1:nbClust){
-        mprofilclusti=mean(sampleDatSpecies[which(sampleClusters==k),])
+        mprofilclusti=colMeans(sampleDatSpecies[which(sampleClusters==k),])
         mprofil=rbind(mprofil,mprofilclusti)
       }
       mprofil=rbind(mprofil,blank)
@@ -402,7 +453,8 @@ print(paste(" --- selected method :",methMetier, "---"))
   
   
       # Mean profile of the dataset
-      meanprofile=mean(sampleDatSpecies)
+      #meanprofile=mean(sampleDatSpecies)
+      meanprofile=colMeans(sampleDatSpecies)
       png(paste(analysisName,numSample,"Sample_Mean profile of the sample.png",sep="_"), width = 1200, height = 800)
       op <- par(las=2)
       barplot(meanprofile, main="Mean profile of the sample", xlab="Species", ylab="Percentage of catch")
@@ -520,7 +572,8 @@ print(paste(" --- selected method :",methMetier, "---"))
       
  
     # Select the sample which gives the smaller classification's quality (the best sample)
-    sam=sampleList[which.min(classifVarExplain),]
+    #sam=sampleList[which.min(classifVarExplain),]
+    sam=sampleList[which.max(classifVarExplain),]
     outofsam=setdiff(1:nbLog,sam)
     sampleDatLog=datLog[sam,]
     
@@ -535,7 +588,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     
     # Determine the number of cluster thanks to the scree-test
     inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
-    nbClust=which(scree(inerties.vector)$epsilon<0)[2]
+    nbClust=which(scree(inerties.vector)[,"epsilon"]<0)[2]
 
     # Cut the dendogram at the selected level
     sampleClusters=cutree(log.hac,k=nbClust)
@@ -650,7 +703,8 @@ print(paste(" --- selected method :",methMetier, "---"))
 
 
     # Mean profile of the dataset
-    meanprofile=mean(datSpecies)
+    #meanprofile=mean(datSpecies)
+    meanprofile=colMeans(datSpecies)
     png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
     barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
@@ -844,11 +898,11 @@ print(paste(" --- selected method :",methMetier, "---"))
     
     
 
-
+    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
-    return(list(clusters=clusters, sizeClusters=sizeClusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(le_id_clust=le_id_clust, clusters=clusters, sizeClusters=sizeClusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   }   else 
 
@@ -875,9 +929,10 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     diffvarintra=diff(varintra,na.rm=T)
     diffdiffvar=diff(diffvarintra,na.rm=T)
-    maxdiffdiff=max(diffdiffvar,na.rm=T)
-    k=which(diffdiffvar==maxdiffdiff)+1
-
+#    maxdiffdiff=max(diffdiffvar,na.rm=T)
+#    k=which(diffdiffvar==maxdiffdiff)+1
+    k=which.max(diffdiffvar)+1
+    
     # KMEANS with k optimal
     clusters<-kmeans(datLog, k, iter.max=20, nstart=6, algorithm="Hartigan-Wong")
 
@@ -918,7 +973,8 @@ print(paste(" --- selected method :",methMetier, "---"))
     
     
     # Mean profile of the dataset
-    meanprofile=mean(datSpecies)
+    #meanprofile=mean(datSpecies)
+    meanprofile=colMeans(datSpecies)
     png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
     barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
@@ -1113,11 +1169,11 @@ print(paste(" --- selected method :",methMetier, "---"))
 
 
 
-
+    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters$cluster)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
-    return(list(clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(le_id_clust=le_id_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   } else                                                                                                        
 
@@ -1202,7 +1258,8 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     
     # Mean profile of the dataset
-    meanprofile=mean(datSpecies)
+    #meanprofile=mean(datSpecies)
+    meanprofile=colMeans(datSpecies)
     png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
     barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
@@ -1395,11 +1452,11 @@ print(paste(" --- selected method :",methMetier, "---"))
     odbcClose(channel)
     
     
-    
+    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(le_id_clust=le_id_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   } else 
 
@@ -1494,7 +1551,8 @@ print(paste(" --- selected method :",methMetier, "---"))
 
 
     # Mean profile of the dataset
-    meanprofile=mean(datSpecies)
+    #meanprofile=mean(datSpecies)
+    meanprofile=colMeans(datSpecies)
     png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
     barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
@@ -1689,11 +1747,11 @@ print(paste(" --- selected method :",methMetier, "---"))
     
     
     
-    le_id_clust <- cbind(LE_ID=LE_ID,clust=clusters$clustering)
+    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(le_id_clust=le_id_clust,clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(le_id_clust=le_id_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
