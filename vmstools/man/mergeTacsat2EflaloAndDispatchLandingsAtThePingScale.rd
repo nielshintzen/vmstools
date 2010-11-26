@@ -90,7 +90,9 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   
   # create one column 'date.in.R' from pasting date and time 
   # (to order tacsat if needed)
-  #ctime <- strptime(  paste(tacsat$SI_DATE, tacsat$SI_TIME) , tz='GMT',   "%e/%m/%Y %H:%M" )
+  # please, uncomment and run the following:
+  #ctime <- strptime(  paste(tacsat$SI_DATE, tacsat$SI_TIME) , 
+  #                               tz='GMT',   "%e/%m/%Y %H:%M" )
   tacsat <- cbind.data.frame(tacsat, date.in.R=ctime)
      
   # order tacsat
@@ -99,15 +101,23 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
-  inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours, 30)
-  
+  tacsat$SI_HARB <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours, rowSize=30, returnNames=TRUE)
+  inHarb <- tacsat$SI_HARB 
+  inHarb <- replace(inHarb, !is.na(inHarb), 1)
+  inHarb <- replace(inHarb, is.na(inHarb), 0)
+  inHarb <- as.numeric(inHarb)
+    
   # assign a trip identifier
   tacsat$SI_FT <- 1 # init
   idx <- which(inHarb==0)
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
   
   # keep out of harbour points only
-  tacsat <- tacsat[which(inHarb==0),] 
+  # (but keep the departure point lying in the harbour)
+  startTrip <- c(diff(tacsat[,"SI_FT"]),0)
+  tacsat[which(startTrip>0),"SI_FT"] <-  tacsat[which(startTrip>0)+1,"SI_FT"] # tricky here 
+  tacsat <- tacsat[which(inHarb==0 |  startTrip>0),] 
+  
   
   # assign a state to each ping (start guesses only)
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
