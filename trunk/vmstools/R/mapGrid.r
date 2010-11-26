@@ -19,6 +19,7 @@ mapGrid <- function( sGDF
                          , legendncol = 1
                          , legendtitle = "fishing activity"
                          , plotPoints = FALSE
+                         , colPoints =1
                          , addScale = TRUE
                          , outGridFile = ""  #name for output gridAscii
                          , outPlot = ""  #name for output png
@@ -66,7 +67,7 @@ axis(2, las=2)
 if(addScale) map.scale(x=xlim0[2]-(xlim0[2]-xlim0[1])/2, y=ylim0[1], ratio=FALSE)
 
 #to add points (can obscure grid)
-if (plotPoints) points(sPDF, pch=".")
+if (plotPoints) points(sPDF, pch=".", col=colPoints)
 
 #legend(x='bottomleft', legend=breaks[1:(length(breaks)-1)], pch = 22, pt.bg=cols, title="fishing activity",bg="white",pt.cex=2 )
 legend(x=legendx, legend=breaks0[1:(length(breaks0)-1)], pch = 22, pt.bg=cols, title=legendtitle, ncol=legendncol, bg="white",pt.cex=2 )
