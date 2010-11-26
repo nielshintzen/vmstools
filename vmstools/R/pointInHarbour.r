@@ -44,7 +44,7 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE){
           res <- numeric(length(x1))
           idx <- which(dx1<=harb[hars,"rharb"])
           res[idx] <- 1 
-          if(returnNames) res[idx] <- rownames(harb)[hars][idx]  # overwrite '1' with the port names
+          if(returnNames) res[idx] <- rownames(harb)[hars]  # overwrite '1' with the port names
           
 
           if(chunks==nChunks){ store[(chunks*rowSize-rowSize+1):length(lon)]  <- res
