@@ -28,7 +28,8 @@ transformation_proportion=function(tab){
       res[i,]=res[i,]*(100/sommeligne)
     }
   }
-  return(data.frame(res))
+  #return(data.frame(res))
+  return(res)
 }
 
 
@@ -40,7 +41,7 @@ table_variables=function(data){
   res1=t(as.matrix(data[1:round(n/2),]))
   res2=t(as.matrix(data[(round(n/2)+1):n,]))
   res=cbind(res1,res2)
-  res=data.frame(res)
+  #res=data.frame(res)
   row.names(res)=colnames(data)
   colnames(res)=row.names(data)
   return(res)
@@ -58,8 +59,9 @@ scree=function(eig){
     delta[i]=eig[i]-eig[i-1]
     epsilon[i]=delta[i]-delta[i-1]
   }
-
-  data=data.frame(valeurs_propres=eig, delta=delta, epsilon=epsilon)
+#  data=data.frame(valeurs_propres=eig, delta=delta, epsilon=epsilon)
+  data=matrix(0,nrow=n,ncol=3)
+  data=cbind(valeurs_propres=eig, delta=delta, epsilon=epsilon)
   return(data)
 }
 
@@ -85,12 +87,14 @@ select_species=function(data,groupes_cah){
 
 building_tab_pca=function(data,especes){
   p=ncol(data)
-  noms=names(data)
+  #noms=names(data)
+  noms=colnames(data)
   ind_princ=which(is.element(noms,especes))
   #ind_autres=setdiff(1:p,ind_princ)
   princ=data[,ind_princ]
   #autres=apply(data[,ind_autres],1,sum)
-  return(data.frame(princ))
+  #return(data.frame(princ))
+  return(princ)
 }
 
 
@@ -139,40 +143,44 @@ test.values=function(groupes,data){
     noms_groupes[j]=paste("groupe",j,sep="_")
   }
   colnames(res)=noms_groupes
-  return(data.frame(res))
+  #return(data.frame(res))
+  return(res)
 }
 
 
 # Fonction determining the target species
 
 targetspecies=function(resval){
-  p=length(resval[,1])
-  nbgp=length(resval[1,])
+  p=nrow(resval)
+  nbgp=ncol(resval)
   
   tabnumespcib=data.frame()
   tabnomespcib=data.frame()
-  tabnumespsignif=data.frame()
-  tabnomespsignif=data.frame()
-  tabnumesppascib=data.frame()
-  tabnomesppascib=data.frame()
+#  tabnumespsignif=data.frame()
+#  tabnomespsignif=data.frame()
+#  tabnumesppascib=data.frame()
+#  tabnomesppascib=data.frame()
+  
     
   for(i in 1:nbgp){
     # qnorm(0.975,mean=0,sd=1)=1.96
     numespcib=which(resval[,i]>1.96)   
     numespcibdec=numespcib[order(resval[numespcib,i],decreasing=T)]           
-    nomespcib=row.names(resval[numespcibdec,])
+    #nomespcib=row.names(resval[numespcibdec,])
+    nomespcib=names(numespcibdec)
     
-    numespsignif=which(abs(resval[,i])>1.96)
-    nomespsignif=row.names(resval[numespsignif,])
-    
-    numesppascib=setdiff(numespsignif,numespcib)
-    numesppascibdec=numesppascib[order(resval[numesppascib,i],decreasing=F)]
-    nomesppascib=row.names(resval[numesppascibdec,])
-    
+#    numespsignif=which(abs(resval[,i])>1.96)
+#    #nomespsignif=row.names(resval[numespsignif,])
+#    nomespsignif=names(numespsignif)
+#    
+#    numesppascib=setdiff(numespsignif,numespcib)
+#    numesppascibdec=numesppascib[order(resval[numesppascib,i],decreasing=F)]
+#    #nomesppascib=row.names(resval[numesppascibdec,])
+#    nomesppascib=names(numesppascibdec)
     
     nbespgpcib=length(numespcib)
-    nbespgpsignif=length(numespsignif)
-    nbespgppascib=length(nomesppascib)
+#    nbespgpsignif=length(numespsignif)
+#    nbespgppascib=length(nomesppascib)
 
     if(nbespgpcib>0){
       for (j in 1:nbespgpcib){
@@ -183,28 +191,31 @@ targetspecies=function(resval){
         tabnumespcib[i,]=NA
         tabnomespcib[i,]=NA
     }
-    
-    if(nbespgpsignif>0){
-      for (j in 1:nbespgpsignif){
-        tabnumespsignif[i,j]=numespsignif[j]
-        tabnomespsignif[i,j]=nomespsignif[j]
-      }
-    }else{
-        tabnumespsignif[i,]=NA
-        tabnomespsignif[i,]=NA
-    }
-    
-    if(nbespgppascib>0){
-      for (j in 1:nbespgppascib){
-        tabnumesppascib[i,j]=numesppascibdec[j]
-        tabnomesppascib[i,j]=nomesppascib[j]
-      }
-    }else{
-        tabnumesppascib[i,]=NA
-        tabnomesppascib[i,]=NA
-    }          
+   
+#    if(nbespgpsignif>0){
+#      for (j in 1:nbespgpsignif){
+#        tabnumespsignif[i,j]=numespsignif[j]
+#        tabnomespsignif[i,j]=nomespsignif[j]
+#      }
+#    }else{
+#        tabnumespsignif[i,]=NA
+#        tabnomespsignif[i,]=NA
+#    }
+#    
+#    if(nbespgppascib>0){
+#      for (j in 1:nbespgppascib){
+#        tabnumesppascib[i,j]=numesppascibdec[j]
+#        tabnomesppascib[i,j]=nomesppascib[j]
+#      }
+#    }else{
+#        tabnumesppascib[i,]=NA
+#        tabnomesppascib[i,]=NA
+#    }          
     
   }
+  tabnumespcib=as.matrix(tabnumespcib)
+  tabnomespcib=as.matrix(tabnomespcib)
+  
   return(list(tabnumespcib=tabnumespcib,tabnomespcib=tabnomespcib))
 }
 
