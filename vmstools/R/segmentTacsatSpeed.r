@@ -313,21 +313,21 @@ segmentSpeedTacsat <- function(tacsat,
 
  if(general$visual.check){
    windows()
-   par(mfrow=c(3,1))
+   par(mfrow=c(2,1))
    if(class(o)!="try-error"){
      plot(dati$x/100, o$fitted.values, type="l",
          ylab="cumulative distrib.", xlab="Knots",
            main=paste("segmented regression  - ",a.vesselid))
-    }
-   plot(hi)
+    } else{plot(0,0,type="n")}
+   #plot(hi)
    #points(dati$x,dati$y)
    tmp <- as.numeric(as.character(sort(xxx$apparent.speed)))
-   hist(tmp, nclass=100, main="apparent speed between consecutive points",
-                      xlab="apparent speed [knots]")
+   his <- hist(tmp, nclass=100, main="apparent speed between consecutive points",
+                      xlab="apparent speed [knots]", plot=TRUE)
    if(!is.null(bound1)) abline(v=bound1/100,col=2)
    if(!is.null(bound2)) abline(v=bound2/100,col=2)
-   if(!is.null(bound1)) text(bound1/100, 1, signif(bound1,3), col=2)
-   if(!is.null(bound2)) text(bound2/100, 1, signif(bound2,3), col=2)
+   if(!is.null(bound1)) text(bound1/100, median(his$counts), signif(bound1,3), col=2, cex=2)
+   if(!is.null(bound2)) text(bound2/100,  median(his$counts), signif(bound2,3), col=2, cex=2)
    # save the panel plot
    savePlot(filename = file.path(general$output.path,
       paste(unique(a.vesselid),"-detected_speed_span_for_feffort-", general$a.year,"-",gr, sep="")),
@@ -347,6 +347,7 @@ segmentSpeedTacsat <- function(tacsat,
              'GTR','GTN','GEN','GN')) bound1 <- lstargs$force.lower.bound
              # special case for gillnetters= set a lower bound
      if(gr %in% c('SDN','SSC')) bound1 <- lstargs$force.lower.bound
+  cat(paste(gr," force lower bound at",lstargs$force.lower.bound,"knots\n"))
   }
 
   # then, assign...
@@ -356,8 +357,8 @@ segmentSpeedTacsat <- function(tacsat,
   tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr, "SI_STATE"] <- xxx$SI_STATE # output
   tacsat.this.vessel[,"bound1"] <- bound1
   tacsat.this.vessel[,"bound2"] <- bound2
-  cat(paste(gr," lower(apparent)speed bound:",round(bound1,1),"nm\n"))
-  cat(paste(gr," upper(apparent)speed bound:",round(bound2,1),"nm\n"))
+  cat(paste(gr," lower(apparent)speed bound:",round(bound1,1),"knots\n"))
+  cat(paste(gr," upper(apparent)speed bound:",round(bound2,1),"knots\n"))
   } else{
      tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr, "SI_STATE"] <- 2
      #=> end a.flag: in case of very few records for this gear...
