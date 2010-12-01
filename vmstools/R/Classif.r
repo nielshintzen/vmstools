@@ -898,7 +898,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     
     
 
-    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters$clustering)
+    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
