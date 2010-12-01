@@ -872,7 +872,9 @@ return()
   
   # debug
   eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" &!is.na(eflalo2$VE_REF),]
-  
+  if(all(is.na(eflalo2$VE_FLT))) eflalo2$VE_FLT <- "fleet1"
+    if(!match('LE_MET_level6',colnames(eflalo2))>0) eflalo2$LE_MET_level6 <- eflalo2$LE_MET
+ 
   # TEST FOR A GIVEN SET OF VESSELS
   # (if do.wp3 is at true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
