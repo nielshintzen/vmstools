@@ -140,7 +140,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
          logbk.this.vessel            <- logbooks[logbooks$VE_REF %in% a.vesselid,]
          logbk.this.vessel$LE_RECT    <- factor(logbk.this.vessel$LE_RECT)
          logbk.this.vessel$VE_REF     <- factor(logbk.this.vessel$VE_REF)
-
+     
          # automatic detection of a.year
          general$a.year <-   format(strptime(  paste(logbk.this.vessel$FT_DDAT[1]) , tz='GMT',  "%e/%m/%Y" ), "%Y")
          
@@ -164,8 +164,11 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               mid.time[r] <- as.character(seq(from=dep[r], to=arr[r], length.out = 3)[2])
               }
            logbk.this.vessel$mid.time           <-  mid.time
-           logbk.this.vessel$bk.tripnum         <-  factor(mid.time) # init
+           logbk.this.vessel$bk.tripnum         <-  factor(mid.time) # init        
            levels(logbk.this.vessel$bk.tripnum) <- 1:length(logbk.this.vessel$bk.tripnum) # assign a bk.tripnum code from mid.time
+           # overwrite if FT_REF is actually informed:
+           if(match('FT_REF',colnames(logbk.this.vessel))>0 & !all(is.na(logbk.this.vessel$FT_REF))) 
+                            logbk.this.vessel$bk.tripnum <- logbk.this.vessel$FT_REF
      
            
          #=> LOGBOOK (EFLALO) INPUT REQUIRES AT LEAST,
@@ -744,7 +747,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                      a.table <- a.table[, !colnames(a.table) %in%
                                   c("count.fping.trip.sq.day","count.fping.trip.sq","count.fping.trip",
                                       "tot.fish.effort.trip","tot.fish.effort.trip.sq",
-                                         "count.gr.trip", "count.gr.trip.sq", "count.gr.trip.sq.day")] # remove tool columns
+                                         "count.gr.trip", "count.gr.trip.sq", "count.gr.trip.sq.day",
+                                           "bk.tripnum.sq", "bk.tripnum.sq.day")] # remove tool columns
                      if(i==1) colnm <-  colnames(a.table) ; if(is.null(colnm)) colnm <-  colnames(a.table)
                      merged <- rbind.data.frame (merged, a.table[, colnm])
                      }
