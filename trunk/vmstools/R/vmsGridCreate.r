@@ -78,12 +78,15 @@ if ( nrow(dF) > 0 )
        {
         #sum timeInterval for each gridCellIndex
         perCell <- tapply(sPDF[[nameVarToSum]], gridCellIndexPerVMSpoint, sum)
-       } #else
+        #print('1')
+       } 
+       else
        {
         #if no time interval, just count pings
         #probably a better way than doing this!
         sPDF$ones <- 1 #this just creates a vector of all 1s
         perCell <- tapply(sPDF$ones, gridCellIndexPerVMSpoint, sum)
+        #print('2')
        }
    
     #then need to get those aggregated data values back onto the original grid
@@ -113,7 +116,7 @@ if ( nrow(dF) > 0 )
     #to output spatialGridDataFrame to a gridascii file
     if (outGridFile != "")
        {
-        writeAsciiGrid(spatialGridDataFrame, outGridFile, attr=gridValName)
+        writeAsciiGrid(spatialGridDataFrame, outGridFile, attr=gridValName, dec='.')
        }
 
     #option to save the plot
