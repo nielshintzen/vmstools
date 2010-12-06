@@ -41,7 +41,7 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       # Dendogram cutting at the selected level
       cah_cluster_var=cutree(cah_var,k=nb.finalclusters)
   
-      png(paste(analysisName,"HAC_Dendogram.png",sep="_"), width = 1200, height = 800)
+      png(paste(analysisName,"HAC_Dendogram_Step1.png",sep="_"), width = 1200, height = 800)
       plclust(cah_var,labels=F,hang=-1,ann=F)
       title(main="HAC dendogram",xlab="Species",ylab="Height")
       rect.hclust(cah_var, k=nb.finalclusters)
@@ -81,7 +81,7 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
   
   
       # Dendogram of the first cut in the residual species cluster
-      png(paste(analysisName,"HAC_Dendogram_Step.png",sep="_"), width = 1200, height = 800)
+      png(paste(analysisName,"HAC_Dendogram_Step1_Step.png",sep="_"), width = 1200, height = 800)
       plclust(cah_var,labels=F,hang=-1,ann=F)
       title(main="HAC dendogram - Step",xlab="Species",ylab="Height")
       rect.hclust(cah_var, k=(nb.finalclusters+nb_cut))
