@@ -224,9 +224,9 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
     if(DiagFlag==FALSE) { 
       explo_species = list(nbAllSpecies=nbAllSpecies,
-                            propMainSpeciesHAC=propMainSpeciesHAC,
-                            propMainSpeciesTotale=propMainSpeciesTotale,
-                            propMainSpeciesLogevent=propMainSpeciesLogevent,
+                            PropMainSpeciesHAC=PropMainSpeciesHAC,
+                            PropMainSpeciesTotale=PropMainSpeciesTotale,
+                            PropMainSpeciesLogevent=PropMainSpeciesLogevent,
                             nbMainSpeciesHAC=nbMainSpeciesHAC, 
                             nbMainSpeciesTotale=nbMainSpeciesTotale, 
                             nbMainSpeciesLogevent=nbMainSpeciesLogevent,
@@ -237,9 +237,9 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
                             ListSpeciesAll=ListSpecies) 
     }else{         
       explo_species = list(nbAllSpecies=nbAllSpecies,
-                            propMainSpeciesHAC=propMainSpeciesHAC,
-                            propMainSpeciesTotale=propMainSpeciesTotale,
-                            propMainSpeciesLogevent=propMainSpeciesLogevent,
+                            PropMainSpeciesHAC=PropMainSpeciesHAC,
+                            PropMainSpeciesTotale=PropMainSpeciesTotale,
+                            PropMainSpeciesLogevent=PropMainSpeciesLogevent,
                             nbMainSpeciesHAC=nbMainSpeciesHAC, 
                             nbMainSpeciesTotale=nbMainSpeciesTotale, 
                             nbMainSpeciesLogevent=nbMainSpeciesLogevent,
