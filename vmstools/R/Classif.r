@@ -349,7 +349,8 @@ print(paste(" --- selected method :",methMetier, "---"))
       numSample=i
       print(paste("sample",i))
       # Sample of size 15000 logevents
-      sam=min(nbLog,sample(1:nbLog,size=15000,replace=F))
+      minsam=min(nbLog,15000)
+      sam=sample(1:nbLog,size=minsam,replace=F))
       # Record the 5 samples
       sampleList=rbind(sampleList,sam)
       outofsam=setdiff(1:nbLog,sam)
