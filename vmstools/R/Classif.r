@@ -886,6 +886,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     }
     
     db <- paste(analysisName,"_tables.xls",sep="")
+    if(db %in% list.files()) file.remove(db)
     channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
     sqlSave(channel, clusterDesc2, tablename = "DescClust")
     
@@ -918,7 +919,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     varintra=numeric()
     nbLog=nrow(datLog)
     for (k in 2:15){
-      clustersKmeans=kmeans(datLog, k, iter.max=20, nstart=5)
+      clustersKmeans=kmeans(datLog, k, iter.max=40, nstart=20)
       varintra[k]=1/nbLog*sum(clustersKmeans$withinss)
     }
     png(paste(analysisName,"Within Variance Kmeans.png",sep="_"), width = 1200, height = 800)
@@ -935,7 +936,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     k=which.max(diffdiffvar)+1
     
     # KMEANS with k optimal
-    clusters<-kmeans(datLog, k, iter.max=20, nstart=6, algorithm="Hartigan-Wong")
+    clusters=kmeans(datLog, k, iter.max=40, nstart=20, algorithm="Hartigan-Wong")
 
 
     # Quality of classification
@@ -1157,6 +1158,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     }
     
     db <- paste(analysisName,"_tables.xls",sep="")
+    if(db %in% list.files()) file.remove(db)
     channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
     sqlSave(channel, clusterDesc2, tablename = "DescClust")
     
@@ -1442,6 +1444,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     }
     
     db <- paste(analysisName,"_tables.xls",sep="")
+    if(db %in% list.files()) file.remove(db)
     channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
     sqlSave(channel, clusterDesc2, tablename = "DescClust")
     
@@ -1733,6 +1736,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     }
     
     db <- paste(analysisName,"_tables.xls",sep="")
+    if(db %in% list.files()) file.remove(db)
     channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
     sqlSave(channel, clusterDesc2, tablename = "DescClust")
     
