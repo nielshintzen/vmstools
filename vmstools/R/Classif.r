@@ -199,7 +199,7 @@ datSpecies <- datSpecies[,-1]
     } else 
     # OR
     if(criterion=="screetest"){
-      nbaxes=which(scree(log.pca$eig[,1])[,"epsilon"]<0)[1]  # thanks to the scree-test
+      nbaxes=which(scree(log.pca$eig[,1])[,"epsilon"]<0)[2]  # thanks to the scree-test
       #nbaxes=which(scree(log.pca$eig)[,"epsilon"]<0)[1]
       cat("--- number of axes:",nbaxes,"\n")
       cat("--- percentage inertia explained:",log.pca$eig[nbaxes,3],"\n")
@@ -1472,7 +1472,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     # Calculation of optimal k thanks to the silhouette
     clustersClara.silcoeff=numeric()
     for (k in 3:15){
-      clustersClara=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))
+      clustersClara=clara(datLog, k, metric=param3, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
 
@@ -1491,7 +1491,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     k=which.max(clustersClara.silcoeff)
     
     # CLARA with optimal k
-    clusters=clara(datLog, k, metric=param3, stand=F, samples=5, sampsize=min(nbLog,40+2*k))  # CLARA with optimal k
+    clusters=clara(datLog, k, metric=param3, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))  # CLARA with optimal k
     summary(clusters)
 
 #    #Silhouette of CLARA with optimal k
