@@ -996,9 +996,15 @@ print(paste(" --- selected method :",methMetier, "---"))
     for(i in 1:nbClust){
 #      mprofilclusti=mean(datSpecies[which(clusters$cluster==i),])
 #      mprofil=rbind(mprofil,mprofilclusti)
-      summaryClusters[,,i]=apply(datSpecies[which(clusters$cluster==i),],2, 
-        function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      if(clusters$size[i]==1){
+        summaryClusters[,,i]=apply(t(as.matrix(datSpecies[which(clusters$cluster==i),])),2, 
+          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      }else{
+        summaryClusters[,,i]=apply(datSpecies[which(clusters$cluster==i),],2, 
+          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      }
     }
+    
     # Species names for mean profile plots
     nameSpPlot=character()
     catchMeanThreshold=2
