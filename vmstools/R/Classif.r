@@ -466,16 +466,18 @@ print(paste(" --- selected method :",methMetier, "---"))
   
       # Mean profiles by cluster
       nbSpec=ncol(sampleDatSpecies)
-#      mprofil=numeric()
       summarySampleClusters=array(0,dim=c(6,nbSpec,nbClust))
       dimnames(summarySampleClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
       dimnames(summarySampleClusters)[[2]]=names(meanprofile)
       dimnames(summarySampleClusters)[[3]]=paste("Cluster ",1:nbClust)
       for(k in 1:nbClust){
-#        mprofilclusti=mean(sampleDatSpecies[which(sampleClusters==k),])
-#        mprofil=rbind(mprofil,mprofilclusti)
-        summarySampleClusters[,,k]=apply(sampleDatSpecies[which(sampleClusters==k),],2, 
-          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+        if(sizeClusters[k]==1){
+          summaryClusters[,,k]=apply(t(as.matrix(sampleDatSpecies[which(sampleClusters==k),])),2, 
+            function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+        }else{
+          summaryClusters[,,k]=apply(sampleDatSpecies[which(sampleClusters==k),],2, 
+            function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+        }
       }
       # Species names for mean profile plots
       nameSpPlot=character()
@@ -716,16 +718,18 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     # Mean profiles by cluster
     nbSpec=ncol(datSpecies)
-#    mprofil=numeric()
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
     dimnames(summaryClusters)[[2]]=names(meanprofile)
     dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)
     for(i in 1:nbClust){
-#      mprofilclusti=mean(datSpecies[which(clusters==k),])
-#      mprofil=rbind(mprofil,mprofilclusti)
-      summaryClusters[,,i]=apply(datSpecies[which(clusters==i),],2, 
-        function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      if(sizeClusters[i]==1){
+        summaryClusters[,,i]=apply(t(as.matrix(datSpecies[which(clusters==i),])),2, 
+          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      }else{
+        summaryClusters[,,i]=apply(datSpecies[which(clusters==i),],2, 
+          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      }
     }
     # Species names for mean profile plots
     nameSpPlot=character()
@@ -988,14 +992,11 @@ print(paste(" --- selected method :",methMetier, "---"))
     # Mean profiles by cluster
     nbClust=length(clusters$size)
     nbSpec=ncol(datSpecies)
-#    mprofil=numeric()
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
     dimnames(summaryClusters)[[2]]=names(meanprofile)
     dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)
     for(i in 1:nbClust){
-#      mprofilclusti=mean(datSpecies[which(clusters$cluster==i),])
-#      mprofil=rbind(mprofil,mprofilclusti)
       if(clusters$size[i]==1){
         summaryClusters[,,i]=apply(t(as.matrix(datSpecies[which(clusters$cluster==i),])),2, 
           function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
@@ -1004,7 +1005,6 @@ print(paste(" --- selected method :",methMetier, "---"))
           function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
       }
     }
-    
     # Species names for mean profile plots
     nameSpPlot=character()
     catchMeanThreshold=2
@@ -1280,16 +1280,18 @@ print(paste(" --- selected method :",methMetier, "---"))
     # Mean profile by cluster
     nbClust=length(clusters$id.med)
     nbSpec=ncol(datSpecies)
-#    mprofil=numeric()
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
     dimnames(summaryClusters)[[2]]=names(meanprofile)
     dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)  
     for(i in 1:nbClust){
-#      mprofilclusti=mean(datSpecies[which(clusters$clustering==i),])
-#      mprofil=rbind(mprofil,mprofilclusti)
+      if(clusters$clusinfo[i,1]==1){
+        summaryClusters[,,i]=apply(t(as.matrix(datSpecies[which(clusters$clustering==i),])),2, 
+          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      }else{
         summaryClusters[,,i]=apply(datSpecies[which(clusters$clustering==i),],2, 
           function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      }
     }
     # Species names for mean profile plots
     nameSpPlot=character()
@@ -1574,16 +1576,18 @@ print(paste(" --- selected method :",methMetier, "---"))
     # Mean profile by cluster
     nbClust=length(clusters$i.med)
     nbSpec=ncol(datSpecies)
-#    mprofil=numeric()
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
     dimnames(summaryClusters)[[2]]=names(meanprofile)
     dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)
     for(i in 1:nbClust){
-#      mprofilclusti=mean(datSpecies[which(clusters$clustering==i),])
-#      mprofil=rbind(mprofil,mprofilclusti)
-      summaryClusters[,,i]=apply(datSpecies[which(clusters$clustering==i),],2, 
-        function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      if(clusters$clusinfo[i,1]==1){
+        summaryClusters[,,i]=apply(t(as.matrix(datSpecies[which(clusters$clustering==i),])),2, 
+          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      }else{
+        summaryClusters[,,i]=apply(datSpecies[which(clusters$clustering==i),],2, 
+          function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
+      }
     }
     # Species names for mean profile plots
     nameSpPlot=character()
