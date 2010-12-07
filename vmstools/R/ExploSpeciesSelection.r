@@ -98,7 +98,7 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       # Return the dataset retaining only the main species
       nbMainSpeciesHAC=length(nomespsel)
       NamesMainSpeciesHAC=nomespsel
-      propMainSpeciesHAC=nbMainSpeciesHAC/nbAllSpecies*100   
+      PropMainSpeciesHAC=nbMainSpeciesHAC/nbAllSpecies*100   
       
       if(DiagFlag==TRUE) {
         datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
@@ -108,7 +108,7 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
   print(Sys.time()-t1)
 
-  }else{ NamesMainSpeciesHAC=NA; nbMainSpeciesHAC=as.numeric(NA); medianPourcentCatchMainSpeciesHAC=as.numeric(NA); propMainSpeciesHAC=NA }
+  }else{ NamesMainSpeciesHAC=NA; nbMainSpeciesHAC=as.numeric(NA); medianPourcentCatchMainSpeciesHAC=as.numeric(NA); PropMainSpeciesHAC=NA }
  
     # TOTALE
     
@@ -156,7 +156,7 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     nbMainSpeciesTotale=c(0,nbMainSpeciesTotale)
     nbMainSpeciesTotale[length(nbMainSpeciesTotale)]=p-1
     NamesMainSpeciesTotale=nomespsel[1:nbMainSpeciesTotale[length(nbMainSpeciesTotale)-1]]
-    propMainSpeciesTotale=nbMainSpeciesTotale[length(nbMainSpeciesTotale)-1]/nbAllSpecies*100
+    PropMainSpeciesTotale=nbMainSpeciesTotale[length(nbMainSpeciesTotale)-1]/nbAllSpecies*100
     
     if (DiagFlag) medianPourcentCatchMainSpeciesTotale=c(0,medianPourcentCatchMainSpeciesTotale)
 
@@ -190,7 +190,7 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     }
     nbMainSpeciesLogevent=c(p-1,nbMainSpeciesLogevent)
     NamesMainSpeciesLogevent=nomespsel
-    propMainSpeciesLogevent=nbMainSpeciesLogevent[length(nbMainSpeciesLogevent)]/nbAllSpecies*100
+    PropMainSpeciesLogevent=nbMainSpeciesLogevent[length(nbMainSpeciesLogevent)]/nbAllSpecies*100
     
     
     if(DiagFlag) medianPourcentCatchMainSpeciesLogevent=c(100,medianPourcentCatchMainSpeciesLogevent)
