@@ -430,7 +430,7 @@ print(paste(" --- selected method :",methMetier, "---"))
   
   
       # Projections on the first factorial plans
-      png(paste(analysisName,numSample,"Sample_HAC_Projections.png",sep="_"), width = 1200, height = 800)
+      png(paste(analysisName,numSample,"Sample_Projections.png",sep="_"), width = 1200, height = 800)
       op <- par(mfrow=c(2,3))
       plot(sampleDatLog[,1], sampleDatLog[,2], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(sampleClusters)], main="Projection of HAC classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
       if(dim(datLog)[2]>2) {
@@ -446,7 +446,7 @@ print(paste(" --- selected method :",methMetier, "---"))
   
       
       # Rectangles plotting
-      png(paste(analysisName,numSample,"Sample_HAC_Dendogram.png",sep="_"), width = 1200, height = 800)
+      png(paste(analysisName,numSample,"Sample_Dendogram.png",sep="_"), width = 1200, height = 800)
       plclust(log.hac,labels=F,hang=-1,ann=F)
       title(main="HAC dendogram",xlab="Logevents",ylab="Height")
       rect.hclust(log.hac, k=nbClust)
@@ -472,10 +472,10 @@ print(paste(" --- selected method :",methMetier, "---"))
       dimnames(summarySampleClusters)[[3]]=paste("Cluster ",1:nbClust)
       for(k in 1:nbClust){
         if(sizeClusters[k]==1){
-          summaryClusters[,,k]=apply(t(as.matrix(sampleDatSpecies[which(sampleClusters==k),])),2, 
+          summarySampleClusters[,,k]=apply(t(as.matrix(sampleDatSpecies[which(sampleClusters==k),])),2, 
             function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
         }else{
-          summaryClusters[,,k]=apply(sampleDatSpecies[which(sampleClusters==k),],2, 
+          summarySampleClusters[,,k]=apply(sampleDatSpecies[which(sampleClusters==k),],2, 
             function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
         }
       }
@@ -682,7 +682,7 @@ print(paste(" --- selected method :",methMetier, "---"))
 #    gc(reset=TRUE)
 
     # Projections on the first factorial plans
-    png(paste(analysisName,"HAC_Projections.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="Projection of HAC classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
     if(dim(datLog)[2]>2) {
@@ -698,7 +698,7 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     
     # Rectangles plotting
-    png(paste(analysisName,"HAC_Dendogram.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Dendogram.png",sep="_"), width = 1200, height = 800)
     plclust(log.hac,labels=F,hang=-1,ann=F)
     title(main="HAC dendogram",xlab="Logevents",ylab="Height")
     rect.hclust(log.hac, k=nbClust)
@@ -926,7 +926,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       clustersKmeans=kmeans(datLog, k, iter.max=40, nstart=20)
       varintra[k]=1/nbLog*sum(clustersKmeans$withinss)
     }
-    png(paste(analysisName,"Within Variance Kmeans.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Within variance of the classification.png",sep="_"), width = 1200, height = 800)
     plot(varintra,main="Within clusters variance",xlab="Number of clusters",ylab="Within Variance")
     dev.off()
 
@@ -963,7 +963,7 @@ print(paste(" --- selected method :",methMetier, "---"))
 
 
     # Projections on the first factorial plans
-    png(paste(analysisName,"KMEANS_Projections.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="Projection of Kmeans classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
     if(dim(datLog)[2]>2) {
@@ -1201,8 +1201,8 @@ print(paste(" --- selected method :",methMetier, "---"))
       clustersPam.silcoeff[k]=clustersPam$silinfo$avg.width
     }
 
-    png(paste(analysisName,"silcoeffpam.png",sep="_"), width = 1200, height = 800)
-    plot(clustersPam.silcoeff)     # k optimal corresponds to maximum of silhouette's coefficients
+    png(paste(analysisName,"Silhouette of the classification.png",sep="_"), width = 1200, height = 800)
+    plot(clustersPam.silcoeff, main="Silhouette of the classification", xlab="Number of clusters", ylab="Silhouette") # k optimal corresponds to maximum of silhouette's coefficients
     dev.off()
 
     clustersPam.silcoeff                                           
@@ -1251,7 +1251,7 @@ print(paste(" --- selected method :",methMetier, "---"))
 
     
     # Projections on the first factorial plans
-    png(paste(analysisName,"PAM_Projections.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="Projection of PAM classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
     if(dim(datLog)[2]>2) {
@@ -1488,7 +1488,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
 
-    png(paste(analysisName,"silcoeffclara.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Silhouette of the classification.png",sep="_"), width = 1200, height = 800)
     plot(clustersClara.silcoeff, main="Silhouette of the classification", xlab="Number of clusters", ylab="Silhouette")               # k optimal corresponds to maximum of silhouette's coefficients
     dev.off()
     
@@ -1547,7 +1547,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     target=targetspecies(resval)
     
     # Projections on the first factorial plans
-    png(paste(analysisName,"CLARA_Projections.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="Projection of CLARA classification on the factorial plan 1-2", xlab="axis 1", ylab="axis 2")
     if(dim(datLog)[2]>2) {
