@@ -53,6 +53,7 @@ print("######## STEP 1 COMBINATION OF MAIN SPECIES FROM THE THREE EXPLORATORY ME
 
 
 t1 <- Sys.time()
+
 # clu : first select the appropriate columns
 #dat <- dat[,c("LE_ID",grep(Val,names(dat),value=T))]
 
@@ -75,8 +76,9 @@ print("calculating proportions...") #clu
     
     # Total quantity caught species by species
     sumcol=rep(as.numeric(NA),p-1) #numeric()
-    for(i in 2:p) sumcol[i]=sum(dat[,i])
-    # } names(sumcol) <- names(dat)[-1]
+    for(i in 2:p) sumcol[i-1]=sum(dat[,i])
+    # } 
+    names(sumcol) <- names(dat)[-1]
     #clu 
     #sumcol <- apply(dat[,-1],2,sum)
     
@@ -131,6 +133,7 @@ print("calculating proportions...") #clu
   
   
 datSpecies <- cbind(LE_ID=dat$LE_ID,datSpecies)
+
   
 
 print(" --- end of step 1 ---")
@@ -152,7 +155,7 @@ return(datSpecies)
 ##############################################################################################################################################
 
 classif_step2 <-function(datSpecies,analysisName="",pcaYesNo="pca",criterion="70percents"){
-LE_ID <- datSpecies[1]
+LE_ID <- datSpecies[,1]
 datSpecies <- datSpecies[,-1]
 
 
@@ -160,7 +163,7 @@ datSpecies <- datSpecies[,-1]
   
   t1 <- Sys.time()
   print(paste(" --- selected method :",pcaYesNo, "---"))
-
+   
 
   if(pcaYesNo=="pca"){                                                                 
     print("running PCA on all axes...")  
@@ -316,7 +319,7 @@ datSpecies <- datSpecies[,-1]
 
 classif_step3 <-function(datSpecies, datLog, analysisName="",methMetier="clara",param3="euclidean",param4=NULL){
 
-LE_ID <- datSpecies[1]
+le_id <- datSpecies[,1]
 datSpecies <- datSpecies[,-1]
 
 print("######## STEP 3 CLUSTERING ########")
@@ -904,11 +907,11 @@ print(paste(" --- selected method :",methMetier, "---"))
     
     
 
-    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters)
+    LE_ID_clust=cbind(LE_ID=LE_ID,clust=clusters)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
-    return(list(le_id_clust=le_id_clust, clusters=clusters, sizeClusters=sizeClusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, sizeClusters=sizeClusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   }   else 
 
@@ -1178,11 +1181,11 @@ print(paste(" --- selected method :",methMetier, "---"))
 
 
 
-    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters$cluster)
+    LE_ID_clust=cbind(LE_ID=LE_ID,clust=clusters$cluster)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
-    return(list(le_id_clust=le_id_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   } else                                                                                                        
 
@@ -1464,11 +1467,11 @@ print(paste(" --- selected method :",methMetier, "---"))
     odbcClose(channel)
     
     
-    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters$clustering)
+    LE_ID_clust=cbind(LE_ID=LE_ID,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(le_id_clust=le_id_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   } else 
 
@@ -1762,11 +1765,11 @@ print(paste(" --- selected method :",methMetier, "---"))
     
     
     
-    le_id_clust=cbind(LE_ID=LE_ID,clust=clusters$clustering)
+    LE_ID_clust=cbind(LE_ID=le_id,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(le_id_clust=le_id_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
