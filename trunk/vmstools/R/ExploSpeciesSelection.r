@@ -6,11 +6,11 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     p=ncol(dat)   # Number of species
     n=nrow(dat)
     
-    # Delete logevents without catch
-    logWithoutCatch=which(apply(dat[,2:p],1,sum)==0)
-    logWithCatch=setdiff(1:n,logWithoutCatch)
-    dat=dat[logWithCatch,]
-    n=nrow(dat)
+    # Delete logevents without catch  - THIS SHOULD BE DONE OUTSIDE 
+    #logWithoutCatch=which(apply(dat[,2:p],1,sum)==0)
+    #logWithCatch=setdiff(1:n,logWithoutCatch)
+    #dat=dat[logWithCatch,]
+    #n=nrow(dat)
       
     # Transform quantities to proportions of total quantity caught by logevent
     print("calculating proportions...") 
@@ -231,10 +231,10 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
                             nbMainSpeciesTotale=nbMainSpeciesTotale, 
                             nbMainSpeciesLogevent=nbMainSpeciesLogevent,
                             NamesMainSpeciesHAC=sort(NamesMainSpeciesHAC), 
-                            NamesMainSpeciesTotaleUnsorted=sort(NamesMainSpeciesTotale),                                             
-                            NamesMainSpeciesTotaleSorted=NamesMainSpeciesTotale,
+                            NamesMainSpeciesTotaleAlphabetical=sort(NamesMainSpeciesTotale),                                             
+                            NamesMainSpeciesTotaleByImportance=NamesMainSpeciesTotale,
                             NamesMainSpeciesLogevent=sort(NamesMainSpeciesLogevent),
-                            ListSpeciesAll=ListSpecies) 
+                            NamesMainSpeciesAll=ListSpecies) 
     }else{         
       explo_species = list(nbAllSpecies=nbAllSpecies,
                             PropMainSpeciesHAC=PropMainSpeciesHAC,
@@ -244,10 +244,10 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
                             nbMainSpeciesTotale=nbMainSpeciesTotale, 
                             nbMainSpeciesLogevent=nbMainSpeciesLogevent,
                             NamesMainSpeciesHAC=sort(NamesMainSpeciesHAC), 
-                            NamesMainSpeciesTotaleUnsorted=sort(NamesMainSpeciesTotale),                                             
-                            NamesMainSpeciesTotaleSorted=NamesMainSpeciesTotale,
+                            NamesMainSpeciesTotaleAlphabetical=sort(NamesMainSpeciesTotale),                                             
+                            NamesMainSpeciesTotaleByImportance=NamesMainSpeciesTotale,
                             NamesMainSpeciesLogevent=sort(NamesMainSpeciesLogevent),
-                            ListSpeciesAll=ListSpecies,
+                            NamesMainSpeciesAll=ListSpecies,
                             medianPourcentCatchMainSpeciesHAC=median(pourcentCatchMainSpeciesHAC),
                             medianPourcentCatchMainSpeciesTotale=medianPourcentCatchMainSpeciesTotale,
                             medianPourcentCatchMainSpeciesLogevent=medianPourcentCatchMainSpeciesLogevent)
@@ -256,4 +256,3 @@ ExploSpeciesSelection=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     return(explo_species)
     
 }
-
