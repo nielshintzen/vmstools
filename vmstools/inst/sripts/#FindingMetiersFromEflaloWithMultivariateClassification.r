@@ -1,3 +1,21 @@
+###################################################################################
+##     FINDING METIERS FROM EFLALO USING MULTIVARIATE CLUSTERING METHODS         ##
+##                                                                               ##
+##              LOT 2 - VMS LOGBOOKS (WP2)                                       ##
+##                                                                               ##
+##                                                                               ##
+## Authors : Nicolas Deporte (IFREMER / OCEANIC DEVELOPMENT)                     ## 
+##           Stephanie Mahévas, Sebastien Demaneche (IFREMER)                    ##
+##           Clara Ulrich, Francois Bastardie (DTU Aqua)                         ##
+##                                                                               ##
+## Last update : December 2010   ,                                               ##
+##                                                                               ##
+## Runs with R 2.11.1                                                            ##
+##                                                                               ##
+###################################################################################
+
+
+
 rm(list=ls(all=TRUE))
 gc(reset=TRUE)
 path <- "C:/CLARA/VMSTools_sandbox/"
@@ -21,7 +39,7 @@ Gear <- c("OTB")
 
 analysisName=paste(country,"_",Gear,year,"_",AreaCodename,sep="")
 
-
+# load your own dataset (called dat1 here)
 load(paste("data/DK_eflalo_",year,Gear,AreaCodename,".Rdata",sep=""))
 
  #! KEEPING ONLY LE_ID AND THE OUTPUT YOU WANT TO GET  (KG/EURO)
