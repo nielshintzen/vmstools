@@ -44,7 +44,7 @@
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
            function(logbooks, tacsat, general=list(output.path=file.path("C:"),
-                     visual.check=TRUE, do.wp3=FALSE, speed="segment"), ...){
+                     visual.check=TRUE, do.wp3=FALSE, speed="segment", conserve.all=FALSE), ...){
 
   lstargs <- list(...)
 
@@ -598,6 +598,28 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               # so we can choose to correct (see ** below) to keep these land. weight
               # the remaining loss in weight will come from the matching records having catches but
               # without fishing pings (i.e. only steaming pings)!
+              if(is.null(general$conserve.all)) general$conserve.all <- FALSE
+              if(general$conserve.all){
+              # do the conservation of landings anyway?
+              # detect possible weight landed while no feffort detected from vms
+                   # find bk.tripnum with some NA
+                   vv<- an(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","bk.tripnum"]))
+                   # then, find bk.tripnum with at least one no NA
+                   no.vv<- an(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","bk.tripnum"]))
+                   tripnum.all.na.inside <- vv[!vv%in%no.vv] # trip num without at least one count.fping!
+                   # so, deduce loss in weight
+                   zz<- merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,]
+           
+                  if(method=="bk.tripnum"){
+                     # in this case, reallocate evenly between all pings (caution: including steaming pings)
+                     merged.this.vessel[,"count.fping.trip"] <- as.numeric(as.character(merged.this.vessel[,"count.fping.trip"] ) )
+                     merged.this.vessel$bk.tripnum <- factor( merged.this.vessel$bk.tripnum)
+                     nbpings.per.trip <- unlist(lapply(split(merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,],
+                                           merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,]$bk.tripnum),nrow))            
+                     merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside, "count.fping.trip"] <- rep(nbpings.per.trip,nbpings.per.trip )
+                     merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside, "flag"] <- 5
+                    }
+                } # end conserve.all
 
           
 
@@ -652,6 +674,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
              }  # TO DO**: assign landings to the mid point of the trip for trips with all na inside (i.e. only steaming detected while declared landings) 
                  # (i.e. assign 1 to in count.fping.trip for the mid point)
 
+             
               return(merged.this.vessel)
               }
 
@@ -714,7 +737,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     # do.merging
                     merged1  <- do.merging(method="bk.tripnum", .logbk.for.meth1, .vms.for.meth1, general)
                     # add meth flag
-                    merged1$flag <- 1 # meth 1
+                     merged1[merged1[,"flag"]!=5,]$flag <- 1 # meth 1
                     }
                  #!! METH2 !!#
                  if(nrow(.logbk.for.meth2)!=0 && nrow(.vms.for.meth2)!=0 ) {
