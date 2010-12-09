@@ -5,17 +5,15 @@ function(tacsat
                           ,margin   #Specify the margin in minutes it might deviate from the interval time, in minutes
                        ){
 VMS         <- tacsat
-if(colnames(VMS)[1] == c("VI_REF")){
-  colnames(VMS)<- c("ship","declat","declon","date","time","speed")
-  VMS$datim   <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
-}
+VMS$datim   <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
+
 startVMS    <- startTacsat
 clStartVMS  <- startVMS #Total VMS list starting point instead of subset use
-iShip       <- VMS$ship[startVMS]
-VMS.        <- subset(VMS,ship==iShip)
-startVMS    <- which(VMS$ship[startVMS] == VMS.$ship & VMS$datim[startVMS] == VMS.$datim)
+iShip       <- VMS$VE_REF[startVMS]
+VMS.        <- subset(VMS,VE_REF==iShip)
+startVMS    <- which(VMS$VE_REF[startVMS] == VMS.$VE_REF & VMS$datim[startVMS] == VMS.$datim)
 if(clStartVMS != dim(VMS)[1]){
-  if(VMS$ship[clStartVMS] != VMS$ship[clStartVMS+1]){
+  if(VMS$VE_REF[clStartVMS] != VMS$VE_REF[clStartVMS+1]){
       #End of dataset reached
     endDataSet <- 1
     endVMS <- NA

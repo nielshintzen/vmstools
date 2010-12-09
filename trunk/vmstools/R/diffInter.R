@@ -14,7 +14,7 @@ diffInter <- function(interpolation
 
         #Calculate the difference between each datapoint
       distInt <- distance(int[3:dim(int)[1],1],  int[3:dim(int)[1],2],  int[2:(dim(int)[1]-1),1],      int[2:(dim(int)[1]-1),2])
-      distRef <- distance(ref$declon[2:dim(ref)[1]], ref$declat[2:dim(ref)[1]], ref$declon[1:(dim(ref)[1]-1)], ref$declat[1:(dim(ref)[1]-1)])
+      distRef <- distance(ref$SI_LONG[2:dim(ref)[1]], ref$SI_LATI[2:dim(ref)[1]], ref$SI_LONG[1:(dim(ref)[1]-1)], ref$SI_LATI[1:(dim(ref)[1]-1)])
         #To calculate the total distance travelled, sum all individual distances
       cumsumInt     <- cumsum(distInt)
       cumsumRef     <- cumsum(distRef)
@@ -32,7 +32,7 @@ diffInter <- function(interpolation
       matchPy       <- int[matchRef+1,2]
 
         #Calculate the distance between the reference points and the points on the interpolated track that are matched
-      res <- distance(matchPx,matchPy,ref$declon,ref$declat)
+      res <- distance(matchPx,matchPy,ref$SI_LONG,ref$SI_LATI)
         #Store the differences for each interpolation
       storeDiffs[i,]<- c( mean(res[-c(1,length(res))],na.rm=T),
                           exp(mean(log(res[-c(1,length(res))])[which(is.finite(log(res[-c(1,length(res))]))==T)],na.rm=T)),
@@ -41,18 +41,3 @@ diffInter <- function(interpolation
                           sum(res[-c(1,length(res))],na.rm=T))
     }
 return(storeDiffs)}
-
-
-
-
-      
-# plot(interpolation[[i]][-1,1],interpolation[[i]][-1,2],type="l",xlim=c(2.895,2.955))
-# points(matchPx,matchPy,pch=19,col="red")
-# lines(ref$declon,ref$declat,lty=2,col="grey")
-# points(ref$declon,ref$declat,col="grey",pch=19)
-# points(matchPx,matchPy,pch=19,col="red")
-# for(j in 1:8) lines(c(matchPx[j],ref$declon[j]),c(matchP[j],ref$declat[j]),lty=3,col="blue")
-                                   
-                                   
-                                    
-                                    
