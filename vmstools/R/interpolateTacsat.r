@@ -9,7 +9,6 @@ function(tacsat                          #VMS datapoints
                               ){
 
 VMS. <- tacsat
-colnames(VMS.) <- c("ship","declat","declon","date","time","speed","heading")
 VMS.$datim     <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
                               
   #Start interpolating the data
@@ -24,16 +23,16 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
     iSuccess    <- 0
     endDataSet  <- 0
     startVMS    <- 1
-    ship        <- VMS.$ship[startVMS]
+    ship        <- VMS.$VE_REF[startVMS]
   } else {
       if(is.na(endVMS)==T) endVMS <- startVMS + 1
       startVMS <- endVMS
-      if(endDataSet == 1 & rev(unique(VMS.$ship))[1] != ship){
-        startVMS  <- which(VMS.$ship == unique(VMS.$ship)[which(unique(VMS.$ship)==ship)+1])[1]
-        ship      <- VMS.$ship[startVMS]
+      if(endDataSet == 1 & rev(unique(VMS.$VE_REF))[1] != ship){
+        startVMS  <- which(VMS.$VE_REF == unique(VMS.$VE_REF)[which(unique(VMS.$VE_REF)==ship)+1])[1]
+        ship      <- VMS.$VE_REF[startVMS]
         endDataSet<- 0
       }
-      if(endDataSet == 1 & rev(unique(VMS.$ship))[1] == ship) endDataSet <- 2 #Final end of dataset
+      if(endDataSet == 1 & rev(unique(VMS.$VE_REF))[1] == ship) endDataSet <- 2 #Final end of dataset
     }
 
 
@@ -59,26 +58,26 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
       F01 <- -2*t^3+3*t^2
       F11 <- t^3-t^2          
 
-      if (is.na(VMS.[startVMS,"heading"])=="TRUE") VMS.[startVMS,"heading"] <- 0
-      if (is.na(VMS.[endVMS,  "heading"])=="TRUE") VMS.[endVMS,  "heading"] <- 0
+      if (is.na(VMS.[startVMS,"SI_HE"])=="TRUE") VMS.[startVMS,"SI_HE"] <- 0
+      if (is.na(VMS.[endVMS,  "SI_HE"])=="TRUE") VMS.[endVMS,  "SI_HE"] <- 0
       
         #Heading at begin point in degrees
-      Hx0 <- sin(VMS.[startVMS,"heading"]/(180/pi))
-      Hy0 <- cos(VMS.[startVMS,"heading"]/(180/pi))
+      Hx0 <- sin(VMS.[startVMS,"SI_HE"]/(180/pi))
+      Hy0 <- cos(VMS.[startVMS,"SI_HE"]/(180/pi))
         #Heading at end point in degrees
-      Hx1 <- sin(VMS.[endVMS-headingAdjustment,"heading"]/(180/pi))
-      Hy1 <- cos(VMS.[endVMS-headingAdjustment,"heading"]/(180/pi))
+      Hx1 <- sin(VMS.[endVMS-headingAdjustment,"SI_HE"]/(180/pi))
+      Hy1 <- cos(VMS.[endVMS-headingAdjustment,"SI_HE"]/(180/pi))
       
-      Mx0 <- VMS.[startVMS, "declon"]
-      Mx1 <- VMS.[endVMS,   "declon"]
-      My0 <- VMS.[startVMS, "declat"]
-      My1 <- VMS.[endVMS,   "declat"]
+      Mx0 <- VMS.[startVMS, "SI_LONG"]
+      Mx1 <- VMS.[endVMS,   "SI_LONG"]
+      My0 <- VMS.[startVMS, "SI_LATI"]
+      My1 <- VMS.[endVMS,   "SI_LATI"]
 
         #Corrected for longitude lattitude effect
-      Hx0 <- Hx0 * params$fm * VMS.[startVMS,"speed"] /((params$st[2]-params$st[1])/2+params$st[1])
-      Hx1 <- Hx1 * params$fm * VMS.[endVMS,"speed"]   /((params$st[2]-params$st[1])/2+params$st[1])
-      Hy0 <- Hy0 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"declon"],VMS.[c(startVMS,endVMS),"declat"])[1] * VMS.[startVMS,"speed"]/((params$st[2]-params$st[1])/2+params$st[1])
-      Hy1 <- Hy1 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"declon"],VMS.[c(startVMS,endVMS),"declat"])[2] * VMS.[endVMS,"speed"]/((params$st[2]-params$st[1])  /2+params$st[1])
+      Hx0 <- Hx0 * params$fm * VMS.[startVMS,"SI_SP"] /((params$st[2]-params$st[1])/2+params$st[1])
+      Hx1 <- Hx1 * params$fm * VMS.[endVMS,"SI_SP"]   /((params$st[2]-params$st[1])/2+params$st[1])
+      Hy0 <- Hy0 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"SI_LONG"],VMS.[c(startVMS,endVMS),"SI_LATI"])[1] * VMS.[startVMS,"SI_SP"]/((params$st[2]-params$st[1])/2+params$st[1])
+      Hy1 <- Hy1 * params$fm * lonLatRatio(VMS.[c(startVMS,endVMS),"SI_LONG"],VMS.[c(startVMS,endVMS),"SI_LATI"])[2] * VMS.[endVMS,"SI_SP"]/((params$st[2]-params$st[1])  /2+params$st[1])
 
         #Finalizing the interpolation based on cHs
       fx <- numeric()
@@ -93,8 +92,8 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
     
       #Interpolate according to a straight line
     if(method == "SL" & int == 1){
-      fx <- seq(VMS.$declon[startVMS],VMS.$declon[endVMS],length.out=res)
-      fy <- seq(VMS.$declat[startVMS],VMS.$declat[endVMS],length.out=res)
+      fx <- seq(VMS.$SI_LONG[startVMS],VMS.$SI_LONG[endVMS],length.out=res)
+      fy <- seq(VMS.$SI_LATI[startVMS],VMS.$SI_LATI[endVMS],length.out=res)
       
         #Add one to list of successful interpolations
       iSuccess <- iSuccess + 1
