@@ -18,6 +18,7 @@ vmsGridCreate <- function( dF
                          , plotMap = TRUE
                          , plotTitle = ""
                          , numCats = 5
+                         , paletteCats = "heat.colors"
                          , addLegend = TRUE
                          , legendx='bottomleft'
                          , legendncol = 1
@@ -107,7 +108,7 @@ if ( nrow(dF) > 0 )
         mapGrid(spatialGridDataFrame, sPDF
                ,we=we, ea=ea, so=so, no=no
                ,gridValName=gridValName, plotTitle = plotTitle
-               ,numCats = numCats, addLegend = addLegend
+               ,numCats = numCats, paletteCats =paletteCats, addLegend = addLegend
                ,legendx=legendx, legendncol = legendncol
                ,legendtitle = legendtitle, plotPoints = plotPoints, colPoints=colPoints, addScale = addScale
                ,outGridFile = outGridFile, outPlot = outPlot, breaks0=lstargs$breaks0 )

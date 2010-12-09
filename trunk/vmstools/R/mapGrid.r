@@ -14,6 +14,7 @@ mapGrid <- function( sGDF
                          , gridValName="fishing"
                          , plotTitle = ""
                          , numCats = 5
+                         , paletteCats = "heat.colors"
                          , addLegend = TRUE
                          , legendx='bottomleft'
                          , legendncol = 1
@@ -42,7 +43,10 @@ if(length(lstargs$breaks0)==0) {
       } else{
       breaks0 <- lstargs$breaks0
       }
-cols <- rev(rainbow((length(breaks0)-1)))
+
+# rainbow, heat.colors, etc.
+cols <- do.call(paletteCats, (length(breaks0)-1)))
+
 image(sGDF, attr=gridValName, axes=FALSE,  col=cols, xlim=xlim0, ylim=ylim0,breaks=breaks0)
 
 library(mapdata)
