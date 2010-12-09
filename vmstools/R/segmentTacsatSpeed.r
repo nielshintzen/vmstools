@@ -340,9 +340,10 @@ segmentSpeedTacsat <- function(tacsat,
   bound2 <- bound2  / 100   # re-transform
   xxx$apparent.speed <- replace(xxx$apparent.speed, is.na(xxx$apparent.speed), 0) # debug 0/0
 
+
   # maybe you want to only keep the upper bound
   # and then set the lower one for particular gear?
-  if(length(lstargs$force.low.bound)!=0) {
+  if(length(lstargs$force.lower.bound)!=0) {
      if(gr %in% c('GNS','GND','GNC','GNF',
              'GTR','GTN','GEN','GN')) bound1 <- lstargs$force.lower.bound
              # special case for gillnetters= set a lower bound
