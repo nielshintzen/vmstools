@@ -46,7 +46,10 @@ cols <- rev(rainbow((length(breaks0)-1)))
 image(sGDF, attr=gridValName, axes=FALSE,  col=cols, xlim=xlim0, ylim=ylim0,breaks=breaks0)
 
 library(mapdata)
-map("worldHires", add=TRUE,col="darkgreen",fill=TRUE,bg="white")
+map("worldHires", add=TRUE,col="darkgreen",fill=TRUE,bg="white",regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
+'spain','luxembourg','denmark', 'sweden','iceland', 'portugal','italy','sicily','ussr','sardinia','albania','monaco','turkey','austria',
+'switzerland','czechoslovakia','finland','libya', 'hungary','yugoslavia','poland','greece','romania','bulgaria', 'slovakia','morocco',
+'tunisia','algeria','egypt' ))
 box() # to put a box around the plot
 #mtext(paste(gear,year),font=4,line=-1.5)
 axis(1)
