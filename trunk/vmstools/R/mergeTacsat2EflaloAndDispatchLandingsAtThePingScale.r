@@ -737,7 +737,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                     # do.merging
                     merged1  <- do.merging(method="bk.tripnum", .logbk.for.meth1, .vms.for.meth1, general)
                     # add meth flag
-                     if(("flag" %in% names(merged1)  && nrow(merged1[is.na(merged1[,"flag"]),])!=0){
+                     if("flag" %in% names(merged1)  && nrow(merged1[is.na(merged1[,"flag"]),])!=0){
                         merged1[is.na(merged1[,"flag"]),"flag"] <- 1 # meth 1
                         } else merged1$flag <- 1
                     }
