@@ -45,7 +45,7 @@ if(length(lstargs$breaks0)==0) {
       }
 
 # rainbow, heat.colors, etc.
-cols <- do.call(paletteCats, (length(breaks0)-1))
+cols <- rev(do.call(paletteCats, list(length(breaks0)-1)))
 
 image(sGDF, attr=gridValName, axes=FALSE,  col=cols, xlim=xlim0, ylim=ylim0,breaks=breaks0)
 
