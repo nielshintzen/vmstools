@@ -35,7 +35,7 @@ memory.limit(size=2000)
 # 
 country <- "DK"
 
-year <- 2008
+year <- 2007
 AreaCodename <- "3a4"
 Gear <- c("OTB")
 
