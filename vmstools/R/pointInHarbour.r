@@ -6,6 +6,11 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE){
     harb      <- cbind(xharb,yharb,rharb)
     harb      <- orderBy(~xharb+yharb,data=harb)
 
+    xys       <- data.frame(lon,lat)
+    ordxys    <- order(xys$lon,xys$lat)
+    lon       <- lon[ordxys]
+    lat       <- lat[ordxys]
+
     nChunks   <- ceiling(length(lon)/rowSize)
      store     <- rep(0, length(lon))
     for(chunks in 1:nChunks){
@@ -43,16 +48,29 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE){
 
           res <- numeric(length(x1))
           idx <- which(dx1<=harb[hars,"rharb"])
-          res[idx] <- 1 
-          if(returnNames) res[idx] <- rownames(harb)[hars]  # overwrite '1' with the port names
-          
-
-          if(chunks==nChunks){ store[(chunks*rowSize-rowSize+1):length(lon)]  <- pmax(store[(chunks*rowSize-rowSize+1):length(lon)],res,na.rm=T)
-          } else { store[(chunks*rowSize-rowSize+1):(chunks*rowSize)]         <- pmax(store[(chunks*rowSize-rowSize+1):(chunks*rowSize)],res,na.rm=T)}
-
-          }
+          res[idx] <- 1
+          if(returnNames){
+            res[idx]  <- rownames(harb)[hars]  # overwrite '1' with the port names
+            if(chunks==nChunks){
+              idx2 <- idx[which(store[(chunks*rowSize-rowSize+1):length(lon)][idx] == "0")]
+              store[(chunks*rowSize-rowSize+1):length(lon)][idx2] <- res[idx2]
+            } else {
+                idx2 <- idx[which(store[(chunks*rowSize-rowSize+1):(chunks*rowSize)][idx] == "0")]
+                store[(chunks*rowSize-rowSize+1):(chunks*rowSize)][idx2] <- res[idx2]
+              }
+          } else {
+              if(chunks==nChunks){
+                store[(chunks*rowSize-rowSize+1):length(lon)]   <- store[(chunks*rowSize-rowSize+1):length(lon)]+res
+              } else {
+                  store[(chunks*rowSize-rowSize+1):(chunks*rowSize)] <- store[(chunks*rowSize-rowSize+1):(chunks*rowSize)]+res
+                }
+            }
+        }
       }
     }
+    if(returnNames == F) store[which(store>0)] <- 1
+    #Get order in tacsat back
+    store[ordxys] <- store
 
     if(returnNames) store <- replace(store, store=="0", NA)
 
