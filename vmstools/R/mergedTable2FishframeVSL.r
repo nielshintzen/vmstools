@@ -12,6 +12,7 @@
          # 1. load
          what <- "weight"
          load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
+         all.merged[all.merged$LE_MET_level6=="", "LE_MET_level6"] <-"NA"  # debug
          nm <- colnames(all.merged)
          idx.col  <- grep('KG', nm) # index columns with species
          all.merged$SI_LONG <- an( all.merged$SI_LONG)
@@ -34,6 +35,7 @@
          
          what <- "value"
          load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
+         all.merged[all.merged$LE_MET_level6=="", "LE_MET_level6"] <-"NA"  # debug
          nm <- colnames(all.merged)
          idx.col  <- grep('EURO', nm) # index columns with species
          all.merged$SI_LONG <- an( all.merged$SI_LONG)
