@@ -22,6 +22,7 @@ mapGrid <- function( sGDF
                          , plotPoints = FALSE
                          , colPoints =1
                          , colLand = 'sienna'
+                         , addICESgrid = FALSE
                          , addScale = TRUE
                          , outGridFile = ""  #name for output gridAscii
                          , outPlot = ""  #name for output png
@@ -60,8 +61,12 @@ regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
    image(im$x,im$y,im$z,  axes=FALSE, col=cols,  breaks = breaks0, 
    xlim=xlim0 , ylim=ylim0, add=TRUE   )
    
+#add ICES rectangles 
+if(addICESgrid){
+  for(i in seq(-15,50, by=1)) abline(v=i)
+  for(i in seq(0, 75, by=0.5)) abline(h=i)
+  }
 
-#map("worldHires", add=TRUE, col=colLand, fill=TRUE, bg="white",  xlim=xlim0 + c(+1,-1), ylim=ylim0 + c(+1,-1), 
 map("worldHires", add=TRUE, col=colLand, fill=TRUE, bg="white",  xlim=xlim0 , ylim=ylim0 , 
 regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
 'spain','luxembourg','denmark', 'sweden','iceland', 'portugal','italy','sicily','ussr','sardinia','albania','monaco','turkey','austria',
