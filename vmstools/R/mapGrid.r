@@ -21,6 +21,7 @@ mapGrid <- function( sGDF
                          , legendtitle = "fishing activity"
                          , plotPoints = FALSE
                          , colPoints =1
+                         , colLand = 'sienna'
                          , addScale = TRUE
                          , outGridFile = ""  #name for output gridAscii
                          , outPlot = ""  #name for output png
@@ -47,13 +48,26 @@ if(length(lstargs$breaks0)==0) {
 # rainbow, heat.colors, etc.
 cols <- rev(do.call(paletteCats, list(length(breaks0)-1)))
 
-image(sGDF, attr=gridValName, axes=FALSE,  col=cols, xlim=xlim0, ylim=ylim0,breaks=breaks0)
 
 library(mapdata)
-map("worldHires", add=TRUE,col="darkgreen",fill=TRUE,bg="white",regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
+map("worldHires", add=FALSE,col=colLand,fill=TRUE, bg="white",  xlim=xlim0 + c(+0.1,-0.1), ylim=ylim0 + c(+0.1,-0.1), 
+regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
 'spain','luxembourg','denmark', 'sweden','iceland', 'portugal','italy','sicily','ussr','sardinia','albania','monaco','turkey','austria',
 'switzerland','czechoslovakia','finland','libya', 'hungary','yugoslavia','poland','greece','romania','bulgaria', 'slovakia','morocco',
 'tunisia','algeria','egypt' ))
+
+  im <-  as.image.SpatialGridDataFrame(sGDF, attr=2)
+   image(im$x,im$y,im$z,  axes=FALSE, col=cols,  breaks = breaks0, 
+   xlim=xlim0 , ylim=ylim0, add=TRUE   )
+   
+
+map("worldHires", add=TRUE,col=colLand, fill=TRUE, bg="white",  xlim=xlim0 + c(+1,-1), ylim=ylim0 + c(+1,-1), 
+regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
+'spain','luxembourg','denmark', 'sweden','iceland', 'portugal','italy','sicily','ussr','sardinia','albania','monaco','turkey','austria',
+'switzerland','czechoslovakia','finland','libya', 'hungary','yugoslavia','poland','greece','romania','bulgaria', 'slovakia','morocco',
+'tunisia','algeria','egypt' ),   mar=c(6,6,2,2))
+
+
 box() # to put a box around the plot
 #mtext(paste(gear,year),font=4,line=-1.5)
 axis(1)
@@ -68,6 +82,7 @@ axis(2, las=2)
  } else{
    mtext("Degree South", side=2, line=3)
    }
+
  
 
 # add a scale
