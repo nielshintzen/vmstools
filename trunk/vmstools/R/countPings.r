@@ -17,8 +17,5 @@ dimnames(npings.by.trip.statsq)[[2]] <- c("FT_REF","LE_RECT","npings")
 tacsat.with.pings <- merge(tacsat,npings.by.trip.statsq,all=T)
 }
 
-
-
-
 tacsat.with.pings
 }
