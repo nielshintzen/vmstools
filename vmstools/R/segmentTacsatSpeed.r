@@ -345,10 +345,15 @@ segmentSpeedTacsat <- function(tacsat,
   # and then set the lower one for particular gear?
   if(length(lstargs$force.lower.bound)!=0) {
      if(gr %in% c('GNS','GND','GNC','GNF',
-             'GTR','GTN','GEN','GN')) bound1 <- lstargs$force.lower.bound
+             'GTR','GTN','GEN','GN')){
+                bound1 <- lstargs$force.lower.bound
+              cat(paste(gr," force lower bound at",lstargs$force.lower.bound,"knots\n"))
+             }
              # special case for gillnetters= set a lower bound
-     if(gr %in% c('SDN','SSC')) bound1 <- lstargs$force.lower.bound
-  cat(paste(gr," force lower bound at",lstargs$force.lower.bound,"knots\n"))
+     if(gr %in% c('SDN','SSC')) {
+                bound1 <- lstargs$force.lower.bound
+                cat(paste(gr," force lower bound at",lstargs$force.lower.bound,"knots\n"))
+                }
   }
 
   # then, assign...
