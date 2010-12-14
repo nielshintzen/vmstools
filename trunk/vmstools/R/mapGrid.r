@@ -61,7 +61,8 @@ regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
    xlim=xlim0 , ylim=ylim0, add=TRUE   )
    
 
-map("worldHires", add=TRUE,col=colLand, fill=TRUE, bg="white",  xlim=xlim0 + c(+1,-1), ylim=ylim0 + c(+1,-1), 
+#map("worldHires", add=TRUE, col=colLand, fill=TRUE, bg="white",  xlim=xlim0 + c(+1,-1), ylim=ylim0 + c(+1,-1), 
+map("worldHires", add=TRUE, col=colLand, fill=TRUE, bg="white",  xlim=xlim0 , ylim=ylim0 , 
 regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
 'spain','luxembourg','denmark', 'sweden','iceland', 'portugal','italy','sicily','ussr','sardinia','albania','monaco','turkey','austria',
 'switzerland','czechoslovakia','finland','libya', 'hungary','yugoslavia','poland','greece','romania','bulgaria', 'slovakia','morocco',
