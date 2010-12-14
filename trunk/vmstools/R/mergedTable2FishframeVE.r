@@ -16,6 +16,9 @@
     all.merged$totvalue <- value
     all.merged$totweight <- weight
 
+    # debug
+    all.merged[all.merged$LE_MET_level6=="", "LE_MET_level6"] <-"NA"
+
     an <- function(x) as.numeric(as.character(x))
     all.merged$SI_LONG <- an( all.merged$SI_LONG)
     all.merged$SI_LATI <- an( all.merged$SI_LATI)
