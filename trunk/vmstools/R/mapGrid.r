@@ -48,13 +48,13 @@ if(length(lstargs$breaks0)==0) {
 # rainbow, heat.colors, etc.
 cols <- rev(do.call(paletteCats, list(length(breaks0)-1)))
 
-
 library(mapdata)
+windows(8,7)
 map("worldHires", add=FALSE,col=colLand,fill=TRUE, bg="white",  xlim=xlim0 + c(+0.1,-0.1), ylim=ylim0 + c(+0.1,-0.1), 
 regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
 'spain','luxembourg','denmark', 'sweden','iceland', 'portugal','italy','sicily','ussr','sardinia','albania','monaco','turkey','austria',
 'switzerland','czechoslovakia','finland','libya', 'hungary','yugoslavia','poland','greece','romania','bulgaria', 'slovakia','morocco',
-'tunisia','algeria','egypt' ))
+'tunisia','algeria','egypt' ),  mar=c(2,6,2,2))
 
   im <-  as.image.SpatialGridDataFrame(sGDF, attr=2)
    image(im$x,im$y,im$z,  axes=FALSE, col=cols,  breaks = breaks0, 
@@ -66,7 +66,7 @@ map("worldHires", add=TRUE, col=colLand, fill=TRUE, bg="white",  xlim=xlim0 , yl
 regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
 'spain','luxembourg','denmark', 'sweden','iceland', 'portugal','italy','sicily','ussr','sardinia','albania','monaco','turkey','austria',
 'switzerland','czechoslovakia','finland','libya', 'hungary','yugoslavia','poland','greece','romania','bulgaria', 'slovakia','morocco',
-'tunisia','algeria','egypt' ),   mar=c(6,6,2,2))
+'tunisia','algeria','egypt' ))
 
 
 box() # to put a box around the plot
