@@ -47,8 +47,9 @@
 # Classif : function for the selection of species (hac, totale, logevent), PCA (pca, nopca), classification of logevents (hac, kmeans, pam, and clara) and métiers computation (thanks to test-values)
 classif_step1 <-function(dat,NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100){
 
-    print("######## STEP 1 COMBINATION OF MAIN SPECIES FROM THE THREE EXPLORATORY METHODS ########")
-  
+  print("######## STEP 1 COMBINATION OF MAIN SPECIES FROM THE THREE EXPLORATORY METHODS ########")
+
+
     t1 <- Sys.time()
     
     # clu : first select the appropriate columns
@@ -64,8 +65,8 @@ classif_step1 <-function(dat,NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100
     #list Species Totale
     p=ncol(dat)   # Number of species +1
     #for (i in 2:p) dat[is.na(dat[,i]),i] <-0
-
     
+        
     print("calculating proportions...") 
         
     propdat=transformation_proportion(dat[,2:p])
@@ -76,6 +77,8 @@ classif_step1 <-function(dat,NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100
     for(i in 2:p) sumcol[i-1]=sum(dat[,i])
 
     names(sumcol) <- names(dat)[-1]
+
+    #sumcol <- apply(dat[,-1],2,sum)
     
     # Total quantity caught
     # sumtotale=sum(sumcol,na.rm=T)
@@ -83,10 +86,9 @@ classif_step1 <-function(dat,NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100
     propesp=sumcol/sum(sumcol,na.rm=T)*100
     # Columns number of each species by decreasing order of capture
     numesp=order(propesp,decreasing=T)
-    # Cumulative percent of catch
+    # Percent of each species in the total catch by decreasing order
     propesp=cumsum(propesp[order(propesp,decreasing=T)])
-
-    
+ 
     Store(objects())#[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
     gc(reset=TRUE)
     
@@ -98,10 +100,10 @@ classif_step1 <-function(dat,NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100
     espsel=numesp[1:(length(pourcent)+1)]
     nomespselTotal=nameSpecies[espsel]
     
-#    #eventually removing MZZ
-#    nomespselTotal <- nomespsel[!nomespsel=="MZZ"]      
-#    #cat("main species:",sort(nomespsel),"\n")
-
+    #    #eventually removing MZZ
+    #    nomespselTotal <- nomespsel[!nomespsel=="MZZ"]      
+    #    #cat("main species:",sort(nomespsel),"\n")
+    
     #LogEvent
     if (is.null(paramLogevent) | !is.numeric(paramLogevent)) stop("paramLogevent must be numeric between 0 and 100")
     
@@ -121,17 +123,15 @@ classif_step1 <-function(dat,NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100
 
     # We are bulding the table with main species and aggregated other species
     datSpecies=building_tab_pca(propdat,ListSpeciesAll)
-
   
-  
-    datSpecies <- cbind(LE_ID=dat$LE_ID,datSpecies)
-
-  
-
+    #datSpecies <- data.frame(LE_ID=dat$LE_ID,datSpecies)
+    rownames(datSpecies)=dat$LE_ID
+      
+    
     print(" --- end of step 1 ---")
     print(Sys.time()-t1)
-
-
+    
+    
     return(datSpecies)
 
 }
@@ -147,8 +147,11 @@ classif_step1 <-function(dat,NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100
 ##############################################################################################################################################
 
 classif_step2 <-function(datSpecies,analysisName="",pcaYesNo="pca",criterion="70percents"){
-LE_ID <- datSpecies[,1]
-datSpecies <- datSpecies[,-1]
+  #LE_ID <- datSpecies[,1]
+  LE_ID <- rownames(datSpecies)
+  NbSpecies <- dim(datSpecies)[2]
+  #datSpecies <- datSpecies[,-1]
+  datSpecies <- as.matrix(datSpecies,ncol=NbSpecies,nrow=length(LE_ID))
 
 
   print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
@@ -170,13 +173,7 @@ datSpecies <- datSpecies[,-1]
     savePlot(filename=paste(analysisName,'Individuals projection on the two first factorial axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
     
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#    gc(reset=TRUE)
-    
-    # Data frame given eigenvalues, inertia and cumulative inertia of factorial axis
-    #tabInertia=data.frame(cbind(Axis=1:length(log.pca$eig[,1]), Eigenvalues=log.pca$eig[,1], Inertia=log.pca$eig[,2], CumulativeInertia=log.pca$eig[,3]))                  
-    #tabInertia=as.matrix(log.pca$eig)
-    
+        
     # Determine the number of axis to keep
     if(criterion=="70percents"){
       nbaxes=which(log.pca$eig[,3]>70)[1]   # we are taking the axis until having 70% of total inertia
@@ -210,7 +207,7 @@ datSpecies <- datSpecies[,-1]
     text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
     dev.off()       
     
-
+    
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
     
@@ -232,7 +229,6 @@ datSpecies <- datSpecies[,-1]
     # PCA with the good number of axis
     print("running PCA on selected axes...")
     log.pca=log.pca$ind$coord[,1:nbaxes]
-
     datLog=round(log.pca,4)
     
     #write.table(datLog, file="datLog_OTB2008euroNA_26_11_10.txt", quote=T, dec='.', sep=';', col.names=T, row.names=F)
@@ -266,13 +262,20 @@ datSpecies <- datSpecies[,-1]
 
 classif_step3 <-function(datSpecies, datLog, analysisName="",methMetier="clara",param3="euclidean",param4=NULL){
 
-le_id <- datSpecies[,1]
-datSpecies <- datSpecies[,-1]
-
-print("######## STEP 3 CLUSTERING ########")
-
-t1 <- Sys.time()
-print(paste(" --- selected method :",methMetier, "---"))  
+  #le_id <- datSpecies[,1]
+  #datSpecies <- datSpecies[,-1]
+  #datSpecies <- as.matrix(as.numeric(datSpecies[,-1]))
+  
+  LE_ID  <- rownames(datSpecies)
+  nbSpec <- dim(datSpecies)[2]
+  datSpecies <- as.matrix(datSpecies,ncol=nbSpec,nrow=length(le_id))
+  
+  
+  
+  print("######## STEP 3 CLUSTERING ########")
+  
+  t1 <- Sys.time()
+  print(paste(" --- selected method :",methMetier, "---"))  
 
 
   if(methMetier=="hac"){
@@ -298,8 +301,8 @@ print(paste(" --- selected method :",methMetier, "---"))
       
       numSample=i
       print(paste("sample",i))
-      # Sample of size 15000 logevents
-      minsam=min(nbLog,15000)
+      # Sample of size 10000 logevents
+      minsam=min(nbLog,10000)
       sam=sample(1:nbLog,size=minsam,replace=F)
       # Record the 5 samples
       sampleList=rbind(sampleList,sam)
@@ -484,7 +487,7 @@ print(paste(" --- selected method :",methMetier, "---"))
       png(paste(analysisName,numSample,"Sample_Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
       coord=barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
       barplot(sizeClusters, names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
-      text(coord,sizeClusters+200,sizeClusters,font=2,xpd=NA)
+      text(coord,sizeClusters+100,sizeClusters,font=2,xpd=NA)
       dev.off()
   
   
@@ -547,7 +550,6 @@ print(paste(" --- selected method :",methMetier, "---"))
     
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
-
     sampleDatLogWithClusters=data.frame()
     sampleDatLogWithClusters=cbind(sampleDatLog,sampleClusters)
     sampleDatLogWithClusters=as.data.frame(sampleDatLogWithClusters)
@@ -564,7 +566,7 @@ print(paste(" --- selected method :",methMetier, "---"))
     #otherDatLogWithClusters=cbind(otherLog, result.lda$class)
     otherDatLogWithClusters=cbind(otherLog,pred$class)
     colnames(otherDatLogWithClusters)=colnames(sampleDatLogWithClusters)
-
+  
     # Rebuilt complete datLog with clusters
     clusters=numeric(length=nbLog)
     clusters[sam]=sampleClusters
@@ -836,7 +838,10 @@ print(paste(" --- selected method :",methMetier, "---"))
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
     
-    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, sizeClusters=sizeClusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, sizeClusters=sizeClusters,
+     nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot,
+      mProfilSample=mProfilSample, nbClust=nbClust, summaryClusters=summaryClusters,
+       resval=resval, target=target))
 
   }   else 
 
@@ -1405,7 +1410,6 @@ print(paste(" --- selected method :",methMetier, "---"))
     gc(reset=TRUE)
 
     cat("silcoeff",clustersClara.silcoeff,"\n")
-    
     k=which.max(clustersClara.silcoeff)
     
     # CLARA with optimal k
@@ -1414,7 +1418,6 @@ print(paste(" --- selected method :",methMetier, "---"))
 
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
 #    gc(reset=TRUE)
-
 
     # Quality of classification
     centerOfGravityClassif=numeric()
@@ -1645,11 +1648,15 @@ print(paste(" --- selected method :",methMetier, "---"))
 
 
     
-    LE_ID_clust=cbind(LE_ID=le_id,clust=clusters$clustering)
+    
+    
+    LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, nameTarget=target$tabnomespcib,
+    betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust,
+    summaryClusters=summaryClusters, resval=resval, target=target))
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
