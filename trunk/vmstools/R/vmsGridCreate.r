@@ -26,6 +26,7 @@ vmsGridCreate <- function( dF
                          , plotPoints = TRUE
                          , colPoints = 1
                          , colLand = 'sienna'
+                         , addICESgrid = FALSE
                          , addScale = TRUE
                          , outGridFile = ""  #name for output gridAscii
                          , outPlot = ""  #name for output png
@@ -111,7 +112,8 @@ if ( nrow(dF) > 0 )
                ,gridValName=gridValName, plotTitle = plotTitle
                ,numCats = numCats, paletteCats =paletteCats, addLegend = addLegend
                ,legendx=legendx, legendncol = legendncol
-               ,legendtitle = legendtitle, plotPoints = plotPoints, colPoints=colPoints, colLand=colLand, addScale = addScale
+               ,legendtitle = legendtitle, plotPoints = plotPoints, colPoints=colPoints 
+               , colLand=colLand, addICESgrid = addICESgrid, addScale = addScale
                ,outGridFile = outGridFile, outPlot = outPlot, breaks0=lstargs$breaks0 )
        } #end of plotMap
 
