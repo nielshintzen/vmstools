@@ -17,7 +17,7 @@
   #(to get a VE line and then VSL lines, VE and then VSL lines, etc.)
   ff <- rbind(ve,vsl)
   library(doBy)
-  ff <- orderBy(~col7+col9+col5+col1, data=ff)
+  ff <- orderBy(~col7+col9+col5+col6+col1, data=ff)
 
   # round the numbers
   ff[, c(11,12,13)] <- round(ff[, c(11,12,13)])
