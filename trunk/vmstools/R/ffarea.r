@@ -241,7 +241,7 @@
                 12.81,12.44), pol.y=c(55.3,54.75,54.67,54.56,54.56,53.5,53.5,55,55.3,55.4,55.5,55.38,55.33))>0]<-"24"
                 
     ICES.area[point.in.polygon(point.x=tacsat$SI_LONG, point.y=tacsat$SI_LATI, pol.x=c(14.2,14.78,15,15,18,18,14.2), pol.y=c(55.4,55.3,
-                55,54.7,54.7,56.5,56.5))>0]<-"25"
+                55,53,53,56.5,56.5))>0]<-"25"
                 
     ICES.area[point.in.polygon(point.x=tacsat$SI_LONG, point.y=tacsat$SI_LATI, pol.x=c(18,18,22,22),pol.y=c(56.5,53.5,53.5,56.5))>0]<-"26"
     
