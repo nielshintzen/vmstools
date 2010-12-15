@@ -59,4 +59,19 @@ level5 <- lapply(spp, function(x) {
 
 
 
+# Determine the metier of each logevent from dat thanks to the first species in catch of the logevent and compare with the results of classif_step3.
+first=firstSpecies(dat1,classif2,classif3$clusters)
+# Determine the metier in level 5 from the metier in level 7 based on the first species catched logevent by logevent
+L5=sapply(first$firstSp,function(x) Level7to5(x))
+unique(L5)
+barplot(table(L5))
 
+# Determine the metier of each logevent thanks to the first group of species (level 5) in catch of the logevent
+colnames(dat)=sapply(colnames(dat), Level7to5)
+nbC5=length(unique(colnames(dat)))
+tab=matrix(NA,nrow=nrow(dat),ncol=nbC5)
+colnames(tab)=unique(colnames(dat))
+for(i in 1:nbC5){
+  tab[,i]=apply(dat,1,function(x) sum(dat[x,which(colnames(dat)==unique(colnames(dat))[i])]))
+}
+clust5GP=unique(colnames(dat))[apply(tab,1,which.max)]
