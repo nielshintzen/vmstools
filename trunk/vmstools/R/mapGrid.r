@@ -97,14 +97,17 @@ if(addScale) map.scale(x=xlim0[2]-(xlim0[2]-xlim0[1])/2, y=ylim0[1], ratio=FALSE
 
 #to add points (can obscure grid)
 if (plotPoints) {
- colPoints <- factor(colPoints)
- a.legPoints <- levels(colPoints)
- levels(colPoints) <- colors()[(1:length(levels(colPoints))) *10] 
- points(sPDF, pch=16, col=as.character(colPoints),cex=0.5)
+ if(length(colPoints)!=1) {
+   colPoints <- factor(colPoints)
+   a.legPoints <- levels(colPoints)
+   levels(colPoints) <- colors()[(1:length(levels(colPoints))) *10] 
+   points(sPDF, pch=16, col=as.character(colPoints),cex=0.5)
 
      if(length(legPoints)!=0){
      legend(x='bottomright', legend=a.legPoints, pch = 16, col=levels(colPoints), title="", ncol=2, bg="white", pt.cex=1)
      }
+   }
+   points(sPDF, pch=16, col=colPoints,cex=0.5)   
  }
    
 #legend(x='bottomleft', legend=breaks[1:(length(breaks)-1)], pch = 22, pt.bg=cols, title="fishing activity",bg="white",pt.cex=2 )
