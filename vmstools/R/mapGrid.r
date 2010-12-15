@@ -106,8 +106,9 @@ if (plotPoints) {
      if(length(legPoints)!=0){
      legend(x='bottomright', legend=a.legPoints, pch = 16, col=levels(colPoints), title="", ncol=2, bg="white", pt.cex=1)
      }
+   }else{
+   points(sPDF, pch=16, col=colPoints,cex=0.1)   
    }
-   points(sPDF, pch=16, col=colPoints,cex=0.5)   
  }
    
 #legend(x='bottomleft', legend=breaks[1:(length(breaks)-1)], pch = 22, pt.bg=cols, title="fishing activity",bg="white",pt.cex=2 )
