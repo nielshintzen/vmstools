@@ -24,6 +24,7 @@ vmsGridCreate <- function( dF
                          , legendncol = 1
                          , legendtitle = "fishing activity"
                          , plotPoints = TRUE
+                         , legPoints = FALSE
                          , colPoints = 1
                          , colLand = 'sienna'
                          , addICESgrid = FALSE
@@ -112,7 +113,7 @@ if ( nrow(dF) > 0 )
                ,gridValName=gridValName, plotTitle = plotTitle
                ,numCats = numCats, paletteCats =paletteCats, addLegend = addLegend
                ,legendx=legendx, legendncol = legendncol
-               ,legendtitle = legendtitle, plotPoints = plotPoints, colPoints=colPoints 
+               ,legendtitle = legendtitle, plotPoints = plotPoints, legPoints = legPoints, colPoints=colPoints 
                , colLand=colLand, addICESgrid = addICESgrid, addScale = addScale
                ,outGridFile = outGridFile, outPlot = outPlot, breaks0=lstargs$breaks0 )
        } #end of plotMap
