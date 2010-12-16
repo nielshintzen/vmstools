@@ -11,7 +11,7 @@ library(stats)
 library(SOAR)
 library(amap)
 library(MASS)
-library(RODBC)
+#library(RODBC)
 
 
 # Transform quantities to percents fished in the logevent
