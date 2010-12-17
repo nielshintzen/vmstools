@@ -4,18 +4,17 @@
 
 
 library(FactoMineR)
-#library(ade4)
 library(cluster)
 library(graphics)
 library(stats)
 library(SOAR)
 library(amap)
 library(MASS)
-#library(RODBC)
+library(RODBC)
+
 
 
 # Transform quantities to percents fished in the logevent
-
 transformation_proportion=function(tab){
   res=as.matrix(tab)
   n=nrow(tab)
@@ -28,20 +27,16 @@ transformation_proportion=function(tab){
       res[i,]=res[i,]*(100/sommeligne)
     }
   }
-  #return(data.frame(res))
   return(res)
 }
 
 
 # Transposing data (changing variables into individuals)
-
 table_variables=function(data){
   n=nrow(data)
-  #p=ncol(data)
   res1=t(as.matrix(data[1:round(n/2),]))
   res2=t(as.matrix(data[(round(n/2)+1):n,]))
   res=cbind(res1,res2)
-  #res=data.frame(res)
   row.names(res)=colnames(data)
   colnames(res)=row.names(data)
   return(res)
@@ -49,7 +44,6 @@ table_variables=function(data){
 
 
 # Scree-test
-
 scree=function(eig){
   n=length(eig)
   delta=numeric(n)
@@ -59,7 +53,6 @@ scree=function(eig){
     delta[i]=eig[i]-eig[i-1]
     epsilon[i]=delta[i]-delta[i-1]
   }
-#  data=data.frame(valeurs_propres=eig, delta=delta, epsilon=epsilon)
   data=matrix(0,nrow=n,ncol=3)
   data=cbind(valeurs_propres=eig, delta=delta, epsilon=epsilon)
   return(data)
@@ -67,7 +60,6 @@ scree=function(eig){
 
 
 # Removing the cluster with the smallest mean of capture
-
 select_species=function(data,groupes_cah){
   nb.classes=length(levels(as.factor(groupes_cah)))
   moyennes=numeric(nb.classes)
@@ -82,31 +74,23 @@ select_species=function(data,groupes_cah){
 }
 
 
-
 # Building the table with main species
-
 building_tab_pca=function(data,especes){
   p=ncol(data)
-  #noms=names(data)
   noms=colnames(data)
   ind_princ=which(is.element(noms,especes))
-  #ind_autres=setdiff(1:p,ind_princ)
   princ=data[,ind_princ]
-  #autres=apply(data[,ind_autres],1,sum)
-  #return(data.frame(princ))
   return(princ)
 }
 
 
 # Function computing the test-values
-
 test.values=function(groupes,data){
                                                                          
   n=nrow(data)
   p=ncol(data)
   noms_var=colnames(data)
   nb_groupes=length(levels(as.factor(groupes)))
-
   noms_groupes=character(nb_groupes)
 
   stats_globales=matrix(0,nr=p,ncol=2)
@@ -143,44 +127,25 @@ test.values=function(groupes,data){
     noms_groupes[j]=paste("groupe",j,sep="_")
   }
   colnames(res)=noms_groupes
-  #return(data.frame(res))
   return(res)
 }
 
 
 # Fonction determining the target species
-
 targetspecies=function(resval){
   p=nrow(resval)
   nbgp=ncol(resval)
   
   tabnumespcib=data.frame()
   tabnomespcib=data.frame()
-#  tabnumespsignif=data.frame()
-#  tabnomespsignif=data.frame()
-#  tabnumesppascib=data.frame()
-#  tabnomesppascib=data.frame()
-  
-    
+   
   for(i in 1:nbgp){
     # qnorm(0.975,mean=0,sd=1)=1.96
     numespcib=which(resval[,i]>1.96)   
     numespcibdec=numespcib[order(resval[numespcib,i],decreasing=T)]           
-    #nomespcib=row.names(resval[numespcibdec,])
     nomespcib=names(numespcibdec)
-    
-#    numespsignif=which(abs(resval[,i])>1.96)
-#    #nomespsignif=row.names(resval[numespsignif,])
-#    nomespsignif=names(numespsignif)
-#    
-#    numesppascib=setdiff(numespsignif,numespcib)
-#    numesppascibdec=numesppascib[order(resval[numesppascib,i],decreasing=F)]
-#    #nomesppascib=row.names(resval[numesppascibdec,])
-#    nomesppascib=names(numesppascibdec)
-    
+       
     nbespgpcib=length(numespcib)
-#    nbespgpsignif=length(numespsignif)
-#    nbespgppascib=length(nomesppascib)
 
     if(nbespgpcib>0){
       for (j in 1:nbespgpcib){
@@ -190,32 +155,10 @@ targetspecies=function(resval){
     }else{
         tabnumespcib[i,]=NA
         tabnomespcib[i,]=NA
-    }
-   
-#    if(nbespgpsignif>0){
-#      for (j in 1:nbespgpsignif){
-#        tabnumespsignif[i,j]=numespsignif[j]
-#        tabnomespsignif[i,j]=nomespsignif[j]
-#      }
-#    }else{
-#        tabnumespsignif[i,]=NA
-#        tabnomespsignif[i,]=NA
-#    }
-#    
-#    if(nbespgppascib>0){
-#      for (j in 1:nbespgppascib){
-#        tabnumesppascib[i,j]=numesppascibdec[j]
-#        tabnomesppascib[i,j]=nomesppascib[j]
-#      }
-#    }else{
-#        tabnumesppascib[i,]=NA
-#        tabnomesppascib[i,]=NA
-#    }          
-    
+    }   
   }
   tabnumespcib=as.matrix(tabnumespcib)
   tabnomespcib=as.matrix(tabnomespcib)
-  
   return(list(tabnumespcib=tabnumespcib,tabnomespcib=tabnomespcib))
 }
 
