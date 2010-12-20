@@ -592,11 +592,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               colnames(tmp5) <- c("VE_REF", method, coln1, coln2)
               merged.this.vessel <- tmp5
 
-              # note: at this stage some few lgbk records could have got 
-              # no correpondance in vms (misreporting of area)=> NA on vms side
-              # and then the landing weight of these records are possibly lost because count.ping at NA...
-              # so we can choose to correct (see ** below) to keep these land. weight
-              # the remaining loss in weight will come from the matching records having catches but
+              # we can choose to correct to keep the land. weight:
+              # the loss in weight will come from the matching records having catches but
               # without fishing pings (i.e. only steaming pings)!
               if(is.null(general$conserve.all)) general$conserve.all <- FALSE
               if(general$conserve.all){
@@ -634,19 +631,16 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               idx.col.v <- grep('EURO', nm) # index columns with species value
               idx.col <- c(idx.col.w, idx.col.v)
               if(method=="bk.tripnum.sq.day"){
-                  merged.this.vessel[merged.this.vessel$SI_LATI=='NA', "count.fping.trip.sq.day"] <- 1 # **correct for loss if in lgk but not in vms
                              merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,an) /
                                                         an(merged.this.vessel$count.fping.trip.sq.day)) /
                                                                         an(merged.this.vessel$count.gr.trip.sq.day)
               }
               if(method=="bk.tripnum.sq"){
-                  merged.this.vessel[merged.this.vessel$SI_LATI=='NA', "count.fping.trip.sq"] <- 1 # **correct for loss if in lgk but not in vms
                              merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,an) /
                                                         an(merged.this.vessel$count.fping.trip.sq)) /
                                                                         an(merged.this.vessel$count.gr.trip.sq)
               }
               if(method=="bk.tripnum"){
-                 merged.this.vessel[merged.this.vessel$SI_LATI=='NA', "count.fping.trip"] <- 1 # **correct for loss if in lgk but not in vms
                          # maybe do more by adding unallocated landings to the midpoint of the trip**
                              merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,an) /
                                                            an(merged.this.vessel$count.fping.trip) ) /
@@ -699,7 +693,8 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
                  tripnum.sq.day.in.vms.and.in.bk <- tripnum.sq.day.vms [tripnum.sq.day.vms %in% tripnum.sq.day.logbk]
                  tripnum.sq.in.vms.and.in.bk     <- tripnum.sq.vms [tripnum.sq.vms %in% tripnum.sq.logbk]
                  .vms.in.bk                      <- .vms[ .vms$bk.tripnum.sq.day %in%  tripnum.sq.day.in.vms.and.in.bk,]
-                 .vms.in.bk2                     <- .vms[ .vms$bk.tripnum.sq %in%  tripnum.sq.in.vms.and.in.bk,]
+                 .vms.in.bk2                     <- .vms[ !(.vms$bk.tripnum.sq.day %in%  tripnum.sq.day.in.vms.and.in.bk) &
+                                                            .vms$bk.tripnum.sq %in%  tripnum.sq.in.vms.and.in.bk,]
                  in.bk.and.feffort.not.at.0   <- unique(.vms.in.bk[.vms.in.bk$SI_STATE==1,]$bk.tripnum.sq.day)
                  in.bk2.and.feffort.not.at.0   <- unique(.vms.in.bk2[.vms.in.bk2$SI_STATE==1,]$bk.tripnum.sq)
                  
