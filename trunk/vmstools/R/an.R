@@ -1,3 +1,3 @@
 `an` <-
-function(x){return(as.numeric(as.character(x)))}
+function(x){return(as.numeric(x))}
 
