@@ -48,8 +48,6 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
 
   lstargs <- list(...)
 
-  #utils--
-  an <<- function(x) as.numeric(as.character(x)) # alias
   
   # create required folders for outputs
   cat("if it still doesn't exist, 'results' folder is created in ",general$output.path,"\n")    
@@ -77,21 +75,20 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
     xx <- cbind.data.frame(xx, icessquare= rep(0,nrow(xx)))
 
 
-    an <- function(x) as.numeric(as.character(x))
-    rlong      <- range(an(xx$SI_LONG),na.rm=T)
+    rlong      <- range(anf(xx$SI_LONG),na.rm=T)
     vect.long  <- signif(seq(floor(rlong[1]), ceiling(rlong[2]), by=1),4)   # long (x)
     label.long <- rep(paste(rep(LETTERS,each=10),0:9,sep=""),each=1)
     names(label.long) <- signif(seq(-50, 209, by=1),4)   # long (x)
     label.long <- label.long[!is.na(names(label.long))]  # => correspondance long (-50 to 209) / sq letter (A0 to Z9)
     label.long <- label.long[as.character(vect.long)]
-    rlat      <- range(an(xx$SI_LATI), na.rm=T)
+    rlat      <- range(anf(xx$SI_LATI), na.rm=T)
     vect.lat   <- signif(seq(floor(rlat[1]), ceiling(rlat[2]),by=0.5),4) # lat  (y)
     label.lat  <- rep(paste(seq(1,75,1)),each=1)
     names(label.lat) <-   paste(signif(seq(36,73, by=0.5),4))
     label.lat <- label.lat[!is.na(names(label.lat))] # => correspondance lat (36 to 73) / sq number (1 to 75)
     label.lat <- label.lat[as.character(vect.lat)]
     vect.label <- paste(rep(label.lat,each=length(label.long)),"",label.long,sep="")
-    xx[,"SI_RECT"] <- paste(label.lat [findInterval(an(xx[,"SI_LATI"]), vect.lat)] , label.long [findInterval(an(xx[,"SI_LONG"]), vect.long)], sep="")
+    xx[,"SI_RECT"] <- paste(label.lat [findInterval(anf(xx[,"SI_LATI"]), vect.lat)] , label.long [findInterval(anf(xx[,"SI_LONG"]), vect.long)], sep="")
 
    return(xx)
    }
@@ -122,7 +119,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
       #!#!##!#!##!#!##!#!##!#!##!#!#
       #!#!##!#!##!#!##!#!##!#!##!#!#
       #!#!##!#!##!#!##!#!##!#!##!#!#
-      all.vesselid     <- as.character(unique(logbooks[an(logbooks$VE_LEN)>=0,]$VE_REF)) 
+      all.vesselid     <- as.character(unique(logbooks[anf(logbooks$VE_LEN)>=0,]$VE_REF)) 
       all.vesselid     <- all.vesselid[!is.na(all.vesselid)] # e.g. when VE_LEN at NA exists     
       if(length(lstargs$a.vesselid)!=0) all.vesselid <- lstargs$a.vesselid 
        # => IF ARG INFORMED, THEN KEEP ONLY ONE OR SEVERAL VESSELS AS NEEDED....
@@ -600,16 +597,16 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               # do the conservation of landings anyway?
               # detect possible weight landed while no feffort detected from vms
                    # find bk.tripnum with some NA
-                   vv<- an(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","bk.tripnum"]))
+                   vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","bk.tripnum"]))
                    # then, find bk.tripnum with at least one no NA
-                   no.vv<- an(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","bk.tripnum"]))
+                   no.vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","bk.tripnum"]))
                    tripnum.all.na.inside <- vv[!vv%in%no.vv] # trip num without at least one count.fping!
                    # so, deduce loss in weight
                    zz<- merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,]
            
                   if(method=="bk.tripnum"){
                      # in this case, reallocate evenly between all pings (caution: including steaming pings)
-                     merged.this.vessel[,"count.fping.trip"] <- as.numeric(as.character(merged.this.vessel[,"count.fping.trip"] ) )
+                     merged.this.vessel[,"count.fping.trip"] <- anf(merged.this.vessel[,"count.fping.trip"])
                      merged.this.vessel$bk.tripnum <- factor( merged.this.vessel$bk.tripnum)
                      nbpings.per.trip <- unlist(lapply(split(merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,],
                                            merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,]$bk.tripnum),nrow))            
@@ -625,26 +622,25 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               # method 1, 2 and 3: per ping
               # PER PING:
               # ASSUMING EQUAL ALLOCATION BETWEEN FISHING PINGS AND GEARS USE INSIDE A SAME TRIP
-              an        <- function(x) as.numeric(as.character(x))
               nm        <- names(merged.this.vessel)
               idx.col.w <- grep('KG', nm) # index columns with species weight
               idx.col.v <- grep('EURO', nm) # index columns with species value
               idx.col <- c(idx.col.w, idx.col.v)
               if(method=="bk.tripnum.sq.day"){
-                             merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,an) /
-                                                        an(merged.this.vessel$count.fping.trip.sq.day)) /
-                                                                        an(merged.this.vessel$count.gr.trip.sq.day)
+                             merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,anf) /
+                                                        anf(merged.this.vessel$count.fping.trip.sq.day)) /
+                                                                        anf(merged.this.vessel$count.gr.trip.sq.day)
               }
               if(method=="bk.tripnum.sq"){
-                             merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,an) /
-                                                        an(merged.this.vessel$count.fping.trip.sq)) /
-                                                                        an(merged.this.vessel$count.gr.trip.sq)
+                             merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,anf) /
+                                                        anf(merged.this.vessel$count.fping.trip.sq)) /
+                                                                        anf(merged.this.vessel$count.gr.trip.sq)
               }
               if(method=="bk.tripnum"){
                          # maybe do more by adding unallocated landings to the midpoint of the trip**
-                             merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,an) /
-                                                           an(merged.this.vessel$count.fping.trip) ) /
-                                                                        an(merged.this.vessel$count.gr.trip)
+                             merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,anf) /
+                                                           anf(merged.this.vessel$count.fping.trip) ) /
+                                                                        anf(merged.this.vessel$count.gr.trip)
               }
 
       
@@ -652,18 +648,18 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
               # conservation of catches?
               # detect possible weight landed while no feffort detected from vms
                    # find bk.tripnum with some NA
-                   vv<- an(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","bk.tripnum"]))
+                   vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","bk.tripnum"]))
                    # then, find bk.tripnum with at least one no NA
-                   no.vv<- an(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","bk.tripnum"]))
+                   no.vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","bk.tripnum"]))
                    tripnum.all.na.inside <- vv[!vv%in%no.vv] # trip num without at least one count.fping!
                    # so, deduce loss in weight
                    zz<- merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,]
-                   loss <- tapply(an(zz$LE_KG_COD), zz$FT_REF, sum, na.rm=TRUE)
+                   loss <- tapply(anf(zz$LE_KG_COD), zz$FT_REF, sum, na.rm=TRUE)
                    names(loss) <- paste(a.vesselid, names(loss), sep='.')
                    land.losses <<- c(land.losses, loss )
 
                 cat(paste("weight loss for ", general$sp.to.keep[1]," (vms failure in fishing/steaming detection): ",
-                      sum(an(unique(zz$LE_KG_COD)), na.rm=TRUE),"\n", sep="" ))
+                      sum(anf(unique(zz$LE_KG_COD)), na.rm=TRUE),"\n", sep="" ))
               
              }  # TO DO**: assign landings to the mid point of the trip for trips with all na inside (i.e. only steaming detected while declared landings) 
                  # (i.e. assign 1 to in count.fping.trip for the mid point)
@@ -800,7 +796,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale <-
         names(merged)  [names(merged) %in% "date.in.R.time"] <- "SI_TIME"
     
         # last calculation 
-        merged$KW_HOURS <- an(merged$VE_KW) * an(merged$LE_EFF_VMS)
+        merged$KW_HOURS <- anf(merged$VE_KW) * anf(merged$LE_EFF_VMS)
     
         # last clean up 
         merged <- merged[, !colnames(merged) %in% c('idx', 'icessquare')]
@@ -864,8 +860,7 @@ return()
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
-  # order tacsat chronologically
-  library(doBy)
+  # order tacsat chronologically with library(doBy) 
   tacsat <- sortTacsat(tacsat)
 
   # test each ping if in harbour or not
@@ -927,8 +922,8 @@ return()
              
   # map landing of cod from all studied vessels
   df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD")]
-  df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
-  df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
+  df1$SI_LONG <- anf(df1$SI_LONG)
+  df1$SI_LATI <- anf(df1$SI_LATI)
   df1 <-   df1[ !is.na(df1$SI_LATI),]
   df1 <-   df1[ !is.na(df1$SI_LONG),]
   vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",

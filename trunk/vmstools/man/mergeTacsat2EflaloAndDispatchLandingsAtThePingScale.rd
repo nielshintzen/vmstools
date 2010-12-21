@@ -59,7 +59,7 @@ mergeTacsat2EflaloAndDispatchLandingsAtThePingScale(logbooks, vms, general = gen
 }
   \item{general}{list, general settings to go through all functions
 }
-  \item{\dots}{character, a.vesselid = name of the vessel(s) in tacsat (and hopefully, in eflalo)
+  \item{\dots}{character, (optional) a.vesselid = name of the vessel(s) in tacsat (and hopefully, in eflalo)
 }
 }
 \details{in tacsat SI_STAT, fishing should be coded 1 and non-fishing should be coded 2.
@@ -87,14 +87,12 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
-  
-  # order tacsat chronologically
-  library(doBy)
+   # order tacsat chronologically with library(doBy) 
   tacsat <- sortTacsat(tacsat)
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
-  tacsat$SI_HARB <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,harbours=euharbours, rowSize=30, returnNames=TRUE)
+  tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG), lat=anf(tacsat$SI_LATI), harbours=euharbours, rowSize=30, returnNames=TRUE)
   inHarb <- tacsat$SI_HARB 
   inHarb <- replace(inHarb, !is.na(inHarb), 1)
   inHarb <- replace(inHarb, is.na(inHarb), 0)
@@ -111,7 +109,6 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   tacsat[which(startTrip>0),"SI_FT"] <-  tacsat[which(startTrip>0)+1,"SI_FT"] # tricky here 
   tacsat <- tacsat[which(inHarb==0 |  startTrip>0),] 
   
-  
   # assign a state to each ping (start guesses only)
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
@@ -124,8 +121,8 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   # debug
   eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" &!is.na(eflalo2$VE_REF),]
   if(all(is.na(eflalo2$VE_FLT))) eflalo2$VE_FLT <- "fleet1"
-  if(!match('LE_MET_level6',colnames(eflalo2))>0) eflalo2$LE_MET_level6 <- eflalo2$LE_MET
-  
+    if(!match('LE_MET_level6',colnames(eflalo2))>0) eflalo2$LE_MET_level6 <- eflalo2$LE_MET
+ 
   # TEST FOR A GIVEN SET OF VESSELS
   # (if do.wp3 is at true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
@@ -152,8 +149,8 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
              
   # map landing of cod from all studied vessels
   df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD")]
-  df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
-  df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
+  df1$SI_LONG <- anf(df1$SI_LONG)
+  df1$SI_LATI <- anf(df1$SI_LATI)
   df1 <-   df1[ !is.na(df1$SI_LATI),]
   df1 <-   df1[ !is.na(df1$SI_LONG),]
   vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
@@ -177,10 +174,15 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
 
  
  
+  
   # TO DO....
   # Use the interpolation routine to improve the location of the effort
-  #interpolations      <- interpolateTacsat( all.merged 
-  #                            ,interval=60             
+  #all.merged$SI_SP <- as.numeric(as.character( all.merged$SI_SP))
+  #all.merged$SI_HE <- as.numeric(as.character( all.merged$SI_HE))
+  #all.merged$SI_LONG <-as.numeric(as.character(all.merged$SI_LONG))
+  #all.merged$SI_LATI <-as.numeric(as.character(all.merged$SI_LATI))
+  #interpolations      <- interpolateTacsat( all.merged [,c("VE_REF","SI_LATI","SI_LONG","SI_DATE","SI_TIME","SI_SP","SI_HE")]
+  #                            ,interval=120             
   #                            ,margin=12               
   #                            ,res=100                
   #                            ,method="cHs"           
@@ -196,8 +198,7 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   #          cellsizeX =0.05, cellsizeY =0.05, legendtitle = "landings (kg)")
 
   
- 
- 
+               
   }
 
 }
