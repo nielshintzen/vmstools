@@ -32,7 +32,9 @@ setwd(path) # you must choose the path of your working directory
 source("FunctionsForClassif.r")
 source("Classif.r")
 source("ExploSpeciesSelection.r")
-source("firstSpecies.r")
+source("CompClassiftoOrdi.r")
+source("Level7to5.r")
+source("Level5.r")
 source("MetierPredict.r")
 memory.limit(size=4000)
 
@@ -51,7 +53,7 @@ analysisName=paste(country,"_",Gear,year,"_",AreaCodename,sep="")
 
 # load your own dataset (called dat1 here)
 #load(paste("data/All_eflalo_2007OTB3a4.Rdata",sep=""))
-load("All_eflalo_2008OTB3a4.Rdata")
+load("All_eflalo_2007OTB3a4.Rdata")
 
 # creating the directory of the analysis
 if (!file.exists(analysisName)) dir.create(analysisName)
@@ -80,7 +82,8 @@ names(dat1)[-1]=unlist(lapply(strsplit(names(dat1[,-1]),"_"),function(x) x[[3]])
 #removing miscellaneous species
 
 dat1 <- dat1[,!names(dat1)=="MZZ"]
-
+save(dat1, file="dat1_2007.Rdata")
+#load("dat1_2007.Rdata")
 
 #-----------------------------
 # II. EXPLORING THE VARIOUS METHODS FOR IDENTIFYING MAIN SPECIES AND KEEPING THEM IN THE DATA SET (STEP 1)
@@ -122,7 +125,7 @@ load("Step2.Rdata")
 # IV. STEP 3 - CLUSTERING METHOD : HAC, CLARA OR KMEANS
 #-----------------------------
 for (option_step3 in c("CLARA","KMEANS")) {
-#option_step3="HAC"
+#option_step3="CLARA"
 
 setwd(paste(path,analysisName,option_step2,sep="/"))
 if (!file.exists(option_step3)) dir.create(option_step3)
@@ -135,7 +138,7 @@ if (option_step3=="CLARA")  Step3=classif_step3(Step1,Step2,analysisName=analysi
 if (option_step3=="KMEANS") Step3=classif_step3(Step1,Step2,analysisName=analysisName,methMetier="kmeans",param3=NULL,param4=NULL)    
 
 save(Step3,file="Step3.Rdata")
-
+#load("Step3.Rdata")
 } # end of step 3
 } # end of step 2
 
@@ -145,7 +148,7 @@ save(Step3,file="Step3.Rdata")
 
 
 #-----------------------------
-# VI. STEP 5 - Predicting Metier for current year using clustering performed previous year
+# VII. STEP 6 - Predicting Metier for current year using clustering performed previous year
 #-----------------------------
 
 
@@ -231,3 +234,25 @@ dat1 <- cbind(dat1,CLUSTER=Step3$LE_ID_clust[,"clust"])
 #now reload the full data set
 
 eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
+
+
+
+
+#-----------------------------------------------------
+# VI. STEP 5 - COMPARISON WITH ORDINATION METHODS
+#-----------------------------------------------------
+
+# load previous R objects (Step1,Step2,Step3)
+setwd(path)
+load("dat1_2007.Rdata")
+setwd(paste(path,analysisName,sep="/"))
+load("Explo_Step1.Rdata")
+option_step2="PCA_70"
+setwd(paste(path,analysisName,option_step2,sep="/"))
+load("Step2.Rdata")
+option_step3="CLARA"
+setwd(paste(path,analysisName,option_step2,option_step3,sep="/"))
+load("Step3.Rdata")
+clusters=Step3$clusters$clustering
+compMetiers=CompClassiftoOrdi(dat1,Step2,clusters)
+
