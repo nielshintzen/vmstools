@@ -18,7 +18,7 @@
           er <- try(load(file = file.path(folder, paste('merged_',a.vesselid,'_',a.year,'.RData',sep=''))) 
                         , silent=TRUE) # get the 'merged' table for this vessel
 
-
+ 
          if(class(er)!="try-error")   {
            if(length(species.to.keep)!=0){
               get.sp            <- function (nm) unlist(lapply(strsplit(nm, split="_"), function(x) x[3]))

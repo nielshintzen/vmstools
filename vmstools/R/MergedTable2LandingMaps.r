@@ -35,7 +35,7 @@
     dir.create(file.path(output, "jpegLandings", a.sp, "overall"))
     dir.create(file.path(output, "jpegLandings", a.sp, "overall",what))
     savePlot(filename = file.path(output, "jpegLandings", a.sp, "overall", what,
-                            paste("map_landings_",what,"_merged_vessels_",what,"_",a.sp,"_",a.year,".jpeg",sep="")),type ="jpeg")
+                            paste("map_landings_",what,"_merged_vessels_",a.sp,"_",a.year,".jpeg",sep="")),type ="jpeg")
 
     dev.off()
 
@@ -59,7 +59,7 @@
       dir.create(file.path(output, "jpegLandings", a.sp, a.met))
       dir.create(file.path(output, "jpegLandings", a.sp, a.met, what))
       savePlot(filename = file.path(output, "jpegLandings", a.sp, a.met, what,
-                            paste("map_landings_",what,"_merged_vessels_",what,"_",a.sp,"_", a.met,"_",a.year,".jpeg",sep="")),type ="jpeg")
+                            paste("map_landings_",what,"_merged_vessels_",a.sp,"_", a.met,"_",a.year,".jpeg",sep="")),type ="jpeg")
       dev.off()
       }
    }
@@ -83,9 +83,10 @@
       a.met <- gsub(">=", replacement="o",met) # debug
       a.met <- gsub("<", replacement="",a.met) # debug
       a.met <- gsub(">", replacement="o",a.met)# debug
+      dir.create(file.path(output, "jpegLandings", a.sp, a.met, what, "quarter"))
       # save
-      savePlot(filename = file.path(output, "jpegLandings", a.sp, a.met, what,
-        paste("map_landings_",what,"_merged_vessels_",what,"_",a.sp,"_", a.met,"_",a.year,"_",a.quarter,".jpeg",sep="")),type ="jpeg")
+      savePlot(filename = file.path(output, "jpegLandings", a.sp, a.met, what, "quarter",
+        paste("map_landings_",what,"_merged_vessels_",a.sp,"_", a.met,"_",a.year, a.quarter,".jpeg",sep="")),type ="jpeg")
       dev.off()
       }
      }}
@@ -93,7 +94,7 @@
  return()
  }
   #  in value
- # MergedTable2LandingMaps (all.merged=all.merged, sp="LE_EURO_COD",
+ # MergedTable2LandingMaps (all.merged=all.merged, sp="LE_EURO_COD", output= file.path("C:","VMSanalysis", "FemernBelt"),
  #                   cellsizeX =0.05, cellsizeY =0.05, we=9.8, ea=12.7, no=55.2, so=54.0, # fehmarn Belt area
  #                       breaks0= c(0,100, 100*(2^1),100*(2^2),100*(2^3),100*(2^4),100*(2^5),100*(2^6), 100*(2^7),100*(2^8),100*(2^9), 10000000)
  #                       )
