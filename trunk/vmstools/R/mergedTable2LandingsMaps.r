@@ -1,4 +1,3 @@
-
   # Author: F.Bastardie
   mergedTable2LandingsMaps <-
      function (all.merged, sp="LE_KG_COD", output= file.path("C:","VMSanalysis", "FemernBelt"),
@@ -40,6 +39,29 @@
 
     dev.off()
 
+
+      # per quarter
+   for (a.quarter in levels(all.merged$quarter) ){
+     df1 <- all.merged[all.merged$quarter==a.quarter  &
+                all.merged$SI_STATE==1,  c("SI_LATI","SI_LONG",sp)]
+      df1$SI_LATI <- anf(df1$SI_LATI) # debug...
+      df1$SI_LONG <- anf(df1$SI_LONG) # debug...
+      df1[,sp] <- replace(df1[,sp], is.na(df1[,sp]) | df1[,sp]<0, 0)
+      if(nrow(df1)!=0){
+      vmsGridCreate(df1, nameVarToSum=sp,  numCats=10,  plotPoints =FALSE, legendtitle=paste("landings",what,a.unit,sep=' '),
+          colLand="darkolivegreen4",  addICESgrid=TRUE,
+            nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =cellsizeX, cellsizeY =cellsizeY, we=we, ea=ea, no=no, so=so,
+             breaks0=breaks0,legendncol=2)
+         title(paste( a.sp, "-", a.year, "-", a.quarter) )
+      # create folder and save
+      dir.create(file.path(output, "jpegLandings", a.sp, "overall", what, "quarter"))
+      savePlot(filename = file.path(output, "jpegLandings", a.sp, "overall", what, "quarter",
+        paste("map_landings_",what,"_merged_vessels_",a.sp,"_",a.year, a.quarter,".jpeg",sep="")),type ="jpeg")
+      dev.off()
+      }
+     }
+
+
     # per metier
     for (met in levels(all.merged$LE_MET_level6) ){
       df1 <- all.merged[all.merged$LE_MET_level6==met &
@@ -80,7 +102,7 @@
           colLand="darkolivegreen4",  addICESgrid=TRUE,
             nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =cellsizeX, cellsizeY =cellsizeY, we=we, ea=ea, no=no, so=so,
              breaks0=breaks0,legendncol=2)
-         title(paste(met, "-", a.sp) )
+         title(paste(met, "-", a.sp, "-", a.year, "-", a.quarter) )
       a.met <- gsub(">=", replacement="o",met) # debug
       a.met <- gsub("<", replacement="",a.met) # debug
       a.met <- gsub(">", replacement="o",a.met)# debug
@@ -99,4 +121,3 @@
  #                   cellsizeX =0.05, cellsizeY =0.05, we=9.8, ea=12.7, no=55.2, so=54.0, # fehmarn Belt area
  #                       breaks0= c(0,100, 100*(2^1),100*(2^2),100*(2^3),100*(2^4),100*(2^5),100*(2^6), 100*(2^7),100*(2^8),100*(2^9), 10000000)
  #                       )
-
