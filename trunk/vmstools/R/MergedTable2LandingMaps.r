@@ -33,7 +33,8 @@
           # create folders and save
     dir.create(file.path(output, "jpegLandings", a.sp))
     dir.create(file.path(output, "jpegLandings", a.sp, "overall"))
-    savePlot(filename = file.path(output, "jpegLandings", a.sp, "overall",
+    dir.create(file.path(output, "jpegLandings", a.sp, "overall",what))
+    savePlot(filename = file.path(output, "jpegLandings", a.sp, "overall", what,
                             paste("map_landings_",what,"_merged_vessels_",what,"_",a.sp,"_",a.year,".jpeg",sep="")),type ="jpeg")
 
     dev.off()
@@ -56,7 +57,8 @@
       a.met <- gsub(">", replacement="o",a.met)  # debug
       # create folders and save
       dir.create(file.path(output, "jpegLandings", a.sp, a.met))
-      savePlot(filename = file.path(output, "jpegLandings", a.sp, a.met,
+      dir.create(file.path(output, "jpegLandings", a.sp, a.met, what))
+      savePlot(filename = file.path(output, "jpegLandings", a.sp, a.met, what,
                             paste("map_landings_",what,"_merged_vessels_",what,"_",a.sp,"_", a.met,"_",a.year,".jpeg",sep="")),type ="jpeg")
       dev.off()
       }
@@ -82,7 +84,7 @@
       a.met <- gsub("<", replacement="",a.met) # debug
       a.met <- gsub(">", replacement="o",a.met)# debug
       # save
-      savePlot(filename = file.path(output, "jpegLandings", a.sp, a.met,
+      savePlot(filename = file.path(output, "jpegLandings", a.sp, a.met, what,
         paste("map_landings_",what,"_merged_vessels_",what,"_",a.sp,"_", a.met,"_",a.year,"_",a.quarter,".jpeg",sep="")),type ="jpeg")
       dev.off()
       }
