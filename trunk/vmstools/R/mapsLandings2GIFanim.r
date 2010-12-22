@@ -3,14 +3,18 @@
  # need to install the ImageMagik freeware
 mapsLandings2GIFanim <- function(idir = file.path("C:","VMSanalysis","FemernBelt","jpegLandings"),
                            spp=c("COD","SPR","HER","PLE","FLE","DAB","WHB")){
-library(animation)
+library(animation) 
 for(sp in spp){
     for(met in list.files(file.path(idir, sp))){
+     # for(what in c("weight","value")){
+      for(what in c("weight")){
            setwd(file.path(idir, sp, met,what,"quarter"))
            filename <- paste("map_landings_",what,"_merged_vessels_",sp,"_",met,"_",sep='')
+           cat(paste(filename,"\n"))
            wildcard = paste(filename, "*.", "jpeg", sep = "")
            im.convert(wildcard, interval = 1, loop = 0, output = "anim.gif",  # library(animation)
-           outdir = getwd(), convert = "convert", cmd.fun = system, clean = FALSE)
+           outdir = getwd(), convert = "convert", cmd.fun = system, clean = FALSE)   
+    } # end what
   } # end met
  } # end sp
 return()
