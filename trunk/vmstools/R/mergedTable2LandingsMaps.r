@@ -56,7 +56,7 @@
       # create folder and save
       dir.create(file.path(output, "jpegLandings", a.sp, "overall", what, "quarter"))
       savePlot(filename = file.path(output, "jpegLandings", a.sp, "overall", what, "quarter",
-        paste("map_landings_",what,"_merged_vessels_",a.sp,"_",a.year, a.quarter,".jpeg",sep="")),type ="jpeg")
+        paste("map_landings_",what,"_merged_vessels_",a.sp,"_overall_",a.year, a.quarter,".jpeg",sep="")),type ="jpeg")
       dev.off()
       }
      }
