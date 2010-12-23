@@ -175,7 +175,13 @@ new_country <- "All"
 new_year <- 2008
 new_AreaCodename <- "3a4"
 new_Gear <- c("OTB")
-load("All_eflalo_2008OTB3a4.Rdata")
+#load("All_eflalo_2008OTB3a4.Rdata")
+load("dat1_2008.Rdata")
+datPred=dat1
+rm(dat1)
+gc()
+
+
 datPred <- dat1[,c("LE_ID",grep("EURO",names(dat1),value=T))]
 rm(dat1)
 gc()
@@ -187,7 +193,7 @@ for (i in grep("EURO",names(datPred))) null.value <- c(null.value,which(datPred[
 null.value <- c(null.value,which(apply(datPred[,2:ncol(datPred)],1,sum,na.rm=T)==0))
 
 if(length(null.value)!=0) {LogEvent.removed <- datPred[sort(unique(null.value)),] ; datPred <- datPred[-sort(unique(null.value)),]}
-Store(LogEvent.removed)
+#Store(LogEvent.removed)
 
 names(datPred)[-1]=unlist(lapply(strsplit(names(datPred[,-1]),"_"),function(x) x[[3]]))
 
@@ -195,7 +201,7 @@ names(datPred)[-1]=unlist(lapply(strsplit(names(datPred[,-1]),"_"),function(x) x
 
 datPred <- datPred[,!names(datPred)=="MZZ"]
 
-#create a new folder for step5
+#create a new folder for step6
 option_step5 = "Predict_2008"
 setwd(paste(path,analysisName,option_step2,option_step3,sep="/"))
 if (!file.exists(option_step5)) dir.create(option_step5)
@@ -215,7 +221,7 @@ datPred=as.matrix(datPred)
 rownames(datPred) <- le_id_datPred
 #colnames(datPred) <- nameDatPredSpecies
 Donnees2008Cluster = metierPredict(learningData=Step1,clustersAffectation=clust2007,newData=datPred)
-
+save(Donnees2008Cluster,file="Donnees2008Cluster.Rdata")
 
 
 
