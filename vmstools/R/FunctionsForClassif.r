@@ -3,14 +3,14 @@
 ###############################################################################
 
 
-library(FactoMineR)
-library(cluster)
-library(graphics)
-library(stats)
-library(SOAR)
-library(amap)
-library(MASS)
-library(RODBC)
+#library(FactoMineR)
+#library(cluster)
+#library(graphics)
+#library(stats)
+#library(SOAR)
+#library(amap)
+#library(MASS)
+#library(RODBC)
 
 
 
