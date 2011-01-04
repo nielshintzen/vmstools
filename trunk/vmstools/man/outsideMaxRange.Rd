@@ -34,30 +34,37 @@ EU lot 2 project}
 \author{Niels T. Hintzen}
 \seealso{\code{createGrid(),calculateCI(),point.in.polygon()}}
 \examples{
-data(VMS)
+data(tacsat)
 
-st        <- c(2,6)       #Speed threshold points (two values), NULL means use all points
-hd        <- NULL         #Heading threshold points (two values), NULL means use all points
-remDup    <- T            #Remove duplicate records in VMS dataset
+  #Sort the Tacsat data
+tacsat     <- sortTacsat(tacsat)
+tacsat     <- tacsat[1:1000,]
 
-VMS     <- sortVMS(VMS)
-VMS     <- VMS[1:1000,]
-VMS     <- filterVMS(VMS,st,hd,remDup)
+  #Filter the Tacsat data
+tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
+tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME,sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M:%S")
 
-interpolation <- interpolateVMS(VMS,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2))
+  #Interpolate the VMS data
+interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
-xrange  <- range(unlist(lapply(lapply(interpolation,function(x){return(x[-1,])}),function(x){return(x[,1])})),na.rm=T)*c(0.95,1.05)
-yrange  <- range(unlist(lapply(lapply(interpolation,function(x){return(x[-1,])}),function(x){return(x[,2])})),na.rm=T)*c(0.95,1.05)
-
-grid    <- createGrid(xrange,yrange,0.01,0.005)
-
-spatialGrid   <- SpatialGrid(grid=grid);                    
+  #Create the final grid where all interpolations should fit on
+xrange  <- range(unlist(lapply(lapply(interpolation,function(x){return(x[-1,])}),function(x){return(x[,1])})),na.rm=T)
+yrange  <- range(unlist(lapply(lapply(interpolation,function(x){return(x[-1,])}),function(x){return(x[,2])})),na.rm=T)
+xrange  <- range(c(xrange,range(tacsat$SI_LONG,na.rm=T))); xrange <- c(min(xrange) - min(xrange)*0.05,
+                                                                       max(xrange) + max(xrange)*0.05)
+yrange  <- range(c(yrange,range(tacsat$SI_LATI,na.rm=T))); yrange <- c(min(yrange) - min(yrange)*0.05,
+                                                                       max(yrange) + max(yrange)*0.05)
+grid          <- createGrid(xrange,yrange,0.1,0.05)
+spatialGrid   <- SpatialGrid(grid=grid);
 gridded(spatialGrid) = TRUE
-sP            <- as(spatialGrid,"SpatialPixels");           
+sP            <- as(spatialGrid,"SpatialPixels");
 sPDF          <- as(sP,"SpatialPixelsDataFrame")
 sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
 
-result <- outsideMaxRange(intLon=c(2.993,2.742),intLat=c(51.516,51.429),vmsIdx1=3,vmsIdx2=4,VMS,grid,sPDF,interpolation,2,params=list(fm=0.2,distscale=70,sigline=0.18))
-print(result[[2]]/result[[1]]) #approximately 5% of the total value of the CI is located outside the maximum range
-print(result[[3]])             #the maximum value of the CI is 1.017199
+lon           <- tacsat$SI_LONG[c(3,4)]
+lat           <- tacsat$SI_LATI[c(3,4)]
+
+result <- outsideMaxRange(intLon=lon,intLat=lat,vmsIdx1=3,vmsIdx2=4,tacsat,grid,sPDF,interpolation,10,params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)))
+print(result[[2]]/result[[1]]) #0% of the total value of the CI is located outside the maximum range
+
 }

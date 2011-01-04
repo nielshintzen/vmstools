@@ -31,10 +31,16 @@ EU lot 2 project}
 \examples{
 data(VMShf)
 
-VMShf   <- sortVMS(VMShf)
-VMShf   <- filterVMS(VMShf,c(2,6),NULL,T)
+#-Put the data in the right format
+VMShf$SI_DATE <- format(as.Date(VMShf$date),"%d/%m/%Y")
+VMShf$SI_TIME <- format(VMShf$date, "%H:%M:%S")
+colnames(VMShf) <- c("VE_REF","SI_LATI","SI_LONG","SI_SP","SI_HE","SI_DATIM","SI_DATE","SI_TIME")
 
-interpolation <- interpolateVMS(VMShf,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+#-Sort the data and remove non-fishing pings
+VMShf   <- sortTacsat(VMShf)
+VMShf   <- filterTacsat(VMShf,c(2,6),NULL,T)
 
-cHs <- diffInter(interpolation,VMShf) #Returns a matrix with 38 rows (each row represents 1 interpolation) and 5 measures
+interpolation <- interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.3,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+
+cHs <- diffInter(interpolation,VMShf) #Returns a matrix with 21 rows (each row represents 1 interpolation) and 5 measures
 }

@@ -9,7 +9,7 @@ function(tacsat                          #VMS datapoints
                               ){
 
 VMS. <- tacsat
-VMS.$datim     <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
+VMS.$datim     <- as.POSIXct(paste(VMS.$SI_DATE,  VMS.$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
                               
   #Start interpolating the data
 if(!method %in% c("cHs","SL"))  stop("method selected that does not exist")
@@ -27,6 +27,7 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
   } else {
       if(is.na(endVMS)==T) endVMS <- startVMS + 1
       startVMS <- endVMS
+      #-Check if the end of the dataset is reached
       if(endDataSet == 1 & rev(unique(VMS.$VE_REF))[1] != ship){
         startVMS  <- which(VMS.$VE_REF == unique(VMS.$VE_REF)[which(unique(VMS.$VE_REF)==ship)+1])[1]
         ship      <- VMS.$VE_REF[startVMS]
@@ -35,7 +36,7 @@ for(iStep in 1:(dim(VMS.)[1]-1)){
       if(endDataSet == 1 & rev(unique(VMS.$VE_REF))[1] == ship) endDataSet <- 2 #Final end of dataset
     }
 
-
+  #if end of dataset is not reached, try to find succeeding point
   if(endDataSet != 2){
     result      <- findEndTacsat(VMS.,startVMS,interval,margin)
     endVMS      <- result[1]

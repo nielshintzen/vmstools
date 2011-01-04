@@ -52,7 +52,7 @@ tacsat     <- sortTacsat(tacsat)
 tacsat     <- tacsat[1:1000,]
 
   #Filter the Tacsat data
-tacsat     <- filterTacsat(tacsat,st,hd,remDup)
+tacsat     <- filterTacsat(tacsat,st=c(2,6),hd=NULL,remDup)
 
   #Interpolate the VMS data
 interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
