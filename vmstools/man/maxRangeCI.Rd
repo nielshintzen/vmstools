@@ -34,9 +34,13 @@ Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite s
 }
 \seealso{\code{plotCIinterpolation(),interpolateVMS(),N1p0(),plotInterpolation()}}
 \examples{
-data(VMS)
-lon <- VMS$declon[c(2,3)]
-lat <- VMS$declat[c(2,3)]
-maxRangeCI(lon,lat,an(difftime(VMS$date[3],VMS$date[2],units="mins")),VMS$speed[c(2,3)])
+data(tacsat)
+  #shorten the tacsat file for example use and add date-time combination
+tacsat <- tacsat[1:10,]
+tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME,sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M:%S")
+lon <- tacsat$SI_LONG[c(3,4)]
+lat <- tacsat$SI_LATI[c(3,4)]
+  #Calculate maximum range to be used within Confidence Interval calculation
+maxRangeCI(lon,lat,an(difftime(tacsat$SI_DATIM[4],tacsat$SI_DATIM[3],units="mins")),tacsat$SI_SP[c(3,4)])
 }
 

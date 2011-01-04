@@ -5,7 +5,7 @@ function(tacsat
                          ,remDup=T                 #Specify if you want to remove duplicated VMS records (these should not occur in the first place)
                          ){
   VMS <- tacsat
-  VMS$datim     <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")                                                   
+  VMS$datim     <- as.POSIXct(paste(VMS$SI_DATE,  VMS$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
   #Remove duplicate records
 if(is.null(remDup)==F){
   uniqueVMS <- which(duplicated(VMS[,c("VE_REF","datim")])==F)

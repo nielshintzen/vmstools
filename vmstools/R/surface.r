@@ -1,4 +1,6 @@
 surface <- function(vmsGrid,method="Trapezoid",includeNA=T){  #Methods can be "Trapezoid" and "UTM"
+        if(class(vmsGrid) != 'SpatialGridDataFrame') stop("class of vmsGrid should be SpatialGridDataFrame")
+        if(!method %in% c("Trapezoid","UTM")) stop("method not available")
         if (class(vmsGrid)=='SpatialGridDataFrame') # not empty...
           {
              if(method == "Trapezoid"){

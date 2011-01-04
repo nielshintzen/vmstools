@@ -9,8 +9,9 @@ calculateCI <- function(intLon
                                ,int
                                ,params){
 
-  res1          <- maxRangeCI(intLon,intLat,an(difftime(VMS.$date[vmsIdx2],VMS.$date[vmsIdx1],units="mins")),
-                              c(VMS.$speed[vmsIdx1],VMS.$speed[vmsIdx2]))
+  VMS.$SI_DATIM <- as.POSIXct(paste(VMS.$SI_DATE,  VMS.$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
+  res1          <- maxRangeCI(intLon,intLat,an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="mins")),
+                              c(VMS.$SI_SP[vmsIdx1],VMS.$SI_SP[vmsIdx2]))
     #First find the boundaries of the mills ellipse, thereafter, add a 10% extra margin, based on the minimum or
     # maximum value. In the longitude direction, take the minimum value, and find the according latitude to go from km to degrees
   res2          <- range(res1[[1]][,1],na.rm=T); boundx <- c(min(res2) - res1[[2]]*0.2*km2Degree(min(res2),
