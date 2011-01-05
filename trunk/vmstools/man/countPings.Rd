@@ -1,15 +1,47 @@
 \name{countPings}
 \alias{countPings}
-\title{Ping counting over trips}
-\description{This function counts the number of pings in the tacsat data for each trip and then merges them with that same file}
-\usage{countPings(tacsat = tacsat1f)}
+\title{
+Count the number of VMS pings in a selection
+}
+\description{
+Count the number of VMS pings in any selection made in time and spatial frame.
+}
+\usage{
+countPings(formula, tacsat, grid = NULL)
+}
 \arguments{
-  \item{tacsat}{data.frame of vms data, typically with only fishing pings}
+  \item{formula}{ specify the elements you want to use as axis of the count}
+  \item{tacsat}{ tacsat data file, possibly with additional columns}
+  \item{grid}{ if in formulate 'gridcell' is chosen, a SpatialGrid must be provided}
 }
-\details{}
-\references{}
-\author{Doug Beare}
-\note{}
-\seealso{}
-\examples{tacsat1f <-countPings(tacsat = tacsat1f) # Where tacsat1f is simply tacsat data with non fishing pings removed
+\details{
+Formula has form: ~Variable+timeVariable+anotherTimeVariable+spatialVariable \n
+
+options in formula for Variable: any column name of tacsat file   \n
+options in formula for timeVariable: week, month, quarter, year    \n
+options in formula for spatialVariable: icesrectangle, icesarea, gridcell \n
 }
+\value{
+Returns the matrix with counted pings by each specified variable
+}
+\references{Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite spline interpolation of position registration data,
+EU lot 2 project}
+\author{Niels T. Hintzen}
+\note{
+if Tacsat is a big file, the overlay function might fail resulting in terminating the function}
+\seealso{
+\code{createGrid(),vmsGridCreate()}
+}
+\examples{
+data(tacsat)
+
+#make the tacsat file a bit smaller
+tacsat  <- tacsat[1:10000,]
+
+grid          <- createGrid(range(tacsat$SI_LONG,na.rm=T),range(tacsat$SI_LATI,na.rm=T),0.5,0.5)
+grid          <- SpatialGrid(grid=grid);
+gridded(grid) = TRUE
+result        <- countPings(~VE_REF+year+gridcell,tacsat,grid=grid)
+result        <- countPings(~VE_REF+week+year+icesrectangle,tacsat)
+}
+
