@@ -3,7 +3,7 @@
 # required: library 'segmented'
 # F. Bastardie
 
-segmentSpeedTacsat <- function(tacsat,
+segmentTacsatSpeed <- function(tacsat,
                          general=list(
                            output.path=file.path('C:','output'),
                                        visual.check=TRUE, a.year=2009), ...){
