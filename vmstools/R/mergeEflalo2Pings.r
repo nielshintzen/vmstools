@@ -865,7 +865,7 @@ return()
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
-  tacsat$SI_HARB <- pointInHarbour(lon=tacsat$SI_LONG, lat=tacsat$SI_LATI, harbours=euharbours, rowSize=30, returnNames=TRUE)
+  tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG), lat=anf(tacsat$SI_LATI), harbours=euharbours, rowSize=30, returnNames=TRUE)
   inHarb <- tacsat$SI_HARB 
   inHarb <- replace(inHarb, !is.na(inHarb), 1)
   inHarb <- replace(inHarb, is.na(inHarb), 0)

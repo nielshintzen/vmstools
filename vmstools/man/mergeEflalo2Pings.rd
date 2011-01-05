@@ -1,5 +1,5 @@
-\name{mergeTacsat2EflaloAndDispatchLandingsAtThePingScale}
-\alias{mergeTacsat2EflaloAndDispatchLandingsAtThePingScale}
+\name{mergeEflalo2Pings}
+\alias{mergeEflalo2Pings}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Coupling of VMS and logbooks data including landings dispatching between fishing pings.
@@ -49,7 +49,7 @@ occurred when the match failed both for the catch date and area, and no fishing 
 }
 
 \usage{
-mergeTacsat2EflaloAndDispatchLandingsAtThePingScale(logbooks, vms, general = general, ...)
+mergeEflalo2Pings(logbooks, vms, general = general, ...)
 }
 
 \arguments{
@@ -68,7 +68,9 @@ to detect some repeated positions that are likely to be missing harbours.
 }
 
 \value{
-Nothing is returned but a merged data.frame per vessel in the output folder}
+Nothing is returned but a merged data.frame per vessel in the output folder. 
+These data.frame could be later bound into a big one using bindAllMergedTable()
+}
 
 \references{Bastardie et al. 2010. Fisheries Research}
 \author{Francois Bastardie}
@@ -79,7 +81,7 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
 
 \examples{
 
- \dontrun{
+  \dontrun{
   data(eflalo2)
   data(tacsat)
   data(euharbours)
@@ -87,7 +89,7 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
-   # order tacsat chronologically with library(doBy) 
+  # order tacsat chronologically with library(doBy) 
   tacsat <- sortTacsat(tacsat)
 
   # test each ping if in harbour or not
@@ -116,7 +118,7 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   
   # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
   # (assuming that the other species is coded MZZ)
-  eflalo <- mergeEflaloSpecies (eflalo2, threshold=1e6, code="MZZ") 
+  eflalo <- poolEflaloSpecies (eflalo2, threshold=1e6, code="MZZ") 
   
   # debug
   eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" &!is.na(eflalo2$VE_REF),]
@@ -126,15 +128,15 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   # TEST FOR A GIVEN SET OF VESSELS
   # (if do.wp3 is at true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
-                                                             general=list(output.path=file.path("C:","output"),
-                                                                             visual.check=TRUE,
-                                                                             do.wp3=TRUE, speed="segment"))
+  mergeEflalo2Pings (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
+                                 general=list(output.path=file.path("C:","output"),
+                                    visual.check=TRUE,
+                                        do.wp3=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo2
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2, tacsat=tacsat,
-                                                             general=list(output.path=file.path("C:","output"),
-                                                                             visual.check=TRUE,
-                                                                             do.wp3=FALSE, speed="segment"))
+  mergeEflalo2Pings (logbooks=eflalo2, tacsat=tacsat,
+                                   general=list(output.path=file.path("C:","output"),
+                                      visual.check=TRUE,
+                                         do.wp3=FALSE, speed="segment"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
@@ -169,8 +171,8 @@ Nothing is returned but a merged data.frame per vessel in the output folder}
   tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.keep=character(), 
                       folder = file.path("C:","output"), all.in.one.table=FALSE)
   
-  ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","output"),
-                                          a.year=2009, a.country="NLD") )
+  ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
+                                                   a.year=2009, a.country="NLD") )
 
  
  
