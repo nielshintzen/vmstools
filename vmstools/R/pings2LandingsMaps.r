@@ -5,7 +5,7 @@
           breaks0= c(0,100, 100*(2^1),100*(2^2),100*(2^3),100*(2^4),100*(2^5),100*(2^6), 100*(2^7),100*(2^8),100*(2^9), 10000000)){
 
     if(!"quarter" %in% colnames(all.merged))
-          stop("please add a 'quarter' column to the merged table")
+          all.merged$quarter <- factor(substr(quarters(as.POSIXct(all.merged$SI_DATE)),2,2))
 
     # create the general folder
     dir.create(file.path(output, "jpegLandings"))
@@ -25,7 +25,7 @@
     df1$SI_LATI <- anf(df1$SI_LATI ) # debug...
     df1$SI_LONG <- anf(df1$SI_LONG ) # debug...
     df1[,sp] <- replace(df1[,sp], is.na(df1[,sp]) | df1[,sp]<0, 0)
-    vmsGridCreate(df1, nameVarToSum=sp,  numCats=10,  plotPoints =FALSE, legendtitle=paste("landings",what,a.unit,sep=' '),
+    vmsGridCreate(df1, nameVarToSum=sp,  numCats=10,  plotPoints =FALSE, legendtitle=paste("landings",what, a.unit,sep=' '),
           colLand="darkolivegreen4",  addICESgrid=TRUE,
             nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =cellsizeX, cellsizeY =cellsizeY, we=we, ea=ea, no=no, so=so,
              breaks0=breaks0, legendncol=2)
