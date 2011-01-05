@@ -1,6 +1,6 @@
  # reduce the size of the eflalo data by merging species
  # threshold in euros
-mergeEflaloSpecies <- function(eflalo, threshold.value=3000000, code="MZZ"){
+poolEflaloSpecies <- function(eflalo, threshold.value=3000000, code="MZZ"){
     if(!paste("LE_KG_", code, sep='') %in% colnames(eflalo)) {
               eflalo [, paste("LE_KG_", code, sep='')] <- NA
                eflalo [, paste("LE_EURO_", code, sep='')] <- NA
