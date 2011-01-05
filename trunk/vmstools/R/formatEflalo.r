@@ -1,4 +1,4 @@
-formatEflalo2 <- function(x){
+formatEflalo <- function(x){
   x$VE_REF        <- ac(x$VE_REF)
   x$VE_FLT        <- ac(x$VE_FLT)
   x$VE_COU        <- ac(x$VE_COU)
