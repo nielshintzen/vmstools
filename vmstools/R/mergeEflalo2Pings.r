@@ -98,15 +98,15 @@ mergeEflalo2Pings <-
    #utils--
    # for managing NA on logbook side
    # (from vms trip.sq without corresponding logbook trip.sq e.g. because no declaration in sq because only steaming time inside)
-   # we need to inform back the specificity of the vessel from logbook using info from the same trip i.e. vesselid+bk.tripnum
+   # we need to inform back the specificity of the vessel from logbook using info from the same trip i.e. vesselid+FT_REF
    retrieveOnBkSide <- function(merged, type.data){
       idx <- which(merged$LE_MET_level6=="NA")
       merged.NA <- merged[idx,] # input (only the trip.sq with NA for the logbook part)
 
       for (td in type.data){
-         map <- tapply(merged[, td ], paste(merged$VE_REF, merged$bk.tripnum),
+         map <- tapply(merged[, td ], paste(merged$VE_REF, merged$FT_REF),
                              function(i) {ss<- unique(as.character(i)) ; ss[ss!="NA"][1]})
-         merged.NA[, td ] <- factor(paste(merged.NA$VE_REF,merged.NA$bk.tripnum))
+         merged.NA[, td ] <- factor(paste(merged.NA$VE_REF,merged.NA$FT_REF))
          levels(merged.NA[, td ]) <- map[levels(merged.NA[, td ])]
          }
       if(nrow(merged.NA)>0) merged.NA$flag <- 4 # flag on meth
@@ -141,15 +141,14 @@ mergeEflalo2Pings <-
          # automatic detection of a.year
          general$a.year <-   format(strptime(  paste(logbk.this.vessel$FT_DDAT[1]) , tz='GMT',  "%e/%m/%Y" ), "%Y")
          
-         #   add mid-time and bk.tripnum in eflalo
            # departure time
-           logbk.this.vessel$LE_DTIME <- strptime(  paste(logbk.this.vessel$FT_DDAT, logbk.this.vessel$FT_DTIME) ,
+           logbk.this.vessel$LE_DTIME <- as.POSIXct(  paste(logbk.this.vessel$FT_DDAT, logbk.this.vessel$FT_DTIME) ,
                                                                 tz='GMT',  "%e/%m/%Y %H:%M" )
            # arrival time
-           logbk.this.vessel$LE_LTIME <- strptime(  paste(logbk.this.vessel$FT_LDAT, logbk.this.vessel$FT_LTIME) ,
+           logbk.this.vessel$LE_LTIME <- as.POSIXct(  paste(logbk.this.vessel$FT_LDAT, logbk.this.vessel$FT_LTIME) ,
                                                                 tz='GMT',  "%e/%m/%Y %H:%M" )
            # catch.date
-           logbk.this.vessel$LE_CTIME <- strptime(  paste(logbk.this.vessel$LE_CDAT) , tz='GMT',  "%e/%m/%Y" )
+           logbk.this.vessel$LE_CTIME <- as.POSIXct(  paste(logbk.this.vessel$LE_CDAT) , tz='GMT',  "%e/%m/%Y" )
 
            # mid time bk trips
            LE_MIDTIME <- rep(NA, nrow(logbk.this.vessel))
@@ -159,12 +158,13 @@ mergeEflalo2Pings <-
            for(r in 1:length(dep)){
               LE_MIDTIME[r] <- as.character(seq(from=dep[r], to=arr[r], length.out = 3)[2])
               }
-           logbk.this.vessel$LE_MIDTIME          <-  LE_MIDTIME
-           logbk.this.vessel$bk.tripnum         <-  factor(LE_MIDTIME) # init        
-           levels(logbk.this.vessel$bk.tripnum) <- 1:length(logbk.this.vessel$bk.tripnum) # assign a bk.tripnum code from mid.time
-           # overwrite if FT_REF is actually informed:
-           if(match('FT_REF',colnames(logbk.this.vessel))>0 & !all(is.na(logbk.this.vessel$FT_REF))) 
-                            logbk.this.vessel$bk.tripnum <- logbk.this.vessel$FT_REF
+           if(!colnames(logbk.this.vessel) %in% "FT_REF") {
+             logbk.this.vessel$LE_MIDTIME          <-  LE_MIDTIME
+             logbk.this.vessel$FT_REF              <-  factor(LE_MIDTIME) # init        
+             levels(logbk.this.vessel$FT_REF)      <- 1:length(logbk.this.vessel$FT_REF) # assign a FT_REF code
+             }   # only if FT_REF is actually not already informed
+          
+                           
      
            
          #=> LOGBOOK (EFLALO) INPUT REQUIRES AT LEAST,
@@ -192,7 +192,7 @@ mergeEflalo2Pings <-
          if(!("SI_DATIM" %in% colnames(tacsat))){
           tacsat.this.vessel$SI_TIME <- as.character(tacsat.this.vessel$SI_TIME)
           tacsat.this.vessel[tacsat.this.vessel$SI_TIME=="24:00", "SI_TIME"] <- "00:00"  # debug
-          tacsat.this.vessel$SI_DATIM <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) , 
+          tacsat.this.vessel$SI_DATIM <- as.POSIXct(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) , 
                                  tz='GMT',   "%d/%m/%Y %H:%M" )
          }
 
@@ -214,8 +214,8 @@ mergeEflalo2Pings <-
          if(length(unique(vms.this.vessel$SI_FT))<2) warning('need more than 1 trip in SI_FT')
          a.flag <- to.remove.because.deficient.vms ||  to.remove.because.not.enough.vms.trips || to.remove.because.pble.lgbk
          
-         ## remove bk.tripnum and SI_MIDTIME if it exists
-         vms.this.vessel <- vms.this.vessel[, !colnames(vms.this.vessel) %in% c("bk.tripnum", "SI_MIDTIME")]
+         ## remove FT_REF and SI_MIDTIME if it exists
+         vms.this.vessel <- vms.this.vessel[, !colnames(vms.this.vessel) %in% c("FT_REF", "SI_MIDTIME")]
 
 
 
@@ -230,12 +230,58 @@ mergeEflalo2Pings <-
          .logbk <- logbk.this.vessel
          .vms   <- vms.this.vessel
 
-
-
-
-
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-         #!  DO THE VIRTUAL MERGING  #!#!#!#!#!#!#!#!#!#!#
+         #!  DO THE LINK - APPROACH 1 #!#!!#!#!#!#!#!#!#!#
+         #!#!#!#!#!#!#!#!!#!#!#!#!#!#!#!!#!#!#!#!#!#!#!#!#
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+NIELS <- FALSE
+       if(NIELS){
+           eftim <- .logbk[which(duplicated(.logbk$FT_REF)==F),c("LE_DTIME","LE_LTIME","FT_REF")]
+           dtime <- eftim[,1]
+           ltime <- eftim[,2]
+           stime <- .vms$SI_DATIM
+           tripn <- eftim[,3]
+                            
+                               
+                     
+                              smdtime <- t(outer(stime,dtime,"-"))
+                              gtltime <- outer(ltime,stime,"-")
+                            
+                              #-Find first point where tacsat time is greater or equal to departure time and smaller than arrival time
+                              st <- apply(smdtime,1,function(x){which(x>=0)[1]})
+                              en <- apply(gtltime,1,function(x){rev(which(x>=0))[1]})
+                              
+                              #-Make sure that values are within the interval of departure and arrival time
+                              subse <- which(is.na(st <= en) == F & (st <= en) == T)
+                              
+                              st <- st[subse]
+                              en <- en[subse]
+                              
+                              #-Assign Tacsat data with FT_REF from Eflalo2 dataset where they link
+                              
+                              if(length(st)!=1){
+                          
+                                idx   <- unlist(mapply(seq,st,en,SIMPLIFY=FALSE))
+                                reps  <- unlist(lapply(mapply(seq,st,en,SIMPLIFY=FALSE),length))
+                                .vms$FT_REF      <- 0
+                                .vms$FT_REF[idx] <- rep(tripn[subse],reps)
+                              } 
+                              if(length(st)==1){
+                                .vms$FT_REF <- 0
+                                .vms$FT_REF[seq(st,en)] <- rep(tripn[subse],length(seq(st,en)))
+                              }
+                              if(length(st)==0){
+                     
+                                .vms$FT_REF <- 0
+                              }
+                          
+                          
+           } # end NIELS               
+
+   FRANCOIS <- TRUE
+   if(FRANCOIS){
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         #!  DO THE LINK - APPROACH 2 #!#!!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!!#!#!#!#!#!#!#!!#!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
 
@@ -298,12 +344,12 @@ mergeEflalo2Pings <-
               text(as.POSIXct(table.midtime$SI_MIDTIME[i]), 0.52, table.midtime$SI_FT[i], cex=0.5, col=1)
     
             }
-            tmp <- .logbk[, c("LE_DTIME","LE_LTIME", "LE_MIDTIME", "bk.tripnum")]
+            tmp <- .logbk[, c("LE_DTIME","LE_LTIME", "LE_MIDTIME", "FT_REF")]
             tmp <- tmp[!duplicated(tmp$LE_MIDTIME), ]
             for(i in 1:nrow(tmp)){
               segments(as.POSIXct(tmp$LE_DTIME[i]), 0.1, as.POSIXct(tmp$LE_LTIME[i]), 0.1, col=1)
               points(as.POSIXct(tmp$LE_MIDTIME[i]), 0.1, col=1)
-              text(as.POSIXct(tmp$LE_MIDTIME[i]), 0.0785, tmp$bk.tripnum[i], cex=0.5, col=1)
+              text(as.POSIXct(tmp$LE_MIDTIME[i]), 0.0785, tmp$FT_REF[i], cex=0.5, col=1)
             }
           }
          
@@ -311,8 +357,8 @@ mergeEflalo2Pings <-
           # THE CORE CODE: compare bk$LE_MIDTIME and vms$SI_MIDTIME
           # find the nearest bk$LE_MIDTIME for each vms$SI_MIDTIME
           # and then change levels
-          # (so, for each mid.time in vms, a bk.tripnum will be find)
-          # (so, no lines in vms without a bk.tripnum from bk...)
+          # (so, for each mid.time in vms, a FT_REF will be find)
+          # (so, no lines in vms without a FT_REF from bk...)
           fa1 <- levels(factor(.vms$SI_MIDTIME))
           new.levels <- fa1
           fa2 <-  levels(factor(.logbk$LE_MIDTIME))
@@ -325,12 +371,12 @@ mergeEflalo2Pings <-
           sauv <- .vms$SI_MIDTIME
           levels(.vms$SI_MIDTIME) <- new.levels # and change mid.time in vms to force the merging
 
-          # finally, replace levels by the bk.tripnum
-          tmp <-  .logbk[.logbk$LE_MIDTIME %in% .vms$SI_MIDTIME , c("bk.tripnum","LE_MIDTIME")]
-          tmp2 <- tmp[!duplicated(tmp$bk.tripnum),]
+          # finally, replace levels by the FT_REF
+          tmp <-  .logbk[.logbk$LE_MIDTIME %in% .vms$SI_MIDTIME , c("FT_REF","LE_MIDTIME")]
+          tmp2 <- tmp[!duplicated(tmp$FT_REF),]
           idx <- match( levels(.vms$SI_MIDTIME), tmp2$LE_MIDTIME )
-          .vms$bk.tripnum <- .vms$SI_MIDTIME # init
-          levels(.vms$bk.tripnum) <- as.character(tmp2$bk.tripnum )   [idx]
+          .vms$FT_REF <- .vms$SI_MIDTIME # init
+          levels(.vms$FT_REF) <- as.character(tmp2$FT_REF )   [idx]
 
 
           if(general$visual.check){
@@ -367,18 +413,18 @@ mergeEflalo2Pings <-
      
        
          .logbk$LE_MIDTIME    <- factor(.logbk$LE_MIDTIME)
-         .logbk$bk.tripnum  <- factor(.logbk$bk.tripnum)
+         .logbk$FT_REF        <- factor(.logbk$FT_REF)
          .vms$SI_MIDTIME      <- factor(.vms$SI_MIDTIME)
-         .vms$bk.tripnum    <- factor(.vms$bk.tripnum)
+         .vms$FT_REF          <- factor(.vms$FT_REF)
 
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          #! ASSIGN A 'SI_FT' FROM VMS TRIP NUM TO  #!#!#!#
          #! LOGBOOK TRIPS WITH NO VMS CORRESPONDANCE #!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-       dep.bk.not.in.vms  <- unique( .logbk$bk.tripnum [ !( .logbk$bk.tripnum %in%  .vms$bk.tripnum )  ] )
+       dep.bk.not.in.vms  <- unique( .logbk$FT_REF [ !( .logbk$FT_REF %in%  .vms$FT_REF )  ] )
        if(length(dep.bk.not.in.vms)!=0){
          # bk tripnum from dep not in vms
-         idx <-  .logbk$bk.tripnum %in% dep.bk.not.in.vms
+         idx <-  .logbk$FT_REF %in% dep.bk.not.in.vms
          bk  <- .logbk[idx,] [order(.logbk[idx,]$LE_DTIME),]
          if(!"SI_MIDTIME" %in% colnames(.vms)){
             vms <- .vms  [order(.vms$SI_DTIME),]
@@ -404,21 +450,22 @@ mergeEflalo2Pings <-
          levels(bk$LE_MIDTIME) <- new.levels # and change mid.time in logbk to force the merging
 
          # finally, replace levels by the tripnum
-         # (note: a same bk.tripnum in vms can have different mid.time
+         # (note: a same FT_REF in vms can have different mid.time
          # due to the first merging of vms to logbk in the vms analysis)
-         tmp <-  vms[vms$SI_MIDTIME %in% bk$LE_MIDTIME , c("bk.tripnum","SI_MIDTIME")]
-         tmp2 <- tmp[!duplicated(data.frame(tmp$bk.tripnum,tmp$SI_MIDTIME)),]
+         tmp <-  vms[vms$SI_MIDTIME %in% bk$LE_MIDTIME , c("FT_REF","SI_MIDTIME")]
+         tmp2 <- tmp[!duplicated(data.frame(tmp$FT_REF, tmp$SI_MIDTIME)),]
          idx2 <- match(levels(bk$LE_MIDTIME), tmp2$SI_MIDTIME)
-         bk$bk.tripnum <- bk$LE_MIDTIME # init
-         levels(bk$bk.tripnum)  <- as.character(tmp2$bk.tripnum) [idx2]
+         bk$FT_REF <- bk$LE_MIDTIME # init
+         levels(bk$FT_REF)  <- as.character(tmp2$FT_REF) [idx2]
 
          # output
          bk$LE_MIDTIME   <- as.character(bk$LE_MIDTIME)
-         bk$bk.tripnum <- as.character(bk$bk.tripnum)
+         bk$FT_REF <- as.character(bk$FT_REF)
          .logbk[idx,][order(.logbk[idx,]$LE_DTIME),]  <- bk
          }
 
 
+        } # end FRANCOIS
 
 
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
@@ -444,11 +491,11 @@ mergeEflalo2Pings <-
              ## because the assignement of a state is gear-specific.
              ## caution here: we assume only one gear used inside a trip...
              # because note that we remove 'logevent' and keep only one duplicate of tripnum
-             .vms$LE_GEAR <- .vms$bk.tripnum # init
-             tmp <- .logbk[,c("LE_GEAR","bk.tripnum")]
-             tmp <- tmp[!duplicated(tmp$bk.tripnum),] #remove logevent and keep only one duplicate of tripnum
-             tmp <- tmp[tmp$bk.tripnum %in% unique(.vms$LE_GEAR),]
-             idx <- match(levels(.vms$LE_GEAR), as.character(tmp$bk.tripnum))
+             .vms$LE_GEAR <- .vms$FT_REF # init
+             tmp <- .logbk[,c("LE_GEAR","FT_REF")]
+             tmp <- tmp[!duplicated(tmp$FT_REF),] #remove logevent and keep only one duplicate of tripnum
+             tmp <- tmp[tmp$FT_REF %in% unique(.vms$LE_GEAR),]
+             idx <- match(levels(.vms$LE_GEAR), as.character(tmp$FT_REF))
              levels(.vms$LE_GEAR) <- as.character(tmp$LE_GEAR)  [idx]
        
              # then do the assignement of the state 
@@ -474,12 +521,12 @@ mergeEflalo2Pings <-
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # SET UP PRIMARY KEYS FOR MERGING!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-         .logbk$bk.tripnum <- factor(.logbk$bk.tripnum )
-         .logbk$bk.tripnum.sq <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT, sep='') 
-         .logbk$bk.tripnum.sq.day <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT,".",.logbk$LE_CTIME, sep='') 
-         .vms$bk.tripnum <- factor(.vms$bk.tripnum)
-         .vms$bk.tripnum.sq <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT, sep='') 
-         .vms$bk.tripnum.sq.day <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT,".", format(.vms$SI_DATIM,  '%Y-%m-%d'), sep='') 
+         .logbk$FT_REF <- factor(.logbk$FT_REF )
+         .logbk$FT_REF_SQ <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT, sep='') 
+         .logbk$FT_REF_SQ_DAY <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT,".",.logbk$LE_CTIME, sep='') 
+         .vms$FT_REF <- factor(.vms$FT_REF)
+         .vms$FT_REF_SQ <- paste(.vms$FT_REF, ".", .vms$SI_RECT, sep='') 
+         .vms$FT_REF_SQ_DAY <- paste(.vms$FT_REF, ".", .vms$SI_RECT,".", format(.vms$SI_DATIM,  '%Y-%m-%d'), sep='') 
 
          # for gear, if several gears inside a same trip,
          #  it is problematic because we have to assume a split of total effort or toal nb of ping between gears...
@@ -492,72 +539,72 @@ mergeEflalo2Pings <-
            idx.col.w  <- grep('KG', nm) # index columns with species weight
            idx.col.v  <- grep('EURO', nm) # index columns with species value
            idx.col    <- c(idx.col.w, idx.col.v)
-             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER BK.TRIPNUM
+             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF
               agg.logbk.this.vessel.method.1  <- aggregate(.logbk[,idx.col],
-                      list(.logbk$bk.tripnum, 
+                      list(.logbk$FT_REF, 
                               .logbk$VE_REF,  .logbk$VE_FLT,.logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
               colnames(agg.logbk.this.vessel.method.1) <- 
-                           c("bk.tripnum", "VE_REF",  "VE_FLT", "VE_KW","LE_MET_level6","LE_GEAR", nm[idx.col] )
-             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER BK.TRIPNUM.SQ
+                           c("FT_REF", "VE_REF",  "VE_FLT", "VE_KW","LE_MET_level6","LE_GEAR", nm[idx.col] )
+             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF_SQ
               agg.logbk.this.vessel.method.2  <- aggregate(.logbk[,idx.col],
-                      list(.logbk$bk.tripnum.sq, 
+                      list(.logbk$FT_REF_SQ, 
                               .logbk$VE_REF,  .logbk$VE_FLT,.logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
               colnames(agg.logbk.this.vessel.method.2) <- 
-                           c("bk.tripnum.sq", "VE_REF",  "VE_FLT","VE_KW","LE_MET_level6" ,"LE_GEAR", nm[idx.col])
-             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER BK.TRIPNUM.SQ.DAY (NOTE: SO, 'LE_SEQNUM' IS AGGREGATED HERE)
+                           c("FT_REF_SQ", "VE_REF",  "VE_FLT","VE_KW","LE_MET_level6" ,"LE_GEAR", nm[idx.col])
+             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF_SQ_DAY (NOTE: SO, 'LE_SEQNUM' IS AGGREGATED HERE)
               agg.logbk.this.vessel.method.3  <- aggregate(.logbk[,idx.col],
-                      list(.logbk$bk.tripnum.sq.day, 
-                             .logbk$VE_REF,  .logbk$VE_FLT,.logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
+                      list(.logbk$FT_REF_SQ_DAY, 
+                             .logbk$VE_REF,  .logbk$VE_FLT, .logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
               colnames(agg.logbk.this.vessel.method.3) <- 
-                          c("bk.tripnum.sq.day", "VE_REF", "VE_FLT","VE_KW", "LE_MET_level6","LE_GEAR",  nm[idx.col])
+                          c("FT_REF_SQ_DAY", "VE_REF", "VE_FLT","VE_KW", "LE_MET_level6","LE_GEAR",  nm[idx.col])
 
 
              #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
              # MERGING WITH VMS PER TRIP !!!!!!!!!!#!#!#!#!#!#
              #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-             do.merging <- function(method="bk.tripnum", .logbk, .vms, general){
+             do.merging <- function(method="FT_REF", .logbk, .vms, general){
 
 
               # IF BY PING-------------
-              # find total nb of FISHING ping per tripnum from vms  # used for method 1  'bk.tripnum'
-              if(method=="bk.tripnum"){
-               .vms$count.fping.trip  <- factor(.vms$bk.tripnum)  # init
-              count.fping.trip <- table(.vms[.vms$SI_STATE==1,]$bk.tripnum)
-              # => COUNT nb of FISHING pings per bk.tripnum because each weight will be repeated by ping after merging
+              # find total nb of FISHING ping per tripnum from vms  # used for method 1  'FT_REF'
+              if(method=="FT_REF"){
+               .vms$count.fping.trip  <- factor(.vms$FT_REF)  # init
+              count.fping.trip <- table(.vms[.vms$SI_STATE==1,]$FT_REF)
+              # => COUNT nb of FISHING pings per FT_REF because each weight will be repeated by ping after merging
               levels(.vms$count.fping.trip) <- count.fping.trip[levels(.vms$count.fping.trip)]  # mapping
               .vms[.vms$SI_STATE==2,]$count.fping.trip <- NA
-              # => COUNT nb of gears per bk.tripnum because each ping will be repeated by gear after merging
-              count.gr.trip <- tapply(.logbk$LE_GEAR, .logbk$bk.tripnum, function(x) length(unique(x)))
-              .logbk$count.gr.trip <- count.gr.trip[.logbk$bk.tripnum]  # mapping
+              # => COUNT nb of gears per FT_REF because each ping will be repeated by gear after merging
+              count.gr.trip <- tapply(.logbk$LE_GEAR, .logbk$FT_REF, function(x) length(unique(x)))
+              .logbk$count.gr.trip <- count.gr.trip[.logbk$FT_REF]  # mapping
               }
 
 
-              # find total nb of FISHING ping per trip-icessquare from vms  # used for method 2   'bk.tripnum.sq'
-              if(method=="bk.tripnum.sq"){
-              .vms$count.fping.trip.sq  <- factor(.vms$bk.tripnum.sq)  # init
-              count.fping.trip.sq <- table(.vms[.vms$SI_STATE==1,]$bk.tripnum.sq) # COUNT nb of FISHING pings per bk.tripnum.sq
+              # find total nb of FISHING ping per trip-icessquare from vms  # used for method 2   'FT_REF_SQ'
+              if(method=="FT_REF_SQ"){
+              .vms$count.fping.trip.sq  <- factor(.vms$FT_REF_SQ)  # init
+              count.fping.trip.sq <- table(.vms[.vms$SI_STATE==1,]$FT_REF_SQ) # COUNT nb of FISHING pings per FT_REF_SQ
               levels(.vms$count.fping.trip.sq) <- count.fping.trip.sq[levels(.vms$count.fping.trip.sq)]  # mapping
               if(any('2' %in% unique(.vms$SI_STATE))) .vms[.vms$SI_STATE==2,]$count.fping.trip.sq <- NA
-              # => COUNT nb of gears per bk.tripnum.sq because each ping will be repeated by gear after merging
-              count.gr.trip.sq <- tapply(.logbk$LE_GEAR, .logbk$bk.tripnum.sq, function(x) length(unique(x)))
-              .logbk$count.gr.trip.sq <- count.gr.trip.sq[.logbk$bk.tripnum.sq]  # mapping
+              # => COUNT nb of gears per FT_REF_SQ because each ping will be repeated by gear after merging
+              count.gr.trip.sq <- tapply(.logbk$LE_GEAR, .logbk$FT_REF_SQ, function(x) length(unique(x)))
+              .logbk$count.gr.trip.sq <- count.gr.trip.sq[.logbk$FT_REF_SQ]  # mapping
               }
 
-              # find total nb of FISHING ping per trip-icessquare-day from vms  # used for method 3   'bk.tripnum.sq.day'
-              if(method=="bk.tripnum.sq.day"){
-              .vms$count.fping.trip.sq.day  <- factor(.vms$bk.tripnum.sq.day)  # init
-              count.fping.trip.sq.day <- table(.vms[.vms$SI_STATE==1,]$bk.tripnum.sq.day) # COUNT nb of FISHING pings per bk.tripnum.sq.day
+              # find total nb of FISHING ping per trip-icessquare-day from vms  # used for method 3   'FT_REF_SQ_DAY'
+              if(method=="FT_REF_SQ_DAY"){
+              .vms$count.fping.trip.sq.day  <- factor(.vms$FT_REF_SQ_DAY)  # init
+              count.fping.trip.sq.day <- table(.vms[.vms$SI_STATE==1,]$FT_REF_SQ_DAY) # COUNT nb of FISHING pings per FT_REF_SQ_DAY
               levels(.vms$count.fping.trip.sq.day) <- count.fping.trip.sq.day[levels(.vms$count.fping.trip.sq.day)]  # mapping
               if(any('2' %in% unique(.vms$SI_STATE))) .vms[.vms$SI_STATE==2,]$count.fping.trip.sq.day <- NA
-              # => COUNT nb of gears per bk.tripnum.sq.day because each ping will be repeated by gear after merging
-              count.gr.trip.sq.day <- tapply(.logbk$LE_GEAR, .logbk$bk.tripnum.sq.day, function(x) length(unique(x)))
-              .logbk$count.gr.trip.sq.day <- count.gr.trip.sq.day[.logbk$bk.tripnum.sq.day]  # mapping}
+              # => COUNT nb of gears per FT_REF_SQ_DAY because each ping will be repeated by gear after merging
+              count.gr.trip.sq.day <- tapply(.logbk$LE_GEAR, .logbk$FT_REF_SQ_DAY, function(x) length(unique(x)))
+              .logbk$count.gr.trip.sq.day <- count.gr.trip.sq.day[.logbk$FT_REF_SQ_DAY]  # mapping}
               }
 
 
 
               # do the merging between .logbk and .vms according to
-              #  meth1: 'bk.tripnum' OR meth2: 'bk.tripnum.sq' OR meth3: 'bk.tripnum.sq.day'
+              #  meth1: 'FT_REF' OR meth2: 'FT_REF_SQ' OR meth3: 'FT_REF_SQ_DAY'
               # need to use a trick to avoid "out of memory" doing the merge()
               coln.idx1 <- which(!colnames(.logbk)%in%c("VE_REF", method))
               coln1 <- colnames(.logbk)[coln.idx1]
@@ -594,22 +641,22 @@ mergeEflalo2Pings <-
               if(general$conserve.all){
               # do the conservation of landings anyway?
               # detect possible weight landed while no feffort detected from vms
-                   # find bk.tripnum with some NA
-                   vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","bk.tripnum"]))
-                   # then, find bk.tripnum with at least one no NA
-                   no.vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","bk.tripnum"]))
+                   # find FT_REF with some NA
+                   vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","FT_REF"]))
+                   # then, find FT_REF with at least one no NA
+                   no.vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","FT_REF"]))
                    tripnum.all.na.inside <- vv[!vv%in%no.vv] # trip num without at least one count.fping!
                    # so, deduce loss in weight
-                   zz<- merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,]
+                   zz<- merged.this.vessel[merged.this.vessel$FT_REF %in% tripnum.all.na.inside,]
            
-                  if(method=="bk.tripnum"){
+                  if(method=="FT_REF"){
                      # in this case, reallocate evenly between all pings (caution: including steaming pings)
                      merged.this.vessel[,"count.fping.trip"] <- anf(merged.this.vessel[,"count.fping.trip"])
-                     merged.this.vessel$bk.tripnum <- factor( merged.this.vessel$bk.tripnum)
-                     nbpings.per.trip <- unlist(lapply(split(merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,],
-                                           merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,]$bk.tripnum),nrow))            
-                     merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside, "count.fping.trip"] <- rep(nbpings.per.trip,nbpings.per.trip )
-                     merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside, "flag"] <- 5
+                     merged.this.vessel$FT_REF <- factor( merged.this.vessel$FT_REF)
+                     nbpings.per.trip <- unlist(lapply(split(merged.this.vessel[merged.this.vessel$FT_REF %in% tripnum.all.na.inside,],
+                                           merged.this.vessel[merged.this.vessel$FT_REF %in% tripnum.all.na.inside,]$FT_REF),nrow))            
+                     merged.this.vessel[merged.this.vessel$FT_REF %in% tripnum.all.na.inside, "count.fping.trip"] <- rep(nbpings.per.trip,nbpings.per.trip )
+                     merged.this.vessel[merged.this.vessel$FT_REF %in% tripnum.all.na.inside, "flag"] <- 5
                     }
                 } # end conserve.all
 
@@ -624,17 +671,17 @@ mergeEflalo2Pings <-
               idx.col.w <- grep('KG', nm) # index columns with species weight
               idx.col.v <- grep('EURO', nm) # index columns with species value
               idx.col <- c(idx.col.w, idx.col.v)
-              if(method=="bk.tripnum.sq.day"){
+              if(method=="FT_REF_SQ_DAY"){
                              merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,anf) /
                                                         anf(merged.this.vessel$count.fping.trip.sq.day)) /
                                                                         anf(merged.this.vessel$count.gr.trip.sq.day)
               }
-              if(method=="bk.tripnum.sq"){
+              if(method=="FT_REF_SQ"){
                              merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,anf) /
                                                         anf(merged.this.vessel$count.fping.trip.sq)) /
                                                                         anf(merged.this.vessel$count.gr.trip.sq)
               }
-              if(method=="bk.tripnum"){
+              if(method=="FT_REF"){
                          # maybe do more by adding unallocated landings to the midpoint of the trip**
                              merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,anf) /
                                                            anf(merged.this.vessel$count.fping.trip) ) /
@@ -645,13 +692,13 @@ mergeEflalo2Pings <-
         if(FALSE){  # HERE, BE AWARE OF A POSSIBLE LEAK IN LANDINGS...
               # conservation of catches?
               # detect possible weight landed while no feffort detected from vms
-                   # find bk.tripnum with some NA
-                   vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","bk.tripnum"]))
-                   # then, find bk.tripnum with at least one no NA
-                   no.vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","bk.tripnum"]))
+                   # find FT_REF with some NA
+                   vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","FT_REF"]))
+                   # then, find FT_REF with at least one no NA
+                   no.vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","FT_REF"]))
                    tripnum.all.na.inside <- vv[!vv%in%no.vv] # trip num without at least one count.fping!
                    # so, deduce loss in weight
-                   zz<- merged.this.vessel[merged.this.vessel$bk.tripnum %in% tripnum.all.na.inside,]
+                   zz<- merged.this.vessel[merged.this.vessel$FT_REF %in% tripnum.all.na.inside,]
                    loss <- tapply(anf(zz$LE_KG_COD), zz$FT_REF, sum, na.rm=TRUE)
                    names(loss) <- paste(a.vesselid, names(loss), sep='.')
                    land.losses <<- c(land.losses, loss )
@@ -675,56 +722,56 @@ mergeEflalo2Pings <-
                  .logbk   <- agg.logbk.this.vessel.method.3
                  my.split <- function(obj,a.sep="\\.",idx=1) unlist(lapply(strsplit(obj, a.sep),function(x)x[idx]))
                  # reduce the level
-                 .logbk$bk.tripnum.sq  <-  paste(my.split(as.character(.logbk$bk.tripnum.sq.day),a.sep="\\.",idx=1),
-                                                 my.split(as.character(.logbk$bk.tripnum.sq.day),a.sep="\\.",idx=2),sep='.')
+                 .logbk$FT_REF_SQ  <-  paste(my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=1),
+                                                 my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=2),sep='.')
                  # reduce the level
-                 .logbk$bk.tripnum     <-        my.split(as.character(.logbk$bk.tripnum.sq),a.sep="\\.",idx=1)
+                 .logbk$FT_REF     <-        my.split(as.character(.logbk$FT_REF_SQ),a.sep="\\.",idx=1)
                  # find common keys
-                 tripnum.sq.day.logbk            <- .logbk$bk.tripnum.sq.day
-                 tripnum.sq.day.vms              <- .vms$bk.tripnum.sq.day
-                 tripnum.sq.logbk                <- .logbk$bk.tripnum.sq
-                 tripnum.sq.vms                  <- .vms$bk.tripnum.sq
+                 tripnum.sq.day.logbk            <- .logbk$FT_REF_SQ_DAY
+                 tripnum.sq.day.vms              <- .vms$FT_REF_SQ_DAY
+                 tripnum.sq.logbk                <- .logbk$FT_REF_SQ
+                 tripnum.sq.vms                  <- .vms$FT_REF_SQ
                  tripnum.sq.day.in.vms.and.in.bk <- tripnum.sq.day.vms [tripnum.sq.day.vms %in% tripnum.sq.day.logbk]
                  tripnum.sq.in.vms.and.in.bk     <- tripnum.sq.vms [tripnum.sq.vms %in% tripnum.sq.logbk]
-                 .vms.in.bk                      <- .vms[ .vms$bk.tripnum.sq.day %in%  tripnum.sq.day.in.vms.and.in.bk,]
-                 .vms.in.bk2                     <- .vms[ !(.vms$bk.tripnum.sq.day %in%  tripnum.sq.day.in.vms.and.in.bk) &
-                                                            .vms$bk.tripnum.sq %in%  tripnum.sq.in.vms.and.in.bk,]
-                 in.bk.and.feffort.not.at.0   <- unique(.vms.in.bk[.vms.in.bk$SI_STATE==1,]$bk.tripnum.sq.day)
-                 in.bk2.and.feffort.not.at.0   <- unique(.vms.in.bk2[.vms.in.bk2$SI_STATE==1,]$bk.tripnum.sq)
+                 .vms.in.bk                      <- .vms[ .vms$FT_REF_SQ_DAY %in%  tripnum.sq.day.in.vms.and.in.bk,]
+                 .vms.in.bk2                     <- .vms[ !(.vms$FT_REF_SQ_DAY %in%  tripnum.sq.day.in.vms.and.in.bk) &
+                                                            .vms$FT_REF_SQ %in%  tripnum.sq.in.vms.and.in.bk,]
+                 in.bk.and.feffort.not.at.0   <- unique(.vms.in.bk[.vms.in.bk$SI_STATE==1,]$FT_REF_SQ_DAY)
+                 in.bk2.and.feffort.not.at.0   <- unique(.vms.in.bk2[.vms.in.bk2$SI_STATE==1,]$FT_REF_SQ)
                  
                      # split .vms and .logbk in three blocks
                   # vms with good match => go to meth3
-                 .vms.for.meth3         <- .vms [.vms$bk.tripnum.sq.day %in%   in.bk.and.feffort.not.at.0, ]
+                 .vms.for.meth3         <- .vms [.vms$FT_REF_SQ_DAY %in%   in.bk.and.feffort.not.at.0, ]
                   # vms with intermediate match => go to meth2
-                 .vms.for.meth2         <- .vms [!(.vms$bk.tripnum.sq.day  %in%   in.bk.and.feffort.not.at.0) &
-                                                      (.vms$bk.tripnum.sq    %in%   in.bk2.and.feffort.not.at.0), ]
+                 .vms.for.meth2         <- .vms [!(.vms$FT_REF_SQ_DAY  %in%   in.bk.and.feffort.not.at.0) &
+                                                      (.vms$FT_REF_SQ    %in%   in.bk2.and.feffort.not.at.0), ]
                   # vms with bad match => go to meth1
-                 .vms.for.meth1         <- .vms [!(.vms$bk.tripnum.sq.day  %in%   in.bk2.and.feffort.not.at.0) &
-                                                      !(.vms$bk.tripnum.sq  %in%   in.bk2.and.feffort.not.at.0), ]
+                 .vms.for.meth1         <- .vms [!(.vms$FT_REF_SQ_DAY  %in%   in.bk2.and.feffort.not.at.0) &
+                                                      !(.vms$FT_REF_SQ  %in%   in.bk2.and.feffort.not.at.0), ]
                   # logbk with good match => go to meth3
-                 .logbk.for.meth3       <- .logbk [.logbk$bk.tripnum.sq.day %in%  in.bk.and.feffort.not.at.0, ]
+                 .logbk.for.meth3       <- .logbk [.logbk$FT_REF_SQ_DAY %in%  in.bk.and.feffort.not.at.0, ]
                   # logbk with intermediate match => go to meth2
-                 .logbk.for.meth2       <- .logbk [!(.logbk$bk.tripnum.sq.day %in%   in.bk.and.feffort.not.at.0) &
-                                                       (.logbk$bk.tripnum.sq %in%  in.bk2.and.feffort.not.at.0), ]
+                 .logbk.for.meth2       <- .logbk [!(.logbk$FT_REF_SQ_DAY %in%   in.bk.and.feffort.not.at.0) &
+                                                       (.logbk$FT_REF_SQ %in%  in.bk2.and.feffort.not.at.0), ]
                   # logbk with bad match => go to meth1
-                 .logbk.for.meth1       <- .logbk [!(.logbk$bk.tripnum.sq.day %in%   in.bk.and.feffort.not.at.0) &
-                                                       !(.logbk$bk.tripnum.sq %in%  in.bk2.and.feffort.not.at.0), ]
+                 .logbk.for.meth1       <- .logbk [!(.logbk$FT_REF_SQ_DAY %in%   in.bk.and.feffort.not.at.0) &
+                                                       !(.logbk$FT_REF_SQ %in%  in.bk2.and.feffort.not.at.0), ]
 
                  suppressWarnings(rm(merged1, merged2, merged3)) # clear
                  #!! METH1 !!#
                  if(nrow(.logbk.for.meth1)!=0 && nrow(.vms.for.meth1)!=0 ) {
-                    # remove useless cols and aggregate according to the key 'bk.tripnum'
-                    .logbk.for.meth1 <- .logbk.for.meth1[, !colnames(.logbk.for.meth1)%in% c("bk.tripnum.sq.day","bk.tripnum.sq")]
+                    # remove useless cols and aggregate according to the key 'FT_REF'
+                    .logbk.for.meth1 <- .logbk.for.meth1[, !colnames(.logbk.for.meth1)%in% c("FT_REF_SQ_DAY","FT_REF_SQ")]
                     nm        <- names(.logbk.for.meth1)
                     idx.col.w <- grep('KG', nm) # index columns with species weight
                     idx.col.v <- grep('EURO', nm) # index columns with species value
                     idx.col <- c(idx.col.w, idx.col.v)
                     .logbk.for.meth1   <- aggregate(.logbk.for.meth1 [,idx.col],
-                                 list(.logbk.for.meth1$VE_REF, .logbk.for.meth1$bk.tripnum,
+                                 list(.logbk.for.meth1$VE_REF, .logbk.for.meth1$FT_REF,
                                             .logbk.for.meth1$VE_FLT, .logbk.for.meth1$VE_KW, .logbk.for.meth1$LE_MET_level6, .logbk.for.meth1$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth1) <- c("VE_REF", "bk.tripnum", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                    colnames(.logbk.for.meth1) <- c("VE_REF", "FT_REF", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
-                    merged1  <- do.merging(method="bk.tripnum", .logbk.for.meth1, .vms.for.meth1, general)
+                    merged1  <- do.merging(method="FT_REF", .logbk.for.meth1, .vms.for.meth1, general)
                     # add meth flag
                      if("flag" %in% names(merged1)  && nrow(merged1[is.na(merged1[,"flag"]),])!=0){
                         merged1[is.na(merged1[,"flag"]),"flag"] <- 1 # meth 1
@@ -732,25 +779,25 @@ mergeEflalo2Pings <-
                     }
                  #!! METH2 !!#
                  if(nrow(.logbk.for.meth2)!=0 && nrow(.vms.for.meth2)!=0 ) {
-                    # remove useless cols and aggregate according to the key 'bk.tripnum.sq'
-                    .logbk.for.meth2 <- .logbk.for.meth2[, !colnames(.logbk.for.meth2)%in% c("bk.tripnum.sq.day","bk.tripnum")]
+                    # remove useless cols and aggregate according to the key 'FT_REF_SQ'
+                    .logbk.for.meth2 <- .logbk.for.meth2[, !colnames(.logbk.for.meth2)%in% c("FT_REF_SQ_DAY","FT_REF")]
                     nm        <- names(.logbk.for.meth2)
                     idx.col.w <- grep('KG', nm) # index columns with species weight
                     idx.col.v <- grep('EURO', nm) # index columns with species value
                     idx.col <- c(idx.col.w, idx.col.v)
                     .logbk.for.meth2   <- aggregate(.logbk.for.meth2 [,idx.col],
-                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$bk.tripnum.sq,
+                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$FT_REF_SQ,
                                             .logbk.for.meth2$VE_FLT, .logbk.for.meth2$VE_KW, .logbk.for.meth2$LE_MET_level6, .logbk.for.meth2$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth2) <- c("VE_REF",  "bk.tripnum.sq", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                    colnames(.logbk.for.meth2) <- c("VE_REF",  "FT_REF_SQ", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
                     # do.merging
-                    merged2 <- do.merging(method="bk.tripnum.sq", .logbk.for.meth2, .vms.for.meth2, general)
+                    merged2 <- do.merging(method="FT_REF_SQ", .logbk.for.meth2, .vms.for.meth2, general)
                     # add meth flag
                     merged2$flag <- 2 # meth 2
                  }
                  #!! METH3 !!#
                  if(nrow(.logbk.for.meth3)!=0 && nrow(.vms.for.meth3)!=0 ) {
                     # do.merging
-                    merged3 <- do.merging(method="bk.tripnum.sq.day", .logbk.for.meth3, .vms.for.meth3, general)
+                    merged3 <- do.merging(method="FT_REF_SQ_DAY", .logbk.for.meth3, .vms.for.meth3, general)
                    # add meth flag
                     merged3$flag <- 3 # meth 3
                  }
@@ -764,7 +811,7 @@ mergeEflalo2Pings <-
                                   c("count.fping.trip.sq.day","count.fping.trip.sq","count.fping.trip",
                                       "tot.fish.effort.trip","tot.fish.effort.trip.sq",
                                          "count.gr.trip", "count.gr.trip.sq", "count.gr.trip.sq.day",
-                                           "bk.tripnum.sq", "bk.tripnum.sq.day")] # remove tool columns
+                                           "FT_REF_SQ", "FT_REF_SQ_DAY")] # remove tool columns
                      if(i==1) colnm <-  colnames(a.table) ; if(is.null(colnm)) colnm <-  colnames(a.table)
                      merged <- rbind.data.frame (merged, a.table[, colnm])
                      }
@@ -777,10 +824,6 @@ mergeEflalo2Pings <-
         rm(a.table, merged1, merged2, merged3, merged.this.vessel,.vms, .logbk, logbk.this.vessel, vms.this.vessel)
         gc(reset=TRUE)
    
-        # restore eflalo names
-        names(merged)  [names(merged) %in% "bk.tripnum"] <- "FT_REF"
-
-
         # restore tacsat names               "%e/%m/%Y %H:%M"
         idx <- merged$SI_DATIM!='NA' # NA is possible when bk not in vms because bk.tripnum vms may belong to another block than block1
         merged$SI_DATIM <- as.character(merged$SI_DATIM)
@@ -798,7 +841,7 @@ mergeEflalo2Pings <-
         merged <- orderBy(~SI_DATIM, merged)
 
         # last clean up 
-        merged <- merged[, !colnames(merged) %in% c('idx', 'icessquare', "SI_DATIM")]
+        merged <- merged[, !colnames(merged) %in% c('idx', 'icessquare', "SI_DATIM", "SI_MIDTIME")]
         
        # save------------
        save("merged",   file=file.path(general$output.path,
