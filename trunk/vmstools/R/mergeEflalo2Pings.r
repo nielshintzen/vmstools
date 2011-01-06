@@ -44,7 +44,7 @@
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeEflalo2Pings <-
            function(logbooks, tacsat, general=list(output.path=file.path("C:"),
-                     visual.check=TRUE, do.wp3=FALSE, speed="segment", conserve.all=FALSE), ...){
+                     visual.check=TRUE, do.wp3=FALSE, speed="segment", conserve.all=TRUE), ...){
 
   lstargs <- list(...)
 
@@ -143,19 +143,18 @@ mergeEflalo2Pings <-
          
          #   add mid-time and bk.tripnum in eflalo
            # departure time
-           ctime <- strptime(  paste(logbk.this.vessel$FT_DDAT, logbk.this.vessel$FT_DTIME) , tz='GMT',  "%e/%m/%Y %H:%M" )
-           logbk.this.vessel <- cbind.data.frame(logbk.this.vessel, date.in.R.dep=ctime)
+           logbk.this.vessel$LE_DTIME <- strptime(  paste(logbk.this.vessel$FT_DDAT, logbk.this.vessel$FT_DTIME) ,
+                                                                tz='GMT',  "%e/%m/%Y %H:%M" )
            # arrival time
-           ctime <- strptime(  paste(logbk.this.vessel$FT_LDAT, logbk.this.vessel$FT_LTIME) , tz='GMT',  "%e/%m/%Y %H:%M" )
-           logbk.this.vessel <- cbind.data.frame(logbk.this.vessel, date.in.R.arr=ctime)
+           logbk.this.vessel$LE_LTIME <- strptime(  paste(logbk.this.vessel$FT_LDAT, logbk.this.vessel$FT_LTIME) ,
+                                                                tz='GMT',  "%e/%m/%Y %H:%M" )
            # catch.date
-           ctime <- strptime(  paste(logbk.this.vessel$LE_CDAT) , tz='GMT',  "%e/%m/%Y" )
-           logbk.this.vessel <- cbind.data.frame(logbk.this.vessel, date.in.R.cat=ctime)
+           logbk.this.vessel$LE_CTIME <- strptime(  paste(logbk.this.vessel$LE_CDAT) , tz='GMT',  "%e/%m/%Y" )
 
            # mid time bk trips
            mid.time <- rep(NA, nrow(logbk.this.vessel))
-           dep <- logbk.this.vessel$date.in.R.dep +10  # we artificially add +10min because bug in R if mid-time is 00:00:00
-           arr <- logbk.this.vessel$date.in.R.arr +1
+           dep <- logbk.this.vessel$LE_DTIME +10  # we artificially add +10min because bug in R if mid-time is 00:00:00
+           arr <- logbk.this.vessel$LE_LTIME +1
 
            for(r in 1:length(dep)){
               mid.time[r] <- as.character(seq(from=dep[r], to=arr[r], length.out = 3)[2])
@@ -189,18 +188,17 @@ mergeEflalo2Pings <-
          tacsat.this.vessel$VE_REF <- factor(tacsat.this.vessel$VE_REF)
          
  
-         # if does not exist, add date.in.R for handling the time in R
-         if(!("date.in.R" %in% colnames(tacsat))){
+         # if does not exist, add SI_DATIM for handling the time in R
+         if(!("SI_DATIM" %in% colnames(tacsat))){
           tacsat.this.vessel$SI_TIME <- as.character(tacsat.this.vessel$SI_TIME)
           tacsat.this.vessel[tacsat.this.vessel$SI_TIME=="24:00", "SI_TIME"] <- "00:00"  # debug
-          ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) , 
-                                 tz='GMT',   "%e/%m/%Y %H:%M" )
-           tacsat.this.vessel <- cbind.data.frame(tacsat.this.vessel, date.in.R=ctime)
+          tacsat.this.vessel$SI_DATIM <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) , 
+                                 tz='GMT',   "%d/%m/%Y %H:%M" )
          }
 
          # keep only the essential
          vms.this.vessel  <- tacsat.this.vessel [, c("VE_REF","SI_LATI","SI_LONG", 
-                          "date.in.R","SI_FT", "SI_SP", "SI_HE", "SI_HARB", "SI_STATE")]
+                          "SI_DATIM","SI_FT", "SI_SP", "SI_HE", "SI_HARB", "SI_STATE")]
          rm(tacsat.this.vessel); gc(reset=TRUE)                  
          vms.this.vessel$VE_REF   <- factor(vms.this.vessel$VE_REF)
 
@@ -245,8 +243,8 @@ mergeEflalo2Pings <-
          #!!!!!!!!!!!!!!!!!!#
          # -If IT DOES NOT EXIST YET-,
          # FIND THE MID-TIME OF VMS TRIPS
-         if(any(colnames(.vms)%in%"date.in.R")){
-           if(!any(colnames(.vms)%in%"date.in.R.dep")){
+         if(any(colnames(.vms)%in%"SI_DATIM")){
+           if(!any(colnames(.vms)%in%"SI_DTIME")){
             # find and add the first point of each trip
            .vms$start.trip <- c(1,diff(.vms[,"SI_FT"]))
            .vms$end.trip <- c(diff(.vms[,"SI_FT"]),0)
@@ -254,21 +252,21 @@ mergeEflalo2Pings <-
            .vms[.vms$end.trip>0, "end.trip"] <- .vms[.vms$end.trip>0, "SI_FT"]
 
            tmp <- .vms[.vms$start.trip>0,]
-           tmp <- tmp[,c("VE_REF","date.in.R","SI_FT")]
+           tmp <- tmp[,c("VE_REF","SI_DATIM","SI_FT")]
            tmp2 <- .vms[.vms$end.trip>0,]
-           tmp2 <- tmp2[,c("VE_REF","date.in.R","SI_FT")]
+           tmp2 <- tmp2[,c("VE_REF","SI_DATIM","SI_FT")]
            .vms <- .vms[,!colnames(.vms) %in% c("start.trip", "end.trip")] # remove tool columns
            table.midtime <- merge(tmp, tmp2, by.x="SI_FT", by.y="SI_FT")
-           table.midtime <- table.midtime[, c("SI_FT","VE_REF.x","date.in.R.x","date.in.R.y") ]
-           colnames(table.midtime) <- c("SI_FT","VE_REF","date.in.R.dep","date.in.R.arr")
+           table.midtime <- table.midtime[, c("SI_FT","VE_REF.x","SI_DATIM.x","SI_DATIM.y") ]
+           colnames(table.midtime) <- c("SI_FT","VE_REF","SI_DTIME","SI_ATIME")
            } else{
-           table.midtime <- .vms[, c("SI_FT","VE_REF","date.in.R.dep","date.in.R.arr") ]
+           table.midtime <- .vms[, c("SI_FT","VE_REF","SI_DTIME","SI_ATIME") ]
            table.midtime <- table.midtime[!duplicated(data.frame(table.midtime$SI_FT, table.midtime$VE_REF)),]
            }
-         } else{stop("no 'date.in.R' found in vms")}
+         } else{stop("no 'SI_DATIM' found in vms")}
          mid.time <- rep(0, nrow(table.midtime))
          for(r in 1: nrow(table.midtime)){
-           mid.time[r] <-  as.character(seq(from=table.midtime$date.in.R.dep[r], to=table.midtime$date.in.R.arr[r], length.out = 3)[2])
+           mid.time[r] <-  as.character(seq(from=table.midtime$SI_DTIME[r], to=table.midtime$SI_ATIME[r], length.out = 3)[2])
          
          }
          table.midtime$mid.time <-  mid.time
@@ -287,23 +285,23 @@ mergeEflalo2Pings <-
             windows(width=8, height=4)
             ltrunk <- (nrow(table.midtime)/5)
             idxtrunk <-  (trunk+(trunk-1)*ltrunk):(trunk*ltrunk)
-        #    plot(table.midtime$date.in.R.dep[idxtrunk],rep(1,length(table.midtime$date.in.R.dep[idxtrunk])),
-             plot(table.midtime$date.in.R.dep,rep(1,length(table.midtime$date.in.R.dep)),
+        #    plot(table.midtime$SI_DTIME[idxtrunk],rep(1,length(table.midtime$SI_DTIME[idxtrunk])),
+             plot(table.midtime$SI_DTIME, rep(1,length(table.midtime$SI_DTIME)),
                  ylim=c(0,0.52), type="n", ylab="", axes=FALSE)
-            r <- as.POSIXct(round(range(table.midtime$date.in.R.dep), "days"))
+            r <- as.POSIXct(round(range(table.midtime$SI_DTIME), "days"))
             axis.POSIXct(1, at=seq(r[1], r[2], by="month"), format="%e%b%y:%H:%M")
             axis(2, at=c(0.5,0.1),labels=c("VMS","LOGBOOK"))
 
             for(i in 1:nrow(table.midtime))  {
-              segments(as.POSIXct(table.midtime$date.in.R.dep[i]), 0.5, as.POSIXct(table.midtime$date.in.R.arr[i]), 0.5, col=1)
+              segments(as.POSIXct(table.midtime$SI_DTIME[i]), 0.5, as.POSIXct(table.midtime$SI_ATIME[i]), 0.5, col=1)
               points(as.POSIXct(table.midtime$mid.time[i]), 0.5, col=1)
               text(as.POSIXct(table.midtime$mid.time[i]), 0.52, table.midtime$SI_FT[i], cex=0.5, col=1)
     
             }
-            tmp <- .logbk[, c("date.in.R.dep","date.in.R.arr", "mid.time", "bk.tripnum")]
+            tmp <- .logbk[, c("LE_DTIME","LE_LTIME", "mid.time", "bk.tripnum")]
             tmp <- tmp[!duplicated(tmp$mid.time), ]
             for(i in 1:nrow(tmp)){
-              segments(as.POSIXct(tmp$date.in.R.dep[i]), 0.1, as.POSIXct(tmp$date.in.R.arr[i]), 0.1, col=1)
+              segments(as.POSIXct(tmp$LE_DTIME[i]), 0.1, as.POSIXct(tmp$LE_LTIME[i]), 0.1, col=1)
               points(as.POSIXct(tmp$mid.time[i]), 0.1, col=1)
               text(as.POSIXct(tmp$mid.time[i]), 0.0785, tmp$bk.tripnum[i], cex=0.5, col=1)
             }
@@ -350,10 +348,10 @@ mergeEflalo2Pings <-
 
      
         ## ADD A WARNING IN CASE OF LONG (UNREALISTIC) TRIPS ##
-        diff.date <- table.midtime$date.in.R.arr - table.midtime$date.in.R.dep    # if at least one trip >30 days
+        diff.date <- table.midtime$SI_ATIME - table.midtime$SI_DTIME    # if at least one trip >30 days
         if(attributes(diff.date)$units=="secs")  idx <- which((((diff.date)/3600)/24) >30)  
         if(attributes(diff.date)$units=="hours")  idx <- which((((diff.date)/1)/24) >30)  
-        attributes((table.midtime$date.in.R.arr - table.midtime$date.in.R.dep ))
+        attributes((table.midtime$SI_ATIME - table.midtime$SI_DTIME ))
         if (length( idx) >0){
              cat(paste("at least one vms trip > 30 days detected! check harbours...", "\n", sep=""))
             suspicious <- .vms[.vms$SI_FT %in%  table.midtime$SI_FT[idx] ,]
@@ -381,12 +379,12 @@ mergeEflalo2Pings <-
        if(length(dep.bk.not.in.vms)!=0){
          # bk tripnum from dep not in vms
          idx <-  .logbk$bk.tripnum %in% dep.bk.not.in.vms
-         bk  <- .logbk[idx,] [order(.logbk[idx,]$date.in.R.dep),]
+         bk  <- .logbk[idx,] [order(.logbk[idx,]$LE_DTIME),]
          if(!"mid.time" %in% colnames(.vms)){
-            vms <- .vms  [order(.vms$date.in.R.dep),]
+            vms <- .vms  [order(.vms$SI_DTIME),]
             mid.time <- rep(NA, nrow(vms))
             for(r in 1: nrow(vms)){
-              mid.time[r] <-  as.character(seq(from=vms$date.in.R.dep[r], to=vms$date.in.R.arr[r], length.out = 3)[2])
+              mid.time[r] <-  as.character(seq(from=vms$SI_DTIME[r], to=vms$SI_ATIME[r], length.out = 3)[2])
             }
             vms$mid.time <-  mid.time
          } else{ vms <- .vms[order(.vms$mid.time),]}
@@ -417,7 +415,7 @@ mergeEflalo2Pings <-
          # output
          bk$mid.time   <- as.character(bk$mid.time)
          bk$bk.tripnum <- as.character(bk$bk.tripnum)
-         .logbk[idx,][order(.logbk[idx,]$date.in.R.dep),]  <- bk
+         .logbk[idx,][order(.logbk[idx,]$LE_DTIME),]  <- bk
          }
 
 
@@ -431,9 +429,9 @@ mergeEflalo2Pings <-
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # COMPUTE EFFORT.MINS      !#!#!#!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-          .vms <- .vms[order(.vms$date.in.R),]
-          .vms$LE_EFF_VMS <- abs(c(0, as.numeric(.vms[-nrow(.vms),"date.in.R"] - 
-                                        .vms[-1,"date.in.R"], units="mins")))
+          .vms <- .vms[order(.vms$SI_DATIM),]
+          .vms$LE_EFF_VMS <- abs(c(0, as.numeric(.vms[-nrow(.vms),"SI_DATIM"] - 
+                                        .vms[-1,"SI_DATIM"], units="mins")))
            start.trip <- c(1,diff(.vms[,"SI_FT"]))
           .vms[start.trip!=0, "LE_EFF_VMS"] <- 0  # just correct for the trip change points
 
@@ -478,10 +476,10 @@ mergeEflalo2Pings <-
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          .logbk$bk.tripnum <- factor(.logbk$bk.tripnum )
          .logbk$bk.tripnum.sq <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT, sep='') 
-         .logbk$bk.tripnum.sq.day <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT,".",.logbk$date.in.R.cat, sep='') 
+         .logbk$bk.tripnum.sq.day <- paste(.logbk$bk.tripnum, ".", .logbk$LE_RECT,".",.logbk$LE_CTIME, sep='') 
          .vms$bk.tripnum <- factor(.vms$bk.tripnum)
          .vms$bk.tripnum.sq <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT, sep='') 
-         .vms$bk.tripnum.sq.day <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT,".", format(.vms$date.in.R,  '%Y-%m-%d'), sep='') 
+         .vms$bk.tripnum.sq.day <- paste(.vms$bk.tripnum, ".", .vms$SI_RECT,".", format(.vms$SI_DATIM,  '%Y-%m-%d'), sep='') 
 
          # for gear, if several gears inside a same trip,
          #  it is problematic because we have to assume a split of total effort or toal nb of ping between gears...
@@ -784,26 +782,23 @@ mergeEflalo2Pings <-
 
 
         # restore tacsat names               "%e/%m/%Y %H:%M"
-        idx <- merged$date.in.R!='NA' # NA is possible when bk not in vms because bk.tripnum vms may belong to another block than block1
-        merged$date.in.R <- as.character( merged$date.in.R)
-        merged$date.in.R.date  <- NA
-        merged[idx,]$date.in.R.date <- paste(substr(merged[idx,]$date.in.R ,9,10),"/",
-                                      substr(merged[idx,]$date.in.R , 6,7), "/", substr(merged[idx,]$date.in.R ,1,4), sep='')
-        merged$date.in.R.time  <- NA
-        merged[idx,]$date.in.R.time <- paste(substr(merged[idx,]$date.in.R , 12,13),":",
-                                      substr(merged[idx,]$date.in.R , 15,16), sep='')
-        names(merged)  [names(merged) %in% "date.in.R.date"] <- "SI_DATE"
-        names(merged)  [names(merged) %in% "date.in.R.time"] <- "SI_TIME"
+        idx <- merged$SI_DATIM!='NA' # NA is possible when bk not in vms because bk.tripnum vms may belong to another block than block1
+        merged$SI_DATIM <- as.character(merged$SI_DATIM)
+        merged$SI_DATE  <- NA
+        merged[idx,"SI_DATE"] <- paste(substr(merged[idx,]$SI_DATIM ,9,10),"/",
+                                      substr(merged[idx,]$SI_DATIM , 6,7), "/", substr(merged[idx,]$SI_DATIM ,1,4), sep='')
+        merged$SI_TIME  <- NA
+        merged[idx,"SI_TIME"] <- paste(substr(merged[idx,]$SI_DATIM , 12,13),":",
+                                      substr(merged[idx,]$SI_DATIM , 15,16), sep='')
     
         # last calculation 
         merged$KW_HOURS <- anf(merged$VE_KW) * anf(merged$LE_EFF_VMS)
     
-        # last clean up 
-        merged <- merged[, !colnames(merged) %in% c('idx', 'icessquare')]
-    
         # order chronologically
-        merged <- orderBy(~date.in.R, merged)
+        merged <- orderBy(~SI_DATIM, merged)
 
+        # last clean up 
+        merged <- merged[, !colnames(merged) %in% c('idx', 'icessquare', "SI_DATIM")]
         
        # save------------
        save("merged",   file=file.path(general$output.path,
@@ -912,6 +907,11 @@ return()
 
   # load the merged output table for one vessel
   load(file.path("C:","output","merged_35_2009.RData"))
+  
+  # check the conservation of landings
+  sum(tapply(an(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
+  sum(eflalo2[eflalo2$VE_REF=="35","LE_KG_PLE"], na.rm=TRUE)
+
   
   # ...or bind all vessels (keeping only some given species here)
   bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"), 
