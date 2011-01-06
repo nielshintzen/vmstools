@@ -152,15 +152,15 @@ mergeEflalo2Pings <-
            logbk.this.vessel$LE_CTIME <- strptime(  paste(logbk.this.vessel$LE_CDAT) , tz='GMT',  "%e/%m/%Y" )
 
            # mid time bk trips
-           mid.time <- rep(NA, nrow(logbk.this.vessel))
+           LE_MIDTIME <- rep(NA, nrow(logbk.this.vessel))
            dep <- logbk.this.vessel$LE_DTIME +10  # we artificially add +10min because bug in R if mid-time is 00:00:00
            arr <- logbk.this.vessel$LE_LTIME +1
 
            for(r in 1:length(dep)){
-              mid.time[r] <- as.character(seq(from=dep[r], to=arr[r], length.out = 3)[2])
+              LE_MIDTIME[r] <- as.character(seq(from=dep[r], to=arr[r], length.out = 3)[2])
               }
-           logbk.this.vessel$mid.time           <-  mid.time
-           logbk.this.vessel$bk.tripnum         <-  factor(mid.time) # init        
+           logbk.this.vessel$LE_MIDTIME          <-  LE_MIDTIME
+           logbk.this.vessel$bk.tripnum         <-  factor(LE_MIDTIME) # init        
            levels(logbk.this.vessel$bk.tripnum) <- 1:length(logbk.this.vessel$bk.tripnum) # assign a bk.tripnum code from mid.time
            # overwrite if FT_REF is actually informed:
            if(match('FT_REF',colnames(logbk.this.vessel))>0 & !all(is.na(logbk.this.vessel$FT_REF))) 
@@ -214,8 +214,8 @@ mergeEflalo2Pings <-
          if(length(unique(vms.this.vessel$SI_FT))<2) warning('need more than 1 trip in SI_FT')
          a.flag <- to.remove.because.deficient.vms ||  to.remove.because.not.enough.vms.trips || to.remove.because.pble.lgbk
          
-         ## remove bk.tripnum and mid.time if it exists
-         vms.this.vessel <- vms.this.vessel[, !colnames(vms.this.vessel) %in% c("bk.tripnum", "mid.time")]
+         ## remove bk.tripnum and SI_MIDTIME if it exists
+         vms.this.vessel <- vms.this.vessel[, !colnames(vms.this.vessel) %in% c("bk.tripnum", "SI_MIDTIME")]
 
 
 
@@ -264,14 +264,14 @@ mergeEflalo2Pings <-
            table.midtime <- table.midtime[!duplicated(data.frame(table.midtime$SI_FT, table.midtime$VE_REF)),]
            }
          } else{stop("no 'SI_DATIM' found in vms")}
-         mid.time <- rep(0, nrow(table.midtime))
+         SI_MIDTIME <- rep(0, nrow(table.midtime))
          for(r in 1: nrow(table.midtime)){
-           mid.time[r] <-  as.character(seq(from=table.midtime$SI_DTIME[r], to=table.midtime$SI_ATIME[r], length.out = 3)[2])
+           SI_MIDTIME[r] <-  as.character(seq(from=table.midtime$SI_DTIME[r], to=table.midtime$SI_ATIME[r], length.out = 3)[2])
          
          }
-         table.midtime$mid.time <-  mid.time
-         if(!any(colnames(.vms)%in%"mid.time")){ # here we are...
-              .vms <- merge(.vms, table.midtime[,c("SI_FT","mid.time")], by.x="SI_FT", by.y="SI_FT")
+         table.midtime$SI_MIDTIME <-  SI_MIDTIME
+         if(!any(colnames(.vms)%in%"SI_MIDTIME")){ # here we are...
+              .vms <- merge(.vms, table.midtime[,c("SI_FT","SI_MIDTIME")], by.x="SI_FT", by.y="SI_FT")
          }
 
 
@@ -294,48 +294,48 @@ mergeEflalo2Pings <-
 
             for(i in 1:nrow(table.midtime))  {
               segments(as.POSIXct(table.midtime$SI_DTIME[i]), 0.5, as.POSIXct(table.midtime$SI_ATIME[i]), 0.5, col=1)
-              points(as.POSIXct(table.midtime$mid.time[i]), 0.5, col=1)
-              text(as.POSIXct(table.midtime$mid.time[i]), 0.52, table.midtime$SI_FT[i], cex=0.5, col=1)
+              points(as.POSIXct(table.midtime$SI_MIDTIME[i]), 0.5, col=1)
+              text(as.POSIXct(table.midtime$SI_MIDTIME[i]), 0.52, table.midtime$SI_FT[i], cex=0.5, col=1)
     
             }
-            tmp <- .logbk[, c("LE_DTIME","LE_LTIME", "mid.time", "bk.tripnum")]
-            tmp <- tmp[!duplicated(tmp$mid.time), ]
+            tmp <- .logbk[, c("LE_DTIME","LE_LTIME", "LE_MIDTIME", "bk.tripnum")]
+            tmp <- tmp[!duplicated(tmp$LE_MIDTIME), ]
             for(i in 1:nrow(tmp)){
               segments(as.POSIXct(tmp$LE_DTIME[i]), 0.1, as.POSIXct(tmp$LE_LTIME[i]), 0.1, col=1)
-              points(as.POSIXct(tmp$mid.time[i]), 0.1, col=1)
-              text(as.POSIXct(tmp$mid.time[i]), 0.0785, tmp$bk.tripnum[i], cex=0.5, col=1)
+              points(as.POSIXct(tmp$LE_MIDTIME[i]), 0.1, col=1)
+              text(as.POSIXct(tmp$LE_MIDTIME[i]), 0.0785, tmp$bk.tripnum[i], cex=0.5, col=1)
             }
           }
          
 
-          # THE CORE CODE: compare bk$mid.time and vms$mid.time
-          # find the nearest bk$mid.time for each vms$mid.time
+          # THE CORE CODE: compare bk$LE_MIDTIME and vms$SI_MIDTIME
+          # find the nearest bk$LE_MIDTIME for each vms$SI_MIDTIME
           # and then change levels
           # (so, for each mid.time in vms, a bk.tripnum will be find)
           # (so, no lines in vms without a bk.tripnum from bk...)
-          fa1 <- levels(factor(.vms$mid.time))
+          fa1 <- levels(factor(.vms$SI_MIDTIME))
           new.levels <- fa1
-          fa2 <-  levels(factor(.logbk$mid.time))
+          fa2 <-  levels(factor(.logbk$LE_MIDTIME))
           for(i in 1:length(fa1)) { # for each level in vms
              tmp <-  abs(as.numeric( as.POSIXct(fa2) - as.POSIXct(fa1)[i] ))
              if(all(is.na(tmp))) tmp <- abs(as.numeric( as.Date(fa2) - as.Date(fa1)[i] )) # debug the R bug in case of mid-time at 00:00 hour
              new.levels[i] <- fa2 [which(tmp == min(tmp, na.rm=T) )]  # find the nearest level in logbook
           }
-          .vms$mid.time <- factor(as.character(.vms$mid.time))
-          sauv <- .vms$mid.time
-          levels(.vms$mid.time) <- new.levels # and change mid.time in vms to force the merging
+          .vms$SI_MIDTIME <- factor(as.character(.vms$SI_MIDTIME))
+          sauv <- .vms$SI_MIDTIME
+          levels(.vms$SI_MIDTIME) <- new.levels # and change mid.time in vms to force the merging
 
           # finally, replace levels by the bk.tripnum
-          tmp <-  .logbk[.logbk$mid.time %in% .vms$mid.time , c("bk.tripnum","mid.time")]
+          tmp <-  .logbk[.logbk$LE_MIDTIME %in% .vms$SI_MIDTIME , c("bk.tripnum","LE_MIDTIME")]
           tmp2 <- tmp[!duplicated(tmp$bk.tripnum),]
-          idx <- match(levels(.vms$mid.time),tmp2$mid.time)
-          .vms$bk.tripnum <- .vms$mid.time # init
+          idx <- match( levels(.vms$SI_MIDTIME), tmp2$LE_MIDTIME )
+          .vms$bk.tripnum <- .vms$SI_MIDTIME # init
           levels(.vms$bk.tripnum) <- as.character(tmp2$bk.tripnum )   [idx]
 
 
           if(general$visual.check){
             for(i in 1: nrow(.vms))  {
-               arrows(as.POSIXct( sauv[i]), 0.5 ,as.POSIXct( .vms$mid.time[i]),0.1, length=0.1)
+               arrows(as.POSIXct( sauv[i]), 0.5 ,as.POSIXct( .vms$SI_MIDTIME[i]),0.1, length=0.1)
             }
           }
 
@@ -366,9 +366,9 @@ mergeEflalo2Pings <-
 
      
        
-         .logbk$mid.time    <- factor(.logbk$mid.time)
+         .logbk$LE_MIDTIME    <- factor(.logbk$LE_MIDTIME)
          .logbk$bk.tripnum  <- factor(.logbk$bk.tripnum)
-         .vms$mid.time      <- factor(.vms$mid.time)
+         .vms$SI_MIDTIME      <- factor(.vms$SI_MIDTIME)
          .vms$bk.tripnum    <- factor(.vms$bk.tripnum)
 
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
@@ -380,40 +380,40 @@ mergeEflalo2Pings <-
          # bk tripnum from dep not in vms
          idx <-  .logbk$bk.tripnum %in% dep.bk.not.in.vms
          bk  <- .logbk[idx,] [order(.logbk[idx,]$LE_DTIME),]
-         if(!"mid.time" %in% colnames(.vms)){
+         if(!"SI_MIDTIME" %in% colnames(.vms)){
             vms <- .vms  [order(.vms$SI_DTIME),]
-            mid.time <- rep(NA, nrow(vms))
+            SI_MIDTIME <- rep(NA, nrow(vms))
             for(r in 1: nrow(vms)){
-              mid.time[r] <-  as.character(seq(from=vms$SI_DTIME[r], to=vms$SI_ATIME[r], length.out = 3)[2])
+              SI_MIDTIME[r] <-  as.character(seq(from=vms$SI_DTIME[r], to=vms$SI_ATIME[r], length.out = 3)[2])
             }
-            vms$mid.time <-  mid.time
-         } else{ vms <- .vms[order(.vms$mid.time),]}
+            vms$SI_MIDTIME <-  SI_MIDTIME
+         } else{ vms <- .vms[order(.vms$SI_MIDTIME),]}
          #1- compare bk$mid.time and vms$mid.time
          # find the nearest vms$mid.time for each bk$mid.time
          # and then change levels
          # (so for each mid.time in bk, a tripnum will be find)
          # (so no lines in bk without a tripnum...)
-         fa1 <- levels(factor(bk$mid.time))
+         fa1 <- levels(factor(bk$LE_MIDTIME))
          new.levels <- fa1
-         fa2 <-  levels(factor(vms$mid.time))
+         fa2 <-  levels(factor(vms$SI_MIDTIME))
          for(i in 1:length(fa1)) { # for each level in logbk
           tmp <-  abs(as.numeric( as.POSIXct(fa2) - as.POSIXct(fa1)[i] ))
           new.levels[i] <- fa2 [which(tmp == min(tmp, na.rm=T) )]  # find the nearest level in vms
          }
-         bk$mid.time <- factor(as.character(bk$mid.time))
-         levels(bk$mid.time) <- new.levels # and change mid.time in logbk to force the merging
+         bk$LE_MIDTIME <- factor(as.character(bk$LE_MIDTIME))
+         levels(bk$LE_MIDTIME) <- new.levels # and change mid.time in logbk to force the merging
 
          # finally, replace levels by the tripnum
          # (note: a same bk.tripnum in vms can have different mid.time
          # due to the first merging of vms to logbk in the vms analysis)
-         tmp <-  vms[vms$mid.time %in% bk$mid.time , c("bk.tripnum","mid.time")]
-         tmp2 <- tmp[!duplicated(data.frame(tmp$bk.tripnum,tmp$mid.time)),]
-         idx2 <- match(levels(bk$mid.time), tmp2$mid.time)
-         bk$bk.tripnum <- bk$mid.time # init
+         tmp <-  vms[vms$SI_MIDTIME %in% bk$LE_MIDTIME , c("bk.tripnum","SI_MIDTIME")]
+         tmp2 <- tmp[!duplicated(data.frame(tmp$bk.tripnum,tmp$SI_MIDTIME)),]
+         idx2 <- match(levels(bk$LE_MIDTIME), tmp2$SI_MIDTIME)
+         bk$bk.tripnum <- bk$LE_MIDTIME # init
          levels(bk$bk.tripnum)  <- as.character(tmp2$bk.tripnum) [idx2]
 
          # output
-         bk$mid.time   <- as.character(bk$mid.time)
+         bk$LE_MIDTIME   <- as.character(bk$LE_MIDTIME)
          bk$bk.tripnum <- as.character(bk$bk.tripnum)
          .logbk[idx,][order(.logbk[idx,]$LE_DTIME),]  <- bk
          }
