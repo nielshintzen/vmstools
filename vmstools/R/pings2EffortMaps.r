@@ -4,10 +4,13 @@
         cellsizeX =0.05, cellsizeY =0.05, we=9.8, ea=12.7, no=55.2, so=54.0,
          breaks0=c(0,25, 50,100,200,400,800,1600, 3200,6400,12800, 100000)){
 
+    # add a quarter
+    cat(paste("add a quarter...can be deadly long!", "\n"))
     if(!"quarter" %in% colnames(all.merged))
           all.merged$quarter <- factor(substr(quarters(as.POSIXct(all.merged$SI_DATE)),2,2))
 
     # create the general folder
+    dir.create(file.path(output), recursive = TRUE )
     dir.create(file.path(output, "jpegEffort"))
 
     # detect the year
@@ -15,6 +18,7 @@
 
 
     # in overall
+    cat(paste("overall...", "\n"))
     df1 <- all.merged[all.merged$SI_STATE==1, c("SI_LATI","SI_LONG","LE_EFF_VMS")]
     df1$SI_LATI <- anf(df1$SI_LATI ) # debug...
     df1$SI_LONG <- anf(df1$SI_LONG ) # debug...
@@ -33,6 +37,7 @@
 
 
       # per quarter
+    cat(paste("per quarter...", "\n"))
    for (a.quarter in levels(all.merged$quarter) ){
      df1 <- all.merged[all.merged$quarter==a.quarter  &
                 all.merged$SI_STATE==1,  c("SI_LATI","SI_LONG","LE_EFF_VMS")]
@@ -58,6 +63,7 @@
 
 
     # per metier
+    cat(paste("per metier...", "\n"))
     for (met in levels(all.merged$LE_MET_level6) ){
       df1 <- all.merged[all.merged$LE_MET_level6==met &
                 all.merged$SI_STATE==1, c("SI_LATI","SI_LONG","LE_EFF_VMS")]
@@ -78,13 +84,14 @@
       a.met <- gsub(">", replacement="o",a.met)  # debug
       # create folders and save
       dir.create(file.path(output, "jpegEffort", "overall", a.met))
-      savePlot(filename = file.path(output, "jpegEffort", a.met,
+      savePlot(filename = file.path(output, "jpegEffort","overall", a.met,
                             paste("map_effort_hours_merged_vessels_", a.met,"_",a.year,".jpeg",sep="")),type ="jpeg")
       dev.off()
       }
    }
 
    # per metier, quarter
+    cat(paste("per metier, per quarter...", "\n"))
    for (met in levels(all.merged$LE_MET_level6) ){
      for (a.quarter in levels(all.merged$quarter) ){
 
