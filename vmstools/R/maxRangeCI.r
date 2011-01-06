@@ -1,5 +1,4 @@
-`maxRangeCI` <-
-function(lon,lat,time,speed){
+maxRangeCI <- function(lon,lat,time.,speed){
 
                     x1 <- lon[1]
                     x2 <- lon[2]
@@ -7,7 +6,7 @@ function(lon,lat,time,speed){
                     y2 <- lat[2]
 
                       #Calculate maximum distance in km
-                    dmax    <- time/60*mean(speed,na.rm=T)*1.852
+                    dmax    <- time./60*mean(speed,na.rm=T)*1.852
 
                       #Calculate d from Haversine function
                     aH  <- sin(((y2-y1)*pi/180)/2)*sin(((y2-y1)*pi/180)/2) + cos(y1*pi/180) * cos(y2*pi/180) *
@@ -19,7 +18,7 @@ function(lon,lat,time,speed){
                     a   <- dmax/2
                     warn<- 0
                     if(d >= dmax){
-                      warning(cat("Distance too far to reach with current speed estimate ",round(lon,3)," ",round(lat,3),"\n"))
+                      warning(paste("Distance too far to reach with current speed estimate ",round(lon,3)," ",round(lat,3),"\n"))
                       dmax <- d
                       warn <- 1
                     }
@@ -61,9 +60,5 @@ function(lon,lat,time,speed){
                       x[k] <- mid.x + a[1] * cos(o) * cos(u) - b[1] * sin(o) * sin(u)
                       y[k] <- mid.y + a[2] * sin(o) * cos(u) + b[2] * cos(o) * sin(u)
                     }
-#                    plot(x,y,type="l")
-#                    points(lon,lat,pch=19,col="green")
-
-                    
                 return(list(matrix(c(x,y),ncol=2),dmax,warn))}
 

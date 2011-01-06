@@ -15,11 +15,11 @@ countPings(formula, tacsat, grid = NULL)
   \item{grid}{ if in formulate 'gridcell' is chosen, a SpatialGrid must be provided}
 }
 \details{
-Formula has form: ~Variable+timeVariable+anotherTimeVariable+spatialVariable \n
+Formula has form: ~Variable+timeVariable+anotherTimeVariable+spatialVariable \\*
 
-options in formula for Variable: any column name of tacsat file   \n
-options in formula for timeVariable: week, month, quarter, year    \n
-options in formula for spatialVariable: icesrectangle, icesarea, gridcell \n
+options in formula for Variable: any column name of tacsat file   \\*
+options in formula for timeVariable: day, week, month, quarter, year    \\*
+options in formula for spatialVariable: icesrectangle, icesarea, gridcell \\*
 }
 \value{
 Returns the matrix with counted pings by each specified variable
