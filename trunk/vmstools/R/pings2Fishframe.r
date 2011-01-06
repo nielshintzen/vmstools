@@ -134,7 +134,7 @@
          # (tricky because sub-block by sub-block because of potential 'out of memory')
          res <- NULL
          lev <- as.character(levels(xx1$c_square)) # do not split randomly but consistently with levels
-         chunk  <- c( seq(1, length(lev), by=4000), length(lev)) # 4000 by 4000 levels...
+         chunk  <- c( seq(1, length(lev), by=2000), length(lev)) # 4000 by 4000 levels...
          for(i in 1: (length(chunk)-1)){
             rm(vsl.ff1,vsl.ff2,vsl.ff) ; gc(reset=TRUE)
             cat(paste("level c_square",chunk[i],"to",chunk[i+1] ,"\n"))
