@@ -228,16 +228,15 @@ segmentTacsatSpeed <- function(tacsat,
 
   if(any(colnames(tacsat.this.vessel) %in% 'SI_DATE'))
           {
-           ctime <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) ,
+           tacsat.this.vessel$SI_DATIM  <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) ,
                             tz='GMT',       "%e/%m/%Y %H:%M" )
-           tacsat.this.vessel <- cbind.data.frame(tacsat.this.vessel, date.in.R=ctime)
           } else{
-          if(!any(colnames(tacsat.this.vessel) %in% 'date.in.R')) stop('you need either to inform a date.in.R or a SI_DATE')
+          if(!any(colnames(tacsat.this.vessel) %in% 'SI_DATIM')) stop('you need either to inform a SI_DATIM or a SI_DATE')
           }
           
 
-  diff.time <- tacsat.this.vessel[-nrow(tacsat.this.vessel),"date.in.R"] -
-                       tacsat.this.vessel[-1,"date.in.R"]
+  diff.time <- tacsat.this.vessel[-nrow(tacsat.this.vessel),"SI_DATIM"] -
+                       tacsat.this.vessel[-1,"SI_DATIM"]
   tacsat.this.vessel$diff.time.mins <- c(0, as.numeric(diff.time, units="mins"))
 
   # add a apparent speed colunm (nautical miles per hour)
