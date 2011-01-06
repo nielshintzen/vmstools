@@ -19,7 +19,7 @@ countPings <- function(formula,tacsat,grid=NULL){
 
                   #Define which variables selected are column names, time variables or spatial variables
                   Vars      <- vars[which(!vars %in% c("day","week","month","quarter","year","gridcell","icesrectangle","icesarea"))]
-                  timeVars  <- vars[which(vars %in% c("day"."week","month","quarter","year"))]
+                  timeVars  <- vars[which(vars %in% c("day","week","month","quarter","year"))]
                   spatVars  <- vars[which(vars %in% c("gridcell","icesrectangle","icesarea"))]
 
                   #Add time notation if you want this as output
