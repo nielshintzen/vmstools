@@ -21,7 +21,7 @@ calculateCI(intLon,intLat,vmsIdx1,vmsIdx2,tacsat,grid,sPDF,interpolation,int,par
   \item{sPDF}{Spatial dataframe to be used to allign to grid}
   \item{interpolation}{interpolation dataset}
   \item{int}{list index of interpolation to use}
-  \item(params}{list of parameters used to perform interpolation}
+  \item{params}{list of parameters used to perform interpolation}
 }
 \references{Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite spline interpolation of position registration data,
 EU lot 2 project}
@@ -39,7 +39,6 @@ tacsat     <- tacsat[1:1000,]
 
   #Filter the Tacsat data
 tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
-tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME,sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M:%S")
 
   #Interpolate the VMS data
 interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
@@ -54,7 +53,7 @@ yrange  <- range(c(yrange,range(tacsat$SI_LATI,na.rm=T))); yrange <- c(min(yrang
 grid          <- createGrid(xrange,yrange,0.1,0.05)
 spatialGrid   <- SpatialGrid(grid=grid);
 gridded(spatialGrid) = TRUE
-sP            <- as(spatialGrid,"SpatialPixels");
+sP            <- as(spatialGrid,"SpatialPixels")
 sPDF          <- as(sP,"SpatialPixelsDataFrame")
 sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
 
@@ -63,5 +62,6 @@ lon <- tacsat$SI_LONG[c(3,4)]
 lat <- tacsat$SI_LATI[c(3,4)]
 
 
-calculateCI(lon,lat,3,4,tacsat,grid,sPDF,interpolation,3,list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)))
+res <- calculateCI(intLon=lon,intLat=lat,vmsIdx1=3,vmsIdx2=4,VMS.=tacsat,grid=grid,sPDF=sPDF,
+                   interpolation=interpolation,int=3,params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)))
 }

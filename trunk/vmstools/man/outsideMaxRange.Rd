@@ -42,7 +42,6 @@ tacsat     <- tacsat[1:1000,]
 
   #Filter the Tacsat data
 tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
-tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME,sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M:%S")
 
   #Interpolate the VMS data
 interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
@@ -65,6 +64,6 @@ lon           <- tacsat$SI_LONG[c(3,4)]
 lat           <- tacsat$SI_LATI[c(3,4)]
 
 result <- outsideMaxRange(intLon=lon,intLat=lat,vmsIdx1=3,vmsIdx2=4,tacsat,grid,sPDF,interpolation,10,params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)))
-print(result[[2]]/result[[1]]) #0% of the total value of the CI is located outside the maximum range
+print(result[[2]]/result[[1]]) 0% of the total value of the CI is located outside the maximum range
 
 }

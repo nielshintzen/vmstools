@@ -3,12 +3,15 @@
 \alias{VMStoolsIMARES}
 \docType{package}
 \title{
-What the package does (short line)
-~~ package title ~~
+development of R scripts to setup the workflow of vms and logbook data to compute pressure indicators
 }
 \description{
-More about what it does (maybe more than one line)
-~~ A concise (1-5 lines) description of the package ~~
+-Design of routines to import VMS and Logbook data\\*
+-Design of routines to cluster metiers\\*
+-Design of routines to link VMS and Logbook data\\*
+-Design of routines to define vessel activity \\*
+-Design of routines to interpolate VMS data \\*
+-Design of routines to compute pressure indicators
 }
 \details{
 \tabular{ll}{
@@ -22,20 +25,9 @@ LazyLoad: \tab yes\cr
 ~~ An overview of how to use the package, including the most important functions ~~
 }
 \author{
-Who wrote it
+Niels T. Hintzen, Doug Beare, Francois Bastardie, Nicolas Deporte, Andy South, Neil Campbell
 
-Maintainer: Who to complain to <yourfault@somewhere.net>
-~~ The author and/or maintainer of the package ~~
+Maintainer: Niels T. Hintzen <niels.hintzen@wur.nl>
 }
 \references{
-~~ Literature or other references for background information ~~
-}
-~~ Optionally other standard keywords, one per line, from file KEYWORDS in the R documentation directory ~~
-\keyword{ package }
-\seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
-\examples{
-~~ simple examples of the most important functions ~~
 }
