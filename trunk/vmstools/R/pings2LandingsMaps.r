@@ -8,6 +8,7 @@
           all.merged$quarter <- factor(substr(quarters(as.POSIXct(all.merged$SI_DATE)),2,2))
 
     # create the general folder
+    dir.create(file.path(output), recursive = TRUE )
     dir.create(file.path(output, "jpegLandings"))
 
     # detect the year
