@@ -219,7 +219,7 @@
   ff <- orderBy(~col7+col9+col5+col6+col1, data=ff)
 
   # round the numbers
-  ff[, c(11,12,13)] <- round(ff[, c(11,12,13)])
+  ff[, c(11,12,13)] <- ceiling(ff[, c(11,12,13)])
 
   # remove record with 0 in value because both
   # weight and value are mandatory for uploading in fishframe
