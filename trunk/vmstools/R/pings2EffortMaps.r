@@ -1,8 +1,8 @@
   # Author: F.Bastardie
   pings2EffortMaps <-
-     function (all.merged, sp="LE_KG_COD", output= file.path("C:","VMSanalysis", "FemernBelt"),
+     function (all.merged,  output= file.path("C:","VMSanalysis", "FemernBelt"),
         cellsizeX =0.05, cellsizeY =0.05, we=9.8, ea=12.7, no=55.2, so=54.0,
-          breaks0= c(0,100, 100*(2^1),100*(2^2),100*(2^3),100*(2^4),100*(2^5),100*(2^6), 100*(2^7),100*(2^8),100*(2^9), 10000000)){
+         breaks0=c(0,25, 50,100,200,400,800,1600, 3200,6400,12800, 100000)){
 
     if(!"quarter" %in% colnames(all.merged))
           all.merged$quarter <- factor(substr(quarters(as.POSIXct(all.merged$SI_DATE)),2,2))
@@ -15,7 +15,7 @@
 
 
     # in overall
-    df1 <- all.merged[all.merged$SI_STATE==1,colnames(all.merged)%in% c("SI_LATI","SI_LONG","LE_EFF_VMS")]
+    df1 <- all.merged[all.merged$SI_STATE==1, c("SI_LATI","SI_LONG","LE_EFF_VMS")]
     df1$SI_LATI <- anf(df1$SI_LATI ) # debug...
     df1$SI_LONG <- anf(df1$SI_LONG ) # debug...
     df1$LE_EFF_VMS <-anf(df1$LE_EFF_VMS) # debug...
@@ -25,7 +25,6 @@
           colLand="darkolivegreen4", addICESgrid=TRUE,
             nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =cellsizeX, cellsizeY =cellsizeY, we=we, ea=ea, no=no, so=so,
              breaks0=breaks0
-           #  breaks0=c(0,25, 50,100,200,400,800,1600, 3200,6400,12800, 100000),
            , legendncol=2)  
     dir.create(file.path(output, "jpegEffort", "overall"))
     savePlot(filename = file.path("C:","VMSanalysis", "FemernBelt", "jpegEffort", "overall",
@@ -47,7 +46,6 @@
           colLand="darkolivegreen4", addICESgrid=TRUE,
             nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =cellsizeX, cellsizeY =cellsizeY, we=we, ea=ea, no=no, so=so,
              breaks0=breaks0
-           #  breaks0=c(0,25, 50,100,200,400,800,1600, 3200,6400,12800, 100000),
            , legendncol=2)  
          title(paste(a.year, "-", a.quarter) )
       # create folder and save
@@ -73,7 +71,6 @@
           colLand="darkolivegreen4", addICESgrid=TRUE,
             nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =cellsizeX, cellsizeY =cellsizeY, we=we, ea=ea, no=no, so=so,
              breaks0=breaks0
-           #  breaks0=c(0,25, 50,100,200,400,800,1600, 3200,6400,12800, 100000),
            , legendncol=2)  
           title(paste(met) )
       a.met <- gsub(">=", replacement="o",met) # debug
@@ -104,7 +101,6 @@
           colLand="darkolivegreen4", addICESgrid=TRUE,
             nameLon="SI_LONG", nameLat="SI_LATI", cellsizeX =cellsizeX, cellsizeY =cellsizeY, we=we, ea=ea, no=no, so=so,
              breaks0=breaks0
-           #  breaks0=c(0,25, 50,100,200,400,800,1600, 3200,6400,12800, 100000),
            , legendncol=2)  
       title(paste(met, "-", a.year, "-", a.quarter) )
       a.met <- gsub(">=", replacement="o",met) # debug
@@ -121,3 +117,7 @@
  return()
  }
  
+ 
+#  pings2EffortMaps (all.merged=all.merged,  output= file.path("C:","VMSanalysis", "FemernBelt"),
+#        cellsizeX =0.05, cellsizeY =0.05, we=9.8, ea=12.7, no=55.2, so=54.0,
+#         breaks0=c(0,25, 50,100,200,400,800,1600, 3200,6400,12800, 100000))
