@@ -154,12 +154,12 @@ mergeEflalo2Pings <-
            LE_MIDTIME <- rep(NA, nrow(logbk.this.vessel))
            dep <- logbk.this.vessel$LE_DTIME +10  # we artificially add +10min because bug in R if mid-time is 00:00:00
            arr <- logbk.this.vessel$LE_LTIME +1
-
            for(r in 1:length(dep)){
               LE_MIDTIME[r] <- as.character(seq(from=dep[r], to=arr[r], length.out = 3)[2])
               }
-           if(!colnames(logbk.this.vessel) %in% "FT_REF") {
-             logbk.this.vessel$LE_MIDTIME          <-  LE_MIDTIME
+           logbk.this.vessel$LE_MIDTIME          <-  LE_MIDTIME
+          
+           if(!"FT_REF" %in% colnames(logbk.this.vessel) ) {
              logbk.this.vessel$FT_REF              <-  factor(LE_MIDTIME) # init        
              levels(logbk.this.vessel$FT_REF)      <- 1:length(logbk.this.vessel$FT_REF) # assign a FT_REF code
              }   # only if FT_REF is actually not already informed
@@ -210,8 +210,12 @@ mergeEflalo2Pings <-
          # filter if vessel with a bad vms
          to.remove.because.deficient.vms <- any(is.na(vms.this.vessel$SI_FT))
          to.remove.because.not.enough.vms.trips <- length(unique(vms.this.vessel$SI_FT))< 2  # nb vms trips < 2
-         to.remove.because.pble.lgbk <- length(unique(logbk.this.vessel$FT_REF))< 2  # nb logbk trips < 2
          if(length(unique(vms.this.vessel$SI_FT))<2) warning('need more than 1 trip in SI_FT')
+        
+         # filter if vessel with a bad logbook
+         to.remove.because.pble.lgbk <- length(unique(logbk.this.vessel$FT_REF))< 2  # nb logbk trips < 2
+        
+         # then...
          a.flag <- to.remove.because.deficient.vms ||  to.remove.because.not.enough.vms.trips || to.remove.because.pble.lgbk
          
          ## remove FT_REF and SI_MIDTIME if it exists
@@ -243,7 +247,7 @@ NIELS <- FALSE
            tripn <- eftim[,3]
                             
                                
-                     
+               
                               smdtime <- t(outer(stime,dtime,"-"))
                               gtltime <- outer(ltime,stime,"-")
                             
@@ -344,6 +348,7 @@ NIELS <- FALSE
               text(as.POSIXct(table.midtime$SI_MIDTIME[i]), 0.52, table.midtime$SI_FT[i], cex=0.5, col=1)
     
             }
+
             tmp <- .logbk[, c("LE_DTIME","LE_LTIME", "LE_MIDTIME", "FT_REF")]
             tmp <- tmp[!duplicated(tmp$LE_MIDTIME), ]
             for(i in 1:nrow(tmp)){
@@ -491,13 +496,15 @@ NIELS <- FALSE
              ## because the assignement of a state is gear-specific.
              ## caution here: we assume only one gear used inside a trip...
              # because note that we remove 'logevent' and keep only one duplicate of tripnum
-             .vms$LE_GEAR <- .vms$FT_REF # init
+             .vms$LE_GEAR <- factor(.vms$FT_REF) # init
              tmp <- .logbk[,c("LE_GEAR","FT_REF")]
              tmp <- tmp[!duplicated(tmp$FT_REF),] #remove logevent and keep only one duplicate of tripnum
              tmp <- tmp[tmp$FT_REF %in% unique(.vms$LE_GEAR),]
              idx <- match(levels(.vms$LE_GEAR), as.character(tmp$FT_REF))
-             levels(.vms$LE_GEAR) <- as.character(tmp$LE_GEAR)  [idx]
-       
+             dd  <-  as.character(tmp$LE_GEAR)  [idx]
+             dd  <- replace(dd, is.na(dd), "UKN") # unknown because not matched if Niels
+            levels(.vms$LE_GEAR) <- dd
+     
              # then do the assignement of the state 
              #according to a segemented regression on the (apparent) speed histogram
             .vms <- segmentTacsatSpeed (tacsat=.vms, vessels=a.vesselid, 
