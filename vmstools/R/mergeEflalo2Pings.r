@@ -530,10 +530,10 @@ NIELS <- FALSE
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          .logbk$FT_REF <- factor(.logbk$FT_REF )
          .logbk$FT_REF_SQ <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT, sep='') 
-         .logbk$FT_REF_SQ_DAY <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT,".",.logbk$LE_CTIME, sep='') 
+         .logbk$FT_REF_SQ_DAY <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT,".", an(format(.logbk$LE_CTIME,  '%d')), sep='') 
          .vms$FT_REF <- factor(.vms$FT_REF)
          .vms$FT_REF_SQ <- paste(.vms$FT_REF, ".", .vms$SI_RECT, sep='') 
-         .vms$FT_REF_SQ_DAY <- paste(.vms$FT_REF, ".", .vms$SI_RECT,".", format(.vms$SI_DATIM,  '%Y-%m-%d'), sep='') 
+         .vms$FT_REF_SQ_DAY <- paste(.vms$FT_REF, ".", .vms$SI_RECT,".", an(format(.vms$SI_DATIM,  '%d')), sep='') 
 
          # for gear, if several gears inside a same trip,
          #  it is problematic because we have to assume a split of total effort or toal nb of ping between gears...
@@ -572,37 +572,66 @@ NIELS <- FALSE
              do.merging <- function(method="FT_REF", .logbk, .vms, general){
 
 
+             
+                
               # IF BY PING-------------
               # find total nb of FISHING ping per tripnum from vms  # used for method 1  'FT_REF'
               if(method=="FT_REF"){
-               .vms$count.fping.trip  <- factor(.vms$FT_REF)  # init
-              count.fping.trip <- table(.vms[.vms$SI_STATE==1,]$FT_REF)
+ #              .vms$count.fping.trip  <- factor(.vms$FT_REF)  # init
+ #             count.fping.trip <- table(.vms[.vms$SI_STATE==1,]$FT_REF)
+ #             # => COUNT nb of FISHING pings per FT_REF because each weight will be repeated by ping after merging
+ #             levels(.vms$count.fping.trip) <- count.fping.trip[levels(.vms$count.fping.trip)]  # mapping
+ #             .vms[.vms$SI_STATE==2,]$count.fping.trip <- NA
+           
               # => COUNT nb of FISHING pings per FT_REF because each weight will be repeated by ping after merging
-              levels(.vms$count.fping.trip) <- count.fping.trip[levels(.vms$count.fping.trip)]  # mapping
+              .vms$count.fping.trip             <- factor(.vms$FT_REF)  # init
+              countp                            <- countPings(~VE_REF+FT_REF, .vms[.vms$SI_STATE=="1",])
+              rownames(countp)                  <-  countp$FT_REF  
+              levels(.vms$count.fping.trip)     <- countp[levels(.vms$count.fping.trip),"pings"]    # mapping
               .vms[.vms$SI_STATE==2,]$count.fping.trip <- NA
+     
               # => COUNT nb of gears per FT_REF because each ping will be repeated by gear after merging
               count.gr.trip <- tapply(.logbk$LE_GEAR, .logbk$FT_REF, function(x) length(unique(x)))
               .logbk$count.gr.trip <- count.gr.trip[.logbk$FT_REF]  # mapping
-              }
+              
+               }
 
 
               # find total nb of FISHING ping per trip-icessquare from vms  # used for method 2   'FT_REF_SQ'
               if(method=="FT_REF_SQ"){
-              .vms$count.fping.trip.sq  <- factor(.vms$FT_REF_SQ)  # init
-              count.fping.trip.sq <- table(.vms[.vms$SI_STATE==1,]$FT_REF_SQ) # COUNT nb of FISHING pings per FT_REF_SQ
-              levels(.vms$count.fping.trip.sq) <- count.fping.trip.sq[levels(.vms$count.fping.trip.sq)]  # mapping
+     #         .vms$count.fping.trip.sq  <- factor(.vms$FT_REF_SQ)  # init
+     #         count.fping.trip.sq <- table(.vms[.vms$SI_STATE==1,]$FT_REF_SQ) # COUNT nb of FISHING pings per FT_REF_SQ
+     #         levels(.vms$count.fping.trip.sq) <- count.fping.trip.sq[levels(.vms$count.fping.trip.sq)]  # mapping
+     #         if(any('2' %in% unique(.vms$SI_STATE))) .vms[.vms$SI_STATE==2,]$count.fping.trip.sq <- NA
+     
+              .vms$count.fping.trip.sq          <- factor(.vms$FT_REF_SQ)  # init
+              countp                            <- countPings(~VE_REF+SI_RECT+FT_REF, .vms[.vms$SI_STATE=="1",])
+              rownames(countp)                  <-  interaction(countp$FT_REF,countp$SI_RECT)  
+              levels(.vms$count.fping.trip.sq ) <- countp[levels(.vms$count.fping.trip.sq),"pings"]    # mapping
               if(any('2' %in% unique(.vms$SI_STATE))) .vms[.vms$SI_STATE==2,]$count.fping.trip.sq <- NA
+     
+     
               # => COUNT nb of gears per FT_REF_SQ because each ping will be repeated by gear after merging
               count.gr.trip.sq <- tapply(.logbk$LE_GEAR, .logbk$FT_REF_SQ, function(x) length(unique(x)))
               .logbk$count.gr.trip.sq <- count.gr.trip.sq[.logbk$FT_REF_SQ]  # mapping
               }
 
+
               # find total nb of FISHING ping per trip-icessquare-day from vms  # used for method 3   'FT_REF_SQ_DAY'
               if(method=="FT_REF_SQ_DAY"){
-              .vms$count.fping.trip.sq.day  <- factor(.vms$FT_REF_SQ_DAY)  # init
-              count.fping.trip.sq.day <- table(.vms[.vms$SI_STATE==1,]$FT_REF_SQ_DAY) # COUNT nb of FISHING pings per FT_REF_SQ_DAY
-              levels(.vms$count.fping.trip.sq.day) <- count.fping.trip.sq.day[levels(.vms$count.fping.trip.sq.day)]  # mapping
+#              .vms$count.fping.trip.sq.day  <- factor(.vms$FT_REF_SQ_DAY)  # init
+#              count.fping.trip.sq.day <- table(.vms[.vms$SI_STATE==1,]$FT_REF_SQ_DAY) # COUNT nb of FISHING pings per FT_REF_SQ_DAY
+#              levels(.vms$count.fping.trip.sq.day) <- count.fping.trip.sq.day[levels(.vms$count.fping.trip.sq.day)]  # mapping
+#              if(any('2' %in% unique(.vms$SI_STATE))) .vms[.vms$SI_STATE==2,]$count.fping.trip.sq.day <- NA
+
+
+              .vms$count.fping.trip.sq.day          <- factor(.vms$FT_REF_SQ_DAY)  # init
+              countp                                <- countPings(~VE_REF+day+SI_RECT+FT_REF, .vms[.vms$SI_STATE=="1",])
+              rownames(countp)                      <-  interaction(countp$FT_REF, countp$SI_RECT, countp$SI_DAY)  
+              levels(.vms$count.fping.trip.sq.day) <- countp[levels(.vms$count.fping.trip.sq.day),"pings"]    # mapping
               if(any('2' %in% unique(.vms$SI_STATE))) .vms[.vms$SI_STATE==2,]$count.fping.trip.sq.day <- NA
+
+
               # => COUNT nb of gears per FT_REF_SQ_DAY because each ping will be repeated by gear after merging
               count.gr.trip.sq.day <- tapply(.logbk$LE_GEAR, .logbk$FT_REF_SQ_DAY, function(x) length(unique(x)))
               .logbk$count.gr.trip.sq.day <- count.gr.trip.sq.day[.logbk$FT_REF_SQ_DAY]  # mapping}
