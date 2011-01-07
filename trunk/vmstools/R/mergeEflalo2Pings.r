@@ -530,10 +530,10 @@ NIELS <- FALSE
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          .logbk$FT_REF <- factor(.logbk$FT_REF )
          .logbk$FT_REF_SQ <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT, sep='') 
-         .logbk$FT_REF_SQ_DAY <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT,".", an(format(.logbk$LE_CTIME,  '%d')), sep='') 
+         .logbk$FT_REF_SQ_DAY <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT,".", an(format(.logbk$LE_CTIME,  '%j')), sep='') 
          .vms$FT_REF <- factor(.vms$FT_REF)
          .vms$FT_REF_SQ <- paste(.vms$FT_REF, ".", .vms$SI_RECT, sep='') 
-         .vms$FT_REF_SQ_DAY <- paste(.vms$FT_REF, ".", .vms$SI_RECT,".", an(format(.vms$SI_DATIM,  '%d')), sep='') 
+         .vms$FT_REF_SQ_DAY <- paste(.vms$FT_REF, ".", .vms$SI_RECT,".", an(format(.vms$SI_DATIM,  '%j')), sep='') 
 
          # for gear, if several gears inside a same trip,
          #  it is problematic because we have to assume a split of total effort or toal nb of ping between gears...
