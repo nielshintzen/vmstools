@@ -3,6 +3,7 @@ function(xrange
                              ,yrange
                              ,resx
                              ,resy
+                             ,type="GridTopology"
                              ){
                 
                 library(sp)             
@@ -11,5 +12,29 @@ function(xrange
                 yborder     <- seq(floor(sort(yrange)[1]),ceiling(sort(yrange)[2]),resy)
                 
                 grid        <- GridTopology(c(xborder[1],yborder[1]),c(resx,resy),c(length(xborder),length(yborder)))
+                if(type=="SpatialGrid"){
+                  grid      <- SpatialGrid(grid=grid);
+                }
+                if(type=="SpatialPixels"){
+                  grid      <- SpatialGrid(grid=grid);
+                  gridded(grid) = TRUE
+                  grid      <- as(grid,"SpatialPixels");
+                }
+                if(type=="SpatialPixelsDataFrame"){
+                  grid      <- SpatialGrid(grid=grid);
+                  gridded(grid) = TRUE
+                  grid      <- as(grid,"SpatialPixels");
+                  grid      <- as(grid,"SpatialPixelsDataFrame")
+                }
+                if(type=="SpatialGridDataFrame"){
+                  grid      <- SpatialGrid(grid=grid);
+                  gridded(grid) = TRUE
+                  grid      <- as(grid,"SpatialPixels");
+
+                  sPDF          <- as(grid,"SpatialGridDataFrame")
+                  sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
+                  grid          <- sPDF
+                }
+                
               return(grid)}
 
