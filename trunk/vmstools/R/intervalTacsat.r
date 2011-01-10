@@ -11,6 +11,6 @@ intervalTacsat <- function(tacsat,level="trip"){
                       tacsat$INTV[2:nrow(tacsat)]  <- difftime(tacsat$SI_DATIM[2:nrow(tacsat)],tacsat$SI_DATIM[1:(nrow(tacsat)-1)],units="mins")
                       vessels                         <- unique(tacsat$VE_REF)
                       first.vessels                   <- unlist(lapply(as.list(vessels),function(x){which(tacsat$VE_REF==x)[1]}))
-                      tacsat$INTV[first.vessels-1] <- NA
+                      tacsat$INTV[first.vessels]    <- NA
                     }
                   return(tacsat)}

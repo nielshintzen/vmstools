@@ -24,7 +24,7 @@ countPings <- function(formula,tacsat,grid=NULL){
 
                   #Add time notation if you want this as output
                   if(length(timeVars)>0){
-                    tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
+                    tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
                     if("day" %in% timeVars){       tacsat$SI_DAY   <- an(format(tacsat$SI_DATIM,format="%j"))   ; timeVars[which(timeVars=="day")]      <- "SI_DAY"}
                     if("week" %in% timeVars){      tacsat$SI_WEEK  <- an(format(tacsat$SI_DATIM,format="%W"))   ; timeVars[which(timeVars=="week")]     <- "SI_WEEK" }
                     if("month" %in% timeVars){     tacsat$SI_MONTH <- an(format(tacsat$SI_DATIM,format="%m"))   ; timeVars[which(timeVars=="month")]    <- "SI_MONTH"}
@@ -50,7 +50,7 @@ countPings <- function(formula,tacsat,grid=NULL){
                       spatVars[which(spatVars=="gridcell")] <- "GR_LONG"; spatVars <- c(spatVars,"GR_LATI")
                     }
                     if("icesrectangle" %in% spatVars){   tacsat$LE_RECT <- ICESrectangle(tacsat); spatVars[which(spatVars=="icesrectangle")] <- "LE_RECT" }
-                    if("icesarea" %in% spatVars){        tacsat$LE_AREA <- ffarea(tacsat)       ; spatVars[which(spatVars=="icesarea")] <- "LE_AREA"}
+                    if("icesarea" %in% spatVars){        tacsat$LE_AREA <- ICESarea(tacsat)     ; spatVars[which(spatVars=="icesarea")] <- "LE_AREA"}
                   }
 
                   tacsat$SUM  <- 1
