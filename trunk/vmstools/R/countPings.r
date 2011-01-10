@@ -24,7 +24,7 @@ countPings <- function(formula,tacsat,grid=NULL){
 
                   #Add time notation if you want this as output
                   if(length(timeVars)>0){
-                    tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+                    if(!length(grep("SI_DATIM",colnames(tacsat)))>0) tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
                     if("day" %in% timeVars){       tacsat$SI_DAY   <- an(format(tacsat$SI_DATIM,format="%j"))   ; timeVars[which(timeVars=="day")]      <- "SI_DAY"}
                     if("week" %in% timeVars){      tacsat$SI_WEEK  <- an(format(tacsat$SI_DATIM,format="%W"))   ; timeVars[which(timeVars=="week")]     <- "SI_WEEK" }
                     if("month" %in% timeVars){     tacsat$SI_MONTH <- an(format(tacsat$SI_DATIM,format="%m"))   ; timeVars[which(timeVars=="month")]    <- "SI_MONTH"}
