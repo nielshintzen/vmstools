@@ -51,7 +51,7 @@ if(length(lstargs$breaks0)==0) {
 cols <- rev(do.call(paletteCats, list(length(breaks0)-1)))
 
 library(mapdata)
-windows(8,7)
+#windows(8,7)         # what is this for ? 
 map("worldHires", add=FALSE,col=colLand,fill=TRUE, bg="white",  xlim=xlim0 + c(+0.1,-0.1), ylim=ylim0 + c(+0.1,-0.1), 
 regions=c('uk','ireland','france','germany','netherlands', 'norway','belgium',
 'spain','luxembourg','denmark', 'sweden','iceland', 'portugal','italy','sicily','ussr','sardinia','albania','monaco','turkey','austria',
