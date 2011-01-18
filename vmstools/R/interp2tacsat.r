@@ -1,7 +1,8 @@
 
 interp2tacsat <- function(interpolation,tacsat,npoints=10){
 
-# This function takes the list of tracks output by interpolateTacsat and converts those back to tacsat format.
+# This function takes the list of tracks output by interpolateTacsat and converts them back to tacsat format.
+# The npoints argument is the optional number of points between each 'real' position.
 
 interpolationEQ <- equalDistance(interpolation,npoints)  #Divide points equally along interpolated track (default is 10).
 
