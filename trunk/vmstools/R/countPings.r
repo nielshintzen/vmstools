@@ -53,14 +53,16 @@ countPings <- function(formula,tacsat,grid=NULL){
                     if("icesarea" %in% spatVars){        tacsat$LE_AREA <- ICESarea(tacsat)     ; spatVars[which(spatVars=="icesarea")] <- "LE_AREA"}
                   }
 
-                  tacsat$SUM  <- 1
-                  buildList   <- list()
-                  totVars     <- c(Vars,timeVars,spatVars)
-                  for(iVars in 1:length(totVars)) buildList[[iVars]] <- tacsat[,totVars[iVars]]
+                  tacsat$SUM      <- 1
+                  totVars         <- c(Vars,timeVars,spatVars)
 
                   #Do the counting of pings
-                  res           <- aggregate(tacsat$SUM,buildList,sum)
-                  colnames(res) <- c(totVars,"pings")
+                  for(iVars in 1:length(totVars)) tacsat[,totVars[iVars]] <- af(ac(tacsat[,totVars[iVars]]))
+                  DT              <- data.table(tacsat)
+                  eq              <- c.listquote(totVars)
+
+                  res             <- DT[,sum(SUM),by=eval(eq)]
+                  colnames(res)   <- c(totVars,"pings")
 
               return(res)}
 
