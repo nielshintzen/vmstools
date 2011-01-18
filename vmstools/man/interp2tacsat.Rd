@@ -1,12 +1,7 @@
 \name{interp2tacsat}
 \alias{interp2tacsat}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Convert the output (a list) from interpolateTacsat to tacsat
-#
-
-
-
 }
 \description{
 This function takes the list of tracks output by interpolateTacsat and converts them back to tacsat format. This means
