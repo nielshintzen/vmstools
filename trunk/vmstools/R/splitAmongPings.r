@@ -31,7 +31,7 @@ tacsat$ID               <- 1:nrow(tacsat)
 eflaloCol               <- colnames(eflalo)
 kgs                     <- grep("KG",colnames(eflalo))
 eur                     <- grep("EURO",colnames(eflalo))
-kgeur                   <- function(x){return(c(grep("KG",x),grep("EURO",x)))}
+assign("kgeur",function(x){return(c(grep("KG",x),grep("EURO",x)))},envir=.GlobalEnv)
 
   #- Subset tacsat file
 tacsat                  <- subset(tacsat,SI_STATE != 0) #only attribute variable to fishing pings
