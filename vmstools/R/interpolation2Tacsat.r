@@ -1,5 +1,5 @@
 
-interp2tacsat <- function(interpolation,tacsat,npoints=10){
+interpolation2Tacsat <- function(interpolation,tacsat,npoints=10){
 
 # This function takes the list of tracks output by interpolateTacsat and converts them back to tacsat format.
 # The npoints argument is the optional number of points between each 'real' position.
