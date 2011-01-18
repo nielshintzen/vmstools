@@ -1,0 +1,61 @@
+\name{interp2tacsat}
+\alias{interp2tacsat}
+%- Also NEED an '\alias' for EACH other topic documented here.
+\title{
+Convert the output (a list) from interpolateTacsat to tacsat
+#
+
+
+
+}
+\description{
+This function takes the list of tracks output by interpolateTacsat and converts them back to tacsat format. This means
+that all the functions that work on tacsat can work with this new, larger interpolated dataset. For example you could now
+distribute the landings among the new pings.  The npoints argument is the optional number of pings between each real or actual ping.
+}
+\usage{
+interp2tacsat(interpolation, tacsat, npoints = 10)
+}
+
+\arguments{
+  \item{interpolation}{A list of tracks between actual pings output by the interpolateTacsat function.}
+  \item{tacsat}{Tacsat data used when the interpolateTacsat function was called. 
+}
+  \item{npoints}{The number of pings or positions required between each real or actual vessel position or ping}
+}
+\details{The distances between the new vessel positions are assumed to be equal.
+}
+\value{
+A data frame in tacsat format is returned with estimated locations, speeds and headings between each real or actual vessel position.
+}
+\references{}
+\author{Niels Hintzen, Doug Beare
+}
+\note{
+
+}
+
+
+\seealso{
+code{interpolateTacsat()}
+}
+\examples{
+
+data(tacsat)
+   
+input10 <- tacsat[tacsat$VE_REF=="10",]     # Take out data for vessel '10'
+
+res1 <- 100 # set resolution for number of locations or pings required between each real or actual vessel location.
+
+#Do the interpolation
+
+interpolation <- interpolateTacsat(tacsat=input10,interval=120,
+                                          margin=15,res=res1,
+                                          method="cHs",
+                                          params=list(fm=0.2,distscale=20,sigline=0.2,st=c(4,8)),headingAdjustment=0)
+                                          
+#Convert the interpolated data back to tacsat with 10 locations or pings between each real or actual vessel location.
+
+tacsat10 <- interp2tacsat(interpolation=interpolation, tacsat=input10,npoints=10)
+  
+  }
