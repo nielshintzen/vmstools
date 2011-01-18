@@ -1,6 +1,6 @@
 Package: vmstools
 Title: For analysing fisheries VMS (Vessel Monitoring System) data
-Version: 0.39
+Version: 0.40
 Date: 2011-01-17
 Author: Niels Hintzen <niels.hintzen@wur.nl>, Francois Bastardie <fba@aqua.dtu.dk>, Doug Beare <douglas.beare@wur.nl>
 Maintainer: Niels Hintzen <niels.hintzen@wur.nl>
