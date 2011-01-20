@@ -23,19 +23,23 @@ gc(reset=TRUE)
 path <- "C:/Nicolas/Scripts/R/Analyses"
 setwd(path) # you must choose the path of your working directory
 
-#source("programs/FunctionsForClassif.r")
-#source("programs/Classif.r")
-#source("programs/ExploSpeciesSelection.r")
-#source("programs/MetierPredict.r")
+#source("programs/multivariateClassificationUtils.r")
+#source("extractTableMainSpecies.r")
+#source("programs/getTableAfterPCA.r")
+#source("programs/getMetierClusters.r")
+#source("programs/selectMainSpecies.r")
+#source("programs/predictMetier.r")
 #memory.limit(size=4000)
 
-source("FunctionsForClassif.r")
-source("Classif.r")
-source("ExploSpeciesSelection.r")
-source("CompClassiftoOrdi.r")
-source("Level7to5.r")
-source("Level5.r")
-source("MetierPredict.r")
+source("multivariateClassificationUtils.r")
+source("extractTableMainSpecies.r")
+source("getTableAfterPCA.r")
+source("getMetierClusters.r")
+source("selectMainSpecies.r")
+source("compareMultivariateClassificationToOrdination.r")
+source("level7to5.r")
+source("level5.r")
+source("predictMetier.r")
 memory.limit(size=4000)
 
 
@@ -89,10 +93,10 @@ save(dat1, file="dat1_2007.Rdata")
 # II. EXPLORING THE VARIOUS METHODS FOR IDENTIFYING MAIN SPECIES AND KEEPING THEM IN THE DATA SET (STEP 1)
 #-----------------------------
 #EXPLORATION
-explo=ExploSpeciesSelection(dat1,analysisName,RunHAC=TRUE,DiagFlag=FALSE)
+explo=selectMainSpecies(dat1,analysisName,RunHAC=TRUE,DiagFlag=FALSE)
 
 # Step 1 : selection of main species
-Step1=classif_step1(dat1,explo$NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
+Step1=extractTableMainSpecies(dat1,explo$NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
 
 save(explo,Step1,file="Explo_Step1.Rdata")
 
@@ -104,8 +108,8 @@ load("Explo_Step1.Rdata")
 
 # Step 2 : PCA
 
-for (option_step2 in c("PCA_70","PCA_SC","NO_PCA")) {
-#option_step2="PCA_70"
+#for (option_step2 in c("PCA_70","PCA_SC","NO_PCA")) {
+option_step2="PCA_70"
 
 setwd(paste(path,analysisName,sep="/"))
 if (!file.exists(option_step2)) dir.create(option_step2)
@@ -113,9 +117,9 @@ setwd(paste(path,analysisName,option_step2,sep="/"))
 if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)      
 
 
-if (option_step2=="PCA_70") Step2=classif_step2(Step1,analysisName,pcaYesNo="pca",criterion="70percents") else    # criterion="70percents"
-if (option_step2=="PCA_SC") Step2=classif_step2(Step1,analysisName,pcaYesNo="pca",criterion="screetest") else    # criterion="screetest"
-if (option_step2=="NO_PCA") Step2=classif_step2(Step1,analysisName,pcaYesNo="nopca",criterion=NULL)    
+if (option_step2=="PCA_70") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="pca",criterion="70percents") else    # criterion="70percents"
+if (option_step2=="PCA_SC") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="pca",criterion="screetest") else    # criterion="screetest"
+if (option_step2=="NO_PCA") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="nopca",criterion=NULL)    
 
 save(Step2,file="Step2.Rdata")
 
@@ -124,8 +128,8 @@ load("Step2.Rdata")
 #-----------------------------
 # IV. STEP 3 - CLUSTERING METHOD : HAC, CLARA OR KMEANS
 #-----------------------------
-for (option_step3 in c("CLARA","KMEANS")) {
-#option_step3="CLARA"
+#for (option_step3 in c("CLARA","KMEANS")) {
+option_step3="CLARA"
 
 setwd(paste(path,analysisName,option_step2,sep="/"))
 if (!file.exists(option_step3)) dir.create(option_step3)
@@ -133,14 +137,58 @@ setwd(paste(path,analysisName,option_step2,option_step3,sep="/"))
 if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)      
 
 
-if (option_step3=="HAC")    Step3=classif_step3(Step1,Step2,analysisName,methMetier="hac",param3="euclidean",param4="ward") else    
-if (option_step3=="CLARA")  Step3=classif_step3(Step1,Step2,analysisName=analysisName,methMetier="clara",param3="euclidean",param4=NULL) else    
-if (option_step3=="KMEANS") Step3=classif_step3(Step1,Step2,analysisName=analysisName,methMetier="kmeans",param3=NULL,param4=NULL)    
+if (option_step3=="HAC")    Step3=getMetierClusters(Step1,Step2,analysisName,methMetier="hac",param3="euclidean",param4="ward") else    
+if (option_step3=="CLARA")  Step3=getMetierClusters(Step1,Step2,analysisName=analysisName,methMetier="clara",param3="euclidean",param4=NULL) else    
+if (option_step3=="KMEANS") Step3=getMetierClusters(Step1,Step2,analysisName=analysisName,methMetier="kmeans",param3=NULL,param4=NULL)    
 
 save(Step3,file="Step3.Rdata")
 #load("Step3.Rdata")
-} # end of step 3
-} # end of step 2
+#} # end of step 3
+#} # end of step 2
+
+
+
+
+
+#-----------------------------
+# V. STEP 4 - MERGING BACK TO EFLALO
+#-----------------------------
+
+#choosing the final option
+setwd(paste(path,analysisName,sep=""))
+
+load("PCA_70/CLARA/Step3.Rdata")
+
+ if(!nrow(dat1)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
+
+dat1 <- cbind(dat1,CLUSTER=Step3$LE_ID_clust[,"clust"])
+#now reload the full data set
+
+eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
+
+
+
+
+#-----------------------------------------------------
+# VI. STEP 5 - COMPARISON WITH ORDINATION METHODS
+#-----------------------------------------------------
+
+# load previous R objects (Step1,Step2,Step3)
+setwd(paste(path,analysisName,sep="/"))
+load("dat1_2007.Rdata")
+load("Explo_Step1.Rdata")
+option_step2="PCA_70"
+setwd(paste(path,analysisName,option_step2,sep="/"))
+load("Step2.Rdata")
+option_step3="CLARA"
+setwd(paste(path,analysisName,option_step2,option_step3,sep="/"))
+load("Step3.Rdata")
+compOrdin="CompOrdin"
+if (!file.exists(compOrdin)) dir.create(compOrdin)
+setwd(paste(path,analysisName,option_step2,option_step3,compOrdin,sep="/"))
+if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)  
+compMetiers=compareMultivariateClassificationToOrdination(dat=dat1,Step2=Step2,clusters=Step3$clusters$clustering)
+save(compMetiers,file="compMetiers.Rdata")
 
 
 
@@ -150,9 +198,6 @@ save(Step3,file="Step3.Rdata")
 #-----------------------------
 # VII. STEP 6 - Predicting Metier for current year using clustering performed previous year
 #-----------------------------
-
-
-
 
 
 # load previous R objects (Step1,Step2,Step3)
@@ -220,45 +265,43 @@ datPred=as.matrix(datPred)
 #datPred <- matrix(datPred,ncol=nbSpeciesDatPred,nrow=length(le_id_datPred))
 rownames(datPred) <- le_id_datPred
 #colnames(datPred) <- nameDatPredSpecies
-Donnees2008Cluster = metierPredict(learningData=Step1,clustersAffectation=clust2007,newData=datPred)
+Donnees2008Cluster = predictMetier(learningData=Step1,clustersAffectation=clust2007,newData=datPred)
 save(Donnees2008Cluster,file="Donnees2008Cluster.Rdata")
 
 
 
-#-----------------------------
-# V. STEP 4 - MERGING BACK TO EFLALO
-#-----------------------------
-
-#choosing the final option
-setwd(paste(path,analysisName,sep=""))
-
-load("PCA_70/CLARA/Step3.Rdata")
-
- if(!nrow(dat1)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
-
-dat1 <- cbind(dat1,CLUSTER=Step3$LE_ID_clust[,"clust"])
-#now reload the full data set
-
-eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
 
 
 
 
-#-----------------------------------------------------
-# VI. STEP 5 - COMPARISON WITH ORDINATION METHODS
-#-----------------------------------------------------
+sam=sample(1:nbLog,size=15000,replace=F) 
+outofsam=setdiff(1:nbLog,sam)
+learningData=dat[sam,]
+learningData=learningData[,-1]
+newData=as.data.frame(dat[outofsam,])
+newData=newData[,-1]
+clustersAffectation=Step3$clusters$clustering[sam]
+learningData=as.data.frame(cbind(learningData,as.factor(clustersAffectation)))
+colnames(learningData)=c(colnames(learningData[1:nbSpeciesLearningData]),"clust")
 
-# load previous R objects (Step1,Step2,Step3)
-setwd(path)
-load("dat1_2007.Rdata")
-setwd(paste(path,analysisName,sep="/"))
-load("Explo_Step1.Rdata")
-option_step2="PCA_70"
-setwd(paste(path,analysisName,option_step2,sep="/"))
-load("Step2.Rdata")
-option_step3="CLARA"
-setwd(paste(path,analysisName,option_step2,option_step3,sep="/"))
-load("Step3.Rdata")
-clusters=Step3$clusters$clustering
-compMetiers=CompClassiftoOrdi(dat1,Step2,clusters)
+learning=nm(clust~.,data=learningData)      # celui là marche !
+gam=learning$regularization["gamma"]
+lam=learning$regularization["lambda"]
+learning=rda(clust~.,data=learningData,gamma=gam,lambda=lam)
+result=predict(learning,newData) 
+clustPred=result$class
+clustReal=Step3$clusters$clustering[outofsam]
+t=table(clustPred,clustReal)
+t=t[order(as.integer(rownames(t))),]
+pourcWellClass=sum(diag(t))/length(outofsam)*100
+pourcBadClass=100-pourcWellClass
 
+
+learning=fda(clust~.,data=learningData)
+result=predict(learning,newData) 
+clustPred=result$class
+clustReal=Step3$clusters$clustering[outofsam]
+table(clustPred,clustReal)
+
+model=multinom(clust~.,data=learningData)
+stepc=greedy.wilks(clust~.,data=learningData,niveau=0.1)
