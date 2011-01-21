@@ -87,7 +87,7 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
 
 
     # PCA with the good number of axis
-    print("running PCA on selected axes...")
+    print("retaining Principal Components of selected axes...")
     log.pca=log.pca$ind$coord[,1:nbaxes]
     datLog=round(log.pca,4)
 
