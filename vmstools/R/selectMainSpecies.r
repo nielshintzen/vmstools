@@ -28,7 +28,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     if (RunHAC == TRUE) {
 
       # HAC
-      print("######## STEP 1 SELECTION OF MAIN SPECIES BY 'HAC' METHOD ########")
+      print("######## SPECIES EXPLORATION METHOD 1: HAC ########")
       # Transposing data
       table_var=table_variables(propdat)
   
@@ -114,7 +114,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
  
     # TOTALE
     
-    print("######## STEP 2 SELECTION OF MAIN SPECIES BY 'TOTAL' METHOD ########")
+    print("######## SPECIES EXPLORATION METHOD 2: 'TOTAL' ########")
     
     # Total quantity caught by species
     sumcol=numeric(length=p-1)
@@ -168,7 +168,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
     # LOGEVENT
     
-    print("######## STEP 3 SELECTION OF MAIN SPECIES BY 'LOGEVENT' METHOD ########")
+    print("######## SPECIES EXPLORATION METHOD 3: 'LOGEVENT' ########")
     
     nbMainSpeciesLogevent=numeric()
     medianPourcentCatchMainSpeciesLogevent=numeric()
