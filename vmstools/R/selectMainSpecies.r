@@ -52,7 +52,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       dev.off()
         
       temp=select_species(dat[,2:p],cah_cluster_var)
-      namesResidualSpecies=nameSpecies[which(cah_cluster_var==temp[[2]])] #liste des especes residuelles
+      namesResidualSpecies=nameSpecies[which(cah_cluster_var==temp[[2]])] #list of residual species 
   
       fait=FALSE
       nb_cut=1
@@ -75,10 +75,10 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
           }else{
             print("------ Updating residual species -----")
             nb_cut = nb_cut+1;  # if alone then cutting below and updating nameResidualSpecies to start again
-            numGroupeEspeceSeule = as.numeric(names(sort(nbSpeciesClusters)[1]))
-            namesEspeceSeule = names(cah_cluster_var_step)[which(cah_cluster_var_step==numGroupeEspeceSeule)]
-            namesResidualSpecies = namesResidualSpecies[ - which(namesResidualSpecies==namesEspeceSeule)]
-            print(paste("---- Adding new species ---",namesEspeceSeule))
+            numGroupSpeciesAlone = as.numeric(names(sort(nbSpeciesClusters)[1]))
+            namesSpeciesAlone = names(cah_cluster_var_step)[which(cah_cluster_var_step==numGroupSpeciesAlone)]
+            namesResidualSpecies = namesResidualSpecies[ - which(namesResidualSpecies==namesSpeciesAlone)]
+            print(paste("---- Adding new species ---",namesSpeciesAlone))
           }
         }
       } # end of while
@@ -114,7 +114,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
  
     # TOTALE
     
-    print("######## STEP 2 SELECTION OF MAIN SPECIES BY 'TOTALE' METHOD ########")
+    print("######## STEP 2 SELECTION OF MAIN SPECIES BY 'TOTAL' METHOD ########")
     
     # Total quantity caught by species
     sumcol=numeric(length=p-1)
@@ -132,8 +132,8 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
     # We are taking all species until having at least seuil% of total catch
 
-    nbMainSpeciesTotale=numeric()
-    medianPourcentCatchMainSpeciesTotale=numeric()
+    nbMainSpeciesTotal=numeric()
+    medianPourcentCatchMainSpeciesTotal=numeric()
 
     for(seuil in seq(5,100,5)){
       cat("seuil:",seuil,"\n")
@@ -142,7 +142,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       espsel=numesp[1:(length(pourcent)+1)]
       nomespsel=nameSpecies[espsel]
 #      nomespsel=names(pourcent)
-      nbMainSpeciesTotale[seuil/5]=length(nomespsel)
+      nbMainSpeciesTotal[seuil/5]=length(nomespsel)
 
       if(DiagFlag==TRUE) {
         # We are bulding the table with main species and aggregated other species
@@ -151,16 +151,16 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
           vectorNul=rep(0,n)
           datSpeciesWithoutProp=cbind(datSpeciesWithoutProp,vectorNul)
         }
-        pourcentCatchMainSpeciesTotale=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
-        medianPourcentCatchMainSpeciesTotale[seuil/5]=median(pourcentCatchMainSpeciesTotale)
+        pourcentCatchMainSpeciesTotal=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
+        medianPourcentCatchMainSpeciesTotal[seuil/5]=median(pourcentCatchMainSpeciesTotal)
       }
     }
-    nbMainSpeciesTotale=c(0,nbMainSpeciesTotale)
-    nbMainSpeciesTotale[length(nbMainSpeciesTotale)]=p-1
-    NamesMainSpeciesTotale=nomespsel[1:nbMainSpeciesTotale[length(nbMainSpeciesTotale)-1]]
-    PropMainSpeciesTotale=nbMainSpeciesTotale[length(nbMainSpeciesTotale)-1]/nbAllSpecies*100
+    nbMainSpeciesTotal=c(0,nbMainSpeciesTotal)
+    nbMainSpeciesTotal[length(nbMainSpeciesTotal)]=p-1
+    NamesMainSpeciesTotal=nomespsel[1:nbMainSpeciesTotal[length(nbMainSpeciesTotal)-1]]
+    PropMainSpeciesTotal=nbMainSpeciesTotal[length(nbMainSpeciesTotal)-1]/nbAllSpecies*100
     
-    if (DiagFlag) medianPourcentCatchMainSpeciesTotale=c(0,medianPourcentCatchMainSpeciesTotale)
+    if (DiagFlag) medianPourcentCatchMainSpeciesTotal=c(0,medianPourcentCatchMainSpeciesTotal)
 
     print(Sys.time()-t1)
 
@@ -202,56 +202,56 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     # GRAPHICS
     # Number of main species
     png(paste(analysisName,"Number of main species.png",sep="_"), width = 1200, height = 800)
-    plot(seq(0,100,5),nbMainSpeciesTotale,type='l',col="blue",lwd=2, main="Number of main species selected depending of the threshold", xlab="Threshold (%)",ylab="Number of species")
+    plot(seq(0,100,5),nbMainSpeciesTotal,type='l',col="blue",lwd=2, main="Number of main species selected depending of the threshold", xlab="Threshold (%)",ylab="Number of species")
     lines(seq(0,100,5),nbMainSpeciesLogevent,col="green",lwd=2)
     if(!is.na(nbMainSpeciesHAC)) abline(nbMainSpeciesHAC,0, col="red",lwd=2)
     mtext(paste(p-1," Species"),col='darkblue')
-    legend(70, p*0.9, c( "HAC", "Totale", "Logevent"),lwd=2,col=c("red", "blue", "green"))
+    legend(70, p*0.9, c( "HAC", "Total", "Logevent"),lwd=2,col=c("red", "blue", "green"))
     dev.off()
 
     # Median percentage of catch represented by main species by logevent
     if(DiagFlag){
       png(paste(analysisName,"Median percentage of catch represented by main species by logevent.png",sep="_"), width = 1200, height = 800)
-      plot(seq(0,100,5),medianPourcentCatchMainSpeciesTotale,type='l',col="blue",lwd=2, main="Median percentage of catch represented by main species by logevent depending of the threshold", xlab="Threshold (%)",ylab="Median percentage of catch represented by main species by logevent")
+      plot(seq(0,100,5),medianPourcentCatchMainSpeciesTotal,type='l',col="blue",lwd=2, main="Median percentage of catch represented by main species by logevent depending of the threshold", xlab="Threshold (%)",ylab="Median percentage of catch represented by main species by logevent")
       lines(seq(0,100,5),medianPourcentCatchMainSpeciesLogevent,col="green",lwd=2)
       if (RunHAC==TRUE) abline(medianPourcentCatchMainSpeciesHAC,0, col="red",lwd=2)
       mtext(paste(p-1," Species"),col='darkblue')
-      if (RunHAC==TRUE) legend(70, 40, c("HAC", "Totale", "Logevent"),lwd=2,col=c("red", "blue", "green"))
-      if (RunHAC==FALSE) legend(70, 40, c("Totale", "Logevent"),lwd=2,col=c("blue", "green"))
+      if (RunHAC==TRUE) legend(70, 40, c("HAC", "Total", "Logevent"),lwd=2,col=c("red", "blue", "green"))
+      if (RunHAC==FALSE) legend(70, 40, c("Total", "Logevent"),lwd=2,col=c("blue", "green"))
       dev.off()
     }
     
-    ListSpecies=sort(unique(c(NamesMainSpeciesHAC,NamesMainSpeciesTotale,NamesMainSpeciesLogevent)))
+    ListSpecies=sort(unique(c(NamesMainSpeciesHAC,NamesMainSpeciesTotal,NamesMainSpeciesLogevent)))
 
 
     if(DiagFlag==FALSE) { 
       explo_species = list(nbAllSpecies=nbAllSpecies,
                             PropMainSpeciesHAC=PropMainSpeciesHAC,
-                            PropMainSpeciesTotale=PropMainSpeciesTotale,
+                            PropMainSpeciesTotal=PropMainSpeciesTotal,
                             PropMainSpeciesLogevent=PropMainSpeciesLogevent,
                             nbMainSpeciesHAC=nbMainSpeciesHAC, 
-                            nbMainSpeciesTotale=nbMainSpeciesTotale, 
+                            nbMainSpeciesTotal=nbMainSpeciesTotal, 
                             nbMainSpeciesLogevent=nbMainSpeciesLogevent,
                             NamesMainSpeciesHAC=sort(NamesMainSpeciesHAC), 
-                            NamesMainSpeciesTotaleAlphabetical=sort(NamesMainSpeciesTotale),                                             
-                            NamesMainSpeciesTotaleByImportance=NamesMainSpeciesTotale,
+                            NamesMainSpeciesTotalAlphabetical=sort(NamesMainSpeciesTotal),                                             
+                            NamesMainSpeciesTotalByImportance=NamesMainSpeciesTotal,
                             NamesMainSpeciesLogevent=sort(NamesMainSpeciesLogevent),
                             NamesMainSpeciesAll=ListSpecies) 
     }else{         
       explo_species = list(nbAllSpecies=nbAllSpecies,
                             PropMainSpeciesHAC=PropMainSpeciesHAC,
-                            PropMainSpeciesTotale=PropMainSpeciesTotale,
+                            PropMainSpeciesTotal=PropMainSpeciesTotal,
                             PropMainSpeciesLogevent=PropMainSpeciesLogevent,
                             nbMainSpeciesHAC=nbMainSpeciesHAC, 
-                            nbMainSpeciesTotale=nbMainSpeciesTotale, 
+                            nbMainSpeciesTotal=nbMainSpeciesTotal, 
                             nbMainSpeciesLogevent=nbMainSpeciesLogevent,
                             NamesMainSpeciesHAC=sort(NamesMainSpeciesHAC), 
-                            NamesMainSpeciesTotaleAlphabetical=sort(NamesMainSpeciesTotale),                                             
-                            NamesMainSpeciesTotaleByImportance=NamesMainSpeciesTotale,
+                            NamesMainSpeciesTotalAlphabetical=sort(NamesMainSpeciesTotal),                                             
+                            NamesMainSpeciesTotalByImportance=NamesMainSpeciesTotal,
                             NamesMainSpeciesLogevent=sort(NamesMainSpeciesLogevent),
                             NamesMainSpeciesAll=ListSpecies,
                             medianPourcentCatchMainSpeciesHAC=median(pourcentCatchMainSpeciesHAC),
-                            medianPourcentCatchMainSpeciesTotale=medianPourcentCatchMainSpeciesTotale,
+                            medianPourcentCatchMainSpeciesTotal=medianPourcentCatchMainSpeciesTotal,
                             medianPourcentCatchMainSpeciesLogevent=medianPourcentCatchMainSpeciesLogevent)
     }    
 
