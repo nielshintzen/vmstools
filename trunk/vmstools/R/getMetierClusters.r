@@ -5,7 +5,7 @@
 ################################################################################
 
 
-getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara",param3="euclidean",param4=NULL){
+getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara",param1="euclidean",param2=NULL){
 
   #le_id <- datSpecies[,1]
   #datSpecies <- datSpecies[,-1]
@@ -56,14 +56,14 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       sampleDatSpecies=datSpecies[sam,]
 
       # HAC on the sample
-      log.hac=hcluster(sampleDatLog, method=param3, link=param4)
+      log.hac=hcluster(sampleDatLog, method=param1, link=param2)
       inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
       nbClust=which(scree(inerties.vector)[,"epsilon"]<0)[2]
 
       # Cut the dendogram at the selected level
       sampleClusters=cutree(log.hac,k=nbClust)
 
-#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#      Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #      gc(reset=TRUE)
 
       # Add the cluster to each logevent of the sample
@@ -123,7 +123,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       #print(target$tabnomespcib)
 
 
-#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#      Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #      gc(reset=TRUE)
 
 
@@ -262,7 +262,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
       dev.off()
 
-#      Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#      Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #      gc(reset=TRUE)
 
     } # end of for(i in 1:5)
@@ -278,12 +278,12 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbLogSample=nrow(sampleDatLog)
     nbDim=ncol(sampleDatLog)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
     # HAC with the best sample
     print("Final HAC")
-    log.hac=hcluster(sampleDatLog, method=param3, link=param4)
+    log.hac=hcluster(sampleDatLog, method=param1, link=param2)
 
     # Determine the number of cluster thanks to the scree-test
     inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
@@ -293,7 +293,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     sampleClusters=cutree(log.hac,k=nbClust)
     sampleClusters=as.factor(sampleClusters)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
     sampleDatLogWithClusters=data.frame()
     sampleDatLogWithClusters=cbind(sampleDatLog,sampleClusters)
@@ -318,7 +318,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusters[outofsam]=pred$class
     datLogWithClusters=cbind(datLog,clusters)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
 
@@ -358,7 +358,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #print(target$tabnomespcib)
 
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
     # Projections on the first factorial plans
@@ -461,7 +461,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
 
@@ -608,7 +608,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     plot(varintra,main="Within clusters variance",xlab="Number of clusters",ylab="Within Variance")
     dev.off()
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
     diffvarintra=diff(varintra,na.rm=T)
@@ -634,7 +634,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #Determine the target species
     target=targetspecies(resval)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
 
@@ -702,7 +702,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     title(main=paste("Mean profile by cluster","\n","\n",sep=""))
     dev.off()
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
 
@@ -880,14 +880,14 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     max=max(clustersPam.silcoeff, na.rm=T)
     k=which(clustersPam.silcoeff==max)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
     # PAM with optimal k
     clusters=pam(datLog,k)
     summary(clusters)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
     # Quality of classification
@@ -979,7 +979,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
 
@@ -1143,7 +1143,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Calculation of optimal k thanks to the silhouette
     clustersClara.silcoeff=numeric()
     for (k in 3:15){
-      clustersClara=clara(datLog, k, metric=param3, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))
+      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
 
@@ -1151,17 +1151,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     plot(clustersClara.silcoeff, main="Silhouette of the classification", xlab="Number of clusters", ylab="Silhouette")               # k optimal corresponds to maximum of silhouette's coefficients
     dev.off()
 
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
     gc(reset=TRUE)
 
     cat("silcoeff",clustersClara.silcoeff,"\n")
     k=which.max(clustersClara.silcoeff)
 
     # CLARA with optimal k
-    clusters=clara(datLog, k, metric=param3, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))  # CLARA with optimal k
+    clusters=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))  # CLARA with optimal k
     summary(clusters)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
     # Quality of classification
@@ -1181,7 +1181,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
 
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
+#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
 
