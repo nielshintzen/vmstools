@@ -8,7 +8,7 @@ Identyfing in an EFLALO dataset which species can be considered as important for
 A typical logbook dataset will contain a large number of species recorded, but only a limited 
 number of these could potentially be considered as target species. This function aims thus at identifying these
 by using three different approaches :
-   - HAC (Hierarchical Ascending Analysis) based on Euclidian distances between species with Ward aggregating criteria;
+   - HAC (Hierarchical Ascendant Classification) based on Euclidian distances between species with Ward aggregating criteria;
    - Total, where species are ranked based on their proportion in the total catches, and those cumulating to a given percentage are retained
    - Logevent, where species are selected if they represent at least a given percentage of at least one logevent (one line)
 
@@ -18,9 +18,9 @@ In the HAC method, a first group of species, the principal ones, is identified b
 Other species are pooled in the group of residuals. New similar HACs are run through a loop on this group of residuals species, to identify if any new species
 might have been left aside in the first run. It is important to note though that HAC method might quickly reach memory limits on standard PCs, and may thus
 not be run on very large datasets.
-In the Total method, the percentage threshold is being increased with 5% steps from 5 to 100,and the ranked species summing up to this value
+In the Total method, the percentage threshold is being increased with 5% steps from 5 to 100, and the ranked species summing up to this value
 is recorded. 
-In the Logevent method,the percentage threshold is also being increased with 5% steps from 5 to 100, and all species respresenting at least this value in
+In the Logevent method, the percentage threshold is also being increased with 5% steps from 5 to 100, and all species representing at least this value in
 at least one line are recorded. 
 
 This function allows thus to explore the variability and the sensitivity of the definition of key species to differences in concepts and subjective
@@ -39,7 +39,7 @@ selectMainSpecies(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE)
 }
 
 \arguments{
-  \item{dat}{a data.frame reduced from an eflalo format. It should contain only the LE_ID (Logevent ID) variable as well as all species names in colonnes, 
+  \item{dat}{a data.frame reduced from an eflalo format. It should contain only the LE_ID (Logevent ID) variable as well as all species names in columns, 
   with raw catch data. It is necessary to sort out potential error-prone lines (such as lines with only 0) prior to the analysis, and to replace NA values by 0.
 }
   \item{analysisName}{character, the name of the run. Used for the file name of the plots. 
@@ -55,11 +55,9 @@ selectMainSpecies(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE)
 
 \value{
 The function produces a plot (saved in the "analysisName" working directory showing the number of species selected according to the method and 
-the percentage threshold selected for both 'Total' and 'logevent' methods. 
+the percentage threshold selected for both 'Total' and 'Logevent' methods. 
 The function returns also a list of diagnostics of the three methods :
   \item{nbAllSpecies}{Number of species initially in the dataset 
-}
-  \item{PropMainSpeciesHAC}{Proportion of the number of species retained by the HAC method to the total number of species 
 }
   \item{PropMainSpeciesHAC}{Proportion of the number of species retained by the HAC method to the total number of species 
 }
