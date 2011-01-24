@@ -107,7 +107,7 @@ Finally, the function returns a list with a number of results and diagnotics on 
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\authors{Nicolas Deporte, Sebastien Demanèche,Stepanie Mahévas, Clara Ulrich}
+\author{Nicolas Deporte, Sebastien Demanèche, Stepanie Mahévas, Clara Ulrich}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
 
 \seealso{\code{extractTableMainSpecies(),getTableAfterPCA()}}
