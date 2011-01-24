@@ -1,5 +1,5 @@
 ICESrectangle2LonLat <-
-function (statsq) 
+function (statsq,midpoint=F)
 {
     part1 <- substr(statsq, 1, 2)
     part2 <- substr(statsq, 3, 4)
@@ -16,5 +16,12 @@ function (statsq)
     lon <- lonvalues[indx]
     if (any(is.na(lat)) | any(is.na(lon))) 
         warning("Some stat squares have not been recognised.")
+        
+    if(midpoint == F){
+
+                        lat <- lat - 0.25
+                        lon <- lon - 0.5
+
+                        }
     return(data.frame(lat, lon))
 }

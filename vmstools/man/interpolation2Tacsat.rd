@@ -1,5 +1,5 @@
-\name{interp2tacsat}
-\alias{interp2tacsat}
+\name{interpolation2Tacsat}
+\alias{interpolation2Tacsat}
 \title{
 Convert the output (a list) from interpolateTacsat to tacsat
 }
@@ -9,7 +9,7 @@ that all the functions that work on tacsat can work with this new, larger interp
 distribute the landings among the new pings.  The npoints argument is the optional number of pings between each real or actual ping.
 }
 \usage{
-interp2tacsat(interpolation, tacsat, npoints = 10)
+interpolation2Tacsat(interpolation, tacsat, npoints = 10)
 }
 
 \arguments{
@@ -23,34 +23,27 @@ interp2tacsat(interpolation, tacsat, npoints = 10)
 \value{
 A data frame in tacsat format is returned with estimated locations, speeds and headings between each real or actual vessel position.
 }
-\references{}
+\references{EU Lot 2 project}
 \author{Niels Hintzen, Doug Beare
 }
-\note{
-
-}
-
 
 \seealso{
-code{interpolateTacsat()}
+\code{interpolateTacsat()}
 }
 \examples{
 
 data(tacsat)
    
-input10 <- tacsat[tacsat$VE_REF=="10",]     # Take out data for vessel '10'
-
-res1 <- 100 # set resolution for number of locations or pings required between each real or actual vessel location.
+input   <- tacsat[1:100,]     # Take out first 100 rows
+res1    <- 100                # set resolution for number of locations or pings required between each real or actual vessel location.
 
 #Do the interpolation
-
-interpolation <- interpolateTacsat(tacsat=input10,interval=120,
-                                          margin=15,res=res1,
+interpolation <- interpolateTacsat(tacsat=input,interval=120,
+                                          margin=12,res=res1,
                                           method="cHs",
-                                          params=list(fm=0.2,distscale=20,sigline=0.2,st=c(4,8)),headingAdjustment=0)
+                                          params=list(fm=0.4,distscale=20,sigline=0.2,st=c(4,8)),headingAdjustment=0)
                                           
 #Convert the interpolated data back to tacsat with 10 locations or pings between each real or actual vessel location.
-
-tacsat10 <- interp2tacsat(interpolation=interpolation, tacsat=input10,npoints=10)
+tacsat        <- interpolation2Tacsat(interpolation=interpolation, tacsat=input,npoints=10)
   
-  }
+}
