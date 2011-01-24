@@ -1,7 +1,8 @@
 effort <- function(x,level="trip",unit="hours"){
 
+              if("SI_FT" %in% colnames(x)) x$FT_REF <- x$SI_FT
               #-Add if necessary a datim column
-              if(!length(grep("SI_DATIM",colnames(x)))>0){
+              if(!"SI_DATIM" %in% colnames(x)){
                 if(all(c("VE_FLT","VE_KW") %in% colnames(x)))    x$SI_DATIM <- as.POSIXct(paste(x$FT_DDAT,  x$FT_DTIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
                 if(all(c("SI_LATI","SI_LONG") %in% colnames(x))) x$SI_DATIM <- as.POSIXct(paste(x$SI_DATE,  x$SI_TIME,    sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
               }
@@ -17,16 +18,15 @@ effort <- function(x,level="trip",unit="hours"){
               x     <- orderBy(~VE_REF+SI_DATIM+FT_REF,data=x)
 
               if(all(c("SI_LATI","SI_LONG") %in% colnames(x))){
-                spl   <- split(x,f=af(x$ID))
-                eff   <- lapply(spl,function(y){return(an(difftime(last(y$SI_DATIM),y$SI_DATIM[1],units=unit)))})
-                res   <- unlist(eff)
-                res   <- data.frame(cbind(names(res),res)); colnames(res) <- c("ID","effort")
-              }
-              if(all(c("VE_FLT","VE_KW") %in% colnames(x))){
-                x$SI_DATIM2 <- as.POSIXct(paste(x$FT_LDAT,  x$FT_LTIME,    sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-                res   <- an(difftime(x$SI_DATIM2,x$SI_DATIM,units=unit))
-                res   <- data.frame(cbind(x$ID,res)); colnames(res) <- c("ID","effort")
+                x$LE_EFF_VMS  <- abs(c(0, as.numeric(x[-nrow(x),"SI_DATIM"] -
+                                          x[-1,"SI_DATIM"], units=unit)))
+                start.trip    <- c(1,diff(an(x[,"FT_REF"])))
+                x[start.trip!=0, "LE_EFF_VMS"] <- 0  # just correct for the trip change points
               }
 
-              res2    <- merge(x,res,by="ID",all=T)
-        return(res2)}
+              if(all(c("VE_FLT","VE_KW") %in% colnames(x))){
+                x$SI_DATIM2   <- as.POSIXct(paste(x$FT_LDAT,  x$FT_LTIME,    sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+                x$LE_EFF_LOG  <- an(difftime(x$SI_DATIM2,x$SI_DATIM,units=unit))
+              }
+
+        return(x)}
