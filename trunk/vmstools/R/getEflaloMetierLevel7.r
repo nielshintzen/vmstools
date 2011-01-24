@@ -1,4 +1,4 @@
-getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACinSpeciesSelection=TRUE,paramTotal=95,paramLogevent=100,critPca="PCA_70", algoClust="CLARA"){
+getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACinSpeciesSelection=TRUE, paramTotal=95, paramLogevent=100, critPca="PCA_70", algoClust="CLARA"){
 
   #-------------------------------------------------------------------------
   # I. GETTING THE DATA IN AND CLEANING FOR MISSING AND NEGATIVE VALUES ETC
@@ -6,8 +6,8 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
 
   timeStart=Sys.time()
   
-  print("--- CREATING DIRECTORIES AND REDUCING THE EFLALO DATASET TO THE ONLY DATA NECESSARY FOR THE ANALYSIS ---") 
-  cat("\n")
+  print("--- CREATING DIRECTORIES AND REDUCING THE EFLALO DATASET TO THE ONLY DATA NECESSARY FOR THE ANALYSIS ---")
+  cat("\n") 
     
   # creating the directory of the analysis
   if (!file.exists(analysisName)) dir.create(analysisName)
@@ -42,7 +42,7 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   # II. EXPLORING THE VARIOUS METHODS FOR IDENTIFYING MAIN SPECIES AND KEEPING THEM IN THE DATA SET (STEP 1)
   #----------------------------------------------------------------------------------------------------------
   print("--- EXPLORING THE DATA FOR SELECTION OF MAIN SPECIES ---")
-  print("\n") 
+  cat("\n") 
 
   #EXPLORATION
   explo=selectMainSpecies(dat,analysisName,RunHAC=runHACinSpeciesSelection,DiagFlag=FALSE)
