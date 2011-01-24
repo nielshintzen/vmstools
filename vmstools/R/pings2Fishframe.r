@@ -39,7 +39,7 @@
     }
     all.merged$c_square  <-CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05)
     all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
-    all.merged$LE_VMS_EFF <- an(all.merged$LE_EFF_VMS) / 24 # convert in hours
+    all.merged$LE_EFF_VMS <- an(all.merged$LE_EFF_VMS) / 24 # convert in hours
     all.merged <- all.merged[,c("LE_EFF_VMS","KW_HOURS","totvalue", "totweight", "LE_MET_level6","ICES_area","c_square","month")]
     all.merged$c_square <- factor(all.merged$c_square)
     all.merged$ICES_area <- factor(all.merged$ICES_area)
@@ -229,7 +229,7 @@
 
   # save
   write.table(ff, file=file.path(general$output.path,
-         paste("ff_", general$a.year, ".txt", sep='')),  dec=".", sep=";",
+         paste(general$a.country,"_", general$a.year, "VD.csv", sep='')),  dec=".", sep=";",
           quote=FALSE, row.names=FALSE, col.names=FALSE)
 
 
