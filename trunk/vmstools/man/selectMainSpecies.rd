@@ -8,7 +8,7 @@ Identyfing in an EFLALO dataset which species can be considered as important for
 A typical logbook dataset will contain a large number of species recorded, but only a limited 
 number of these could potentially be considered as target species. This function aims thus at identifying these
 by using three different approaches :
-   - HAC (Hierarchical Ascendant Classification) based on Euclidian distances between species with Ward aggregating criteria;
+   - HAC (Hierarchical Ascending Classification) based on Euclidian distances between species with Ward aggregating criteria;
    - Total, where species are ranked based on their proportion in the total catches, and those cumulating to a given percentage are retained
    - Logevent, where species are selected if they represent at least a given percentage of at least one logevent (one line)
 
