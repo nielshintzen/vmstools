@@ -25,14 +25,14 @@ getTableAfterPCA(datSpecies,analysisName="",pcaYesNo="pca",criterion="70percents
   \item{datSpecies}{numerical matrix with Logevents as lines and species as columns, with percentage values (between 0 and 100) of each species in the logevent catches. 
 Logevent ID (LE_ID) should be as row names. Typically, this table will be produced from a eflalo dataset using the function extractTableMainSpecies()
 }
-    \item{analysisName}{character, the name of the run. Used for the file name of the plots. 
+  \item{analysisName}{character, the name of the run. Used for the file name of the plots. 
 }
   \item{pcaYesNo}{character. An indication of whether a PCA should be performed. Use "pca" if a PCA should be run, and "nopca" if it shouldn't.  
 }
   \item{criterion}{character. Criterion used for selected the number of principal components (axes) retained. 
   The number of axes can be chosen either by using a scree test (criterion 'screetest'), looking for the second-order unsignificant marginal increases 
-  of explained inertia, or by selecting all axes cumulating up to 70 percent of explained inertia (criterion '70percents'). If pcaYesNo="noppac", then this criterion
-  should be set as NULL. Experience has shown that the 70percents criterion may often select a larger number axes than the scree test criterion, and may therefore be
+  of explained inertia, or by selecting all axes cumulating up to 70 percent of explained inertia (criterion '70percents'). If pcaYesNo="nopca", then this criterion
+  should be set as NULL. Experience has shown that the '70percents' criterion may often select a larger number axes than the scree test criterion, and may therefore be
   more appropriate for analysing large and heterogeneous datasets, by retaining more information for the subsequent clustering.  
 }
 }
