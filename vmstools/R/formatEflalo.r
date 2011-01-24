@@ -23,8 +23,6 @@ formatEflalo <- function(x){
   x$LE_RECT       <- ac(x$LE_RECT)
   x$LE_MET_level6 <- ac(x$LE_MET_level6)
   x$LE_UNIT       <- ac(x$LE_UNIT)
-  x$LE_EFF        <- an(ac(x$LE_EFF))
-  x$LE_EFF_VMS    <- an(ac(x$LE_EFF_VMS))
   for(i in c(grep("_KG_",colnames(x)),grep("_EURO_",colnames(x)))) x[,i] <- an(ac(x[,i]))
   return(x)
 }
