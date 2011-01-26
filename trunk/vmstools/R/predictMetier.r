@@ -3,30 +3,20 @@
 ####################################################
 
 predictMetier=function(learningData,clustersAffectation,newData){
-#,clustersCheck){
 
   print("#--------- Predict Metier --------#")
-  #library(MASS)
-  library(klaR)   # rda
-  library(mda)   # fda
 
   le_id=rownames(learningData)
   nbSpeciesLearningData=ncol(learningData)   # Number of species of learningData
   namelearningDataSpecies=colnames(learningData)
-  #learningData=as.matrix(learningData,ncol=nbSpeciesLearningData,nrow=length(le_id))
-
-  # Discriminante analysis on the learning dataset
-  #learning=lda(learningData,as.factor(clustersAffectation))
   
   learningData=as.data.frame(cbind(learningData,as.factor(clustersAffectation)))
   colnames(learningData)=c(colnames(learningData[1:nbSpeciesLearningData]),"clust")
   print("------------ Learning ------------")
-  learning=rda(clust~.,data=learningData,gamma=0.05,lambda=0.2)
   learning=fda(clust~.,data=learningData)
   
   #Moving  logevents of newData characterized by catch of species not caught in datSpecies
   #in an undefined Metier
-
   nbSpecNewData=ncol(newData)   # Number of species of newData
   nbLogNewData=nrow(newData)   #Number of logevents of newData
   nameNewDataSpecies=colnames(newData)
@@ -51,17 +41,13 @@ predictMetier=function(learningData,clustersAffectation,newData){
 
   #newDataFormat=newDataFormat[,2:p] #remove LE_ID
   newOrder=match(namelearningDataSpecies,colnames(newDataFormat))
-#  newDataFormatMatrix = as.matrix(newDataFormat[,newOrder],
-#            ncol=nbSpeciesLearningData , nrow=nbLogNewData) #Order col as in learningData
   newDataFormatMatrix=as.data.frame(newDataFormat[,newOrder],
             ncol=nbSpeciesLearningData , nrow=nbLogNewData) #Order col as in learningData
   
   #predict clusters
-  #result.lda=predict(learning.lda,newDataFormatMatrix)
   print("------------ Predicting ------------")
-  result=predict(learning,newDataFormatMatrix)
-  #predictedClusters=data.frame(rownames(newDataFormat0),result.lda$class)
-  predictedClusters=data.frame(rownames(newDataFormat0),result$class)
+  result=predict(learning,newdata=newDataFormatMatrix)  
+  predictedClusters=data.frame(rownames(newDataFormat0),result)
   dimnames(predictedClusters)[[2]]=c("LE_ID","Class")
 
   clustersForAllLogEvents=rbind(predictedClusters,notPredictedClusters)
