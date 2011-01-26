@@ -36,7 +36,7 @@ source("extractTableMainSpecies.r")
 source("getTableAfterPCA.r")
 source("getMetierClusters.r")
 source("selectMainSpecies.r")
-source("compareMultivariateClassificationToOrdination.r")
+source("compareToOrdination.r")
 source("level7to5.r")
 source("level5.r")
 source("predictMetier.r")
@@ -187,7 +187,7 @@ compOrdin="CompOrdin"
 if (!file.exists(compOrdin)) dir.create(compOrdin)
 setwd(paste(path,analysisName,option_step2,option_step3,compOrdin,sep="/"))
 if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)  
-compMetiers=compareMultivariateClassificationToOrdination(dat=dat1,Step2=Step2,clusters=Step3$clusters$clustering)
+compMetiers=compareToOrdination(dat=dat1,Step2=Step2,clusters=Step3$clusters$clustering)
 save(compMetiers,file="compMetiers.Rdata")
 
 
