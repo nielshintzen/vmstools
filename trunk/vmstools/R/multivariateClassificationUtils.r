@@ -4,14 +4,13 @@
 ##########################################################################
 
 
-library(FactoMineR)
-library(cluster)
-library(graphics)
-library(stats)
-library(SOAR)
-library(amap)
-library(MASS)
-library(RODBC)
+library(FactoMineR)   # function PCA
+library(cluster)      # functions pam & clara
+library(SOAR)         # function Store
+library(amap)         # function hcluster
+library(MASS)         # function lda
+#library(RODBC)
+library(mda)          # function fda
 
 
 
