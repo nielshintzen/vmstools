@@ -100,7 +100,7 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   if (!file.exists(compOrdin)) dir.create(compOrdin)
   setwd(file.path(path,analysisName,critPca,algoClust,compOrdin))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
-  compMetiers=compareMultivariateClassificationToOrdination(dat=dat,Step2=Step2,clusters=Step3$clusters$clustering)
+  compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=Step3$clusters$clustering)
   save(compMetiers,file="compMetiers.Rdata")
   
   
