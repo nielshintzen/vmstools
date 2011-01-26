@@ -11,7 +11,7 @@ This function will run the various steps of the multivariate analyses in the rig
 }
 
 \usage{
-getEflaloMetierLevel7(dat, analysisName, path, critData="EURO", runHACinSpeciesSelection=TRUE,paramTotal=95,paramLogevent=100,critPca="PCA_70", algoClust="CLARA")
+getEflaloMetierLevel7(dat,analysisName,path,critData="EURO",runHACinSpeciesSelection=TRUE,paramTotal=95,paramLogevent=100,critPca="PCA_70",algoClust="CLARA")
 
 }
 
@@ -53,10 +53,10 @@ Beside, a number of sub-directories are created, with intermediate results and p
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\author{Nicolas Deporte, Sebastien Demanèche,Stepanie Mahévas, Clara Ulrich}
+\author{Nicolas Deporte, Sébastien Demanèche, Stéphanie Mahévas, Clara Ulrich}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
 
-\seealso{\code{selectMainSpecies(), extractTableMainSpecies(),getTableAfterPCA(),getMetierClusters(),compareMultivariateClassificationToOrdination()}}
+\seealso{\code{selectMainSpecies(),extractTableMainSpecies(),getTableAfterPCA(),getMetierClusters(),compareToOrdination()}}
 
 \examples{
 
