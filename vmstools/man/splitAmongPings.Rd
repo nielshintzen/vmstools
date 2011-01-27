@@ -1,11 +1,12 @@
 \name{splitAmongPings}
 \alias{splitAmongPings}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Split values or landings from eflalo over tacsat pings
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Split the values or landings as listed in the eflalo file over the tacsat pings,
+while taking different levels into account such as by day, ICESrectangle or by trip number.
+Also there is a possibility to merge the eflalo records without a matching tacsat trip.
 }
 \usage{
 splitAmongPings(tacsat, eflalo, variable = "all", level = "day", conserve = T)

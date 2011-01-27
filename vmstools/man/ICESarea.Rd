@@ -23,7 +23,7 @@ Returns the areas as a vector}
 \author{Neil Campbell}
 \seealso{
 \code{ICESrectangle(), ICESrectangle2LonLat()
-}
+}}
 \examples{
 res   <- data.frame(SI_LONG = c(1,2,2,4,2),SI_LATI = c(53,53.2,54,56.7,55.2))
 areas <- ICESarea(res)
