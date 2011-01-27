@@ -87,8 +87,6 @@ Finally, the function returns a list with a number of results and diagnotics on 
 }
   \item{clusters}{diagnostics of the clustering process. It may vary between the four methods. 
 }
-  \item{nameTarget}{A tabulated list ranking the most characteristic (species with a test-value > 1.98 by cluster) species in the clusters. 
-}
   \item{betweenVarClassifOnTot}{Percentage of variance explained by the classification.  
 }
   \item{nbClust}{Final number of clusters retained.  
@@ -99,15 +97,21 @@ Finally, the function returns a list with a number of results and diagnotics on 
   \item{resval}{Matrix of test values by species and cluster. The test value measures for each species the difference between the average percentage
   of catches in the cluster compared to the average percentage of catch in the total dataset, thus large positive values (>1.98) will point out the most characteristic species in the clusters.     
 }
-  \item{target}{A tabulated list ranking the most important (in terms of percentage value) and characteristic (in terms of test values) species in the clusters.     
+  \item{target}{A tabulated list ranking the most characteristic species in the clusters (ordering species with a test-value > 1.98 by decreasing order of
+  test-value).     
 }
-
+  \item{descClusters}{A data frame giving some descriptive statistics for each cluster, like cluster size, number of species needed to have at least 50% of the
+  cluster's total catch, number of species with a test-value > 1.98 in the cluster, number of species caught in at least 50% of the logevents, etc...     
+}
+  \item{tabClusters}{A three-dimensional array giving for each cluster a table resuming the most important (in catch) and characteristic (in test-value) species 
+  in the cluster, and the percentage of logevents of the cluster catching these species.     
+}
  
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\author{Nicolas Deporte, Sébastien Demanèche, Stepanie Mahévas, Clara Ulrich}
-\note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
+\author{Nicolas Deporte, Sébastien Demanèche, Stéphanie Mahévas, Clara Ulrich}
+\note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
 
 \seealso{\code{extractTableMainSpecies(),getTableAfterPCA()}}
 
@@ -120,3 +124,4 @@ Finally, the function returns a list with a number of results and diagnotics on 
 }
 
 \keyword{}
+                                       
