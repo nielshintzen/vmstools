@@ -1,8 +1,7 @@
 \name{clipPolygons}
 \alias{clipPolygons}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Function to clip Polygons together
 }
 \description{
 %%  ~~ A concise (1-5 lines) description of what the function does. ~~
