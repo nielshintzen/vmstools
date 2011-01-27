@@ -9,7 +9,6 @@ library(cluster)      # functions pam & clara
 library(SOAR)         # function Store
 library(amap)         # function hcluster
 library(MASS)         # function lda
-#library(RODBC)
 library(mda)          # function fda
 
 
