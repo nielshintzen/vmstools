@@ -177,7 +177,7 @@ compareToOrdination=function(dat, Step2, clusters){
   espSelByCluster=matrix(0,nrow=nbClust,ncol=p)
   nomEspSelByCluster=matrix(NA,nrow=nbClust,ncol=p)
   for(cl in 1:nbClust){ 
-    pourcent=which(propEspByClusterCum[cl,]<=seuilCatch)
+    pourcent=which(propEspByClusterCum[cl,]<seuilCatch)
     # Name of selected species by cluster
     espSelByCluster[cl,1:(length(pourcent)+1)]=numEspByCluster[cl,1:(length(pourcent)+1)]
     nomEspSelByCluster[cl,1:(length(pourcent)+1)]=nameSpecies[espSelByCluster[cl,1:(length(pourcent)+1)]]
@@ -196,6 +196,7 @@ compareToOrdination=function(dat, Step2, clusters){
   
   # Metiers (level 5.7) of each logevent found thanks to the getMetierClusters method.
   clustersStep3L5=unlist(sapply(clusters,function(x) listMetiersLevel57[x]))
+  
   
   
   #################
@@ -217,34 +218,17 @@ compareToOrdination=function(dat, Step2, clusters){
   compL5vsL7=table(logGroupL5,clustStep3L7)
   colnames(compL5vsL7)=paste("Clust",seq=1:nbClust)
   
-  # Compare the metiers (level 5.7) found thanks to the getMetierClusters vs the first species in catch (level 5)
-  #compL5ClustStep3VsSpecies=table(clustersStep3L5,logSpeciesL5)    !! pb regroupement des clusters qui correspondent au même groupe d'espèce niveau 5.
-#  compL5ClustStep3VsSpecies=table(clustStep3L5,logSpeciesL5)         ## pb avec logSpeciesL5
-#  rownames(compL5ClustStep3VsSpecies)=unlist(listMetiersLevel57)
-  
 
-  
-  
-  
-  
-#  pourcentNbLogEspOrdiPlot=t(apply(nbLogEspOrdiPlot,1,function(x) x/sum(x)*100))
-#  barplot(pourcentNbLogEspOrdiPlot)
-#  
-#  write.table(pourcentNbLogEspOrdiPlot, file="pourcentNbLogEspOrdiPlot.txt", quote=T, dec='.', sep=';', col.names=T, row.names=T)
-
-  tabCompL57vsL5=as.data.frame(apply(format(compL57vsL5), 2, as.numeric))
-  tabCompL57vsL7=as.data.frame(apply(format(compL57vsL7), 2, as.numeric))
-  tabCompL5vsL7=as.data.frame(apply(format(compL5vsL7), 2, as.numeric))
-
-  db="compClassifvsOrdin.xls"
-  if(db %in% list.files()) file.remove(db)
-  channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
-  sqlSave(channel, cbind(rownames(compL57vsL5),tabCompL57vsL5), tablename = "compL57vsL5")
-  sqlSave(channel, cbind(rownames(compL57vsL7),tabCompL57vsL7), tablename = "compL57vsL7")
-  sqlSave(channel, cbind(rownames(compL5vsL7),tabCompL5vsL7), tablename = "compL5vsL7")
-  odbcClose(channel)
-  
-  
+  # Create csv tables
+  dfTables=data.frame()
+  dfTables=c("compL57vsL5","compL57vsL7","compL5vsL7")
+  write.table(dfTables[1],file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(compL57vsL5,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(dfTables[2],file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(compL57vsL7,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(dfTables[3],file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(compL5vsL7,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+    
 
   return(list(nbLogFirstSp=nbLogFirstSp, compNbLogClustVsFirstSp=compNbLogClustVsFirstSp,
    compL57vsL5=compL57vsL5, compL57vsL7=compL57vsL7, compL5vsL7=compL5vsL7))
