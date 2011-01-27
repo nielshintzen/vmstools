@@ -506,17 +506,18 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Descriptive and summary tables of clusters
     clusterDesc=matrix(0,nrow=7,ncol=nbClust)
     for(i in 1:nbClust){
-      clusterDesc[,i]=c(sizeClusters[i],
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+      clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
                         length(which(resval[,i]>1.98)),
                         length(which(resval[,i]>3.29)),
                         length(which(apply(datSpecies,2,function (x) (sizeClusters[i]-length(which(x[clusters==i]==0)))/sizeClusters[i]*100)>50)),
-                        length(which(apply(datSpecies,2,function (x) (sizeClusters[i]-length(which(x[clusters==i]==0)))/sizeClusters[i]*100)>90)))
+                        length(which(apply(datSpecies,2,function (x) (sizeClusters[i]-length(which(x[clusters==i]==0)))/sizeClusters[i]*100)>90)),
+                        sizeClusters[i])
     }
-    rownames(clusterDesc)=c("Clusters size","to have 50% of catch", "to have 90% of catch",
+    rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
                             "with a test-value > 1.98", "with a test-value > 3.29",
-                            "catch in 50% of the logevents", "catch in 90% of the logevents")
+                            "catch in 50% of the logevents", "catch in 90% of the logevents",
+                            "Clusters size")
     colnames(clusterDesc)=1:nbClust
     clusterDesc2=as.data.frame(clusterDesc)
 
@@ -565,34 +566,33 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
     }
 
-    db <- paste(analysisName,"_tables.xls",sep="")
-    if(db %in% list.files()) file.remove(db)
-    channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
-    sqlSave(channel, clusterDesc2, tablename = "DescClust")
 
+    # Create csv tables
+    write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
+    
+    dfClust=data.frame()
+    dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA)
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      sqlSave(channel, tabClusti, tablename = paste("Clust",i,sep=""),rownames = TRUE, colnames = TRUE)
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA)  
     }
-    odbcClose(channel)
-
-
-
-
+    
+    
     LE_ID_clust=cbind(LE_ID=LE_ID,clust=clusters)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, sizeClusters=sizeClusters,
-     nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot,
-      mProfilSample=mProfilSample, nbClust=nbClust, summaryClusters=summaryClusters,
-       resval=resval, target=target))
+     betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, 
+     nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, 
+     target=target$tabnomespcib, descClusters=clusterDesc2, tabClusters=tabClusters))
 
   }   else
 
 
 
-
+                          
 
 ########################################################################################################################################   KMEANS
 
@@ -776,17 +776,18 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Descriptive and summary tables of clusters
     clusterDesc=matrix(0,nrow=7,ncol=nbClust)
     for(i in 1:nbClust){
-      clusterDesc[,i]=c(clusters$size[i],
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+      clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
                         length(which(resval[,i]>1.98)),
                         length(which(resval[,i]>3.29)),
                         length(which(apply(datSpecies,2,function (x) (clusters$size[i]-length(which(x[clusters$cluster==i]==0)))/clusters$size[i]*100)>50)),
-                        length(which(apply(datSpecies,2,function (x) (clusters$size[i]-length(which(x[clusters$cluster==i]==0)))/clusters$size[i]*100)>90)))
+                        length(which(apply(datSpecies,2,function (x) (clusters$size[i]-length(which(x[clusters$cluster==i]==0)))/clusters$size[i]*100)>90)),
+                        clusters$size[i])
     }
-    rownames(clusterDesc)=c("Clusters size","to have 50% of catch", "to have 90% of catch",
+    rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
                             "with a test-value > 1.98", "with a test-value > 3.29",
-                            "catch in 50% of the logevents", "catch in 90% of the logevents")
+                            "catch in 50% of the logevents", "catch in 90% of the logevents",
+                            "Clusters size")
     colnames(clusterDesc)=1:nbClust
     clusterDesc2=as.data.frame(clusterDesc)
 
@@ -835,30 +836,32 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
     }
 
-    db <- paste(analysisName,"_tables.xls",sep="")
-    if(db %in% list.files()) file.remove(db)
-    channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
-    sqlSave(channel, clusterDesc2, tablename = "DescClust")
 
+    # Create csv tables
+    write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
+    
+    dfClust=data.frame()
+    dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA)
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      sqlSave(channel, tabClusti, tablename = paste("Clust",i,sep=""),rownames = TRUE, colnames = TRUE)
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA)  
     }
-    odbcClose(channel)
-
-
-
-
+    
+    
     LE_ID_clust=cbind(LE_ID=LE_ID,clust=clusters$cluster)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, 
+    betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, 
+    summaryClusters=summaryClusters, resval=resval, target=target$tabnomespcib,
+    descClusters=clusterDesc2, tabClusters=tabClusters))
 
   } else
 
 
-
+                      
 
 
 ########################################################################################################################################   PAM
@@ -1052,17 +1055,18 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Descriptive and summary tables of clusters
     clusterDesc=matrix(0,nrow=7,ncol=nbClust)
     for(i in 1:nbClust){
-      clusterDesc[,i]=c(clusters$clusinfo[i,1],
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+      clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
                         length(which(resval[,i]>1.98)),
                         length(which(resval[,i]>3.29)),
                         length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>50)),
-                        length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)))
+                        length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)),
+                        clusters$clusinfo[i,1])
     }
-    rownames(clusterDesc)=c("Clusters size","to have 50% of catch", "to have 90% of catch",
+    rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
                             "with a test-value > 1.98", "with a test-value > 3.29",
-                            "catch in 50% of the logevents", "catch in 90% of the logevents")
+                            "catch in 50% of the logevents", "catch in 90% of the logevents",
+                            "Clusters size")
     colnames(clusterDesc)=1:nbClust
     clusterDesc2=as.data.frame(clusterDesc)
 
@@ -1111,28 +1115,32 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
     }
 
-    db <- paste(analysisName,"_tables.xls",sep="")
-    if(db %in% list.files()) file.remove(db)
-    channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
-    sqlSave(channel, clusterDesc2, tablename = "DescClust")
 
+    # Create csv tables
+    write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
+    
+    dfClust=data.frame()
+    dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA)
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      sqlSave(channel, tabClusti, tablename = paste("Clust",i,sep=""),rownames = TRUE, colnames = TRUE)
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA)  
     }
-    odbcClose(channel)
 
 
     LE_ID_clust=cbind(LE_ID=LE_ID,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, nameTarget=target$tabnomespcib, betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, target=target))
+    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, 
+    betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, 
+    summaryClusters=summaryClusters, resval=resval, target=target$tabnomespcib,
+    descClusters=clusterDesc2, tabClusters=tabClusters))
 
   } else
 
 
-
+         
 
 
 ########################################################################################################################################   CLARA
@@ -1321,17 +1329,18 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Descriptive and summary tables of clusters
     clusterDesc=matrix(0,nrow=7,ncol=nbClust)
     for(i in 1:nbClust){
-      clusterDesc[,i]=c(clusters$clusinfo[i,1],
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+      clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
                         length(which(resval[,i]>1.98)),
                         length(which(resval[,i]>3.29)),
                         length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>50)),
-                        length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)))
+                        length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)),
+                        clusters$clusinfo[i,1])
     }
-    rownames(clusterDesc)=c("Clusters size","to have 50% of catch", "to have 90% of catch",
+    rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
                             "with a test-value > 1.98", "with a test-value > 3.29",
-                            "catch in 50% of the logevents", "catch in 90% of the logevents")
+                            "catch in 50% of the logevents", "catch in 90% of the logevents",
+                            "Clusters size")
     colnames(clusterDesc)=1:nbClust
     clusterDesc2=as.data.frame(clusterDesc)
 
@@ -1380,31 +1389,31 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
     }
 
-    db <- paste(analysisName,"_tables.xls",sep="")
-    if(db %in% list.files()) file.remove(db)
-    channel <- odbcConnectExcel(xls.file = db,readOnly=FALSE)
-    sqlSave(channel, clusterDesc2, tablename = "DescClust")
 
+    # Create csv tables
+    write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
+    
+    dfClust=data.frame()
+    dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA)
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      sqlSave(channel, tabClusti, tablename = paste("Clust",i,sep=""),rownames = TRUE, colnames = TRUE)
-    }
-    odbcClose(channel)
-
-
-
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA)  
+    }     
 
 
     LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters$clustering)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
-    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, nameTarget=target$tabnomespcib,
+    return(list(LE_ID_clust=LE_ID_clust, clusters=clusters,
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust,
-    summaryClusters=summaryClusters, resval=resval, target=target))
+    summaryClusters=summaryClusters, resval=resval, target=target$tabnomespcib, 
+    descClusters=clusterDesc2, tabClusters=tabClusters))
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
 
 
 } # end of the function "getMetierClusters"
+                          
