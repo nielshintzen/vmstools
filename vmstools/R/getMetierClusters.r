@@ -488,7 +488,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       targetresval=rbind(targetresval,targetresvalclusti)
     }
 
-    png(paste(analysisName,"Profile of target species by cluster.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Profile of test-values by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -497,7 +497,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
+    title(main=paste("Profile of test-values by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -585,8 +585,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, sizeClusters=sizeClusters,
      betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, 
-     nbClust=nbClust, summaryClusters=summaryClusters, resval=resval, 
-     target=target$tabnomespcib, descClusters=clusterDesc2, tabClusters=tabClusters))
+     nbClust=nbClust, summaryClusters=summaryClusters, testValues=resval, 
+     testValuesSpecies=target$tabnomespcib, descClusters=clusterDesc2, tabClusters=tabClusters))
 
   }   else
 
@@ -758,7 +758,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       targetresval=rbind(targetresval,targetresvalclusti)
     }
 
-    png(paste(analysisName,"Profile of target species by cluster.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Profile of test-values by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -767,7 +767,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
+    title(main=paste("Profile of test-values by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -855,7 +855,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, 
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, 
-    summaryClusters=summaryClusters, resval=resval, target=target$tabnomespcib,
+    summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib,
     descClusters=clusterDesc2, tabClusters=tabClusters))
 
   } else
@@ -1038,7 +1038,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       targetresval=rbind(targetresval,targetresvalclusti)
     }
 
-    png(paste(analysisName,"Profile of target species by cluster.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Profile of test-values by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -1047,7 +1047,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
+    title(main=paste("Profile of test-values by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -1134,7 +1134,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, 
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, 
-    summaryClusters=summaryClusters, resval=resval, target=target$tabnomespcib,
+    summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib,
     descClusters=clusterDesc2, tabClusters=tabClusters))
 
   } else
@@ -1312,7 +1312,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       targetresval[i,numtargeti]=resval[nomtargeti,i]
     }
 
-    png(paste(analysisName,"Profile of target species by cluster.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Profile of test-values by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -1321,7 +1321,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
+    title(main=paste("Profile of test-values by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -1408,7 +1408,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters,
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust,
-    summaryClusters=summaryClusters, resval=resval, target=target$tabnomespcib, 
+    summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib, 
     descClusters=clusterDesc2, tabClusters=tabClusters))
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
