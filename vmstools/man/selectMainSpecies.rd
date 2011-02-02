@@ -85,8 +85,8 @@ The function returns also a list of diagnostics of the three methods :
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\author{Nicolas Deporte, Sebastien Demanèche, Stepanie Mahévas, Clara Ulrich, Francois Bastardie}
-\note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
+\author{Nicolas Deporte, Sebastien Demanèche, Stepanie Mahévas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
+\note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap) }
 
 \seealso{\code{extractTableMainSpecies()}}
 
