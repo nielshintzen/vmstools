@@ -94,11 +94,12 @@ Finally, the function returns a list with a number of results and diagnotics on 
   \item{summaryClusters}{Array documenting, for each cluster, the minimum, mean, maximum, as well as the 25%, 50% and 75% quantiles values of the
   percentage of catch by species for the individual logevents in the cluster.     
 }
-  \item{resval}{Matrix of test values by species and cluster. The test value measures for each species the difference between the average percentage
-  of catches in the cluster compared to the average percentage of catch in the total dataset, thus large positive values (>1.98) will point out the most characteristic species in the clusters.     
+  \item{testValues}{Matrix of test-values by species and cluster. The test-value measures for each species the difference between the average percentage
+  of catches in the cluster compared to the average percentage of catch in the total dataset, thus large positive values (>1.98) will point out the most 
+  characteristic species in the clusters.     
 }
-  \item{target}{A tabulated list ranking the most characteristic species in the clusters (ordering species with a test-value > 1.98 by decreasing order of
-  test-value).     
+  \item{testValuesSpecies}{A tabulated list ranking the most characteristic species in the clusters (ordering species with a test-value > 1.98 by decreasing 
+  order of test-value).     
 }
   \item{descClusters}{A data frame giving some descriptive statistics for each cluster, like cluster size, number of species needed to have at least 50% of the
   cluster's total catch, number of species with a test-value > 1.98 in the cluster, number of species caught in at least 50% of the logevents, etc...     
