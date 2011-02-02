@@ -12,8 +12,8 @@ by using three different approaches :
    - Total, where species are ranked based on their proportion in the total catches, and those cumulating to a given percentage are retained
    - Logevent, where species are selected if they represent at least a given percentage of at least one logevent (one line)
 
-All the three methods work on catch data transformed in percentage of species by logevent (line), in order to remove the effect of large
-hauls compared to small hauls.    
+The HAC and the Logevent methods works on catch data transformed in percentage of species by logevent (line), in order to remove the effect of large
+hauls compared to small hauls. The Total method works on raw data.     
 In the HAC method, a first group of species, the principal ones, is identified by clustering and using a first-order scree test for cutting the tree. 
 Other species are pooled in the group of residuals. New similar HACs are run through a loop on this group of residuals species, to identify if any new species
 might have been left aside in the first run. It is important to note though that HAC method might quickly reach memory limits on standard PCs, and may thus
@@ -85,7 +85,7 @@ The function returns also a list of diagnostics of the three methods :
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\author{Nicolas Deporte, Sebastien Demanèche, Stepanie Mahévas, Clara Ulrich}
+\author{Nicolas Deporte, Sebastien Demanèche, Stepanie Mahévas, Clara Ulrich, Francois Bastardie}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
 
 \seealso{\code{extractTableMainSpecies()}}
