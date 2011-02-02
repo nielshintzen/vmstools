@@ -6,7 +6,7 @@ Finding métiers for a new reduced EFLALO dataset from a reduced EFLALO dataset f
 }
 \description{
 This function permits to determine the métiers of new logevents belonging to a new reduced EFLALO dataset, from a reduced EFLALO dataset for which the 
-métiers are known. For example, this function permits to determine the métiers of logevents realized in 2008, basing to métiers of logevents realized 
+métiers are known. For example, this function permits to determine the métiers of logevents realized in 2008, basing on métiers of logevents realized 
 in 2007. It works with a discriminante analysis ran with the function fda. In the first time, the function fda calibrates a model basing on the dataset 
 for which the métiers are known. In the second time, the function predict is used to predict the métiers of new logevents, thanks to the previous 
 model.
@@ -25,7 +25,7 @@ predictMetier(learningData,clustersAffectation,newData)
   logevent the number of the cluster to which it belongs. This vector will be produced at the step 3 of the métier analysis,
   using the function getMetierClusters(). 
 }
-  \item{newData}{A numerical matrix with logevents as lines and species as columns, with values of each species in the logevent catches. 
+  \item{newData}{A numerical matrix with logevents as lines and species as columns, with raw values of each species in the logevent catches. 
   Logevent ID (LE_ID) should be as row names. 
 }
 }
@@ -35,7 +35,7 @@ predictMetier(learningData,clustersAffectation,newData)
 
 \value{
 A data frame giving the logevent ID (LE_ID) (first column) and the number of the cluster to which it belongs (second column), for all logevents
-belonging to newData.
+in newData. The cluster number "0" corresponds to the unknown métier.
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
