@@ -3,11 +3,11 @@
 %- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{
-Useful functions for the multivariate analysis of logbooks data for identifying metiers.
+Useful functions for the multivariate analysis of logbooks data for identifying métiers.
 }
 
 \description{
-This function contains several functions needed for the multivariate analysis of logbooks data for identifying metiers.
+This function contains several functions needed for the multivariate analysis of logbooks data for identifying métiers.
 
 \item{transformation_proportion}{Transform quantities to percentage values (between 0 and 100) of each species in the logevent total catch.
 }
