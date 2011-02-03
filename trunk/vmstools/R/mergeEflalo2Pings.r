@@ -871,7 +871,7 @@ NIELS <- FALSE
                                       substr(merged[idx,]$SI_DATIM , 15,16), sep='')
 
         # last calculation
-        merged$KW_HOURS <- anf(merged$VE_KW) * anf(merged$LE_EFF_VMS)
+        merged$KW_HOURS <- anf(merged$VE_KW) * anf(merged$LE_EFF_VMS) /60
 
         # order chronologically
         merged <- orderBy(~SI_DATIM, merged)
