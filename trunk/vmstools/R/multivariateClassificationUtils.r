@@ -13,7 +13,8 @@ library(mda)          # function fda
 
 
 
-# Transform quantities to percents fished in the logevent
+# Transform quantities to percentage values (between 0 and 100) 
+# of each species in the logevent total catch
 transformation_proportion=function(tab){
   res=as.matrix(tab)
   n=nrow(tab)
@@ -30,7 +31,7 @@ transformation_proportion=function(tab){
 }
 
 
-# Transposing data (changing variables into individuals)
+# Transpose the dataset (change variables into individuals)
 table_variables=function(data){
   n=nrow(data)
   res1=t(as.matrix(data[1:round(n/2),]))
@@ -42,7 +43,7 @@ table_variables=function(data){
 }
 
 
-# Scree-test
+# Implementation of "scree-test"
 scree=function(eig){
   n=length(eig)
   delta=numeric(n)
@@ -58,7 +59,7 @@ scree=function(eig){
 }
 
 
-# Removing the cluster with the smallest mean of capture
+# Remove the cluster with the smallest mean of capture
 select_species=function(data,groupes_cah){
   nb.classes=length(levels(as.factor(groupes_cah)))
   moyennes=numeric(nb.classes)
@@ -73,7 +74,7 @@ select_species=function(data,groupes_cah){
 }
 
 
-# Building the table with main species
+# Build the table with the main species
 building_tab_pca=function(data,especes){
   p=ncol(data)
   noms=colnames(data)
@@ -83,7 +84,7 @@ building_tab_pca=function(data,especes){
 }
 
 
-# Function computing the test-values
+# Compute the test-value for each species by cluster
 test.values=function(groupes,data){
                                                                          
   n=nrow(data)
@@ -130,7 +131,7 @@ test.values=function(groupes,data){
 }
 
 
-# Fonction determining the target species
+# Determine the species with a test-value > 1.96 by cluster
 targetspecies=function(resval){
   p=nrow(resval)
   nbgp=ncol(resval)
@@ -162,7 +163,7 @@ targetspecies=function(resval){
 }
 
 
-# Calcule of within variance of a cluster (square distance between each row of 
+# Calculate the cluster's within-variance (square distance between each row of 
 # the cluster and the cluster's center of gravity)
 # we calculate the distance row by row
 withinVar=function(oneRowOfCluster,centerOfGravityClusti){
