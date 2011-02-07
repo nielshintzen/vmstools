@@ -25,7 +25,7 @@ formatEflalo <- function(x){
   x$LE_GEAR       <- ac(x$LE_GEAR)
   x$LE_MSZ        <- an(ac(x$LE_MSZ))
   x$LE_RECT       <- ac(x$LE_RECT)
-  X$LE_DIV        <- ac(x$LE_DIV)
+  x$LE_DIV        <- ac(x$LE_DIV)
   if(length(grep("LE_MET",colnames(x)))>0) x[,grep("LE_MET",colnames(x))] <- ac(x[,grep("LE_MET",colnames(x))])
   for(i in c(grep("_KG_",colnames(x)),grep("_EURO_",colnames(x)))) x[,i] <- an(ac(x[,i]))
   return(x)
