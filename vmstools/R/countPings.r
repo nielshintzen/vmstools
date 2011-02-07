@@ -64,5 +64,5 @@ countPings <- function(formula,tacsat,grid=NULL){
                   res             <- DT[,sum(SUM),by=eval(eq)]
                   colnames(res)   <- c(totVars,"pings")
 
-              return(res)}
+              return(data.frame(res))}
 
