@@ -7,6 +7,9 @@
 
 getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara",param1="euclidean",param2=NULL){
 
+  # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
+  data(correspLevel7to5)
+  
   #le_id <- datSpecies[,1]
   #datSpecies <- datSpecies[,-1]
   #datSpecies <- as.matrix(as.numeric(datSpecies[,-1]))
@@ -527,13 +530,21 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
     namesTarget=matrix(NA,nrow=nbClust,ncol=5)
     nbSpeciesVT = min(5,dim(target$tabnomespcib)[[2]])
-
+    tabLibname=matrix(NA,nrow=nbClust,ncol=10)
+    listLibname=list()
+    
     for(i in 1:nbClust){
       namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
       a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
       colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
       namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
       namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
+    }
+    
+    for(i in 1:nbClust){
+        listLibname[[i]]=lapply(as.list(namesSpecies[i,]), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+                                                    else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"French_name"])
+        tabLibname[i,]=unlist(lapply(listLibname[[i]], function(x) as.character(unlist(x))))
     }
 
     tabPropCatch=matrix(NA,nrow=nbClust,ncol=10)
@@ -554,11 +565,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       print(propLog)
     }
 
-    tabClusters=array(0,dim=c(10,4,nbClust))
-    dimnames(tabClusters)[[2]]=c("FAO","Test-value","% Catch","% Logevents")
+    tabClusters=array(0,dim=c(10,5,nbClust))
+    dimnames(tabClusters)[[2]]=c("Libname","FAO","Test-value","% Catch","% Logevents")
     dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
     for(i in 1:nbClust){
-      tabClusters[,,i]=cbind(namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
+      tabClusters[,,i]=cbind(tabLibname[i,],namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
     }
 
     sizeTabClusters=numeric()
@@ -797,6 +808,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
     namesTarget=matrix(NA,nrow=nbClust,ncol=5)
     nbSpeciesVT = min(5,dim(target$tabnomespcib)[[2]])
+    tabLibname=matrix(NA,nrow=nbClust,ncol=10)
+    listLibname=list()
 
     for(i in 1:nbClust){
       namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
@@ -805,7 +818,13 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
       namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
     }
-
+    
+    for(i in 1:nbClust){
+        listLibname[[i]]=lapply(as.list(namesSpecies[i,]), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+                                                    else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"French_name"])
+        tabLibname[i,]=unlist(lapply(listLibname[[i]], function(x) as.character(unlist(x))))
+    }
+        
     tabPropCatch=matrix(NA,nrow=nbClust,ncol=10)
     tabTestVal=matrix(NA,nrow=nbClust,ncol=10)
     tabPropLog=matrix(NA,nrow=nbClust,ncol=10)
@@ -824,11 +843,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       print(propLog)
     }
 
-    tabClusters=array(0,dim=c(10,4,nbClust))
-    dimnames(tabClusters)[[2]]=c("FAO","Test-value","% Catch","% Logevents")
+    tabClusters=array(0,dim=c(10,5,nbClust))
+    dimnames(tabClusters)[[2]]=c("Libname","FAO","Test-value","% Catch","% Logevents")
     dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
     for(i in 1:nbClust){
-      tabClusters[,,i]=cbind(namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
+      tabClusters[,,i]=cbind(tabLibname[i,],namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
     }
 
     sizeTabClusters=numeric()
@@ -1076,6 +1095,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
     namesTarget=matrix(NA,nrow=nbClust,ncol=5)
     nbSpeciesVT = min(5,dim(target$tabnomespcib)[[2]])
+    tabLibname=matrix(NA,nrow=nbClust,ncol=10)
+    listLibname=list()
 
     for(i in 1:nbClust){
       namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
@@ -1083,6 +1104,12 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
       namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
       namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
+    }
+    
+    for(i in 1:nbClust){
+        listLibname[[i]]=lapply(as.list(namesSpecies[i,]), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+                                                    else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"French_name"])
+        tabLibname[i,]=unlist(lapply(listLibname[[i]], function(x) as.character(unlist(x))))
     }
 
     tabPropCatch=matrix(NA,nrow=nbClust,ncol=10)
@@ -1103,11 +1130,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       print(propLog)
     }
 
-    tabClusters=array(0,dim=c(10,4,nbClust))
-    dimnames(tabClusters)[[2]]=c("FAO","Test-value","% Catch","% Logevents")
+    tabClusters=array(0,dim=c(10,5,nbClust))
+    dimnames(tabClusters)[[2]]=c("Libname","FAO","Test-value","% Catch","% Logevents")
     dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
     for(i in 1:nbClust){
-      tabClusters[,,i]=cbind(namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
+      tabClusters[,,i]=cbind(tabLibname[i,],namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
     }
 
     sizeTabClusters=numeric()
@@ -1350,6 +1377,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
     namesTarget=matrix(NA,nrow=nbClust,ncol=5)
     nbSpeciesVT = min(5,dim(target$tabnomespcib)[[2]])
+    tabLibname=matrix(NA,nrow=nbClust,ncol=10)
+    listLibname=list()
 
     for(i in 1:nbClust){
       namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
@@ -1358,7 +1387,13 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
       namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
     }
-
+    
+    for(i in 1:nbClust){
+        listLibname[[i]]=lapply(as.list(namesSpecies[i,]), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+                                                    else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"French_name"])
+        tabLibname[i,]=unlist(lapply(listLibname[[i]], function(x) as.character(unlist(x))))
+    }
+         
     tabPropCatch=matrix(NA,nrow=nbClust,ncol=10)
     tabTestVal=matrix(NA,nrow=nbClust,ncol=10)
     tabPropLog=matrix(NA,nrow=nbClust,ncol=10)
@@ -1377,11 +1412,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       print(propLog)
     }
 
-    tabClusters=array(0,dim=c(10,4,nbClust))
-    dimnames(tabClusters)[[2]]=c("FAO","Test-value","% Catch","% Logevents")
+    tabClusters=array(0,dim=c(10,5,nbClust))
+    dimnames(tabClusters)[[2]]=c("Libname","FAO","Test-value","% Catch","% Logevents")
     dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
     for(i in 1:nbClust){
-      tabClusters[,,i]=cbind(namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
+      tabClusters[,,i]=cbind(tabLibname[i,],namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
     }
 
     sizeTabClusters=numeric()
