@@ -10,15 +10,15 @@
 #   WITH MULTIVARIATE CLASSIFICATION                                      #
 ###########################################################################  
   
-compareToOrdination=function(dat, Step2, clusters){
+compareToOrdination=function(dat, Step2, clusters, tabClusters){
 
+  # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
+  data(correspLevel7to5)
+  
   ##########################
   # FIRST SPECIES IN CATCH #
   ##########################
   
-  # Modification of the name of species
-  #  names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
-  #  names(dat)
   dat=as.matrix(dat[,2:ncol(dat)])
   p=ncol(dat)
   firstSp=list()
@@ -26,6 +26,7 @@ compareToOrdination=function(dat, Step2, clusters){
 
   # Determine the first species for each logevent (the catchest species of the logevent)
   firstSp=apply(dat,1,function(x) names(which.max(x)))
+  metiersFirstSpeciesL7=firstSp
   
   # Calculate the number of logevent by first species (number of logevents by cluster)
   nbLogFirstSp=sapply(unique(unlist(firstSp)),function(x) table(firstSp==x)[2])
@@ -90,7 +91,6 @@ compareToOrdination=function(dat, Step2, clusters){
   espOrdi=matrix()
   espOrdi=rbind(names(nbLogFirstSp),seq(1:length(nbLogFirstSp)))
   numFirstSp=firstSp
-  #firstSp=sapply(nomEspOrdi, function(x) firstSp[which(firstSp==x)]=espOrdi[2,which(espOrdi[1,]==x)])
   for(i in 1:length(nbLogFirstSp)){
     numFirstSp[which(firstSp==nomEspOrdi[i])]=espOrdi[2,which(espOrdi[1,]==nomEspOrdi[i])]
   }
@@ -107,25 +107,31 @@ compareToOrdination=function(dat, Step2, clusters){
   par(op)
   dev.off()
   
-  # Comparison metiers L7 (clusters clara_step3) vs metiers L7 (first species in catch)
-  compNbLogClustVsFirstSp=table(clusters,firstSp)
-  rownames(compNbLogClustVsFirstSp)=paste("Cluster",seq(1:nbClust),sep="")
   
   # Determine the metier in level 5 from the metier in level 7 based on the first species in catch (logevent by logevent)
-  logSpeciesL5=unlist(sapply(firstSp,level5))      ## pb espèces sans correspondance vers groupe d'espèces
-#  unique(logSpeciesL5)
-#  barplot(table(logSpeciesL5), main="Number of logevents by group of species level 5", xlab="Groups of species level 5", ylab="Number of logevents")
+#  metiersFirstSpeciesL5=unlist(sapply(firstSp,level5))      ## pb espèces sans correspondance vers groupe d'espèces
+#  unique(metiersFirstSpeciesL5)
+#  barplot(table(metiersFirstSpeciesL5), main="Number of logevents by group of species level 5", xlab="Groups of species level 5", ylab="Number of logevents")
  
- 
+  print("Please, be patient...") 
+  metiersFirstSpeciesL5=lapply(as.list(firstSp), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+                                                    else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"DCF_species_level5_COD"])
+  metiersFirstSpeciesL5=unlist(lapply(metiersFirstSpeciesL5, function(x) as.character(x)))
    
-  
+   
+   
+                                      
   ###################################
   # FIRST GROUP OF SPECIES IN CATCH #
   ###################################
   
   # Determine the metier of each logevent thanks to the first group of species in catch (level 5) of the logevent
   datL5=dat
-  colnames(datL5)=lapply(as.list(colnames(datL5)), level7to5)   ## quand on aura toutes les correspondances espèces vers groupes d'espèces, on pourra utiliser level5 à la place de level7to5.
+  #colnames(datL5)=lapply(as.list(colnames(datL5)), level7to5)   ## quand on aura toutes les correspondances espèces vers groupes d'espèces, on pourra utiliser level5 à la place de level7to5.
+  groupColSpecies=lapply(as.list(colnames(datL5)), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+                                                               else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"DCF_species_level5_COD"])  
+  groupColSpecies=unlist(lapply(groupColSpecies, function(x) as.character(x)))
+  colnames(datL5)=groupColSpecies
   nbC5=length(unique(colnames(datL5)))
   tab=matrix(NA,nrow=nrow(datL5),ncol=nbC5)
   colnames(tab)=unique(colnames(datL5))
@@ -137,65 +143,106 @@ compareToOrdination=function(dat, Step2, clusters){
       tab[,i]=apply(subdati,1,sum)
   }
   # Metiers (level 5) of each logevent found thanks to the first group of species in catch (level 5)
-  logGroupL5=unique(colnames(datL5))[apply(tab,1,which.max)]
+  metiersFirstGroupL5=unique(colnames(datL5))[apply(tab,1,which.max)]
   
   
-  # Compare the metiers (level 5) found thanks to the first species in catch vs the first group of species in catch
-  #compL5SpeciesVsGroup=table(logSpeciesL5,logGroupL5)
-  
+
+
   
   
   ###############################################################
   # LEVELS 7 AND 5 FOR METIERS FROM MULTIVARIATE CLASSIFICATION #
   ###############################################################
   
-  # We are taking species of the cluster (by decreasing order of catch) until having at least seuilCatch% of the cluster's total catch
+  # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
   seuilCatch=75
-  nameSpecies=colnames(dat)
   
-  # Total quantity caught species by species by cluster
-  sumColByClust=matrix(0,nrow=nbClust,ncol=p)
-  for(cl in 1:nbClust){
-    for(i in 1:p) sumColByClust[cl,i]=sum(dat[which(clusters==cl),i])
+  targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
+  for(i in 1:nbClust){
+    percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
+    nbSpSel=length(which(percCatchCum<seuilCatch))+1
+    targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
   }
-  colnames(sumColByClust)=nameSpecies
   
-  
-  # Percent of each species in the cluster's total catch
-  propEspByCluster=matrix(0,nrow=nbClust,ncol=p)
-  colnames(propEspByCluster)=nameSpecies
-  for(cl in 1:nbClust) propEspByCluster[cl,]=sumColByClust[cl,]/sum(sumColByClust[cl,])*100
-  
-  # Columns number of each species by decreasing order of catch
-  numEspByCluster=matrix(0,nrow=nbClust,ncol=p)
-  for(cl in 1:nbClust) numEspByCluster[cl,]=order(propEspByCluster[cl,],decreasing=T)
-  # Cumulative percentage of species catch in the cluster's total catch
-  propEspByClusterCum=matrix(0,nrow=nbClust,ncol=p)
-  for(cl in 1:nbClust)  propEspByClusterCum[cl,]=cumsum(sort(propEspByCluster[cl,],decreasing=T))
-  
-   
-  espSelByCluster=matrix(0,nrow=nbClust,ncol=p)
-  nomEspSelByCluster=matrix(NA,nrow=nbClust,ncol=p)
-  for(cl in 1:nbClust){ 
-    pourcent=which(propEspByClusterCum[cl,]<seuilCatch)
-    # Name of selected species by cluster
-    espSelByCluster[cl,1:(length(pourcent)+1)]=numEspByCluster[cl,1:(length(pourcent)+1)]
-    nomEspSelByCluster[cl,1:(length(pourcent)+1)]=nameSpecies[espSelByCluster[cl,1:(length(pourcent)+1)]]
-  }
-      
   # Maximum number of species in the table
-  maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(nomEspSelByCluster),1,which)),length)))
+  maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
+  targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
   
-  nomEspSelByCluster=nomEspSelByCluster[,1:maxColNomEspSelByCluster]
   # List of selected species names by cluster (= List of metiers level 7)
-  listNomEspSelByCluster=list()
-  for(cl in 1:nbClust) listNomEspSelByCluster[[cl]]=unlist(nomEspSelByCluster[cl,which(!is.na(nomEspSelByCluster[cl,]))])
+  listTargetSpeciesByCluster=list()
+  for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
   
-  # List of metiers level 5.7
-  listMetiersLevel57=lapply(listNomEspSelByCluster, level5)
+  # List of metiers level 57
+  #listMetiersLevel57=lapply(listTargetSpeciesByCluster, level5)
+  listMetiersLevel57=list()
+  for (i in 1:nbClust){
+    metiersClusteri=lapply(listTargetSpeciesByCluster[[i]], function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+                                                        else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"DCF_species_level5_COD"])
+    metiersClusteri=as.character(unique(unlist(metiersClusteri)))
+    metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
+    listMetiersLevel57[[i]]=metiersClusteri
+  }
   
-  # Metiers (level 5.7) of each logevent found thanks to the getMetierClusters method.
-  clustersStep3L5=unlist(sapply(clusters,function(x) listMetiersLevel57[x]))
+  
+  # Metiers (level 57) of each logevent found thanks to the getMetierClusters method.
+  metiersClustersL5=unlist(sapply(clusters,function(x) listMetiersLevel57[x]))
+  
+
+  
+  
+  
+     
+   ## Changement dans la définition des espèces cibles (niveau 7) : on ne prend plus les espèces les plus capturées dans la classe
+   ## jusqu'à avoir au moins 75% de la capture totale de la classe
+   ## on prend maintenant les espèces présentes dans le tableau de synthèse de la classe jusqu'à avoir un %Catch cumulé au moins 
+   ## égal à 75% 
+   ## (Rappel : %Catch d'une espèce = la moyenne des pourcentages de capture de cette espèce pour tous les logevents de la classe)
+  
+#  nameSpecies=colnames(dat)
+#  
+#  # Total quantity caught species by species by cluster
+#  sumColByClust=matrix(0,nrow=nbClust,ncol=p)
+#  for(cl in 1:nbClust){
+#    for(i in 1:p) sumColByClust[cl,i]=sum(dat[which(clusters==cl),i])
+#  }
+#  colnames(sumColByClust)=nameSpecies
+#  
+#  
+#  # Percent of each species in the cluster's total catch
+#  propEspByCluster=matrix(0,nrow=nbClust,ncol=p)
+#  colnames(propEspByCluster)=nameSpecies
+#  for(cl in 1:nbClust) propEspByCluster[cl,]=sumColByClust[cl,]/sum(sumColByClust[cl,])*100
+#  
+#  # Columns number of each species by decreasing order of catch
+#  numEspByCluster=matrix(0,nrow=nbClust,ncol=p)
+#  for(cl in 1:nbClust) numEspByCluster[cl,]=order(propEspByCluster[cl,],decreasing=T)
+#  # Cumulative percentage of species catch in the cluster's total catch
+#  propEspByClusterCum=matrix(0,nrow=nbClust,ncol=p)
+#  for(cl in 1:nbClust)  propEspByClusterCum[cl,]=cumsum(sort(propEspByCluster[cl,],decreasing=T))
+#  
+#   
+#  espSelByCluster=matrix(0,nrow=nbClust,ncol=p)
+#  nomEspSelByCluster=matrix(NA,nrow=nbClust,ncol=p)
+#  for(cl in 1:nbClust){ 
+#    pourcent=which(propEspByClusterCum[cl,]<seuilCatch)
+#    # Name of selected species by cluster
+#    espSelByCluster[cl,1:(length(pourcent)+1)]=numEspByCluster[cl,1:(length(pourcent)+1)]
+#    nomEspSelByCluster[cl,1:(length(pourcent)+1)]=nameSpecies[espSelByCluster[cl,1:(length(pourcent)+1)]]
+#  }
+#      
+#  # Maximum number of species in the table
+#  maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(nomEspSelByCluster),1,which)),length)))
+#  
+#  nomEspSelByCluster=nomEspSelByCluster[,1:maxColNomEspSelByCluster]
+#  # List of selected species names by cluster (= List of metiers level 7)
+#  listNomEspSelByCluster=list()
+#  for(cl in 1:nbClust) listNomEspSelByCluster[[cl]]=unlist(nomEspSelByCluster[cl,which(!is.na(nomEspSelByCluster[cl,]))])
+#  
+#  # List of metiers level 5.7
+#  listMetiersLevel57=lapply(listNomEspSelByCluster, level5)
+#  
+#  # Metiers (level 5.7) of each logevent found thanks to the getMetierClusters method.
+#  clustersStep3L5=unlist(sapply(clusters,function(x) listMetiersLevel57[x]))
   
   
   
@@ -203,33 +250,54 @@ compareToOrdination=function(dat, Step2, clusters){
   #  COMPARISONS  # 
   #################
   
-  # Compare the metiers of getMetierClusters (level 5.7) vs the first group of species in catch (level 5)
-  #compL5ClustStep3VsGroup=table(clustersStep3L5,logGroupL5)  !! pb regroupement des clusters qui correspondent au même groupe d'espèce niveau 5.
+  # Compare the metiers Clusters (from getMetierClusters) (level 7) vs the metier First Species in catch (level 7)
+  compClustersL7vsFirstSpeciesL7=table(clusters,metiersFirstSpeciesL7)
+  rownames(compClustersL7vsFirstSpeciesL7)=paste("Clust",seq=1:nbClust,sep="")
+  
+  # Compare the metiers Clusters (level 5.7) vs metiers First Species (level 5)
   clustStep3L5=clusters
-  compL57vsL5=table(clustStep3L5,logGroupL5)
-  rownames(compL57vsL5)=unlist(listMetiersLevel57)
+  compClustersL5vsFirstSpeciesL5=table(clustStep3L5,metiersFirstSpeciesL5)    
+  rownames(compClustersL5vsFirstSpeciesL5)=unlist(listMetiersLevel57) 
   
-  # Compare the metiers (level 5.7) vs metiers (level 7)
+  # Compare the metiers Clusters (level 5.7) vs metiers First Group (level 5)
+  #compL5ClustStep3VsGroup=table(clustersStep3L5,metiersFirstGroupL5)  !! pb regroupement des clusters qui correspondent au même groupe d'espèce niveau 5.
+  clustStep3L5=clusters
+  compClustersL5vsFirstGroupL5=table(clustStep3L5,metiersFirstGroupL5)
+  rownames(compClustersL5vsFirstGroupL5)=unlist(listMetiersLevel57)
+  
+  # Compare the metiers First Species (level 5) vs First Group (level 5)
+  compFirstSpeciesL5vsFirstGroupL5=table(metiersFirstSpeciesL5,metiersFirstGroupL5)
+  
+  
+  # Less attractive
+  # Compare the metiers Clusters (level 5.7) vs metiers Clusters (level 7)
   clustStep3L7=clusters
-  compL57vsL7=table(clustersStep3L5,clustStep3L7)
-  colnames(compL57vsL7)=paste("Clust",seq=1:nbClust)
+  compClustersL5vsClustersL7=table(metiersClustersL5,clustStep3L7)
+  colnames(compClustersL5vsClustersL7)=paste("Clust",seq=1:nbClust)
   
-  # Compare the metiers (level 5) vs metiers (level 7)
-  compL5vsL7=table(logGroupL5,clustStep3L7)
-  colnames(compL5vsL7)=paste("Clust",seq=1:nbClust)
   
-
+           
   # Create csv tables
   dfTables=data.frame()
-  dfTables=c("compL57vsL5","compL57vsL7","compL5vsL7")
+  dfTables=c("compClustersL7vsFirstSpeciesL7","compClustersL5vsFirstSpeciesL5",
+  "compClustersL5vsFirstGroupL5","compFirstSpeciesL5vsFirstGroupL5","compClustersL5vsClustersL7")
   write.table(dfTables[1],file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
-  write.table(compL57vsL5,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(compClustersL7vsFirstSpeciesL7,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
   write.table(dfTables[2],file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
-  write.table(compL57vsL7,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(compClustersL5vsFirstSpeciesL5,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
   write.table(dfTables[3],file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
-  write.table(compL5vsL7,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
-    
-
-  return(list(nbLogFirstSp=nbLogFirstSp, compNbLogClustVsFirstSp=compNbLogClustVsFirstSp,
-   compL57vsL5=compL57vsL5, compL57vsL7=compL57vsL7, compL5vsL7=compL5vsL7))
+  write.table(compClustersL5vsFirstGroupL5,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(dfTables[4],file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(compFirstSpeciesL5vsFirstGroupL5,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(dfTables[5],file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+  write.table(compClustersL5vsClustersL7,file="tablesCompToOrdination.csv",append=TRUE,col.names=NA)
+      
+  print("Done.")
+  
+  return(list(nbLogFirstSp=nbLogFirstSp, 
+    compClustersL7vsFirstSpeciesL7=compClustersL7vsFirstSpeciesL7, 
+    compClustersL5vsFirstSpeciesL5=compClustersL5vsFirstSpeciesL5,
+    compClustersL5vsFirstGroupL5=compClustersL5vsFirstGroupL5,
+    compFirstSpeciesL5vsFirstGroupL5=compFirstSpeciesL5vsFirstGroupL5,
+    compClustersL5vsClustersL7=compClustersL5vsClustersL7))
 }
