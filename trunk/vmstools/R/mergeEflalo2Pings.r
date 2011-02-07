@@ -343,18 +343,18 @@ NIELS <- FALSE
             axis(2, at=c(0.5,0.1),labels=c("VMS","LOGBOOK"))
 
             for(i in 1:nrow(table.midtime))  {
-              segments(as.POSIXct(table.midtime$SI_DTIME[i]), 0.5, as.POSIXct(table.midtime$SI_ATIME[i]), 0.5, col=1)
-              points(as.POSIXct(table.midtime$SI_MIDTIME[i]), 0.5, col=1)
-              text(as.POSIXct(table.midtime$SI_MIDTIME[i]), 0.52, table.midtime$SI_FT[i], cex=0.5, col=1)
+              segments(as.POSIXct(table.midtime$SI_DTIME[i], tz='GMT'), 0.5, as.POSIXct(table.midtime$SI_ATIME[i], tz='GMT'), 0.5, col=1)
+              points(as.POSIXct(table.midtime$SI_MIDTIME[i], tz='GMT'), 0.5, col=1)
+              text(as.POSIXct(table.midtime$SI_MIDTIME[i], tz='GMT'), 0.52, table.midtime$SI_FT[i], cex=0.5, col=1)
 
             }
 
             tmp <- .logbk[, c("LE_DTIME","LE_LTIME", "LE_MIDTIME", "FT_REF")]
             tmp <- tmp[!duplicated(tmp$LE_MIDTIME), ]
             for(i in 1:nrow(tmp)){
-              segments(as.POSIXct(tmp$LE_DTIME[i]), 0.1, as.POSIXct(tmp$LE_LTIME[i]), 0.1, col=1)
-              points(as.POSIXct(tmp$LE_MIDTIME[i]), 0.1, col=1)
-              text(as.POSIXct(tmp$LE_MIDTIME[i]), 0.0785, tmp$FT_REF[i], cex=0.5, col=1)
+              segments(as.POSIXct(tmp$LE_DTIME[i], tz='GMT'), 0.1, as.POSIXct(tmp$LE_LTIME[i], tz='GMT'), 0.1, col=1)
+              points(as.POSIXct(tmp$LE_MIDTIME[i], tz='GMT'), 0.1, col=1)
+              text(as.POSIXct(tmp$LE_MIDTIME[i], tz='GMT'), 0.0785, tmp$FT_REF[i], cex=0.5, col=1)
             }
           }
 
@@ -368,7 +368,7 @@ NIELS <- FALSE
           new.levels <- fa1
           fa2 <-  levels(factor(.logbk$LE_MIDTIME))
           for(i in 1:length(fa1)) { # for each level in vms
-             tmp <-  abs(as.numeric( as.POSIXct(fa2) - as.POSIXct(fa1)[i] ))
+             tmp <-  abs(as.numeric( as.POSIXct(fa2, tz='GMT') - as.POSIXct(fa1, tz='GMT')[i] ))
              if(all(is.na(tmp))) tmp <- abs(as.numeric( as.Date(fa2) - as.Date(fa1)[i] )) # debug the R bug in case of mid-time at 00:00 hour
              new.levels[i] <- fa2 [which(tmp == min(tmp, na.rm=T) )]  # find the nearest level in logbook
           }
@@ -386,7 +386,7 @@ NIELS <- FALSE
 
           if(general$visual.check){
             for(i in 1: nrow(.vms))  {
-               arrows(as.POSIXct( sauv[i]), 0.5 ,as.POSIXct( .vms$SI_MIDTIME[i]),0.1, length=0.1)
+               arrows(as.POSIXct( sauv[i]), 0.5 ,as.POSIXct( .vms$SI_MIDTIME[i], tz='GMT'),0.1, length=0.1)
             }
           }
 
@@ -448,7 +448,7 @@ NIELS <- FALSE
          new.levels <- fa1
          fa2 <-  levels(factor(vms$SI_MIDTIME))
          for(i in 1:length(fa1)) { # for each level in logbk
-          tmp <-  abs(as.numeric( as.POSIXct(fa2) - as.POSIXct(fa1)[i] ))
+          tmp <-  abs(as.numeric( as.POSIXct(fa2, tz='GMT') - as.POSIXct(fa1, tz='GMT')[i] ))
           new.levels[i] <- fa2 [which(tmp == min(tmp, na.rm=T) )]  # find the nearest level in vms
          }
          bk$LE_MIDTIME <- factor(as.character(bk$LE_MIDTIME))
