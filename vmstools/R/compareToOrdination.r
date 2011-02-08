@@ -114,7 +114,7 @@ compareToOrdination=function(dat, Step2, clusters, tabClusters){
 #  barplot(table(metiersFirstSpeciesL5), main="Number of logevents by group of species level 5", xlab="Groups of species level 5", ylab="Number of logevents")
  
   print("Please, be patient...") 
-  metiersFirstSpeciesL5=lapply(as.list(firstSp), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+  metiersFirstSpeciesL5=lapply(as.list(firstSp), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0){print(paste(x," : unknown species, classed in \'FIF\' group",sep=""));"FIF"} 
                                                     else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"DCF_species_level5_COD"])
   metiersFirstSpeciesL5=unlist(lapply(metiersFirstSpeciesL5, function(x) as.character(x)))
    
@@ -128,7 +128,7 @@ compareToOrdination=function(dat, Step2, clusters, tabClusters){
   # Determine the metier of each logevent thanks to the first group of species in catch (level 5) of the logevent
   datL5=dat
   #colnames(datL5)=lapply(as.list(colnames(datL5)), level7to5)   ## quand on aura toutes les correspondances espèces vers groupes d'espèces, on pourra utiliser level5 à la place de level7to5.
-  groupColSpecies=lapply(as.list(colnames(datL5)), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+  groupColSpecies=lapply(as.list(colnames(datL5)), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0){print(paste(x," : unknown species, classed in \'FIF\' group",sep=""));"FIF"} 
                                                                else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"DCF_species_level5_COD"])  
   groupColSpecies=unlist(lapply(groupColSpecies, function(x) as.character(x)))
   colnames(datL5)=groupColSpecies
@@ -176,7 +176,7 @@ compareToOrdination=function(dat, Step2, clusters, tabClusters){
   #listMetiersLevel57=lapply(listTargetSpeciesByCluster, level5)
   listMetiersLevel57=list()
   for (i in 1:nbClust){
-    metiersClusteri=lapply(listTargetSpeciesByCluster[[i]], function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0) "NA" 
+    metiersClusteri=lapply(listTargetSpeciesByCluster[[i]], function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0){print(paste(x," : unknown species, classed in \'FIF\' group",sep=""));"FIF"}
                                                         else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"DCF_species_level5_COD"])
     metiersClusteri=as.character(unique(unlist(metiersClusteri)))
     metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
