@@ -532,44 +532,12 @@ NIELS <- FALSE
 
          rm(er); rm(xx) ; gc(reset=TRUE)
 
-         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-         # SET UP PRIMARY KEYS FOR MERGING!#!#!#!#!#!#!#!#
-         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-         .logbk$FT_REF <- factor(.logbk$FT_REF )
-         .logbk$FT_REF_SQ <- factor(paste(.logbk$FT_REF, ".", .logbk$LE_RECT, sep=''))
-         .logbk$FT_REF_SQ_DAY <- factor(paste(.logbk$FT_REF, ".", .logbk$LE_RECT,".", an(format(.logbk$LE_CTIME,  '%j')), sep=''))
-         .vms$FT_REF <- factor(.vms$FT_REF)
-         .vms$FT_REF_SQ <- factor(paste(.vms$FT_REF, ".", .vms$SI_RECT, sep=''))
-         .vms$FT_REF_SQ_DAY <- factor(paste(.vms$FT_REF, ".", .vms$SI_RECT,".", an(format(.vms$SI_DATIM,  '%j')), sep=''))
-
-         # for gear, if several gears inside a same trip,
-         #  it is problematic because we have to assume a split of total effort or toal nb of ping between gears...
-
-
-           #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-           # AGGREGATE WEIGHT PER SPECIES !#!#!#!#!#!#!#!#!#
-           #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-           nm         <- names(.logbk)
-           idx.col.w  <- grep('KG', nm) # index columns with species weight
-           idx.col.v  <- grep('EURO', nm) # index columns with species value
-           idx.col    <- c(idx.col.w, idx.col.v)
-           
-           DT  <- data.table(.logbk) # library data.table for fast grouping replacing aggregate()
-             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF_SQ_DAY (NOTE: SO, 'LE_SEQNUM' IS AGGREGATED HERE)
-              eq1  <- c.listquote(paste("sum(",colnames(.logbk)[idx.col],",na.rm=TRUE)",sep=""))
-              agg.logbk.this.vessel.method.3 <- DT[,eval(eq1),by=list(FT_REF_SQ_DAY,VE_REF,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
-              agg.logbk.this.vessel.method.3 <- data.frame(agg.logbk.this.vessel.method.3)
-              colnames(agg.logbk.this.vessel.method.3) <- c("FT_REF_SQ_DAY","VE_REF","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
-           
+    
             
-
-             #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-             # MERGING WITH VMS PER TRIP !!!!!!!!!!#!#!#!#!#!#
-             #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-             do.merging <- function(method="FT_REF", .logbk, .vms, general){
-
-
-
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         # MERGING WITH VMS PER TRIP !!!!!!!!!!#!#!#!#!#!#
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         do.merging <- function(method="FT_REF", .logbk, .vms, general){
 
               # IF BY PING-------------
               # find total nb of FISHING ping per tripnum from vms  # used for method 1  'FT_REF'
@@ -735,50 +703,71 @@ NIELS <- FALSE
 
 
 
-             #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-             # MERGING PROCEDURE CHOICE !#!#!#!#!#!#!#!#!#!#!#
-             #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         # SET UP PRIMARY KEYS FOR MERGING!#!#!#!#!#!#!#!#
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         .logbk$FT_REF_SQ_DAY <- factor(paste(.logbk$FT_REF, ".", .logbk$LE_RECT,".", an(format(.logbk$LE_CTIME,  '%j')), sep=''))
+         .vms$FT_REF <- factor(.vms$FT_REF)
+         .vms$FT_REF_SQ <- factor(paste(.vms$FT_REF, ".", .vms$SI_RECT, sep=''))
+         .vms$FT_REF_SQ_DAY <- factor(paste(.vms$FT_REF, ".", .vms$SI_RECT,".", an(format(.vms$SI_DATIM,  '%j')), sep=''))
 
-                 .logbk   <- agg.logbk.this.vessel.method.3
-                 my.split <- function(obj,a.sep="\\.",idx=1) unlist(lapply(strsplit(obj, a.sep),function(x)x[idx]))
-                 # reduce the level
-                 .logbk$FT_REF_SQ  <-  factor(paste(my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=1),
-                                                 my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=2),sep='.') )
-                 # reduce the level
-                 .logbk$FT_REF     <-       factor( my.split(as.character(.logbk$FT_REF_SQ),a.sep="\\.",idx=1) )
-                 # find common keys
-                 tripnum.sq.day.logbk            <- .logbk$FT_REF_SQ_DAY
-                 tripnum.sq.day.vms              <- .vms$FT_REF_SQ_DAY
-                 tripnum.sq.logbk                <- .logbk$FT_REF_SQ
-                 tripnum.sq.vms                  <- .vms$FT_REF_SQ
-                 tripnum.sq.day.in.vms.and.in.bk <- tripnum.sq.day.vms [tripnum.sq.day.vms %in% tripnum.sq.day.logbk]
-                 tripnum.sq.in.vms.and.in.bk     <- tripnum.sq.vms [tripnum.sq.vms %in% tripnum.sq.logbk]
-                 .vms.in.bk                      <- .vms[ .vms$FT_REF_SQ_DAY %in%  tripnum.sq.day.in.vms.and.in.bk,]
-                 .vms.in.bk2                     <- .vms[ !(.vms$FT_REF_SQ_DAY %in%  tripnum.sq.day.in.vms.and.in.bk) &
+   
+   
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         # AGGREGATE WEIGHT PER SPECIES !#!#!#!#!#!#!#!#!#
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         nm         <- names(.logbk)
+         idx.col.w  <- grep('KG', nm) # index columns with species weight
+         idx.col.v  <- grep('EURO', nm) # index columns with species value
+         idx.col    <- c(idx.col.w, idx.col.v)
+           
+         DT  <- data.table(.logbk) # library data.table for fast grouping replacing aggregate()
+         # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF_SQ_DAY (NOTE: SO, 'LE_SEQNUM' IS AGGREGATED HERE)
+         eq1  <- c.listquote(paste("sum(",nm[idx.col],",na.rm=TRUE)",sep=""))
+         .logbk <- DT[,eval(eq1),by=list(FT_REF_SQ_DAY,VE_REF,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
+         .logbk <- data.frame(.logbk)
+         colnames(.logbk) <- c("FT_REF_SQ_DAY","VE_REF","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
+           
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+         # MERGING PROCEDURE CHOICE !#!#!#!#!#!#!#!#!#!#!#
+         #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+
+         my.split <- function(obj,a.sep="\\.",idx=1) unlist(lapply(strsplit(obj, a.sep),function(x)x[idx]))
+         # reduce the level
+         .logbk$FT_REF_SQ  <-  factor(paste(my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=1),
+                                                 my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=2),sep='.'))
+         # reduce the level
+         .logbk$FT_REF     <-       factor(my.split(as.character(.logbk$FT_REF_SQ),a.sep="\\.",idx=1))
+         
+         # find common keys
+         tripnum.sq.day.in.vms.and.in.bk <- .vms$FT_REF_SQ_DAY [.vms$FT_REF_SQ_DAY %in% .logbk$FT_REF_SQ_DAY]
+         tripnum.sq.in.vms.and.in.bk     <- .vms$FT_REF_SQ [.vms$FT_REF_SQ %in% .logbk$FT_REF_SQ]
+         .vms.in.bk                      <- .vms[ .vms$FT_REF_SQ_DAY %in%  tripnum.sq.day.in.vms.and.in.bk,]
+         .vms.in.bk2                     <- .vms[ !(.vms$FT_REF_SQ_DAY %in%  tripnum.sq.day.in.vms.and.in.bk) &
                                                             .vms$FT_REF_SQ %in%  tripnum.sq.in.vms.and.in.bk,]
-                 in.bk.and.feffort.not.at.0   <- unique(.vms.in.bk[.vms.in.bk$SI_STATE==1,]$FT_REF_SQ_DAY)
-                 in.bk2.and.feffort.not.at.0   <- unique(.vms.in.bk2[.vms.in.bk2$SI_STATE==1,]$FT_REF_SQ)
-
-                     # split .vms and .logbk in three blocks
-                  # vms with good match => go to meth3
-                 .vms.for.meth3         <- .vms [.vms$FT_REF_SQ_DAY %in%   in.bk.and.feffort.not.at.0, ]
-                  # vms with intermediate match => go to meth2
-                 .vms.for.meth2         <- .vms [!(.vms$FT_REF_SQ_DAY  %in%   in.bk.and.feffort.not.at.0) &
-                                                      (.vms$FT_REF_SQ    %in%   in.bk2.and.feffort.not.at.0), ]
-                  # vms with bad match => go to meth1
-                 .vms.for.meth1         <- .vms [!(.vms$FT_REF_SQ_DAY  %in%   in.bk2.and.feffort.not.at.0) &
+         in.bk.and.feffort.not.at.0   <- unique(.vms.in.bk[.vms.in.bk$SI_STATE==1,]$FT_REF_SQ_DAY)
+         in.bk2.and.feffort.not.at.0   <- unique(.vms.in.bk2[.vms.in.bk2$SI_STATE==1,]$FT_REF_SQ)
+       
+         # split .vms and .logbk in three blocks
+           # vms with good match => go to meth3
+           .vms.for.meth3         <- .vms [.vms$FT_REF_SQ_DAY %in%   in.bk.and.feffort.not.at.0, ]
+           # vms with intermediate match => go to meth2
+           .vms.for.meth2         <- .vms [!(.vms$FT_REF_SQ_DAY  %in%   in.bk.and.feffort.not.at.0) &
+                                                     (.vms$FT_REF_SQ    %in%   in.bk2.and.feffort.not.at.0), ]
+           # vms with bad match => go to meth1
+           .vms.for.meth1         <- .vms [!(.vms$FT_REF_SQ_DAY  %in%   in.bk2.and.feffort.not.at.0) &
                                                       !(.vms$FT_REF_SQ  %in%   in.bk2.and.feffort.not.at.0), ]
-                  # logbk with good match => go to meth3
-                 .logbk.for.meth3       <- .logbk [.logbk$FT_REF_SQ_DAY %in%  in.bk.and.feffort.not.at.0, ]
-                  # logbk with intermediate match => go to meth2
-                 .logbk.for.meth2       <- .logbk [!(.logbk$FT_REF_SQ_DAY %in%   in.bk.and.feffort.not.at.0) &
-                                                       (.logbk$FT_REF_SQ %in%  in.bk2.and.feffort.not.at.0), ]
-                  # logbk with bad match => go to meth1
-                 .logbk.for.meth1       <- .logbk [!(.logbk$FT_REF_SQ_DAY %in%   in.bk.and.feffort.not.at.0) &
+           # logbk with good match => go to meth3
+           .logbk.for.meth3       <- .logbk [.logbk$FT_REF_SQ_DAY %in%  in.bk.and.feffort.not.at.0, ]
+           # logbk with intermediate match => go to meth2
+           .logbk.for.meth2       <- .logbk [!(.logbk$FT_REF_SQ_DAY %in%   in.bk.and.feffort.not.at.0) &
+                                                    (.logbk$FT_REF_SQ %in%  in.bk2.and.feffort.not.at.0), ]
+           # logbk with bad match => go to meth1
+           .logbk.for.meth1       <- .logbk [!(.logbk$FT_REF_SQ_DAY %in%   in.bk.and.feffort.not.at.0) &
                                                        !(.logbk$FT_REF_SQ %in%  in.bk2.and.feffort.not.at.0), ]
 
-                 suppressWarnings(rm(merged1, merged2, merged3)) # clear
-                 #!! METH1 !!#
+           suppressWarnings(rm(merged1, merged2, merged3)) # clear
+             #!! METH1 !!#
                  if(nrow(.logbk.for.meth1)!=0 && nrow(.vms.for.meth1)!=0 ) {
                     # remove useless cols and aggregate according to the key 'FT_REF'
                     .logbk.for.meth1 <- .logbk.for.meth1[, !colnames(.logbk.for.meth1)%in% c("FT_REF_SQ_DAY","FT_REF_SQ")]
