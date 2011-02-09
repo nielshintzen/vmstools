@@ -82,58 +82,66 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
 \examples{
 
   \dontrun{
-  data(eflalo2)
+  data(eflalo)
   data(tacsat)
   data(euharbours)
-  # add some missing harbours to the list? 
+  # add some missing harbours to the list?
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
-  # order tacsat chronologically with library(doBy) 
+  # format
+  eflalo <- formatEflalo(eflalo)
+  tacsat <- formatTacsat(tacsat)
+
+  # order tacsat chronologically with library(doBy)
   tacsat <- sortTacsat(tacsat)
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
   tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG), lat=anf(tacsat$SI_LATI), harbours=euharbours, rowSize=30, returnNames=TRUE)
-  inHarb <- tacsat$SI_HARB 
+  inHarb <- tacsat$SI_HARB
   inHarb <- replace(inHarb, !is.na(inHarb), 1)
   inHarb <- replace(inHarb, is.na(inHarb), 0)
   inHarb <- as.numeric(inHarb)
-    
+
   # assign a trip identifier
   tacsat$SI_FT <- 1 # init
   idx <- which(inHarb==0)
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
-  
+
   # keep 'out of harbour' points only
   # (but keep the departure point lying in the harbour)
   startTrip <- c(diff(tacsat[,"SI_FT"]),0)
-  tacsat[which(startTrip>0),"SI_FT"] <-  tacsat[which(startTrip>0)+1,"SI_FT"] # tricky here 
-  tacsat <- tacsat[which(inHarb==0 |  startTrip>0),] 
-  
+  tacsat[which(startTrip>0),"SI_FT"] <-  tacsat[which(startTrip>0)+1,"SI_FT"] # tricky here
+  tacsat <- tacsat[which(inHarb==0 |  startTrip>0),]
+
   # assign a state to each ping (start guesses only)
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
-                     
-  
+
+
   # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
   # (assuming that the other species is coded MZZ)
-  eflalo <- poolEflaloSpecies (eflalo2, threshold=1e6, code="MZZ") 
-  
+  eflalo2 <- poolEflaloSpecies (eflalo, threshold=1e6, code="MZZ")
+
   # debug
-  eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" &!is.na(eflalo2$VE_REF),]
-  if(all(is.na(eflalo2$VE_FLT))) eflalo2$VE_FLT <- "fleet1"
-    if(!match('LE_MET_level6',colnames(eflalo2))>0) eflalo2$LE_MET_level6 <- eflalo2$LE_MET
- 
+  eflalo <- eflalo[!eflalo$VE_REF=="NA" &!is.na(eflalo$VE_REF),]
+  if(all(is.na(eflalo$VE_FLT))) eflalo$VE_FLT <- "fleet1"
+    if(!match('LE_MET_level6',colnames(eflalo))>0) eflalo$LE_MET_level6 <- eflalo$LE_MET
+
+  # debug
+  eflalo <- eflalo[eflalo$LE_MET!="No_logbook6",]
+
+
   # TEST FOR A GIVEN SET OF VESSELS
   # (if do.wp3 is at true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
-  mergeEflalo2Pings (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                  general=list(output.path=file.path("C:","output"),
                                     visual.check=TRUE,
                                         do.wp3=TRUE, speed="segment"))
-  # ...OR APPLY FOR ALL VESSELS IN eflalo2
-  mergeEflalo2Pings (logbooks=eflalo2, tacsat=tacsat,
+  # ...OR APPLY FOR ALL VESSELS IN eflalo
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
                                    general=list(output.path=file.path("C:","output"),
                                       visual.check=TRUE,
                                          do.wp3=FALSE, speed="segment"))
@@ -141,14 +149,19 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
 
   # load the merged output table for one vessel
   load(file.path("C:","output","merged_35_2009.RData"))
-  
+
+  # check the conservation of landings
+  sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
+  sum(eflalo[eflalo$VE_REF=="35","LE_KG_PLE"], na.rm=TRUE)
+
+
   # ...or bind all vessels (keeping only some given species here)
-  bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"), 
+  bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"),
                       folder = file.path("C:","output"), all.in.one.table=TRUE)
- 
+
    # ...and load the merged output table for all vessels
   load(file.path("C:","output","all_merged__2009.RData"))
-             
+
   # map landing of cod from all studied vessels
   df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD")]
   df1$SI_LONG <- anf(df1$SI_LONG)
@@ -161,43 +174,19 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
   # remove steaming points before gridding!
   df2<-df1[-which(is.na(df1$LE_KG_COD)),]
   vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
-                                cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)", 
+                                cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)",
                                  breaks0=c(1,2,4,8,16,32,64,100000))
 
 
 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
   # (by default, this will keep all the species in the output table)
-  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.keep=character(), 
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.keep=character(),
                       folder = file.path("C:","output"), all.in.one.table=FALSE)
-  
+
   ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
                                                    a.year=2009, a.country="NLD") )
 
- 
- 
-  
-  # TO DO....
-  # Use the interpolation routine to improve the location of the effort
-  #all.merged$SI_SP <- as.numeric(as.character( all.merged$SI_SP))
-  #all.merged$SI_HE <- as.numeric(as.character( all.merged$SI_HE))
-  #all.merged$SI_LONG <-as.numeric(as.character(all.merged$SI_LONG))
-  #all.merged$SI_LATI <-as.numeric(as.character(all.merged$SI_LATI))
-  #interpolations      <- interpolateTacsat( all.merged [,c("VE_REF","SI_LATI","SI_LONG","SI_DATE","SI_TIME","SI_SP","SI_HE")]
-  #                            ,interval=120             
-  #                            ,margin=12               
-  #                            ,res=100                
-  #                            ,method="cHs"           
-  #                            ,params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)) 
-  #                            ,headingAdjustment=0
-  #                            )
-  #interpolationsED <- equalDistance(interpolations,res=10)
-  # make sure that the 'res' statement in the interpolateTacsat is significantly bigger 
-  # than the 'res' statement in the equalDistance function.
-   
-  # then map again...
-  #vmsGridCreate(interpolationsED,nameLon="SI_LONG",nameLat="SI_LATI", 
-  #          cellsizeX =0.05, cellsizeY =0.05, legendtitle = "landings (kg)")
 
   
                

@@ -43,7 +43,7 @@
 #!!!!!!!!!!!!!!!!!!!!!#
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeEflalo2Pings <-
-           function(logbooks, tacsat, general=list(output.path=file.path("C:"),
+           function(eflalo, tacsat, general=list(output.path=file.path("C:"),
                      visual.check=TRUE, do.wp3=FALSE, speed="segment", conserve.all=TRUE), ...){
 
   lstargs <- list(...)
@@ -119,7 +119,7 @@ mergeEflalo2Pings <-
       #!#!##!#!##!#!##!#!##!#!##!#!#
       #!#!##!#!##!#!##!#!##!#!##!#!#
       #!#!##!#!##!#!##!#!##!#!##!#!#
-      all.vesselid     <- as.character(unique(logbooks[anf(logbooks$VE_LEN)>=0,]$VE_REF))
+      all.vesselid     <- as.character(unique(eflalo[anf(eflalo$VE_LEN)>=0,]$VE_REF))
       all.vesselid     <- all.vesselid[!is.na(all.vesselid)] # e.g. when VE_LEN at NA exists
       if(length(lstargs$a.vesselid)!=0) all.vesselid <- lstargs$a.vesselid
        # => IF ARG INFORMED, THEN KEEP ONLY ONE OR SEVERAL VESSELS AS NEEDED....
@@ -134,7 +134,7 @@ mergeEflalo2Pings <-
          #----------
          #----------
          # LOGBOOK INPUT
-         logbk.this.vessel            <- logbooks[logbooks$VE_REF %in% a.vesselid,]
+         logbk.this.vessel            <- eflalo[eflalo$VE_REF %in% a.vesselid,]
          logbk.this.vessel$LE_RECT    <- factor(logbk.this.vessel$LE_RECT)
          logbk.this.vessel$VE_REF     <- factor(logbk.this.vessel$VE_REF)
          logbk.this.vessel$VE_FLT     <- factor(logbk.this.vessel$VE_FLT)
@@ -915,12 +915,16 @@ return()
 
 
   #\dontrun{
-  data(eflalo2)
+  data(eflalo)
   data(tacsat)
   data(euharbours)
   # add some missing harbours to the list?
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
+
+  # format
+  eflalo <- formatEflalo(eflalo)
+  tacsat <- formatTacsat(tacsat)
 
   # order tacsat chronologically with library(doBy)
   tacsat <- sortTacsat(tacsat)
@@ -951,26 +955,26 @@ return()
 
   # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
   # (assuming that the other species is coded MZZ)
-  eflalo <- poolEflaloSpecies (eflalo2, threshold=1e6, code="MZZ")
+  eflalo2 <- poolEflaloSpecies (eflalo, threshold=1e6, code="MZZ")
 
   # debug
-  eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" &!is.na(eflalo2$VE_REF),]
-  if(all(is.na(eflalo2$VE_FLT))) eflalo2$VE_FLT <- "fleet1"
-    if(!match('LE_MET_level6',colnames(eflalo2))>0) eflalo2$LE_MET_level6 <- eflalo2$LE_MET
+  eflalo <- eflalo[!eflalo$VE_REF=="NA" &!is.na(eflalo$VE_REF),]
+  if(all(is.na(eflalo$VE_FLT))) eflalo$VE_FLT <- "fleet1"
+    if(!match('LE_MET_level6',colnames(eflalo))>0) eflalo$LE_MET_level6 <- eflalo$LE_MET
 
   # debug
-  eflalo2 <- eflalo2[eflalo2$LE_MET!="No_logbook6",]
+  eflalo <- eflalo[eflalo$LE_MET!="No_logbook6",]
 
 
   # TEST FOR A GIVEN SET OF VESSELS
   # (if do.wp3 is at true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
-  mergeEflalo2Pings (logbooks=eflalo2, tacsat=tacsat, a.vesselid=c("35", "1518"),
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                  general=list(output.path=file.path("C:","output"),
                                     visual.check=TRUE,
                                         do.wp3=TRUE, speed="segment"))
-  # ...OR APPLY FOR ALL VESSELS IN eflalo2
-  mergeEflalo2Pings (logbooks=eflalo2, tacsat=tacsat,
+  # ...OR APPLY FOR ALL VESSELS IN eflalo
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
                                    general=list(output.path=file.path("C:","output"),
                                       visual.check=TRUE,
                                          do.wp3=FALSE, speed="segment"))
@@ -981,7 +985,7 @@ return()
 
   # check the conservation of landings
   sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
-  sum(eflalo2[eflalo2$VE_REF=="35","LE_KG_PLE"], na.rm=TRUE)
+  sum(eflalo[eflalo$VE_REF=="35","LE_KG_PLE"], na.rm=TRUE)
 
 
   # ...or bind all vessels (keeping only some given species here)
