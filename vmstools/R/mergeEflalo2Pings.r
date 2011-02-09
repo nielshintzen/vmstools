@@ -137,6 +137,8 @@ mergeEflalo2Pings <-
          logbk.this.vessel            <- logbooks[logbooks$VE_REF %in% a.vesselid,]
          logbk.this.vessel$LE_RECT    <- factor(logbk.this.vessel$LE_RECT)
          logbk.this.vessel$VE_REF     <- factor(logbk.this.vessel$VE_REF)
+         logbk.this.vessel$VE_FLT     <- factor(logbk.this.vessel$VE_FLT)
+
 
          # automatic detection of a.year
          general$a.year <-   format(strptime(  paste(logbk.this.vessel$FT_DDAT[1]) , tz='GMT',  "%e/%m/%Y" ), "%Y")
@@ -529,11 +531,11 @@ NIELS <- FALSE
          # SET UP PRIMARY KEYS FOR MERGING!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          .logbk$FT_REF <- factor(.logbk$FT_REF )
-         .logbk$FT_REF_SQ <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT, sep='')
-         .logbk$FT_REF_SQ_DAY <- paste(.logbk$FT_REF, ".", .logbk$LE_RECT,".", an(format(.logbk$LE_CTIME,  '%j')), sep='')
+         .logbk$FT_REF_SQ <- factor(paste(.logbk$FT_REF, ".", .logbk$LE_RECT, sep=''))
+         .logbk$FT_REF_SQ_DAY <- factor(paste(.logbk$FT_REF, ".", .logbk$LE_RECT,".", an(format(.logbk$LE_CTIME,  '%j')), sep=''))
          .vms$FT_REF <- factor(.vms$FT_REF)
-         .vms$FT_REF_SQ <- paste(.vms$FT_REF, ".", .vms$SI_RECT, sep='')
-         .vms$FT_REF_SQ_DAY <- paste(.vms$FT_REF, ".", .vms$SI_RECT,".", an(format(.vms$SI_DATIM,  '%j')), sep='')
+         .vms$FT_REF_SQ <- factor(paste(.vms$FT_REF, ".", .vms$SI_RECT, sep=''))
+         .vms$FT_REF_SQ_DAY <- factor(paste(.vms$FT_REF, ".", .vms$SI_RECT,".", an(format(.vms$SI_DATIM,  '%j')), sep=''))
 
          # for gear, if several gears inside a same trip,
          #  it is problematic because we have to assume a split of total effort or toal nb of ping between gears...
@@ -546,25 +548,23 @@ NIELS <- FALSE
            idx.col.w  <- grep('KG', nm) # index columns with species weight
            idx.col.v  <- grep('EURO', nm) # index columns with species value
            idx.col    <- c(idx.col.w, idx.col.v)
-             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF
-              agg.logbk.this.vessel.method.1  <- aggregate(.logbk[,idx.col],
-                      list(.logbk$FT_REF,
-                              .logbk$VE_REF,  .logbk$VE_FLT,.logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
-              colnames(agg.logbk.this.vessel.method.1) <-
-                           c("FT_REF", "VE_REF",  "VE_FLT", "VE_KW","LE_MET_level6","LE_GEAR", nm[idx.col] )
+           
+           DT  <- data.table(.logbk) # library data.table for fast grouping replacing aggregate()
+             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF   
+              eq1  <- c.listquote(paste("sum(",colnames(.logbk)[idx.col],",na.rm=TRUE)",sep=""))
+              agg.logbk.this.vessel.method.1 <- DT[,eval(eq1),by=list(FT_REF,VE_REF,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
+              agg.logbk.this.vessel.method.1 <- data.frame(agg.logbk.this.vessel.method.1)
+              colnames(agg.logbk.this.vessel.method.1) <- c("FT_REF","VE_REF","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
              # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF_SQ
-              agg.logbk.this.vessel.method.2  <- aggregate(.logbk[,idx.col],
-                      list(.logbk$FT_REF_SQ,
-                              .logbk$VE_REF,  .logbk$VE_FLT,.logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
-              colnames(agg.logbk.this.vessel.method.2) <-
-                           c("FT_REF_SQ", "VE_REF",  "VE_FLT","VE_KW","LE_MET_level6" ,"LE_GEAR", nm[idx.col])
+              agg.logbk.this.vessel.method.2 <- DT[,eval(eq1),by=list(FT_REF_SQ,VE_REF,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
+              agg.logbk.this.vessel.method.2 <- data.frame(agg.logbk.this.vessel.method.2)
+              colnames(agg.logbk.this.vessel.method.2) <- c("FT_REF_SQ","VE_REF","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
              # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF_SQ_DAY (NOTE: SO, 'LE_SEQNUM' IS AGGREGATED HERE)
-              agg.logbk.this.vessel.method.3  <- aggregate(.logbk[,idx.col],
-                      list(.logbk$FT_REF_SQ_DAY,
-                             .logbk$VE_REF,  .logbk$VE_FLT, .logbk$VE_KW,  .logbk$LE_MET_level6, .logbk$LE_GEAR), sum, na.rm=TRUE )
-              colnames(agg.logbk.this.vessel.method.3) <-
-                          c("FT_REF_SQ_DAY", "VE_REF", "VE_FLT","VE_KW", "LE_MET_level6","LE_GEAR",  nm[idx.col])
-
+              agg.logbk.this.vessel.method.3 <- DT[,eval(eq1),by=list(FT_REF_SQ_DAY,VE_REF,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
+              agg.logbk.this.vessel.method.3 <- data.frame(agg.logbk.this.vessel.method.3)
+              colnames(agg.logbk.this.vessel.method.3) <- c("FT_REF_SQ_DAY","VE_REF","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
+           
+            
 
              #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
              # MERGING WITH VMS PER TRIP !!!!!!!!!!#!#!#!#!#!#
@@ -977,6 +977,10 @@ return()
   if(all(is.na(eflalo2$VE_FLT))) eflalo2$VE_FLT <- "fleet1"
     if(!match('LE_MET_level6',colnames(eflalo2))>0) eflalo2$LE_MET_level6 <- eflalo2$LE_MET
 
+  # debug
+  eflalo2 <- eflalo2[eflalo2$LE_MET!="No_logbook6",]
+
+
   # TEST FOR A GIVEN SET OF VESSELS
   # (if do.wp3 is at true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
@@ -995,7 +999,7 @@ return()
   load(file.path("C:","output","merged_35_2009.RData"))
 
   # check the conservation of landings
-  sum(tapply(an(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
+  sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
   sum(eflalo2[eflalo2$VE_REF=="35","LE_KG_PLE"], na.rm=TRUE)
 
 
