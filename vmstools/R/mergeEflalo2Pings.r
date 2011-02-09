@@ -732,26 +732,7 @@ NIELS <- FALSE
               }
 
 
-        if(FALSE){  # HERE, BE AWARE OF A POSSIBLE LEAK IN LANDINGS...
-              # conservation of catches?
-              # detect possible weight landed while no feffort detected from vms
-                   # find FT_REF with some NA
-                   vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip=="NA","FT_REF"]))
-                   # then, find FT_REF with at least one no NA
-                   no.vv<- anf(unique(merged.this.vessel[merged.this.vessel$count.fping.trip!="NA","FT_REF"]))
-                   tripnum.all.na.inside <- vv[!vv%in%no.vv] # trip num without at least one count.fping!
-                   # so, deduce loss in weight
-                   zz<- merged.this.vessel[merged.this.vessel$FT_REF %in% tripnum.all.na.inside,]
-                   loss <- tapply(anf(zz$LE_KG_COD), zz$FT_REF, sum, na.rm=TRUE)
-                   names(loss) <- paste(a.vesselid, names(loss), sep='.')
-                   land.losses <<- c(land.losses, loss )
-
-                cat(paste("weight loss for ", general$sp.to.keep[1]," (vms failure in fishing/steaming detection): ",
-                      sum(anf(unique(zz$LE_KG_COD)), na.rm=TRUE),"\n", sep="" ))
-
-             }  # TO DO**: assign landings to the mid point of the trip for trips with all na inside (i.e. only steaming detected while declared landings)
-                 # (i.e. assign 1 to in count.fping.trip for the mid point)
-
+   
 
               return(merged.this.vessel)
               }
