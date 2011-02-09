@@ -483,11 +483,16 @@ NIELS <- FALSE
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # COMPUTE EFFORT.MINS      !#!#!#!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
+          # vms
           .vms <- .vms[order(.vms$SI_DATIM),]
           .vms$LE_EFF_VMS <- abs(c(0, as.numeric(.vms[-nrow(.vms),"SI_DATIM"] -
                                         .vms[-1,"SI_DATIM"], units="mins")))
-           start.trip <- c(1,diff(.vms[,"SI_FT"]))
+          start.trip <- c(1,diff(.vms[,"SI_FT"]))
           .vms[start.trip!=0, "LE_EFF_VMS"] <- 0  # just correct for the trip change points
+          # logbook (start/end of trip)- caution: will be repeated per ping in the merged output
+          #SI_DATIM      <- as.POSIXct(paste(.logbk$FT_DDAT,.logbk$FT_DTIME,sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+          #SI_DATIM2     <- as.POSIXct(paste(.logbk$FT_LDAT,.logbk$FT_LTIME,sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+          #.logbk$LE_EFF <- an(difftime(SI_DATIM2,SI_DATIM,units="mins"))
 
 
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
@@ -550,16 +555,8 @@ NIELS <- FALSE
            idx.col    <- c(idx.col.w, idx.col.v)
            
            DT  <- data.table(.logbk) # library data.table for fast grouping replacing aggregate()
-             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF   
-              eq1  <- c.listquote(paste("sum(",colnames(.logbk)[idx.col],",na.rm=TRUE)",sep=""))
-              agg.logbk.this.vessel.method.1 <- DT[,eval(eq1),by=list(FT_REF,VE_REF,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
-              agg.logbk.this.vessel.method.1 <- data.frame(agg.logbk.this.vessel.method.1)
-              colnames(agg.logbk.this.vessel.method.1) <- c("FT_REF","VE_REF","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
-             # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF_SQ
-              agg.logbk.this.vessel.method.2 <- DT[,eval(eq1),by=list(FT_REF_SQ,VE_REF,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
-              agg.logbk.this.vessel.method.2 <- data.frame(agg.logbk.this.vessel.method.2)
-              colnames(agg.logbk.this.vessel.method.2) <- c("FT_REF_SQ","VE_REF","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
              # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF_SQ_DAY (NOTE: SO, 'LE_SEQNUM' IS AGGREGATED HERE)
+              eq1  <- c.listquote(paste("sum(",colnames(.logbk)[idx.col],",na.rm=TRUE)",sep=""))
               agg.logbk.this.vessel.method.3 <- DT[,eval(eq1),by=list(FT_REF_SQ_DAY,VE_REF,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
               agg.logbk.this.vessel.method.3 <- data.frame(agg.logbk.this.vessel.method.3)
               colnames(agg.logbk.this.vessel.method.3) <- c("FT_REF_SQ_DAY","VE_REF","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
@@ -725,7 +722,6 @@ NIELS <- FALSE
                                                                         anf(merged.this.vessel$count.gr.trip.sq)
               }
               if(method=="FT_REF"){
-                         # maybe do more by adding unallocated landings to the midpoint of the trip**
                              merged.this.vessel[,idx.col] <- (apply(merged.this.vessel[,idx.col],2,anf) /
                                                            anf(merged.this.vessel$count.fping.trip) ) /
                                                                         anf(merged.this.vessel$count.gr.trip)
@@ -746,10 +742,10 @@ NIELS <- FALSE
                  .logbk   <- agg.logbk.this.vessel.method.3
                  my.split <- function(obj,a.sep="\\.",idx=1) unlist(lapply(strsplit(obj, a.sep),function(x)x[idx]))
                  # reduce the level
-                 .logbk$FT_REF_SQ  <-  paste(my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=1),
-                                                 my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=2),sep='.')
+                 .logbk$FT_REF_SQ  <-  factor(paste(my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=1),
+                                                 my.split(as.character(.logbk$FT_REF_SQ_DAY),a.sep="\\.",idx=2),sep='.') )
                  # reduce the level
-                 .logbk$FT_REF     <-        my.split(as.character(.logbk$FT_REF_SQ),a.sep="\\.",idx=1)
+                 .logbk$FT_REF     <-       factor( my.split(as.character(.logbk$FT_REF_SQ),a.sep="\\.",idx=1) )
                  # find common keys
                  tripnum.sq.day.logbk            <- .logbk$FT_REF_SQ_DAY
                  tripnum.sq.day.vms              <- .vms$FT_REF_SQ_DAY
@@ -790,10 +786,12 @@ NIELS <- FALSE
                     idx.col.w <- grep('KG', nm) # index columns with species weight
                     idx.col.v <- grep('EURO', nm) # index columns with species value
                     idx.col <- c(idx.col.w, idx.col.v)
-                    .logbk.for.meth1   <- aggregate(.logbk.for.meth1 [,idx.col],
-                                 list(.logbk.for.meth1$VE_REF, .logbk.for.meth1$FT_REF,
-                                            .logbk.for.meth1$VE_FLT, .logbk.for.meth1$VE_KW, .logbk.for.meth1$LE_MET_level6, .logbk.for.meth1$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth1) <- c("VE_REF", "FT_REF", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                    # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF   
+                    DT  <- data.table(.logbk.for.meth1) # library data.table for fast grouping replacing aggregate()
+                    eq1  <- c.listquote(paste("sum(", nm[idx.col],",na.rm=TRUE)",sep=""))
+                    .logbk.for.meth1 <- DT[,eval(eq1),by=list(VE_REF,FT_REF,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
+                    .logbk.for.meth1 <- data.frame(.logbk.for.meth1)
+                    colnames(.logbk.for.meth1) <- c("VE_REF","FT_REF","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
                     # do.merging
                     merged1  <- do.merging(method="FT_REF", .logbk.for.meth1, .vms.for.meth1, general)
                     # add meth flag
@@ -809,10 +807,12 @@ NIELS <- FALSE
                     idx.col.w <- grep('KG', nm) # index columns with species weight
                     idx.col.v <- grep('EURO', nm) # index columns with species value
                     idx.col <- c(idx.col.w, idx.col.v)
-                    .logbk.for.meth2   <- aggregate(.logbk.for.meth2 [,idx.col],
-                                 list(.logbk.for.meth2$VE_REF, .logbk.for.meth2$FT_REF_SQ,
-                                            .logbk.for.meth2$VE_FLT, .logbk.for.meth2$VE_KW, .logbk.for.meth2$LE_MET_level6, .logbk.for.meth2$LE_GEAR), sum, na.rm=TRUE)
-                    colnames(.logbk.for.meth2) <- c("VE_REF",  "FT_REF_SQ", "VE_FLT", "VE_KW", "LE_MET_level6", "LE_GEAR", nm[idx.col])
+                    # AGGREGATE WEIGHT (OR VALUE) PER SPECIES PER FT_REF_SQ
+                    DT  <- data.table( .logbk.for.meth2) # library data.table for fast grouping replacing aggregate()
+                    eq2  <- c.listquote(paste("sum(",nm[idx.col],",na.rm=TRUE)",sep=""))
+                    .logbk.for.meth2 <- DT[,eval(eq2),by=list(VE_REF,FT_REF_SQ,VE_FLT,VE_KW,LE_MET_level6,LE_GEAR)]
+                    .logbk.for.meth2 <- data.frame(.logbk.for.meth2)
+                    colnames(.logbk.for.meth2) <- c("VE_REF","FT_REF_SQ","VE_FLT","VE_KW","LE_MET_level6","LE_GEAR",nm[idx.col])
                     # do.merging
                     merged2 <- do.merging(method="FT_REF_SQ", .logbk.for.meth2, .vms.for.meth2, general)
                     # add meth flag
