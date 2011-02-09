@@ -2,32 +2,19 @@
 
 = Introduction =
 
-The first step of the merging routine consisted of assigning a common identifier joining each VMS trip to a logbook trip by searching for the nearest trip among all logbook trips based on the temporal mid-point of trips. This circumvents problems where the start and end time of VMS and logbook trips do not match exactly and ensure that each logbook trip will be merged with a given VMS trip even if the reporting of the start and end date by fishermen is uncertain. We observed in the data that this reporting date may fluctuate with +/- 1 day around the VMS trip dates possibly because of error in reporting. Additionally, the possible few remaining logbook trips were also linked with the nearest VMS trips. This latter event may occur from unknown failure in the VMS device while fishermen were still fishing. In the processing, links were then forced to nearest VMS trips to prevent loss of any reported landings. 
+Several steps describing a method for coupling the VMS to the logbooks declaration data including the dispatching of landings between VMS fishing positions are provided in Bastardie et al. 2010:
 
-The second step of the process evaluated the consistency between both types of data sources. Sequentially, a quality flag was issued for each recorded position depending on the various degrees of matching, from finer to coarser, if both data have in common: (i) the trip identifier, the same area (ICES rectangle), and the catch date (ii) only the trip identifier and the area, or (iii) only the trip identifier. The initial datasets (both VMS and logbooks) were split into sub-blocks according to this flag. Each pair of sub-blocks was then joined separately and all merged sub-blocks were bound in one dataset afterwards.
+•	The first step of the merging routine consists of first classifying VMS data into trips based on proximity of locations to ports (see WP3).  The linkage of each VMS trips to logbook trips is then done by assigning a common identifier joining each VMS trip to a logbook trip by searching for the nearest trip among all logbook trips based on the temporal mid-point of trips. This circumvents problems where the start and end time of VMS and logbook trips do not match exactly and ensure that each logbook trip will be merged with a given VMS trip even if the reporting of the start and end date by fishermen is uncertain. We observed in the data that this reporting date may fluctuate with +/- 1 day around the VMS trip dates possibly because of error in reporting. Additionally, the possible few remaining logbook trips are also linked with the nearest VMS trips. This latter event may occur from unknown failure in the VMS device while fishermen were still fishing. In the processing, links are then forced to nearest VMS trips to prevent loss of any reported landings.
 
-Declared landings (in weight and value) at the ICES rectangle
-scale from logbooks were further allocated at a lower spatial and
-time scale level with regard to the VMS information. This was done
-by allocating a proportion of the landings to each detected fishing
-position depending on the level of matching between VMS and logbook
-data as described below. In the case of full matching, landings
-allocated to a given position were proportional to the number of
-detected fishing positions lying inside each declared logbook area
-for a given date, assuming that the total landings declared in this
-area at this date are divided equally among all of these positions. In
-the particular case of the use of several gear types within the same
-rectangle and also for the same catch date, an equal share of landings
-between gear types was also assumed for this day. In case of
-partial matching, the following procedure was used. First, when the
-match was correct by area but not by catch date, the landings were
-equally dispatched between all the fishing positions of this trip
-detected in this particular ICES rectangle. Second, when the match
-failed on both catch date and area, the landings concerned were
-equally allocated to all the detected fishing positions of the trip for
-which no previous match has been detected. Finally, residual landings
-(kept in the final output) occurred when the match failed both
-for the catch date and area, and no fishing position remained.
+•	After this first linkage, gear-specific methods for the distinction of the fishing positions from the non-fishing positions (or ‘steaming’, see WP3, e.g. using method based on vessel speed profile like in Bastardie et al. 2010) can be performed knowing that some gear types used during the trip are now assigned to each VMS trips.  The output of this step is to identify the fishing positions among all the VMS positions. 
+
+•	The next step of the process first evaluates the consistency between both types of data sources. Sequentially, a quality flag is issued for each recorded position depending on the various degrees of matching, from finer to coarser, if both data have in common: (i) the trip identifier, the same area (ICES rectangle), and the catch date (ii) only the trip identifier and the area, or (iii) only the trip identifier. The initial datasets (both VMS and logbooks) is then split into sub-blocks according to this flag. Each pair of sub-blocks is then joined separately and all merged sub-blocks are bound in one dataset afterwards.
+
+•	In a final step, declared landings (in weight and value) at the ICES rectangle scale from logbooks are further allocated at a lower spatial and time scale level with regard to the VMS information. This was done by allocating a proportion of the landings to each detected fishing position (and only to fishing positions) depending on the level of matching between VMS and logbook data as described in the previous step. In the case of full matching, landings allocated to a given position is proportional to the number of detected fishing positions lying inside each declared logbook area for a given date, assuming that the total landings declared in this area at this date are divided equally among all of these positions. In the particular case of the use of several gear types within the same rectangle and also for the same catch date, an equal share of landings between gear types is also assumed for this day. In case of partial matching, the following procedure is used. First, when the match is correct by area but not by catch date, the landings are equally dispatched between all the fishing positions of this trip detected in this particular ICES rectangle. Second, when the match fails on both catch date and area, the landings concerned are equally allocated to all the detected fishing positions of the trip for which no previous match has been detected. Finally, residual landings (kept in the final output) occur when the match fails both for the catch date and area, and no fishing position remained.
+
+This method can be routinely applied to various EU countries to the extent that the same data input format is provided (see WP1).  Hence, the method was applied on the Danish and the Dutch vessels so far and led to build a database gathering all the VMS positions with a piece of landings (in value and in weight) attached to each of the fishing positions. The data can be further aggregated from discrete positions to surface areas and grid-based maps generated by applying various gridding algorithms (e.g., by C_square cell, http://www.marine.csiro.au/csquares/). This database is further arranged to comply with the input format of the FishFrame data warehouse (see WP6) providing new facilities for displaying spatio-temporal allocation of effort and landings together with additional information (e.g. harbour sampling, landing size composition, etc.) and reporting tools.
+
+
 
 = Details =
 
