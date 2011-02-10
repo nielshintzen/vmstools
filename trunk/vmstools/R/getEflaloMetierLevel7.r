@@ -4,6 +4,9 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   # I. GETTING THE DATA IN AND CLEANING FOR MISSING AND NEGATIVE VALUES ETC
   #-------------------------------------------------------------------------
 
+  # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
+  data(correspLevel7to5)
+  
   timeStart=Sys.time()
   
   print("--- CREATING DIRECTORIES AND REDUCING THE EFLALO DATASET TO THE ONLY DATA NECESSARY FOR THE ANALYSIS ---")
@@ -46,11 +49,6 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
 
   #EXPLORATION
   explo=selectMainSpecies(dat,analysisName,RunHAC=runHACinSpeciesSelection,DiagFlag=FALSE)
-
-#  Store(objects()[-which(objects() %in% c('dat', 'analysisName', 'path', 'critData',
-#  'critPca', 'algoClust', 'explo', 'timeStart', 'eflalo_ori', 'LogEvent.removed'))])
-#  rm(list=ls(all=TRUE))
-#  gc(reset=TRUE)
 
   # Step 1 : selection of main species
   Step1=extractTableMainSpecies(dat,explo$NamesMainSpeciesHAC,paramTotal=paramTotal,paramLogevent=paramLogevent)
@@ -100,7 +98,7 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   if (!file.exists(compOrdin)) dir.create(compOrdin)
   setwd(file.path(path,analysisName,critPca,algoClust,compOrdin))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
-  compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=Step3$clusters$clustering)
+  compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=Step3$clusters$clustering,tabClusters=Step3$tabClusters)
   save(compMetiers,file="compMetiers.Rdata")
   
   
