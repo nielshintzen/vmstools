@@ -8,7 +8,7 @@
 getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara",param1="euclidean",param2=NULL){
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
-  data(correspLevel7to5)
+  #data(correspLevel7to5)
   
   #le_id <- datSpecies[,1]
   #datSpecies <- datSpecies[,-1]
@@ -169,7 +169,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       summarySampleClusters=array(0,dim=c(6,nbSpec,nbClust))
       dimnames(summarySampleClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
       dimnames(summarySampleClusters)[[2]]=names(meanprofile)
-      dimnames(summarySampleClusters)[[3]]=paste("Cluster ",1:nbClust)
+      dimnames(summarySampleClusters)[[3]]=paste("Cluster",1:nbClust)
       for(k in 1:nbClust){
         if(sizeClusters[k]==1){
           summarySampleClusters[,,k]=apply(t(as.matrix(sampleDatSpecies[which(sampleClusters==k),])),2,
@@ -357,8 +357,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     resval=test.values(clusters,datSpecies)
     # Determine the target species
     target=targetspecies(resval)
-    #cat("target species:", target,"\n")
-    #print(target$tabnomespcib)
+    rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
 
 
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
@@ -403,7 +402,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
     dimnames(summaryClusters)[[2]]=names(meanprofile)
-    dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)
+    dimnames(summaryClusters)[[3]]=paste("Cluster",1:nbClust)
     for(i in 1:nbClust){
       if(sizeClusters[i]==1){
         summaryClusters[,,i]=apply(t(as.matrix(datSpecies[which(clusters==i),])),2,
@@ -553,7 +552,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     for(i in 1:nbClust){
       print("-----------------------------------------------------------------")
-      print(paste("Cluster ",i))
+      print(paste("Cluster",i))
       propCatch=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
       tabPropCatch[i,1:length(propCatch)]=propCatch
       print(propCatch)
@@ -567,7 +566,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     tabClusters=array(0,dim=c(10,5,nbClust))
     dimnames(tabClusters)[[2]]=c("Libname","FAO","Test-value","% Catch","% Logevents")
-    dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
+    dimnames(tabClusters)[[3]]=paste("Cluster",1:nbClust)
     for(i in 1:nbClust){
       tabClusters[,,i]=cbind(tabLibname[i,],namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
     }
@@ -644,7 +643,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     resval=test.values(clusters$cluster,datSpecies)
     #Determine the target species
     target=targetspecies(resval)
-
+    nbClust=length(clusters$size)
+    rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
+    
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
@@ -676,12 +677,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Mean profiles by cluster
-    nbClust=length(clusters$size)
     nbSpec=ncol(datSpecies)
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
     dimnames(summaryClusters)[[2]]=names(meanprofile)
-    dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)
+    dimnames(summaryClusters)[[3]]=paste("Cluster",1:nbClust)
     for(i in 1:nbClust){
       if(clusters$size[i]==1){
         summaryClusters[,,i]=apply(t(as.matrix(datSpecies[which(clusters$cluster==i),])),2,
@@ -831,7 +831,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     for(i in 1:nbClust){
       print("-----------------------------------------------------------------")
-      print(paste("Cluster ",i))
+      print(paste("Cluster",i))
       propCatch=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
       tabPropCatch[i,1:length(propCatch)]=propCatch
       print(propCatch)
@@ -845,7 +845,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     tabClusters=array(0,dim=c(10,5,nbClust))
     dimnames(tabClusters)[[2]]=c("Libname","FAO","Test-value","% Catch","% Logevents")
-    dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
+    dimnames(tabClusters)[[3]]=paste("Cluster",1:nbClust)
     for(i in 1:nbClust){
       tabClusters[,,i]=cbind(tabLibname[i,],namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
     }
@@ -934,7 +934,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     resval=test.values(clusters$clustering,datSpecies)
     # Determine the target species
     target=targetspecies(resval)
-
+    nbClust=length(clusters$id.med)
+    rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
+    
 
     # Projections on the first factorial plans
     png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
@@ -963,12 +965,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Mean profile by cluster
-    nbClust=length(clusters$id.med)
     nbSpec=ncol(datSpecies)
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
     dimnames(summaryClusters)[[2]]=names(meanprofile)
-    dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)
+    dimnames(summaryClusters)[[3]]=paste("Cluster",1:nbClust)
     for(i in 1:nbClust){
       if(clusters$clusinfo[i,1]==1){
         summaryClusters[,,i]=apply(t(as.matrix(datSpecies[which(clusters$clustering==i),])),2,
@@ -1118,7 +1119,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     for(i in 1:nbClust){
       print("-----------------------------------------------------------------")
-      print(paste("Cluster ",i))
+      print(paste("Cluster",i))
       propCatch=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
       tabPropCatch[i,1:length(propCatch)]=propCatch
       print(propCatch)
@@ -1132,7 +1133,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     tabClusters=array(0,dim=c(10,5,nbClust))
     dimnames(tabClusters)[[2]]=c("Libname","FAO","Test-value","% Catch","% Logevents")
-    dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
+    dimnames(tabClusters)[[3]]=paste("Cluster",1:nbClust)
     for(i in 1:nbClust){
       tabClusters[,,i]=cbind(tabLibname[i,],namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
     }
@@ -1224,7 +1225,10 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     resval=test.values(clusters$cluster,datSpecies)
     # Determine the target species
     target=targetspecies(resval)
-
+    nbClust=length(clusters$i.med)
+    rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
+    
+    
     # Projections on the first factorial plans
     png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
@@ -1252,12 +1256,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Mean profile by cluster
-    nbClust=length(clusters$i.med)
     nbSpec=ncol(datSpecies)
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
     dimnames(summaryClusters)[[2]]=names(meanprofile)
-    dimnames(summaryClusters)[[3]]=paste("Cluster ",1:nbClust)
+    dimnames(summaryClusters)[[3]]=paste("Cluster",1:nbClust)
     for(i in 1:nbClust){
       if(clusters$clusinfo[i,1]==1){
         summaryClusters[,,i]=apply(t(as.matrix(datSpecies[which(clusters$clustering==i),])),2,
@@ -1400,7 +1403,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     for(i in 1:nbClust){
       print("-----------------------------------------------------------------")
-      print(paste("Cluster ",i))
+      print(paste("Cluster",i))
       propCatch=round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)[which(round(sapply(namesSpecies[i,][!is.na(namesSpecies[i,])],function(x) t(summaryClusters["Mean",x,i])),digits=1)>=0.1)]
       tabPropCatch[i,1:length(propCatch)]=propCatch
       print(propCatch)
@@ -1414,7 +1417,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     tabClusters=array(0,dim=c(10,5,nbClust))
     dimnames(tabClusters)[[2]]=c("Libname","FAO","Test-value","% Catch","% Logevents")
-    dimnames(tabClusters)[[3]]=paste("Cluster ",1:nbClust)
+    dimnames(tabClusters)[[3]]=paste("Cluster",1:nbClust)
     for(i in 1:nbClust){
       tabClusters[,,i]=cbind(tabLibname[i,],namesSpecies[i,],tabTestVal[i,],tabPropCatch[i,],tabPropLog[i,])
     }
