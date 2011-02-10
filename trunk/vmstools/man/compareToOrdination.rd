@@ -22,7 +22,7 @@ target species of each métier. This method permits thus to obtain mixed métiers,
 (level 5), what is impossible with the ordination methods.
 
 This function compareToOrdination() shows the differences between the métiers from the ordination methods and
-from the multivariate classification, and shows the interest of this last to obtain exhaustive and accurate métiers.
+from the multivariate classification, and shows the interest of the latter to obtain exhaustive and accurate métiers.
 
 }
 
