@@ -51,7 +51,7 @@ If no PCA is run, the function returns the same matrix as the input, with percen
 \author{Nicolas Deporte, Sebastien Demanèche, Stepanie Mahévas, Clara Ulrich, Francois Bastardie}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
 
-\seealso{\code{extractTableMainSpecies(),getMetierClusters()}}
+\seealso{\code{getEflaloMetierLevel7(), selectMainSpecies(), extractTableMainSpecies(),getMetierClusters()}}
 
 \examples{
 
