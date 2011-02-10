@@ -1,13 +1,13 @@
 ###########################################################################
-#   DETERMINE MÉTIERS LEVEL 7 AND 5 WITH THE ORDINATION METHOD            #
-#   (FIRST SPECIES IN CATCH OR FIRST GROUP OF SPECIES IN CATCH)           #
+#   DETERMINE MÉTIERS LEVEL 7 AND 5 WITH TWO ORDINATION METHODS           #
+#   (FIRST SPECIES IN CATCH AND FIRST GROUP OF SPECIES IN CATCH)          #
 #                                                                         #
 #   DETERMINE MÉTIERS LEVEL5 FROM MÉTIERS LEVEL7 FOUND WITH THE           #
-#   MULTIVARIATE CLASSIFICATION (DETERMINING THE CHARACTERISTIC           #
-#   SPECIES FOR EACH CLUSTER)                                             #
+#   MULTIVARIATE CLASSIFICATION (DETERMINING THE TARGET SPECIES           #
+#   FOR EACH CLUSTER)                                                     #
 #                                                                         #
-#   COMPARE THE MÉTIERS FOUND WITH ORDINATION METHOD AND                  #
-#   WITH MULTIVARIATE CLASSIFICATION                                      #
+#   COMPARE THE MÉTIERS FOUND WITH THE ORDINATION METHODS AND             #
+#   WITH THE MULTIVARIATE CLASSIFICATION                                  #
 ###########################################################################  
   
 compareToOrdination=function(dat, Step2, clusters, tabClusters){
