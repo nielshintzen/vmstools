@@ -119,7 +119,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     # Total quantity caught by species
     sumcol=numeric(length=p-1)
     for(i in 2:p){
-      sumcol[i-1]=sum(dat[,i])
+      sumcol[i-1]=sum(dat[,i], na.rm=TRUE)
     }
     names(sumcol)=names(dat)[-1]
 
@@ -151,7 +151,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
           vectorNul=rep(0,n)
           datSpeciesWithoutProp=cbind(datSpeciesWithoutProp,vectorNul)
         }
-        pourcentCatchMainSpeciesTotal=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
+        pourcentCatchMainSpeciesTotal=apply(datSpeciesWithoutProp,1,sum, na.rm=TRUE)/apply(dat[,2:p],1,sum, na.rm=TRUE)*100
         medianPourcentCatchMainSpeciesTotal[seuil/5]=median(pourcentCatchMainSpeciesTotal)
       }
     }
@@ -176,7 +176,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     for(seuil in seq(5,100,5)){
       cat("seuil:",seuil,"\n")
       nomespsel=character()
-      for (i in nameSpecies) if (any(propdat[,i]>=seuil)) nomespsel <- c(nomespsel,i)
+      for (i in nameSpecies) if (!is.na(any(propdat[,i]>=seuil)) && any(propdat[,i]>=seuil)) nomespsel <- c(nomespsel,i)
       nbMainSpeciesLogevent[seuil/5]=length(nomespsel)
    
       # We are bulding the table with main species and aggregated other species

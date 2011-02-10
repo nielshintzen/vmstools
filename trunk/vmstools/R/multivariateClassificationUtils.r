@@ -20,7 +20,7 @@ transformation_proportion=function(tab){
   n=nrow(tab)
   p=ncol(tab)
   for (i in 1:n){
-    sommeligne=sum(res[i,])
+    sommeligne=sum(res[i,], na.rm=TRUE)
     if(sommeligne==0){
       res[i,]=rep(0,p)
     }else{
@@ -66,9 +66,9 @@ select_species=function(data,groupes_cah){
   for(i in 1:nb.classes){
     namegp=names(which(groupes_cah==i))
     effgp=length(which(groupes_cah==i))
-    moyennes[i]=sum(data[namegp])/effgp
+    moyennes[i]=sum(data[namegp],na.rm=TRUE)/effgp
   }
-  indice.autre=which.min(moyennes)
+  indice.autre=which(moyennes == min(moyennes,na.rm=TRUE)) 
   noms=names(which(groupes_cah!=indice.autre))
   return(list(noms,indice.autre))
 }
