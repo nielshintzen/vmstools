@@ -98,12 +98,14 @@ The function returns also a list of diagnostics of the three methods :
   
   eflalo <- formatEflalo(eflalo)
 
-  analysisName <- "metier_analysis" # note that output plots will be sent to getwd()
+  eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
+
+  analysisName <- "metier_analysis_OTB" # note that output plots will be sent to getwd()
   
   explo=selectMainSpecies(
-           dat=eflalo[,c(grep("LE_ID",colnames(eflalo)), grep("LE_EURO",colnames(eflalo)))],
+           dat=eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
                analysisName, RunHAC=TRUE, DiagFlag=FALSE)
-    #=> send the LE_ID and LE_KG_SP colums only
+    #=> send the LE_ID and LE_KG_SP columns only
 
                
   }
