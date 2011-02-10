@@ -93,6 +93,18 @@ The function returns also a list of diagnostics of the three methods :
 \examples{
 
   \dontrun{
+
+  data(eflalo)
+  
+  eflalo <- formatEflalo(eflalo)
+
+  analysisName <- "metier_analysis" # note that output plots will be sent to getwd()
+  
+  explo=selectMainSpecies(
+           dat=eflalo[,c(grep("LE_ID",colnames(eflalo)), grep("LE_EURO",colnames(eflalo)))],
+               analysisName, RunHAC=TRUE, DiagFlag=FALSE)
+    #=> send the LE_ID and LE_KG_SP colums only
+
                
   }
 
