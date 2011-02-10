@@ -16,7 +16,7 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   if (!file.exists(analysisName)) dir.create(analysisName)
   setwd(file.path(path,analysisName))
   #delete old R cache
-  if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
+  if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)                                            
 
   eflalo_ori = dat # keeping this in cached memory for making the final merging at the end
   Store(eflalo_ori)
