@@ -5,7 +5,7 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   #-------------------------------------------------------------------------
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
-  data(correspLevel7to5)
+  #data(correspLevel7to5)
   
   timeStart=Sys.time()
   
@@ -98,7 +98,12 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   if (!file.exists(compOrdin)) dir.create(compOrdin)
   setwd(file.path(path,analysisName,critPca,algoClust,compOrdin))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
-  compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=Step3$clusters$clustering,tabClusters=Step3$tabClusters)
+  
+  if (algoClust=="HAC")     clusters=Step3$clusters
+  if (algoClust=="CLARA")   clusters=Step3$clusters$clustering
+  if (algoClust=="KMEANS")  clusters=Step3$clusters$cluster  
+  
+  compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=clusters,tabClusters=Step3$tabClusters)
   save(compMetiers,file="compMetiers.Rdata")
   
   
