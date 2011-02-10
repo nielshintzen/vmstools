@@ -22,25 +22,18 @@ gc(reset=TRUE)
 path <- "C:/Nicolas/Scripts/R/Analyses"
 setwd(path) # you must choose the path of your working directory
 
-#source("programs/multivariateClassificationUtils.r")
-#source("programs/extractTableMainSpecies.r")
-#source("programs/getTableAfterPCA.r")
-#source("programs/getMetierClusters.r")
-#source("programs/selectMainSpecies.r")
-#source("programs/predictMetier.r")
-#memory.limit(size=4000)
-
 source("multivariateClassificationUtils.r")
 source("extractTableMainSpecies.r")
 source("getTableAfterPCA.r")
 source("getMetierClusters.r")
 source("selectMainSpecies.r")
-source("compareToOrdination.r")
-source("level7to5.r")
-source("level5.r")
+source("compareToOrdination.r")                                 
 source("predictMetier.r")
 source("getEflaloMetierLevel7.r")
 memory.limit(size=4000)
+
+correspLevel7to5=read.table(file="ASFIS_sp_Feb_2010_DCF-Level5.txt", sep="\t",header = TRUE, quote="\"", dec=".")
+correspLevel7to5=correspLevel7to5[,c(1,3,4,5,6,12,13)]
 
 path <- "C:/Nicolas/Scripts/R/Analyses/Donnees_completes"
 setwd(path)
@@ -61,7 +54,6 @@ dat=read.table(file="EFLALO_2008_DRB_EURO_NA.txt", sep=";",header = TRUE, quote=
 test=getEflaloMetierLevel7(dat,analysisName,path,critData="EURO",runHACinSpeciesSelection=TRUE,paramTotal=95,paramLogevent=100,critPca="PCA_70",algoClust="CLARA")
 
 # load your own dataset (called dat1 here)
-#load(paste("data/All_eflalo_2007OTB3a4.Rdata",sep=""))
 load("All_eflalo_2007OTB3a4.Rdata")
 
 # creating the directory of the analysis
@@ -142,9 +134,9 @@ setwd(paste(path,analysisName,option_step2,option_step3,sep="/"))
 if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)      
 
 
-if (option_step3=="HAC")    Step3=getMetierClusters(Step1,Step2,analysisName,methMetier="hac",param3="euclidean",param4="ward") else    
-if (option_step3=="CLARA")  Step3=getMetierClusters(Step1,Step2,analysisName=analysisName,methMetier="clara",param3="euclidean",param4=NULL) else    
-if (option_step3=="KMEANS") Step3=getMetierClusters(Step1,Step2,analysisName=analysisName,methMetier="kmeans",param3=NULL,param4=NULL)    
+if (option_step3=="HAC")    Step3=getMetierClusters(Step1,Step2,analysisName,methMetier="hac",param1="euclidean",param2="ward") else    
+if (option_step3=="CLARA")  Step3=getMetierClusters(Step1,Step2,analysisName=analysisName,methMetier="clara",param1="euclidean",param2=NULL) else    
+if (option_step3=="KMEANS") Step3=getMetierClusters(Step1,Step2,analysisName=analysisName,methMetier="kmeans",param1=NULL,param2=NULL)    
 
 save(Step3,file="Step3.Rdata")
 #load("Step3.Rdata")
@@ -192,7 +184,7 @@ compOrdin="CompOrdin"
 if (!file.exists(compOrdin)) dir.create(compOrdin)
 setwd(paste(path,analysisName,option_step2,option_step3,compOrdin,sep="/"))
 if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)  
-compMetiers=compareToOrdination(dat=dat1,Step2=Step2,clusters=Step3$clusters$clustering)
+compMetiers=compareToOrdination(dat=dat1,Step2=Step2,clusters=Step3$clusters$clustering,tabClusters=Step3$tabClusters)
 save(compMetiers,file="compMetiers.Rdata")
 
 
