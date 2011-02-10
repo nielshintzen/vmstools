@@ -223,6 +223,10 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     
     ListSpecies=sort(unique(c(NamesMainSpeciesHAC,NamesMainSpeciesTotal,NamesMainSpeciesLogevent)))
 
+    # Proportion of the total catch represented by the species in ListSpecies
+    catchListSpecies=sumcol[ListSpecies]
+    propCatchListSpecies=sum(catchListSpecies)/sum(sumcol)*100
+    
 
     if(DiagFlag==FALSE) { 
       explo_species = list(nbAllSpecies=nbAllSpecies,
@@ -236,7 +240,8 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
                             NamesMainSpeciesTotalAlphabetical=sort(NamesMainSpeciesTotal),                                             
                             NamesMainSpeciesTotalByImportance=NamesMainSpeciesTotal,
                             NamesMainSpeciesLogevent=sort(NamesMainSpeciesLogevent),
-                            NamesMainSpeciesAll=ListSpecies) 
+                            NamesMainSpeciesAll=ListSpecies,
+                            propCatchMainSpeciesAll=propCatchListSpecies) 
     }else{         
       explo_species = list(nbAllSpecies=nbAllSpecies,
                             PropMainSpeciesHAC=PropMainSpeciesHAC,
@@ -252,7 +257,8 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
                             NamesMainSpeciesAll=ListSpecies,
                             medianPourcentCatchMainSpeciesHAC=median(pourcentCatchMainSpeciesHAC),
                             medianPourcentCatchMainSpeciesTotal=medianPourcentCatchMainSpeciesTotal,
-                            medianPourcentCatchMainSpeciesLogevent=medianPourcentCatchMainSpeciesLogevent)
+                            medianPourcentCatchMainSpeciesLogevent=medianPourcentCatchMainSpeciesLogevent,
+                            propCatchMainSpeciesAll=propCatchListSpecies)
     }    
 
     return(explo_species)
