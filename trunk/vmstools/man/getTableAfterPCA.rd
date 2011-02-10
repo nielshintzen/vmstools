@@ -48,7 +48,7 @@ If no PCA is run, the function returns the same matrix as the input, with percen
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\author{Nicolas Deporte, Sebastien Demanèche, Stepanie Mahévas, Clara Ulrich}
+\author{Nicolas Deporte, Sebastien Demanèche, Stepanie Mahévas, Clara Ulrich, Francois Bastardie}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
 
 \seealso{\code{extractTableMainSpecies(),getMetierClusters()}}
@@ -57,6 +57,28 @@ If no PCA is run, the function returns the same matrix as the input, with percen
 
   \dontrun{
                
+  data(eflalo)
+  
+  eflalo <- formatEflalo(eflalo)
+
+  eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
+
+  analysisName <- "metier_analysis_OTB" # note that output plots will be sent to getwd()
+  
+  explo <- selectMainSpecies(
+             dat=eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
+               analysisName, RunHAC=TRUE, DiagFlag=FALSE)
+    #=> send the LE_ID and LE_KG_SP columns only
+           
+  Step1 <- extractTableMainSpecies(
+              eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
+                 explo$NamesMainSpeciesHAC, paramTotal=95, paramLogevent=100)
+    #=> send the LE_ID and LE_KG_SP columns only             
+
+  # Run a PCA
+  Step2 <- getTableAfterPCA(Step1, analysisName, pcaYesNo="pca", criterion="70percents")
+ 
+  
   }
 
 }
