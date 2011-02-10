@@ -2,7 +2,7 @@
 \alias{getMetiersClusters}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Finding Metiers from a reduced EFLALO dataset, step 3 : Clustering logevents using various multivariate methods 
+Finding metiers from a reduced EFLALO dataset, step 3: clustering logevents using various multivariate methods 
 }
 \description{
 This function represents the third step in the multivariate analysis of logbooks data for identifying metiers. 
@@ -114,12 +114,36 @@ Finally, the function returns a list with a number of results and diagnotics on 
 \author{Nicolas Deporte, Sébastien Demanèche, Stéphanie Mahévas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
 
-\seealso{\code{extractTableMainSpecies(),getTableAfterPCA()}}
+\seealso{\code{getEflaloMetierLevel7(), selectMainSpecies(), extractTableMainSpecies(), getMetierClusters(), getTableAfterPCA()}}
 
 \examples{
 
   \dontrun{
-               
+ 
+   data(eflalo)
+  
+  eflalo <- formatEflalo(eflalo)
+
+  eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
+
+  analysisName <- "metier_analysis_OTB" # note that output plots will be sent to getwd()
+  
+  explo <- selectMainSpecies(
+             dat=eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
+               analysisName, RunHAC=TRUE, DiagFlag=FALSE)
+    #=> send the LE_ID and LE_KG_SP columns only
+           
+  Step1 <- extractTableMainSpecies(
+              eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
+                 explo$NamesMainSpeciesHAC, paramTotal=95, paramLogevent=100)
+    #=> send the LE_ID and LE_KG_SP columns only             
+
+  # Run a PCA
+  Step2 <- getTableAfterPCA(Step1, analysisName, pcaYesNo="pca", criterion="70percents")
+
+  # Define a metier for each logevent running the CLARA algorithm 
+  Step3 <- getMetierClusters(Step1, Step2, analysisName, methMetier="clara", param1="euclidean", param2=NULL)
+              
   }
 
 }
