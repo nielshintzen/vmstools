@@ -73,7 +73,9 @@ extractTableMainSpecies = function(dat,NamesMainSpeciesHAC,paramTotal=95,paramLo
 #    pourcent <- apply(propdat,1,function(x) which(x>=seuil))
 #    nomespselLogevent <- names(propdat)[unique(unlist(pourcent))]
     nomespselLogevent=character()
-    for (i in nameSpecies) if (any(propdat[,i]>=seuil)) nomespselLogevent=c(nomespselLogevent,i)
+    for (i in nameSpecies) 
+       if (!is.na(any(propdat[,i]>=seuil)) && any(propdat[,i]>=seuil)) 
+            nomespselLogevent=c(nomespselLogevent,i)
 
     #eventually removing MZZ
    # nomespselLogevent <- nomespsel[!nomespsel=="MZZ"]
