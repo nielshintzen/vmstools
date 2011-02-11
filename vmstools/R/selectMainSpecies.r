@@ -223,7 +223,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     
     ListSpecies=sort(unique(c(NamesMainSpeciesHAC,NamesMainSpeciesTotal,NamesMainSpeciesLogevent)))
 
-    # Proportion of the total catch represented by the species in ListSpecies
+    # Proportion of the total catch represented by the species in ListSpecies (= NamesMainSpeciesAll)
     catchListSpecies=sumcol[ListSpecies]
     propCatchListSpecies=sum(catchListSpecies)/sum(sumcol)*100
     
