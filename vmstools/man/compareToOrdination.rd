@@ -33,11 +33,11 @@ compareToOrdination(dat, Step2, clusters, tabClusters)
 \arguments{
   \item{dat}{a data.frame reduced from an eflalo format. It should contain only the LE_ID (Logevent ID) variable as well as
   all species names in columns, with raw catch data. It is necessary to sort out potential error-prone lines (such as lines
-  with only 0) prior to the analysis, and to replace NA values by 0.
+  with only 0) prior to the analysis, and to possibly replace NA values by 0.
 }
   \item{Step2}{numerical matrix with logevents as lines, and values to be used for calculating distances between individuals
-  as columns. Typically, this table will be produced at the step 2 of the métier analysis, using the function getTableAfterPCA().
-  If a PCA was run, selected Principal Components will appear as columns. If no PCA was run, the matrix will be the same
+  as columns. Typically, this table will be produced at the step 2 of the métier analysis, output of the function getTableAfterPCA().
+  In case a PCA was run, selected principal components will appear as columns. If no PCA was run, the matrix will be the same
   as datSpecies (produced at the step 1 of the métier analysis, using the function extractTableMainSpecies()), with 
   percentage values by species.
 }
@@ -53,7 +53,7 @@ compareToOrdination(dat, Step2, clusters, tabClusters)
 }
 
 \value{
-The function returns a list with a number of tables on the comparison of the three methods :
+The function returns a list with a number of tables on the comparison of the three methods:
   \item{nbLogFirstSp}{An integer vector giving the number of logevents allocated to each métier (level 7) defined by
   the ordination method 'first species'.
 }
