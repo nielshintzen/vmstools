@@ -2,7 +2,7 @@
 \alias{getTableAfterPCA}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Finding Metiers from a reduced EFLALO dataset, step 2 : Options for running a PCA on the selected species. 
+Finding Metiers from a reduced EFLALO dataset, step 2: Options for running a PCA on the selected species. 
 }
 \description{
 This function represents the second step in the multivariate analysis of logbooks data for identifying metiers. 
@@ -40,16 +40,16 @@ Logevent ID (LE_ID) should be as row names. Typically, this table will be produc
 }
 
 \value{
-If a PCA is run, a number of graphs are produced and saved directly in the working directory. They describe 1) species projection on the first 
-factorial axes, 2)individuals (logevents) projections on the first factorial axes, 3)Actual and cumulative percentage of Inertia of factorial axes, and 4) eigen values.  
+If a PCA is run, a number of graphs are produced and directly saved in the working directory. These graphs describe 1) species projection on the first 
+factorial axes, 2) individuals (logevents) projections on the first factorial axes, 3) actual and cumulative percentage of inertia of factorial axes, and 4) eigenvalues.  
 
 If a PCA is run, the function returns a numerical matrix with Logevents as lines and selected Principal Components as columns. 
 If no PCA is run, the function returns the same matrix as the input, with percentage values by species. 
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\author{Nicolas Deporte, Sebastien Demanèche, Stepanie Mahévas, Clara Ulrich, Francois Bastardie}
-\note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
+\author{Nicolas Deporte, Sebastien Demanèche, Stéphanie Mahévas, Clara Ulrich, Francois Bastardie}
+\note{A number of libraries are initially called for the whole métier analyses and must be installed: (FactoMineR),(cluster),(SOAR),(amap) }
 
 \seealso{\code{getEflaloMetierLevel7(), selectMainSpecies(), extractTableMainSpecies(),getMetierClusters()}}
 
