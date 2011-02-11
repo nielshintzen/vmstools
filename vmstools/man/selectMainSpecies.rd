@@ -9,13 +9,13 @@ A typical logbook dataset will contain a large number of species recorded, but o
 number of these could potentially be considered as target species. This function aims thus at identifying these
 by using three different approaches :
    - HAC (Hierarchical Ascending Classification) based on Euclidian distances between species with Ward aggregating criteria;
-   - Total, where species are ranked based on their proportion in the total catches, and those cumulating to a given percentage are retained
-   - Logevent, where species are selected if they represent at least a given percentage of at least one logevent (one line)
+   - Total, where species are ranked based on their proportion in the total catch, and those cumulating to a given percentage are retained
+   - Logevent, where species are selected if they represent at least a given percentage of the logevent's catch for at least one logevent (one line)
 
-The HAC and the Logevent methods works on catch data transformed in percentage of species by logevent (line), in order to remove the effect of large
+The HAC and the Logevent methods work on catch data transformed in percentage of species by logevent (line), in order to remove the effect of large
 hauls compared to small hauls. The Total method works on raw data.     
-In the HAC method, a first group of species, the principal ones, is identified by clustering and using a first-order scree test for cutting the tree. 
-Other species are pooled in the group of residuals. New similar HACs are run through a loop on this group of residuals species, to identify if any new species
+In the HAC method, a first group of species, the residual ones, is identified by clustering and using a first-order scree test for cutting the tree. 
+Other species are pooled in the group of principals. New similar HACs are run through a loop on this group of residuals species, to identify if any new species
 might have been left aside in the first run. It is important to note though that HAC method might quickly reach memory limits on standard PCs, and may thus
 not be run on very large datasets.
 In the Total method, the percentage threshold is being increased with 5% steps from 5 to 100, and the ranked species summing up to this value
@@ -73,14 +73,15 @@ The function returns also a list of diagnostics of the three methods :
 }
   \item{namesMainSpeciesHAC}{Names of species retained by the HAC method 
 }
-  \item{namesMainSpeciesTotalAlphabetical}{Names of species retained by the Total method with 95% threshold in alphabetical order, for easier comparison with the two
-  other methods
+  \item{namesMainSpeciesTotalAlphabetical}{Names of species retained by the Total method with 95% threshold in alphabetical order, for easier comparison 
+  with the two other methods
 }
   \item{namesMainSpeciesTotalByImportance}{Names of species retained by the Total method with 95% threshold in ranked order of importance 
 }
   \item{namesMainSpeciesLogevent}{Names of species retained by the Logevent method with 100% threshold
 }
-  \item{namesMainSpeciesAll}{Unique combination of the species retained in either HAC method, Total method with 95% threshold, and Logevent method with 100% threshold 
+  \item{namesMainSpeciesAll}{Unique combination of the species retained in either HAC method, Total method with 95% threshold, and Logevent method 
+  with 100% threshold 
 }
   \item{propCatchMainSpeciesAll}{Proportion of the total catch represented by the selected species (species in namesMainSpeciesAll)
 }
