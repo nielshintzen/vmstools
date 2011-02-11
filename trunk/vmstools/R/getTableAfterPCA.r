@@ -54,18 +54,38 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     x=1:length(log.pca$eig[,1])
     barplot(log.pca$eig[,1],names.arg=x, main="Eigen values")
     dev.off()
+   
     png(paste(analysisName,"Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
     color=rep("grey",length(log.pca$eig[,1]))
     if(criterion=="screetest") color[1:nbaxes]="green"
     barplot(log.pca$eig[,2],names.arg=x, col=color, main="Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
     dev.off()
-    png(paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
+   
+    #png(paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
+    #color=rep("grey",length(log.pca$eig[,1]))
+    #if(criterion=="70percents") color[1:nbaxes]="green"
+    #barplot(log.pca$eig[,3],names.arg= x, col=color,  xlab="Axis", ylab="% of Inertia", axes=FALSE, cex.names=0.85)
+    #axis(2, las=2)
+    #abline(h=70, col="red")
+    #text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
+    #dev.off()
+
+    # rendering of the plot slightly improved
+    X11(5,5)
+    op <- par(no.readonly = TRUE) 
+    par(mar=c(4,4,1,1))
     color=rep("grey",length(log.pca$eig[,1]))
     if(criterion=="70percents") color[1:nbaxes]="green"
-    barplot(log.pca$eig[,3],names.arg=x, col=color, main="Cumulative Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
+    barplot(log.pca$eig[,3], col=color, ylab="", xlab="",  axes=FALSE, cex.names=2)
+    axis(2,  las=2)
     abline(h=70, col="red")
     text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
+     mtext("Axis", side=1, adj=0.5, outer=FALSE, line=+1, font=1, cex=1.5)
+     mtext("% of Inertia", side=2, adj=0.5, outer=FALSE, line=+2.5, font=1, cex=1.5)
+    savePlot(filename = paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"),type ="wmf")
+    par(op)
     dev.off()
+   
 
 
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
@@ -84,6 +104,7 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     par(op)
     title(main=paste("Projection of Species on first factorial axis","\n","\n",sep=""))
     dev.off()
+
 
 
     # PCA with the good number of axis
