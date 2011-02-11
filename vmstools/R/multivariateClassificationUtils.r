@@ -140,7 +140,7 @@ targetspecies=function(resval){
   tabnomespcib=data.frame()
    
   for(i in 1:nbgp){
-    # qnorm(0.975,mean=0,sd=1)=1.96
+    # qnorm(0.975,mean=0,sd=1)=1.96     (P(resval>1.96)=0.025)
     numespcib=which(resval[,i]>1.96)   
     numespcibdec=numespcib[order(resval[numespcib,i],decreasing=T)]           
     nomespcib=names(numespcibdec)
