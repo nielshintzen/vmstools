@@ -99,8 +99,8 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
   
       # Return the dataset retaining only the main species
       nbMainSpeciesHAC=length(nomespsel)
-      NamesMainSpeciesHAC=nomespsel
-      PropMainSpeciesHAC=nbMainSpeciesHAC/nbAllSpecies*100   
+      namesMainSpeciesHAC=nomespsel
+      propNbMainSpeciesHAC=nbMainSpeciesHAC/nbAllSpecies*100   
       
       if(DiagFlag==TRUE) {
         datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
@@ -110,7 +110,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
   print(Sys.time()-t1)
 
-  }else{ NamesMainSpeciesHAC=NA; nbMainSpeciesHAC=as.numeric(NA); medianPourcentCatchMainSpeciesHAC=as.numeric(NA); PropMainSpeciesHAC=NA }
+  }else{ namesMainSpeciesHAC=NA; nbMainSpeciesHAC=as.numeric(NA); medianPourcentCatchMainSpeciesHAC=as.numeric(NA); propNbMainSpeciesHAC=NA }
  
     # TOTALE
     
@@ -157,8 +157,8 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     }
     nbMainSpeciesTotal=c(0,nbMainSpeciesTotal)
     nbMainSpeciesTotal[length(nbMainSpeciesTotal)]=p-1
-    NamesMainSpeciesTotal=nomespsel[1:nbMainSpeciesTotal[length(nbMainSpeciesTotal)-1]]
-    PropMainSpeciesTotal=nbMainSpeciesTotal[length(nbMainSpeciesTotal)-1]/nbAllSpecies*100
+    namesMainSpeciesTotal=nomespsel[1:nbMainSpeciesTotal[length(nbMainSpeciesTotal)-1]]
+    propNbMainSpeciesTotal=nbMainSpeciesTotal[length(nbMainSpeciesTotal)-1]/nbAllSpecies*100
     
     if (DiagFlag) medianPourcentCatchMainSpeciesTotal=c(0,medianPourcentCatchMainSpeciesTotal)
 
@@ -191,8 +191,8 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       }
     }
     nbMainSpeciesLogevent=c(p-1,nbMainSpeciesLogevent)
-    NamesMainSpeciesLogevent=nomespsel
-    PropMainSpeciesLogevent=nbMainSpeciesLogevent[length(nbMainSpeciesLogevent)]/nbAllSpecies*100
+    namesMainSpeciesLogevent=nomespsel
+    propNbMainSpeciesLogevent=nbMainSpeciesLogevent[length(nbMainSpeciesLogevent)]/nbAllSpecies*100
     
     
     if(DiagFlag) medianPourcentCatchMainSpeciesLogevent=c(100,medianPourcentCatchMainSpeciesLogevent)
@@ -221,40 +221,40 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       dev.off()
     }
     
-    ListSpecies=sort(unique(c(NamesMainSpeciesHAC,NamesMainSpeciesTotal,NamesMainSpeciesLogevent)))
+    listSpecies=sort(unique(c(namesMainSpeciesHAC,namesMainSpeciesTotal,namesMainSpeciesLogevent)))
 
-    # Proportion of the total catch represented by the species in ListSpecies (= NamesMainSpeciesAll)
-    catchListSpecies=sumcol[ListSpecies]
+    # Proportion of the total catch represented by the species in listSpecies (= namesMainSpeciesAll)
+    catchListSpecies=sumcol[listSpecies]
     propCatchListSpecies=sum(catchListSpecies)/sum(sumcol)*100
     
 
     if(DiagFlag==FALSE) { 
       explo_species = list(nbAllSpecies=nbAllSpecies,
-                            PropMainSpeciesHAC=PropMainSpeciesHAC,
-                            PropMainSpeciesTotal=PropMainSpeciesTotal,
-                            PropMainSpeciesLogevent=PropMainSpeciesLogevent,
+                            propNbMainSpeciesHAC=propNbMainSpeciesHAC,
+                            propNbMainSpeciesTotal=propNbMainSpeciesTotal,
+                            propNbMainSpeciesLogevent=propNbMainSpeciesLogevent,
                             nbMainSpeciesHAC=nbMainSpeciesHAC, 
                             nbMainSpeciesTotal=nbMainSpeciesTotal, 
                             nbMainSpeciesLogevent=nbMainSpeciesLogevent,
-                            NamesMainSpeciesHAC=sort(NamesMainSpeciesHAC), 
-                            NamesMainSpeciesTotalAlphabetical=sort(NamesMainSpeciesTotal),                                             
-                            NamesMainSpeciesTotalByImportance=NamesMainSpeciesTotal,
-                            NamesMainSpeciesLogevent=sort(NamesMainSpeciesLogevent),
-                            NamesMainSpeciesAll=ListSpecies,
+                            namesMainSpeciesHAC=sort(namesMainSpeciesHAC), 
+                            namesMainSpeciesTotalAlphabetical=sort(namesMainSpeciesTotal),                                             
+                            namesMainSpeciesTotalByImportance=namesMainSpeciesTotal,
+                            namesMainSpeciesLogevent=sort(namesMainSpeciesLogevent),
+                            namesMainSpeciesAll=listSpecies,
                             propCatchMainSpeciesAll=propCatchListSpecies) 
     }else{         
       explo_species = list(nbAllSpecies=nbAllSpecies,
-                            PropMainSpeciesHAC=PropMainSpeciesHAC,
-                            PropMainSpeciesTotal=PropMainSpeciesTotal,
-                            PropMainSpeciesLogevent=PropMainSpeciesLogevent,
+                            propNbMainSpeciesHAC=propNbMainSpeciesHAC,
+                            propNbMainSpeciesTotal=propNbMainSpeciesTotal,
+                            propNbMainSpeciesLogevent=propNbMainSpeciesLogevent,
                             nbMainSpeciesHAC=nbMainSpeciesHAC, 
                             nbMainSpeciesTotal=nbMainSpeciesTotal, 
                             nbMainSpeciesLogevent=nbMainSpeciesLogevent,
-                            NamesMainSpeciesHAC=sort(NamesMainSpeciesHAC), 
-                            NamesMainSpeciesTotalAlphabetical=sort(NamesMainSpeciesTotal),                                             
-                            NamesMainSpeciesTotalByImportance=NamesMainSpeciesTotal,
-                            NamesMainSpeciesLogevent=sort(NamesMainSpeciesLogevent),
-                            NamesMainSpeciesAll=ListSpecies,
+                            namesMainSpeciesHAC=sort(namesMainSpeciesHAC), 
+                            namesMainSpeciesTotalAlphabetical=sort(namesMainSpeciesTotal),                                             
+                            namesMainSpeciesTotalByImportance=namesMainSpeciesTotal,
+                            namesMainSpeciesLogevent=sort(namesMainSpeciesLogevent),
+                            namesMainSpeciesAll=listSpecies,
                             medianPourcentCatchMainSpeciesHAC=median(pourcentCatchMainSpeciesHAC),
                             medianPourcentCatchMainSpeciesTotal=medianPourcentCatchMainSpeciesTotal,
                             medianPourcentCatchMainSpeciesLogevent=medianPourcentCatchMainSpeciesLogevent,
