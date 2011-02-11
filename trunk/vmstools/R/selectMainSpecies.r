@@ -199,14 +199,26 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
     print(Sys.time()-t1)
 
-    # GRAPHICS
+   # GRAPHICS
     # Number of main species
-    png(paste(analysisName,"Number of main species.png",sep="_"), width = 1200, height = 800)
-    plot(seq(0,100,5),nbMainSpeciesTotal,type='l',col="blue",lwd=2, main="Number of main species selected depending of the threshold", xlab="Threshold (%)",ylab="Number of species")
-    lines(seq(0,100,5),nbMainSpeciesLogevent,col="green",lwd=2)
-    if(!is.na(nbMainSpeciesHAC)) abline(nbMainSpeciesHAC,0, col="red",lwd=2)
-    mtext(paste(p-1," Species"),col='darkblue')
-    legend(70, p*0.9, c( "HAC", "Total", "Logevent"),lwd=2,col=c("red", "blue", "green"))
+    #png(paste(analysisName,"Number of main species.png",sep="_"), width = 1200, height = 800)
+    #plot(seq(0,100,5),nbMainSpeciesTotal,type='l',col="blue",lwd=2, main="Number of main species selected depending of the threshold", xlab="Threshold (%)",ylab="Number of species")
+    #lines(seq(0,100,5),nbMainSpeciesLogevent,col="green",lwd=2)
+    #if(!is.na(nbMainSpeciesHAC)) abline(nbMainSpeciesHAC,0, col="red",lwd=2)
+    #mtext(paste(p-1," Species"),col='darkblue')
+    #legend(70, p*0.9, c( "HAC", "Total", "Logevent"),lwd=2,col=c("red", "blue", "green"))
+    #dev.off()
+
+    # Number of main species (rendering slightly improved)
+    X11(5,5)
+    plot(seq(0,100,5),nbMainSpeciesTotal,type='l',col="blue",lwd=3, axes=FALSE, xlab="Threshold (%)",ylab="Number of species")
+    lines(seq(0,100,5),nbMainSpeciesLogevent,col="green",lwd=3)
+    if(!is.na(nbMainSpeciesHAC)) segments(0,nbMainSpeciesHAC,100,nbMainSpeciesHAC, col="red",lwd=3)
+    axis(1)
+    axis(2, las=2)
+    box()
+    legend(20, p*0.9, c( "HAC", "PerTotal", "PerLogevent"),lwd=3,col=c("red", "blue", "green"),bty="n")
+    savePlot(filename = paste(analysisName, "Number of main species.wmf",sep="_"),type ="wmf")
     dev.off()
 
     # Median percentage of catch represented by main species by logevent
