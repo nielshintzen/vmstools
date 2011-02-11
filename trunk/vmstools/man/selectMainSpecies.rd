@@ -59,11 +59,11 @@ the percentage threshold selected for both 'Total' and 'Logevent' methods.
 The function returns also a list of diagnostics of the three methods :
   \item{nbAllSpecies}{Number of species initially in the dataset 
 }
-  \item{PropMainSpeciesHAC}{Proportion of the number of species retained by the HAC method to the total number of species 
+  \item{propNbMainSpeciesHAC}{Proportion of the number of species retained by the HAC method to the total number of species 
 }
-  \item{PropMainSpeciesTotal}{Proportion of the number of species retained by the Total method to the total number of species 
+  \item{propNbMainSpeciesTotal}{Proportion of the number of species retained by the Total method to the total number of species 
 }
-  \item{PropMainSpeciesLogevent}{Proportion of the number of species retained by the Logevent method to the total number of species 
+  \item{propNbMainSpeciesLogevent}{Proportion of the number of species retained by the Logevent method to the total number of species 
 }
   \item{nbMainSpeciesHAC}{Number of species retained by the HAC method  
 }
@@ -71,16 +71,18 @@ The function returns also a list of diagnostics of the three methods :
 }
   \item{nbMainSpeciesLogevent}{Number of species retained by the Logevent method with a percentage threshold increasing at 5% step from 5% to 100% 
 }
-  \item{NamesMainSpeciesHAC}{Names of species retained by the HAC method 
+  \item{namesMainSpeciesHAC}{Names of species retained by the HAC method 
 }
-  \item{NamesMainSpeciesTotalAlphabetical}{Names of species retained by the Total method with 95% threshold in alphabetical order, for easier comparison with the two
+  \item{namesMainSpeciesTotalAlphabetical}{Names of species retained by the Total method with 95% threshold in alphabetical order, for easier comparison with the two
   other methods
 }
-  \item{NamesMainSpeciesTotalByImportance}{Names of species retained by the Total method with 95% threshold in ranked order of importance 
+  \item{namesMainSpeciesTotalByImportance}{Names of species retained by the Total method with 95% threshold in ranked order of importance 
 }
-  \item{NamesMainSpeciesLogevent}{Names of species retained by the Logevent method with 100% threshold
+  \item{namesMainSpeciesLogevent}{Names of species retained by the Logevent method with 100% threshold
 }
-  \item{NamesMainSpeciesAll}{Unique combination of the species retained in either HAC method, Total method with 95% threshold, and Logevent method with 100% threshold 
+  \item{namesMainSpeciesAll}{Unique combination of the species retained in either HAC method, Total method with 95% threshold, and Logevent method with 100% threshold 
+}
+  \item{propCatchMainSpeciesAll}{Proportion of the total catch represented by the selected species (species in namesMainSpeciesAll)
 }
 }
 
