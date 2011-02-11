@@ -8,7 +8,7 @@
 getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara",param1="euclidean",param2=NULL){
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
-  data(correspLevel7to5)
+  #data(correspLevel7to5)
   
   #le_id <- datSpecies[,1]
   #datSpecies <- datSpecies[,-1]
@@ -506,18 +506,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Descriptive and summary tables of clusters
-    clusterDesc=matrix(0,nrow=7,ncol=nbClust)
+    clusterDesc=matrix(0,nrow=8,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
-                        length(which(resval[,i]>1.98)),
+                        length(which(cumsum(t(summaryClusters["Median",,i])[order(t(summaryClusters["Median",,i]),decreasing=T)])<50))+1,
+                        length(which(resval[,i]>1.96)),
                         length(which(resval[,i]>3.29)),
                         length(which(apply(datSpecies,2,function (x) (sizeClusters[i]-length(which(x[clusters==i]==0)))/sizeClusters[i]*100)>50)),
                         length(which(apply(datSpecies,2,function (x) (sizeClusters[i]-length(which(x[clusters==i]==0)))/sizeClusters[i]*100)>90)),
                         sizeClusters[i])
     }
     rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
-                            "with a test-value > 1.98", "with a test-value > 3.29",
+                            "to have 50% of catch in median",  
+                            "with a test-value > 1.96", "with a test-value > 3.29",
                             "catch in 50% of the logevents", "catch in 90% of the logevents",
                             "Clusters size")
     colnames(clusterDesc)=1:nbClust
@@ -785,18 +787,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Descriptive and summary tables of clusters
-    clusterDesc=matrix(0,nrow=7,ncol=nbClust)
+    clusterDesc=matrix(0,nrow=8,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
-                        length(which(resval[,i]>1.98)),
+                        length(which(cumsum(t(summaryClusters["Median",,i])[order(t(summaryClusters["Median",,i]),decreasing=T)])<50))+1,                        
+                        length(which(resval[,i]>1.96)),
                         length(which(resval[,i]>3.29)),
                         length(which(apply(datSpecies,2,function (x) (clusters$size[i]-length(which(x[clusters$cluster==i]==0)))/clusters$size[i]*100)>50)),
                         length(which(apply(datSpecies,2,function (x) (clusters$size[i]-length(which(x[clusters$cluster==i]==0)))/clusters$size[i]*100)>90)),
                         clusters$size[i])
     }
     rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
-                            "with a test-value > 1.98", "with a test-value > 3.29",
+                            "to have 50% of catch in median",
+                            "with a test-value > 1.96", "with a test-value > 3.29",
                             "catch in 50% of the logevents", "catch in 90% of the logevents",
                             "Clusters size")
     colnames(clusterDesc)=1:nbClust
@@ -1073,18 +1077,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Descriptive and summary tables of clusters
-    clusterDesc=matrix(0,nrow=7,ncol=nbClust)
+    clusterDesc=matrix(0,nrow=8,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
-                        length(which(resval[,i]>1.98)),
+                        length(which(cumsum(t(summaryClusters["Median",,i])[order(t(summaryClusters["Median",,i]),decreasing=T)])<50))+1,                        
+                        length(which(resval[,i]>1.96)),
                         length(which(resval[,i]>3.29)),
                         length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>50)),
                         length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)),
                         clusters$clusinfo[i,1])
     }
     rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
-                            "with a test-value > 1.98", "with a test-value > 3.29",
+                            "to have 50% of catch in median",
+                            "with a test-value > 1.96", "with a test-value > 3.29",
                             "catch in 50% of the logevents", "catch in 90% of the logevents",
                             "Clusters size")
     colnames(clusterDesc)=1:nbClust
@@ -1357,18 +1363,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Descriptive and summary tables of clusters
-    clusterDesc=matrix(0,nrow=7,ncol=nbClust)
+    clusterDesc=matrix(0,nrow=8,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
-                        length(which(resval[,i]>1.98)),
+                        length(which(cumsum(t(summaryClusters["Median",,i])[order(t(summaryClusters["Median",,i]),decreasing=T)])<50))+1,
+                        length(which(resval[,i]>1.96)),
                         length(which(resval[,i]>3.29)),
                         length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>50)),
                         length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)),
                         clusters$clusinfo[i,1])
     }
     rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
-                            "with a test-value > 1.98", "with a test-value > 3.29",
+                            "to have 50% of catch in median", 
+                            "with a test-value > 1.96", "with a test-value > 3.29",
                             "catch in 50% of the logevents", "catch in 90% of the logevents",
                             "Clusters size")
     colnames(clusterDesc)=1:nbClust
