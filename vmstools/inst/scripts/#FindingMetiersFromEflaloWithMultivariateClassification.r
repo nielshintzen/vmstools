@@ -32,8 +32,11 @@ source("predictMetier.r")
 source("getEflaloMetierLevel7.r")
 memory.limit(size=4000)
 
-correspLevel7to5=read.table(file="ASFIS_sp_Feb_2010_DCF-Level5.txt", sep="\t",header = TRUE, quote="\"", dec=".")
-correspLevel7to5=correspLevel7to5[,c(1,3,4,5,6,12,13)]
+#correspLevel7to5=read.table(file="ASFIS_sp_Feb_2010_DCF-Level5.txt", sep="\t",header = TRUE, quote="\"", dec=".")
+#correspLevel7to5=correspLevel7to5[,c(1,3,4,5,6,12,13)]
+
+load("correspLevel7to5.rda")
+load("correspMixedMetier.rda")
 
 path <- "C:/Nicolas/Scripts/R/Analyses/Donnees_completes"
 setwd(path)
@@ -172,7 +175,7 @@ eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
 
 # load previous R objects (Step1,Step2,Step3)
 setwd(paste(path,analysisName,sep="/"))
-load("dat1_2007.Rdata")
+load("dat_cleaned.Rdata")
 load("Explo_Step1.Rdata")
 option_step2="PCA_70"
 setwd(paste(path,analysisName,option_step2,sep="/"))
@@ -184,7 +187,7 @@ compOrdin="CompOrdin"
 if (!file.exists(compOrdin)) dir.create(compOrdin)
 setwd(paste(path,analysisName,option_step2,option_step3,compOrdin,sep="/"))
 if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)  
-compMetiers=compareToOrdination(dat=dat1,Step2=Step2,clusters=Step3$clusters$clustering,tabClusters=Step3$tabClusters)
+compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=Step3$clusters$clustering,targetSpecies=Step3$targetSpecies)
 save(compMetiers,file="compMetiers.Rdata")
 
 
