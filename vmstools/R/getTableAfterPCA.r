@@ -23,14 +23,19 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
   if(pcaYesNo=="pca"){
     print("running PCA on all axes...")
     # PCA (Principal Component Analysis)
-    log.pca <- PCA(datSpecies, graph=T, ncp=ncol(datSpecies))
+    log.pca <- PCA(datSpecies, graph=FALSE, ncp=ncol(datSpecies))
 
-    savePlot(filename=paste(analysisName,'Species projection on the two first factorial axis',sep="_"), type='png', restoreConsole = TRUE)
+    X11(5,5)
+    plot.PCA(log.pca, choix = "var", axes = 1:2, new.plot=FALSE, title="", lim.cos2.var = 0.3)
+    savePlot(filename=paste(analysisName,'Species projection on the two first factorial axis',sep="_"), type='wmf', restoreConsole = TRUE)
     dev.off()
-    savePlot(filename=paste(analysisName,'Individuals projection on the two first factorial axis',sep="_"), type='png', restoreConsole = TRUE)
+    X11(5,5)
+    plot.PCA(log.pca, choix = "ind", axes = 1:2, habillage = "ind", title="", new.plot=FALSE, cex=1.2)
+    savePlot(filename=paste(analysisName,'Individuals projection on the two first factorial axis',sep="_"), type='wmf', restoreConsole = TRUE)
     dev.off()
-    plot(log.pca,label=NULL)
-    savePlot(filename=paste(analysisName,'Individuals projection on the two first factorial axis',sep="_"), type='png', restoreConsole = TRUE)
+    X11(5,5)
+    plot.PCA(log.pca, choix = "var", axes = 1:2, label=NULL, new.plot=FALSE, title="")
+    savePlot(filename=paste(analysisName,'Individuals projection on the two first factorial axis',sep="_"), type='wmf', restoreConsole = TRUE)
     dev.off()
 
 
