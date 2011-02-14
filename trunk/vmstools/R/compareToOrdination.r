@@ -10,7 +10,7 @@
 #   WITH THE MULTIVARIATE CLASSIFICATION                                  #
 ###########################################################################  
   
-compareToOrdination=function(dat, Step2, clusters, tabClusters){
+compareToOrdination=function(dat, Step2, clusters, targetSpecies){
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
   data(correspLevel7to5)
@@ -152,30 +152,34 @@ compareToOrdination=function(dat, Step2, clusters, tabClusters){
   ###############################################################
   # LEVELS 7 AND 5 FOR METIERS FROM MULTIVARIATE CLASSIFICATION #
   ###############################################################
-  
-  # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
-  seuilCatch=75
-  
-  targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
-  for(i in 1:nbClust){
-    percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
-    nbSpSel=length(which(percCatchCum<seuilCatch))+1
-    targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
-  }
-  
-  # Maximum number of species in the table
-  maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
-  targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
-  
-  # List of selected species names by cluster (= List of metiers level 7)
-  listTargetSpeciesByCluster=list()
-  for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
+
+#  Les espèces cibles sont maintenant directement calculées dans getMetierClusters.
+#  
+#  # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
+#  seuilCatch=75
+#  
+#  targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
+#  for(i in 1:nbClust){
+#    percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
+#    nbSpSel=length(which(percCatchCum<seuilCatch))+1
+#    targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
+#  }
+#  
+#  # Maximum number of species in the table
+#  maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
+#  targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
+#  
+#  # List of selected species names by cluster (= List of metiers level 7)
+#  listTargetSpeciesByCluster=list()
+#  for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
+#
+#  targetSpecies (passé en paramètre) = listTargetSpeciesByCluster
+
   
   # List of metiers (level 5.7)
-  #listMetiersLevel57=lapply(listTargetSpeciesByCluster, level5)
   listMetiersLevel57=list()
   for (i in 1:nbClust){
-    metiersClusteri=lapply(listTargetSpeciesByCluster[[i]], function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0){print(paste(x," : unknown species, classed in \'FIF\' group",sep=""));"FIF"}
+    metiersClusteri=lapply(targetSpecies[[i]], function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0){print(paste(x," : unknown species, classed in \'FIF\' group",sep=""));"FIF"}
                                                         else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"DCF_species_level5_COD"])
     metiersClusteri=as.character(unique(unlist(metiersClusteri)))
     metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
