@@ -78,7 +78,7 @@ selected Principal Components will appear as columns. If no PCA was run, the mat
 For any of the four methods used, a number of graphs are produced and saved directly in the working directory. 
 They describe 1) projections of results on factorial plans, 2) the mean profile of the whole dataset, i.e. the average percentage of the various species in a 
 logevent across all individuals, 3) the mean and standard deviation profile in terms of average percentage of catch by species within each cluster, 
-4) the number of logevents by clusters, and 5) the profile of target species (TargetValue) by cluster. 
+4) the number of logevents by clusters, and 5) the profile of test-values by cluster. 
 
 
 Finally, the function returns a list with a number of results and diagnostics on the performance of the method:
@@ -103,8 +103,10 @@ Finally, the function returns a list with a number of results and diagnostics on
   \item{descClusters}{a data frame giving some descriptive statistics for each cluster, like cluster size, number of species needed to have at least 50% of the
   cluster's total catch, number of species with a test-value > 1.98 in the cluster, number of species caught in at least 50% of the logevents, etc...     
 }
-  \item{tabClusters}{a three-dimensional array giving for each cluster a table resuming the most important (in catch) and characteristic (in test-value) species 
-  in the cluster, and the percentage of logevents of the cluster catching these species.     
+  \item{tabClusters}{a 3d-array giving a table summurazing for each cluster the most important species (in terms of catch),
+  the associated test-value, and the percentage of logevents of the cluster catching these species.     
+}
+  \item{targetSpecies}{a list giving the target species by cluster.
 }
  
 }
@@ -119,7 +121,7 @@ Finally, the function returns a list with a number of results and diagnostics on
 
   \dontrun{
  
-   data(eflalo)
+  data(eflalo)
   
   eflalo <- formatEflalo(eflalo)
 
