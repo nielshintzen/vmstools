@@ -476,7 +476,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
 
-    # Target Species profiles (test-value)
+    # Profile of test-values by cluster
     targetresval=numeric()
     nameTargetPlot=character()
     for(i in 1:nbClust){
@@ -578,6 +578,26 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
     }
 
+    # Target Species
+    # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
+    seuilCatch=75
+    
+    targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
+    for(i in 1:nbClust){
+      percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
+      nbSpSel=length(which(percCatchCum<seuilCatch))+1
+      targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
+    }
+    
+    # Maximum number of species in the table
+    maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
+    targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
+    
+    # List of selected species names by cluster (= List of metiers level 7)
+    listTargetSpeciesByCluster=list()
+    for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
+  
+  
 
     # Create csv tables
     write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
@@ -598,7 +618,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, sizeClusters=sizeClusters,
      betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, 
      nbClust=nbClust, summaryClusters=summaryClusters, testValues=resval, 
-     testValuesSpecies=target$tabnomespcib, descClusters=clusterDesc2, tabClusters=tabClusters))
+     testValuesSpecies=target$tabnomespcib, descClusters=clusterDesc2, tabClusters=tabClusters,
+     targetSpecies=listTargetSpeciesByCluster))
 
   }   else
 
@@ -757,7 +778,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
 
-    # Target Species profiles (test-value)
+    # Profile of test-values by cluster
     targetresval=numeric()
     nameTargetPlot=character()
     for(i in 1:nbClust){
@@ -860,6 +881,27 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     }
 
 
+    # Target Species
+    # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
+    seuilCatch=75
+    
+    targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
+    for(i in 1:nbClust){
+      percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
+      nbSpSel=length(which(percCatchCum<seuilCatch))+1
+      targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
+    }
+    
+    # Maximum number of species in the table
+    maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
+    targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
+    
+    # List of selected species names by cluster (= List of metiers level 7)
+    listTargetSpeciesByCluster=list()
+    for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
+  
+  
+
     # Create csv tables
     write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
     
@@ -879,7 +921,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, 
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, 
     summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib,
-    descClusters=clusterDesc2, tabClusters=tabClusters))
+    descClusters=clusterDesc2, tabClusters=tabClusters,
+    targetSpecies=listTargetSpeciesByCluster))
 
   } else
 
@@ -1048,7 +1091,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
 
-    # Target Species profile (test-value) by cluster
+    # Profile of test-values by cluster
     targetresval=numeric()
     nameTargetPlot=character()
     for(i in 1:nbClust){
@@ -1150,6 +1193,27 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     }
 
 
+    # Target Species
+    # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
+    seuilCatch=75
+    
+    targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
+    for(i in 1:nbClust){
+      percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
+      nbSpSel=length(which(percCatchCum<seuilCatch))+1
+      targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
+    }
+    
+    # Maximum number of species in the table
+    maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
+    targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
+    
+    # List of selected species names by cluster (= List of metiers level 7)
+    listTargetSpeciesByCluster=list()
+    for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
+  
+
+
     # Create csv tables
     write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
     
@@ -1169,7 +1233,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, 
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, 
     summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib,
-    descClusters=clusterDesc2, tabClusters=tabClusters))
+    descClusters=clusterDesc2, tabClusters=tabClusters,
+    targetSpecies=listTargetSpeciesByCluster))
 
   } else
 
@@ -1336,7 +1401,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
 
-    # Target Species profile (test-value) by cluster
+    # Profile of test-values by cluster
     targetresval=matrix(0,nrow=nbClust,ncol=nbSpec)
     colnames(targetresval)=colnames(datSpecies)
     rownames(targetresval)=1:nbClust
@@ -1434,6 +1499,27 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     for(i in 1:nbClust){
       sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
     }
+    
+    
+    # Target Species
+    # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
+    seuilCatch=75
+    
+    targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
+    for(i in 1:nbClust){
+      percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
+      nbSpSel=length(which(percCatchCum<seuilCatch))+1
+      targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
+    }
+    
+    # Maximum number of species in the table
+    maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
+    targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
+    
+    # List of selected species names by cluster (= List of metiers level 7)
+    listTargetSpeciesByCluster=list()
+    for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
+  
 
 
     # Create csv tables
@@ -1455,7 +1541,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters,
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust,
     summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib, 
-    descClusters=clusterDesc2, tabClusters=tabClusters))
+    descClusters=clusterDesc2, tabClusters=tabClusters,
+    targetSpecies=listTargetSpeciesByCluster))
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
