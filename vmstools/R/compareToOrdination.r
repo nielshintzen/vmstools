@@ -15,6 +15,10 @@ compareToOrdination=function(dat, Step2, clusters, tabClusters){
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
   data(correspLevel7to5)
   
+  # Load the table linking mixed metiers (composed by 2 simple metiers) to their official code of mixed metiers level 5 (FAO - 3 characters).
+  data(correspMixedMetier)
+  
+  
   ##########################
   # FIRST SPECIES IN CATCH #
   ##########################
@@ -108,11 +112,7 @@ compareToOrdination=function(dat, Step2, clusters, tabClusters){
   dev.off()
   
   
-  # Determine the metier in level 5 from the metier in level 7 based on the first species in catch (logevent by logevent)
-#  metiersFirstSpeciesL5=unlist(sapply(firstSp,level5))      ## pb espèces sans correspondance vers groupe d'espèces
-#  unique(metiersFirstSpeciesL5)
-#  barplot(table(metiersFirstSpeciesL5), main="Number of logevents by group of species level 5", xlab="Groups of species level 5", ylab="Number of logevents")
- 
+  # Determine the metier level 5 from the metier level 7 based on the first species in catch (logevent by logevent)
   print("Please, be patient...") 
   metiersFirstSpeciesL5=lapply(as.list(firstSp), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0){print(paste(x," : unknown species, classed in \'FIF\' group",sep=""));"FIF"} 
                                                     else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"DCF_species_level5_COD"])
@@ -127,7 +127,6 @@ compareToOrdination=function(dat, Step2, clusters, tabClusters){
   
   # Determine the metier of each logevent thanks to the first group of species in catch (level 5) of the logevent
   datL5=dat
-  #colnames(datL5)=lapply(as.list(colnames(datL5)), level7to5)   ## quand on aura toutes les correspondances espèces vers groupes d'espèces, on pourra utiliser level5 à la place de level7to5.
   groupColSpecies=lapply(as.list(colnames(datL5)), function(x) if(length(which(correspLevel7to5[,"X3A_CODE"]==x))==0){print(paste(x," : unknown species, classed in \'FIF\' group",sep=""));"FIF"} 
                                                                else correspLevel7to5[which(correspLevel7to5[,"X3A_CODE"]==x),"DCF_species_level5_COD"])  
   groupColSpecies=unlist(lapply(groupColSpecies, function(x) as.character(x)))
@@ -172,7 +171,7 @@ compareToOrdination=function(dat, Step2, clusters, tabClusters){
   listTargetSpeciesByCluster=list()
   for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
   
-  # List of metiers level 57
+  # List of metiers (level 5.7)
   #listMetiersLevel57=lapply(listTargetSpeciesByCluster, level5)
   listMetiersLevel57=list()
   for (i in 1:nbClust){
@@ -183,96 +182,54 @@ compareToOrdination=function(dat, Step2, clusters, tabClusters){
     listMetiersLevel57[[i]]=metiersClusteri
   }
   
-  
-  # Metiers (level 57) of each logevent found thanks to the getMetierClusters method.
+  # Metiers (level 5.7) of each logevent found thanks to the getMetierClusters method 
+  #(where mixed metiers labels are the aggregation of several simple metiers labels).
   metiersClustersL5=unlist(sapply(clusters,function(x) listMetiersLevel57[x]))
+
+
+  # Correspondence of mixed metiers (composed by 2 simple metiers) to their official code of mixed metiers level 5 (FAO - 3 characters). 
+  listMixedMetiersLevel57=lapply(listMetiersLevel57, function(x) if(nchar(x)!=3){correspMixedMetier[which(correspMixedMetier[,"combMetiersL5"]==x),"mixedMetierL5"]}
+                                            else x )
   
+  # Metiers (level 5.7) of each logevent found thanks to the getMetierClusters method (with official labels for mixed metiers).                                         
+  mixedMetiersClustersL5=unlist(sapply(clusters,function(x) listMixedMetiersLevel57[x]))
 
   
-  
-  
-     
-   ## Changement dans la définition des espèces cibles (niveau 7) : on ne prend plus les espèces les plus capturées dans la classe
-   ## jusqu'à avoir au moins 75% de la capture totale de la classe
-   ## on prend maintenant les espèces présentes dans le tableau de synthèse de la classe jusqu'à avoir un %Catch cumulé au moins 
-   ## égal à 75% 
-   ## (Rappel : %Catch d'une espèce = la moyenne des pourcentages de capture de cette espèce pour tous les logevents de la classe)
-  
-#  nameSpecies=colnames(dat)
-#  
-#  # Total quantity caught species by species by cluster
-#  sumColByClust=matrix(0,nrow=nbClust,ncol=p)
-#  for(cl in 1:nbClust){
-#    for(i in 1:p) sumColByClust[cl,i]=sum(dat[which(clusters==cl),i])
-#  }
-#  colnames(sumColByClust)=nameSpecies
-#  
-#  
-#  # Percent of each species in the cluster's total catch
-#  propEspByCluster=matrix(0,nrow=nbClust,ncol=p)
-#  colnames(propEspByCluster)=nameSpecies
-#  for(cl in 1:nbClust) propEspByCluster[cl,]=sumColByClust[cl,]/sum(sumColByClust[cl,])*100
-#  
-#  # Columns number of each species by decreasing order of catch
-#  numEspByCluster=matrix(0,nrow=nbClust,ncol=p)
-#  for(cl in 1:nbClust) numEspByCluster[cl,]=order(propEspByCluster[cl,],decreasing=T)
-#  # Cumulative percentage of species catch in the cluster's total catch
-#  propEspByClusterCum=matrix(0,nrow=nbClust,ncol=p)
-#  for(cl in 1:nbClust)  propEspByClusterCum[cl,]=cumsum(sort(propEspByCluster[cl,],decreasing=T))
-#  
-#   
-#  espSelByCluster=matrix(0,nrow=nbClust,ncol=p)
-#  nomEspSelByCluster=matrix(NA,nrow=nbClust,ncol=p)
-#  for(cl in 1:nbClust){ 
-#    pourcent=which(propEspByClusterCum[cl,]<seuilCatch)
-#    # Name of selected species by cluster
-#    espSelByCluster[cl,1:(length(pourcent)+1)]=numEspByCluster[cl,1:(length(pourcent)+1)]
-#    nomEspSelByCluster[cl,1:(length(pourcent)+1)]=nameSpecies[espSelByCluster[cl,1:(length(pourcent)+1)]]
-#  }
-#      
-#  # Maximum number of species in the table
-#  maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(nomEspSelByCluster),1,which)),length)))
-#  
-#  nomEspSelByCluster=nomEspSelByCluster[,1:maxColNomEspSelByCluster]
-#  # List of selected species names by cluster (= List of metiers level 7)
-#  listNomEspSelByCluster=list()
-#  for(cl in 1:nbClust) listNomEspSelByCluster[[cl]]=unlist(nomEspSelByCluster[cl,which(!is.na(nomEspSelByCluster[cl,]))])
-#  
-#  # List of metiers level 5.7
-#  listMetiersLevel57=lapply(listNomEspSelByCluster, level5)
-#  
-#  # Metiers (level 5.7) of each logevent found thanks to the getMetierClusters method.
-#  clustersStep3L5=unlist(sapply(clusters,function(x) listMetiersLevel57[x]))
-  
-  
+  ## Changement dans la définition des espèces cibles (niveau 7) : on ne prend plus les espèces les plus capturées dans la classe
+  ## jusqu'à avoir au moins 75% de la capture totale de la classe
+  ## on prend maintenant les espèces présentes dans le tableau de synthèse de la classe jusqu'à avoir un %Catch cumulé au moins 
+  ## égal à 75% 
+  ## (Rappel : %Catch d'une espèce = la moyenne des pourcentages de capture de cette espèce pour tous les logevents de la classe)
+
+
   
   #################
   #  COMPARISONS  # 
   #################
   
-  # Compare the metiers Clusters (from getMetierClusters) (level 7) vs the metier First Species in catch (level 7)
+  # Compare the metiers 'Clusters' (from getMetierClusters) (level 7) vs the metier 'First Species' in catch (level 7)
   compClustersL7vsFirstSpeciesL7=table(clusters,metiersFirstSpeciesL7)
   rownames(compClustersL7vsFirstSpeciesL7)=paste("Clust",seq=1:nbClust,sep="")
   
-  # Compare the metiers Clusters (level 5.7) vs metiers First Species (level 5)
+  # Compare the metiers 'Clusters' (level 5.7) vs the metiers 'First Species' (level 5)
   clustStep3L5=clusters
   compClustersL5vsFirstSpeciesL5=table(clustStep3L5,metiersFirstSpeciesL5)    
-  rownames(compClustersL5vsFirstSpeciesL5)=unlist(listMetiersLevel57) 
+  rownames(compClustersL5vsFirstSpeciesL5)=unlist(listMixedMetiersLevel57) 
   
-  # Compare the metiers Clusters (level 5.7) vs metiers First Group (level 5)
+  # Compare the metiers 'Clusters' (level 5.7) vs the metiers 'First Group' (level 5)
   #compL5ClustStep3VsGroup=table(clustersStep3L5,metiersFirstGroupL5)  !! pb regroupement des clusters qui correspondent au même groupe d'espèce niveau 5.
   clustStep3L5=clusters
   compClustersL5vsFirstGroupL5=table(clustStep3L5,metiersFirstGroupL5)
-  rownames(compClustersL5vsFirstGroupL5)=unlist(listMetiersLevel57)
+  rownames(compClustersL5vsFirstGroupL5)=unlist(listMixedMetiersLevel57)
   
-  # Compare the metiers First Species (level 5) vs First Group (level 5)
+  # Compare the metiers 'First Species' (level 5) vs the metiers 'First Group' (level 5)
   compFirstSpeciesL5vsFirstGroupL5=table(metiersFirstSpeciesL5,metiersFirstGroupL5)
   
   
   # Less attractive
-  # Compare the metiers Clusters (level 5.7) vs metiers Clusters (level 7)
+  # Compare the metiers 'Clusters' (level 5.7) vs the metiers 'Clusters' (level 7)
   clustStep3L7=clusters
-  compClustersL5vsClustersL7=table(metiersClustersL5,clustStep3L7)
+  compClustersL5vsClustersL7=table(mixedMetiersClustersL5,clustStep3L7)    
   colnames(compClustersL5vsClustersL7)=paste("Clust",seq=1:nbClust)
   
   
