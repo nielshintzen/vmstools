@@ -2,8 +2,8 @@
 \alias{compareToOrdination}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-Compare the métiers found with the classification from clustering 
-to the métiers found with two simple alternative ordination methods: 'first species' &  'first group'.
+Compare the métiers found with the classification from clustering e.g. CLARA
+against the métiers found by two simple alternative ordination methods: 'first species' &  'first group'.
 }
 \description{
 This function allows to compare the métiers found using the classification from clustering 
@@ -19,8 +19,8 @@ The classification from clustering defines level 7 métiers for which each metier
  called target species, unlike the métiers from the simpler ordination methods. Hence, mixed métiers can be obtained 
  in case that these species belong to different target assemblages.
 
-This function enlights the differences between the classification from clustering and the simpler
-ordination methods when defining the métiers, and potentially demonstrates the higher power of the clustering in obtaining 
+This function enlights the differences when defining the métiers between the classification from clustering and the simpler
+ordination methods, and potentially demonstrates the higher power of the data clustering method in obtaining 
 exhaustive and accurately defined métiers.
 
 }
@@ -31,22 +31,21 @@ compareToOrdination(dat, Step2, clusters, tabClusters)
 }
 
 \arguments{
-  \item{dat}{a data.frame reduced from an eflalo format. It should contain only the LE_ID (Logevent ID) variable as well as
-  all species names in columns, with raw catch data. It is necessary to sort out potential error-prone lines (such as lines
-  with only 0) prior to the analysis, and to possibly replace NA values by 0.
+  \item{dat}{a reduced data.frame from an eflalo format. It should contain only the LE_ID (Logevent ID) variable as well as
+  all species names in columns, with raw catch data. It may be needed to sort out potential error-prone rows (such as rows
+  with only 0) prior to the analysis, and to also replace NA values by 0.
 }
-  \item{Step2}{numerical matrix with logevents as lines, and values to be used for calculating distances between individuals
-  as columns. Typically, this table will be produced at the step 2 of the métier analysis, output of the function getTableAfterPCA().
-  In case a PCA was run, selected principal components will appear as columns. If no PCA was run, the matrix will be the same
+  \item{Step2}{numerical matrix with logevents as rows, and values to be used for calculating distances between individuals
+  as columns. This matrix is produced at the step 2 of the métier analysis, output of the function getTableAfterPCA().
+  In case a PCA is run, the selected axes will appear as columns. If no PCA is run, the matrix will be the same
   as datSpecies (produced at the step 1 of the métier analysis, using the function extractTableMainSpecies()), with 
   percentage values by species.
 }
-  \item{clusters}{the clustering vector. An integer vector of length n, the number of logevents, giving for each
-  logevents the number of the cluster to which it belongs. This vector will be produced at the step 3 of the métier analysis,
+  \item{clusters}{the vector storing the cluster label of each logbook event. This vector will be produced at the step 3 of the métier analysis,
   using the function getMetierClusters().
 }
-  \item{tabClusters}{a three-dimensional array giving for each cluster a table resuming the most important (in catch) and 
-  characteristic (in test-value) species in the cluster, and the percentage of logevents of the cluster catching these species.  
+  \item{tabClusters}{a 3d-array giving a table summurazing for each cluster the most important species (in terms of catch),
+  the associated test-value, and the percentage of logevents of the cluster catching these species.  
 }
 }
 \details{
@@ -110,8 +109,8 @@ The function returns a list with a number of tables on the comparison of the thr
   # Define a metier for each logevent running the CLARA algorithm 
   Step3 <- getMetierClusters(Step1, Step2, analysisName, methMetier="clara", param1="euclidean", param2=NULL)
   
-  # Compare the differences between the métiers defined by CLARA (multivariate classification)
-  # with the métiers defined by the two ordination methods
+  # Compare the differences between the métiers defined by CLARA (data clustering)
+  # and the métiers defined by two simple ordination methods
   compMetiers <- compareToOrdination(
                    dat=eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
                            Step2=Step2, clusters=Step3$clusters$clustering, tabClusters=Step3$tabClusters)
