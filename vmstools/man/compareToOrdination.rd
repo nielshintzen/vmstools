@@ -44,8 +44,8 @@ compareToOrdination(dat, Step2, clusters, tabClusters)
   \item{clusters}{the vector storing the cluster label of each logbook event. This vector will be produced at the step 3 of the métier analysis,
   using the function getMetierClusters().
 }
-  \item{tabClusters}{a 3d-array giving a table summurazing for each cluster the most important species (in terms of catch),
-  the associated test-value, and the percentage of logevents of the cluster catching these species.  
+  \item{targetSpecies}{a list giving the target species by cluster. This list will be produced at the step 3 of the métier analysis,
+  using the function getMetierClusters(). 
 }
 }
 \details{
