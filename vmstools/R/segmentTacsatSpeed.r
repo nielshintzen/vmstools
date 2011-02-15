@@ -8,6 +8,9 @@ segmentTacsatSpeed <- function(tacsat,
                            output.path=file.path('C:','output'),
                                        visual.check=TRUE, a.year=2009), ...){
 
+  cat("if it still doesn't exist, 'results' folder is created in ",general$output.path,"\n")
+  dir.create(general$output.path, showWarnings = TRUE, recursive = TRUE, mode = "0777")
+
   lstargs <- list(...)
   if(length(lstargs$vessels)!=0) {
      vessels <- lstargs$vessels
@@ -15,7 +18,8 @@ segmentTacsatSpeed <- function(tacsat,
   vessels <- unique(tacsat$VE_REF)
   }
 
-
+  # assign a idx to each ping
+  tacsat$idx <- 1:nrow(tacsat)
 
    # utils---
   distAB.f <- function(A,B, .unit="km"){
@@ -223,6 +227,7 @@ segmentTacsatSpeed <- function(tacsat,
   for(a.vesselid in vessels){ # BY VESSEL
   tacsat.this.vessel <- tacsat[tacsat$VE_REF %in% a.vesselid, ]
   
+
   tacsat.this.vessel[,"bound1"] <- NA
   tacsat.this.vessel[,"bound2"] <- NA
 
@@ -249,7 +254,7 @@ segmentTacsatSpeed <- function(tacsat,
   tacsat.this.vessel$apparent.speed <-
      replace(tacsat.this.vessel$apparent.speed, is.na(tacsat.this.vessel$apparent.speed), 0)
 
- 
+
   idx <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed >= 30 |
                 is.infinite(tacsat.this.vessel$apparent.speed),"idx"]
   tacsat <- tacsat[!tacsat$idx %in% idx,] # just remove!
@@ -259,6 +264,7 @@ segmentTacsatSpeed <- function(tacsat,
       stop('you need first to assign a gear LE_GEAR to each ping')
 
   for (gr in levels(factor(tacsat.this.vessel$LE_GEAR))){ # BY GEAR
+
     xxx <- tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr,] # input
 
     x <- as.numeric(as.character(sort(xxx$apparent.speed))) *100   # multiply by factor 100 because integer needed
@@ -311,7 +317,7 @@ segmentTacsatSpeed <- function(tacsat,
   if(is.null(bound2)) bound2 <- o$psi[order(o$psi[,"Est."])[2],"Est."] +20
 
  if(general$visual.check){
-   windows()
+   X11()
    par(mfrow=c(2,1))
    if(class(o)!="try-error"){
      plot(dati$x/100, o$fitted.values, type="l",
@@ -338,6 +344,7 @@ segmentTacsatSpeed <- function(tacsat,
   bound1 <- bound1  / 100  # re-transform
   bound2 <- bound2  / 100   # re-transform
   xxx$apparent.speed <- replace(xxx$apparent.speed, is.na(xxx$apparent.speed), 0) # debug 0/0
+ 
 
 
   # maybe you want to only keep the upper bound
