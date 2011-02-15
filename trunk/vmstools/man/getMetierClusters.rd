@@ -82,7 +82,7 @@ logevent across all individuals, 3) the mean and standard deviation profile in t
 
 
 Finally, the function returns a list with a number of results and diagnostics on the performance of the method:
-  \item{LE_ID_clust}{a data frame with two columns, linking the initial ID name of the Logevent (LE_ID) with the cluster number where the ID has been allocated.   
+  \item{LE_ID_clust}{a data frame with two columns, linking the initial ID name of the Logevent (LE_ID) with the cluster métier where the ID has been allocated.   
 }
   \item{clusters}{diagnostics of the clustering process. It may vary between the four methods. 
 }
