@@ -593,10 +593,22 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
     targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
     
-    # List of selected species names by cluster (= List of metiers level 7)
+    # List of target species by cluster
     listTargetSpeciesByCluster=list()
     for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
   
+    # List of metiers (level 7)
+    listMetiersL7=list()
+    for (i in 1:nbClust){
+      metiersClusteri=listTargetSpeciesByCluster[[i]]
+      metiersClusteri=as.character(unique(unlist(metiersClusteri)))
+      metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
+      listMetiersL7[[i]]=metiersClusteri
+    }
+  
+    # Metier (level 7) of each logevent
+    metierByLogeventL7=unlist(sapply(clusters,function(x) listMetiersL7[[x]]))
+
   
 
     # Create csv tables
@@ -611,7 +623,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     }
     
     
-    LE_ID_clust=cbind(LE_ID=LE_ID,clust=clusters)
+    #LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters)
+    LE_ID_clust=data.frame(LE_ID=LE_ID,clust=metierByLogeventL7)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
@@ -896,11 +909,23 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
     targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
     
-    # List of selected species names by cluster (= List of metiers level 7)
+    # List of target species by cluster
     listTargetSpeciesByCluster=list()
     for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
   
+    # List of metiers (level 7)
+    listMetiersL7=list()
+    for (i in 1:nbClust){
+      metiersClusteri=listTargetSpeciesByCluster[[i]]
+      metiersClusteri=as.character(unique(unlist(metiersClusteri)))
+      metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
+      listMetiersL7[[i]]=metiersClusteri
+    }
   
+    # Metier (level 7) of each logevent
+    metierByLogeventL7=unlist(sapply(clusters$cluster,function(x) listMetiersL7[[x]]))
+
+
 
     # Create csv tables
     write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
@@ -914,7 +939,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     }
     
     
-    LE_ID_clust=cbind(LE_ID=LE_ID,clust=clusters$cluster)
+    #LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters$cluster)
+    LE_ID_clust=data.frame(LE_ID=LE_ID,clust=metierByLogeventL7)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
@@ -1208,10 +1234,22 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
     targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
     
-    # List of selected species names by cluster (= List of metiers level 7)
+    # List of target species by cluster
     listTargetSpeciesByCluster=list()
     for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
   
+    # List of metiers (level 7)
+    listMetiersL7=list()
+    for (i in 1:nbClust){
+      metiersClusteri=listTargetSpeciesByCluster[[i]]
+      metiersClusteri=as.character(unique(unlist(metiersClusteri)))
+      metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
+      listMetiersL7[[i]]=metiersClusteri
+    }
+  
+    # Metier (level 7) of each logevent
+    metierByLogeventL7=unlist(sapply(clusters$clustering,function(x) listMetiersL7[[x]]))
+
 
 
     # Create csv tables
@@ -1226,7 +1264,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     }
 
 
-    LE_ID_clust=cbind(LE_ID=LE_ID,clust=clusters$clustering)
+    #LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters$clustering)
+    LE_ID_clust=data.frame(LE_ID=LE_ID,clust=metierByLogeventL7)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
@@ -1516,10 +1555,22 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
     targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
     
-    # List of selected species names by cluster (= List of metiers level 7)
+    # List of target species by cluster
     listTargetSpeciesByCluster=list()
     for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
   
+    # List of metiers (level 7)
+    listMetiersL7=list()
+    for (i in 1:nbClust){
+      metiersClusteri=listTargetSpeciesByCluster[[i]]
+      metiersClusteri=as.character(unique(unlist(metiersClusteri)))
+      metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
+      listMetiersL7[[i]]=metiersClusteri
+    }
+  
+    # Metier (level 7) of each logevent
+    metierByLogeventL7=unlist(sapply(clusters$clustering,function(x) listMetiersL7[[x]]))
+
 
 
     # Create csv tables
@@ -1534,7 +1585,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     }     
 
 
-    LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters$clustering)
+    #LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters$clustering)
+    LE_ID_clust=data.frame(LE_ID=LE_ID,clust=metierByLogeventL7)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
 
@@ -1542,7 +1594,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust,
     summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib, 
     descClusters=clusterDesc2, tabClusters=tabClusters,
-    targetSpecies=listTargetSpeciesByCluster))
+    targetSpecies=listTargetSpeciesByCluster))                                   
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
