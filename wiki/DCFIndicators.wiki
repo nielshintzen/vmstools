@@ -33,7 +33,7 @@ The main functions are:
 To run these indicator functions, the following functions are needed:
  * mapGrid.r
  * vmsGridCreate.r
- * tacsatMinimumConvexPolygon.r
+ * tacsatMCP.r
  * surface.r
  * clipPolygons.r
 
