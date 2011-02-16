@@ -96,7 +96,7 @@ save(dat1, file="dat1_2007.Rdata")
 explo=selectMainSpecies(dat1,analysisName,RunHAC=TRUE,DiagFlag=FALSE)
 
 # Step 1 : selection of main species
-Step1=extractTableMainSpecies(dat1,explo$NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
+Step1=extractTableMainSpecies(dat1,explo$namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
 
 save(explo,Step1,file="Explo_Step1.Rdata")
 
