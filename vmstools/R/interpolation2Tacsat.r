@@ -19,7 +19,7 @@ res <- lapply(interpolationEQ,function(x){
                                   timeNotation            <- ifelse(length(unlist(strsplit(tacsat$SI_TIME[1],":")))>2,"secs","mins")
                                   if(timeNotation == "secs") x$SI_TIME  <- format(x$SI_DATIM,format="%H:%M:%S")
                                   if(timeNotation == "mins") x$SI_TIME  <- format(x$SI_DATIM,format="%H:%M")
-                                  x$SI_SP                 <- mean(tacsat$SI_SP[idx[1]],tacsat$SI_SP[idx[2]],na.rm=T)
+                                  x$SI_SP                 <- mean(c(tacsat$SI_SP[idx[1]],tacsat$SI_SP[idx[2]]),na.rm=T)
                                   x$SI_HE                 <- NA;
                                   x$SI_HE[-c(1,nrow(x))]  <- bearing(x$SI_LONG[3:nrow(x)],x$SI_LATI[3:nrow(x)],x$SI_LONG[2:(nrow(x)-1)],x$SI_LATI[2:(nrow(x)-1)])
                                 return(x[-c(1,2,nrow(x)),])})
