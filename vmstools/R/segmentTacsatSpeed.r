@@ -6,11 +6,9 @@
 segmentTacsatSpeed <- function(tacsat,
                          general=list(
                            output.path=file.path('C:','output'),
-                                       visual.check=TRUE, a.year=2009), ...){
+                                       visual.check=TRUE, a.year=2009, speed="calculated"), ...){
 
-  cat("if it still doesn't exist, 'results' folder is created in ",general$output.path,"\n")
-  dir.create(general$output.path, showWarnings = TRUE, recursive = TRUE, mode = "0777")
-
+ 
   lstargs <- list(...)
   if(length(lstargs$vessels)!=0) {
      vessels <- lstargs$vessels
@@ -18,8 +16,16 @@ segmentTacsatSpeed <- function(tacsat,
   vessels <- unique(tacsat$VE_REF)
   }
 
-  # assign a idx to each ping
-  tacsat$idx <- 1:nrow(tacsat)
+  # checks
+  if(!'SI_STATE' %in% colnames(tacsat)) tacsat$SI_STATE <- NA
+  if(!'idx' %in% colnames(tacsat))  tacsat$idx <- 1:nrow(tacsat)
+  cat("if it still doesn't exist, 'results' folder is created in ",general$output.path,"\n")
+  dir.create(general$output.path, showWarnings = TRUE, recursive = TRUE, mode = "0777")
+ 
+  # add
+  tacsat$bound1 <- NA
+  tacsat$bound2 <- NA
+
 
    # utils---
   distAB.f <- function(A,B, .unit="km"){
@@ -228,49 +234,55 @@ segmentTacsatSpeed <- function(tacsat,
   tacsat.this.vessel <- tacsat[tacsat$VE_REF %in% a.vesselid, ]
   
 
-  tacsat.this.vessel[,"bound1"] <- NA
-  tacsat.this.vessel[,"bound2"] <- NA
 
-  if(any(colnames(tacsat.this.vessel) %in% 'SI_DATE'))
+  if('SI_DATE' %in% colnames(tacsat.this.vessel))
           {
            tacsat.this.vessel$SI_DATIM  <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) ,
                             tz='GMT',       "%e/%m/%Y %H:%M" )
           } else{
           if(!any(colnames(tacsat.this.vessel) %in% 'SI_DATIM')) stop('you need either to inform a SI_DATIM or a SI_DATE')
           }
-          
 
-  diff.time <- tacsat.this.vessel[-nrow(tacsat.this.vessel),"SI_DATIM"] -
+            
+  if(is.null(general$speed)) general$speed <- "calculated"
+  if(general$speed=="calculated"){
+     # add a apparent speed colunm (nautical miles per hour)
+     diff.time <- tacsat.this.vessel[-nrow(tacsat.this.vessel),"SI_DATIM"] -
                        tacsat.this.vessel[-1,"SI_DATIM"]
-  tacsat.this.vessel$diff.time.mins <- c(0, as.numeric(diff.time, units="mins"))
-
-  # add a apparent speed colunm (nautical miles per hour)
-  tacsat.this.vessel$apparent.speed <- signif(
+     tacsat.this.vessel$diff.time.mins <- c(0, as.numeric(diff.time, units="mins"))
+     tacsat.this.vessel$speed <- signif(
             c(0, distAB.f(A= tacsat.this.vessel[-nrow(tacsat.this.vessel),c("SI_LATI","SI_LONG")],
               B= tacsat.this.vessel[-1,c("SI_LATI","SI_LONG")], .unit="nm") / (abs(tacsat.this.vessel[-1,]$diff.time.mins)/60)),
               3)
+     }         
+   if(general$speed=="observed"){
+     tacsat.this.vessel$speed <- tacsat.this.vessel$SI_SP # instantaneous speed
+     }          
 
   # cleaning irrealistic points
-  tacsat.this.vessel$apparent.speed <-
-     replace(tacsat.this.vessel$apparent.speed, is.na(tacsat.this.vessel$apparent.speed), 0)
+  tacsat.this.vessel$speed <-
+     replace(tacsat.this.vessel$speed, is.na(tacsat.this.vessel$speed), 0)
 
 
-  idx <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed >= 30 |
-                is.infinite(tacsat.this.vessel$apparent.speed),"idx"]
+  idx <- tacsat.this.vessel[tacsat.this.vessel$speed >= 30 |
+                is.infinite(tacsat.this.vessel$speed),"idx"]
   tacsat <- tacsat[!tacsat$idx %in% idx,] # just remove!
-  tacsat.this.vessel <- tacsat.this.vessel[tacsat.this.vessel$apparent.speed < 30,]
+  tacsat.this.vessel <- tacsat.this.vessel[tacsat.this.vessel$speed < 30,]
  
-  if(is.null(levels(tacsat.this.vessel$LE_GEAR)))
+  # check
+  if(is.null(levels(factor(tacsat.this.vessel$LE_GEAR))))
       stop('you need first to assign a gear LE_GEAR to each ping')
+  
 
-  for (gr in levels(factor(tacsat.this.vessel$LE_GEAR))){ # BY GEAR
+  # FOR- LOOP BY GEAR--------------------
+  for (gr in levels(factor(tacsat.this.vessel$LE_GEAR))){ 
 
     xxx <- tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr,] # input
 
-    x <- as.numeric(as.character(sort(xxx$apparent.speed))) *100   # multiply by factor 100 because integer needed
+    x <- as.numeric(as.character(sort(xxx$speed))) *100   # multiply by factor 100 because integer needed
     hi <- hist(x, nclass=30,plot=FALSE) 
 
-    y <- c(1:length(sort(xxx$apparent.speed))) # sort in increasing order
+    y <- c(1:length(sort(xxx$speed))) # sort in increasing order
     y <- y[x>100 & x<1000] # just removing the 0, and the larger speeds we 100% know it is steaming
     x <- x[x>100 & x<1000]
     dati   <- data.frame(x=x,y=y)
@@ -310,7 +322,7 @@ segmentTacsatSpeed <- function(tacsat,
     o <- try(
          segmented(lm(y~x, data=dati) , seg.Z=~x , psi=psi, control= seg.control(display = FALSE, it.max=50, h=1)), # with 2 starting guesses
          silent=TRUE) # the second breakpoint is quite uncertain and could lead to failure so...
-   if(class(o)!="try-error") break else psi <- list(x=c(psi$x[1],psi$x[2]-20)) # searching decreasing by 20 each time
+   if(!"try-error" %in% class(o)) break else psi <- list(x=c(psi$x[1],psi$x[2]-20)) # searching decreasing by 20 each time
    if(count>10) {bound1 <- start.lower.bound; bound2 <- start.upper.bound ; cat(paste("failure of the segmented regression for",a.vesselid,gr,"\n...")); break}
    }
   if(is.null(bound1)) bound1 <- o$psi[order(o$psi[,"Est."])[1],"Est."] -20 # -20 hard to justify...
@@ -319,14 +331,14 @@ segmentTacsatSpeed <- function(tacsat,
  if(general$visual.check){
    X11()
    par(mfrow=c(2,1))
-   if(class(o)!="try-error"){
+   if(!"try-error" %in% class(o)){
      plot(dati$x/100, o$fitted.values, type="l",
          ylab="cumulative distrib.", xlab="Knots",
            main=paste("segmented regression  - ",a.vesselid))
     } else{plot(0,0,type="n")}
    #plot(hi)
    #points(dati$x,dati$y)
-   tmp <- as.numeric(as.character(sort(xxx$apparent.speed)))
+   tmp <- as.numeric(as.character(sort(xxx$speed)))
    his <- hist(tmp, nclass=100, main="apparent speed between consecutive points",
                       xlab="apparent speed [knots]", plot=TRUE)
    if(!is.null(bound1)) abline(v=bound1/100,col=2)
@@ -341,9 +353,9 @@ segmentTacsatSpeed <- function(tacsat,
   }
 
   # so,
-  bound1 <- bound1  / 100  # re-transform
-  bound2 <- bound2  / 100   # re-transform
-  xxx$apparent.speed <- replace(xxx$apparent.speed, is.na(xxx$apparent.speed), 0) # debug 0/0
+  bound1 <- bound1  / 100  # transform back
+  bound2 <- bound2  / 100   # transform back
+  xxx$speed <- replace(xxx$speed, is.na(xxx$speed), 0) # debug 0/0
  
 
 
@@ -363,14 +375,14 @@ segmentTacsatSpeed <- function(tacsat,
   }
 
   # then, assign...
-  xxx[xxx$apparent.speed < bound1, "SI_STATE"]                       <- 2 # steaming
-  xxx[xxx$apparent.speed >= bound1 & xxx$apparent.speed < bound2, "SI_STATE"]  <- 1 # fishing
-  xxx[xxx$apparent.speed >= bound2 , "SI_STATE"]                     <- 2 # steaming
+  xxx[xxx$speed < bound1, "SI_STATE"]                        <- 2 # steaming
+  xxx[xxx$speed >= bound1 & xxx$speed < bound2, "SI_STATE"]  <- 1 # fishing
+  xxx[xxx$speed >= bound2 , "SI_STATE"]                      <- 2 # steaming
   tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr, "SI_STATE"] <- xxx$SI_STATE # output
   tacsat.this.vessel[,"bound1"] <- bound1
   tacsat.this.vessel[,"bound2"] <- bound2
-  cat(paste(gr," lower(apparent)speed bound:",round(bound1,1),"knots\n"))
-  cat(paste(gr," upper(apparent)speed bound:",round(bound2,1),"knots\n"))
+  cat(paste(gr," lower", general$speed,"speed bound:",round(bound1,1),"knots\n"))
+  cat(paste(gr," upper", general$speed,"speed bound:",round(bound2,1),"knots\n"))
   } else{
      tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr, "SI_STATE"] <- 2
      #=> end a.flag: in case of very few records for this gear...
@@ -380,13 +392,20 @@ segmentTacsatSpeed <- function(tacsat,
 
   # clean up by removing no longer used columns
   tacsat.this.vessel <- tacsat.this.vessel[, !colnames(tacsat.this.vessel) %in%
-                         c('apparent.speed','diff.time.mins','bound1','bound2')]
+                         c('speed','diff.time.mins','SI_DATIM')]
 
   tacsat[tacsat$VE_REF==a.vesselid,] <- tacsat.this.vessel # output
   } # end of a.vesselid
 
 
+  # draw a frequency table
+  tacsat2 <- tacsat[tacsat$VE_REF %in% vessels & !duplicated(tacsat[,c("VE_REF","LE_GEAR")]),]
+  b1 <- tapply(tacsat2$bound1, tacsat2$LE_GEAR, mean, na.rm=TRUE)
+  b2 <- tapply(tacsat2$bound2, tacsat2$LE_GEAR, mean, na.rm=TRUE)
+  cat(paste("lower speed bound mean:",round(b1,1),"knots\n"))
+  cat(paste("upper speed bound mean:",round(b2,1),"knots\n"))
+ 
 
-return(tacsat[tacsat$VE_REF %in% vessels,])
+return(tacsat[tacsat$VE_REF %in% vessels,!colnames(tacsat.this.vessel) %in% c('bound1','bound2')])
 }
 
