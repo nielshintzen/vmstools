@@ -230,19 +230,17 @@ segmentTacsatSpeed <- function(tacsat,
 
 
   # hereafter, the core code...
-  for(a.vesselid in vessels){ # BY VESSEL
+  # A FOR-LOOP BY VESSEL--------------------
+  for(a.vesselid in vessels){ 
   tacsat.this.vessel <- tacsat[tacsat$VE_REF %in% a.vesselid, ]
   
-
-
   if('SI_DATE' %in% colnames(tacsat.this.vessel))
           {
-           tacsat.this.vessel$SI_DATIM  <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) ,
-                            tz='GMT',       "%e/%m/%Y %H:%M" )
+          tacsat.this.vessel$SI_DATIM  <- strptime(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME),
+                            tz='GMT', "%e/%m/%Y %H:%M" )
           } else{
           if(!any(colnames(tacsat.this.vessel) %in% 'SI_DATIM')) stop('you need either to inform a SI_DATIM or a SI_DATE')
           }
-
             
   if(is.null(general$speed)) general$speed <- "calculated"
   if(general$speed=="calculated"){
@@ -274,7 +272,7 @@ segmentTacsatSpeed <- function(tacsat,
       stop('you need first to assign a gear LE_GEAR to each ping')
   
 
-  # FOR- LOOP BY GEAR--------------------
+  # A FOR-LOOP BY GEAR--------------------
   for (gr in levels(factor(tacsat.this.vessel$LE_GEAR))){ 
 
     xxx <- tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr,] # input
@@ -339,7 +337,7 @@ segmentTacsatSpeed <- function(tacsat,
    #plot(hi)
    #points(dati$x,dati$y)
    tmp <- as.numeric(as.character(sort(xxx$speed)))
-   his <- hist(tmp, nclass=100, main="apparent speed between consecutive points",
+   his <- hist(tmp, nclass=100, main=paste(general$speed,"speed between consecutive points"),
                       xlab="apparent speed [knots]", plot=TRUE)
    if(!is.null(bound1)) abline(v=bound1/100,col=2)
    if(!is.null(bound2)) abline(v=bound2/100,col=2)
@@ -397,14 +395,26 @@ segmentTacsatSpeed <- function(tacsat,
   tacsat[tacsat$VE_REF==a.vesselid,] <- tacsat.this.vessel # output
   } # end of a.vesselid
 
-
-  # draw a frequency table
+ 
+  # plot for speed bound distribution
   tacsat2 <- tacsat[tacsat$VE_REF %in% vessels & !duplicated(tacsat[,c("VE_REF","LE_GEAR")]),]
   b1 <- tapply(tacsat2$bound1, tacsat2$LE_GEAR, mean, na.rm=TRUE)
   b2 <- tapply(tacsat2$bound2, tacsat2$LE_GEAR, mean, na.rm=TRUE)
   cat(paste("lower speed bound mean:",round(b1,1),"knots\n"))
   cat(paste("upper speed bound mean:",round(b2,1),"knots\n"))
- 
+  X11()
+  op <- par(no.readonly = TRUE) 
+  par(mfrow=c(1,2))
+  boxplot(bound1 ~ LE_GEAR, data=tacsat2, ylim=c(0,8))
+  boxplot(bound2 ~ LE_GEAR, data=tacsat2, ylim=c(0,8))
+  par(op)
+
+  # save
+  write.table(tacsat2[,c("VE_REF","LE_GEAR","bound1","bound2")], 
+   file = file.path(general$output.path,
+      paste("speed_bounds_per_vessel_per_gear_", general$a.year,".txt", sep="")),
+        quote=FALSE, col.names=TRUE, row.names=FALSE)
+
 
 return(tacsat[tacsat$VE_REF %in% vessels,!colnames(tacsat.this.vessel) %in% c('bound1','bound2')])
 }
