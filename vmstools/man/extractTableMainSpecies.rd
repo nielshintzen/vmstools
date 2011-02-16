@@ -23,15 +23,15 @@ the relevant thresholds for the two other methods Total and Logevent must be sel
 }
 
 \usage{
-extractTableMainSpecies(dat,NamesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
+extractTableMainSpecies(dat,namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
 
 }
 
 \arguments{
-  \item{dat}{a data.frame reduced from an eflalo format. It should contain only the LE_ID (Logevent ID) variable as well as all species names in columns, 
+  \item{dat}{a data frame reduced from an eflalo format. It should contain only the LE_ID (Logevent ID) variable as well as all species names in columns, 
   with raw catch data. It is necessary to sort out potential error-prone lines (such as lines with only 0) prior to the analysis, and to replace NA values by 0.
 }
-  \item{NamesMainSpeciesHAC}{character. The names of species retained by the HAC method selectMainSpecies() function. If omitted, only the two other methods will be used for selecting species. 
+  \item{namesMainSpeciesHAC}{character. The names of species retained by the HAC method selectMainSpecies() function. If omitted, only the two other methods will be used for selecting species. 
 }
   \item{paramTotal}{numeric. The percentage threshold for the Total method. All species ranked in terms of percentage in total catches and cumulating up to this 
   percentage value will be retained. Default value is 95%. 
@@ -73,7 +73,7 @@ Logevent ID (LE_ID) are returned as row names.
            
   Step1 <- extractTableMainSpecies(
               eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
-                 explo$NamesMainSpeciesHAC, paramTotal=95, paramLogevent=100)
+                 explo$namesMainSpeciesHAC, paramTotal=95, paramLogevent=100)
   #=> send the LE_ID and LE_KG_SP columns only             
                
   }
