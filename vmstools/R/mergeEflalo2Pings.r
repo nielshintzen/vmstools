@@ -755,7 +755,7 @@ NIELS <- FALSE
            .vms.for.meth2         <- .vms [!(.vms$FT_REF_SQ_DAY  %in%   in.bk.and.feffort.not.at.0) &
                                                      (.vms$FT_REF_SQ    %in%   in.bk2.and.feffort.not.at.0), ]
            # vms with bad match => go to meth1
-           .vms.for.meth1         <- .vms [!(.vms$FT_REF_SQ_DAY  %in%   in.bk2.and.feffort.not.at.0) &
+           .vms.for.meth1         <- .vms [!(.vms$FT_REF_SQ_DAY  %in%   in.bk.and.feffort.not.at.0) &
                                                       !(.vms$FT_REF_SQ  %in%   in.bk2.and.feffort.not.at.0), ]
            # logbk with good match => go to meth3
            .logbk.for.meth3       <- .logbk [.logbk$FT_REF_SQ_DAY %in%  in.bk.and.feffort.not.at.0, ]
@@ -829,8 +829,9 @@ NIELS <- FALSE
                      merged <- rbind.data.frame (merged, a.table[, colnm])
                      }
                    }
+
                  # if still 'not merging' part, retrieve on NA side i.e. occurs when pings in vms but not in bk
-                   merged <- retrieveOnBkSide(merged, type.data=c( "VE_FLT","VE_KW","LE_MET_level6"))  # i.e. when metier=='NA'
+                   merged <- retrieveOnBkSide(merged, type.data=c( "VE_FLT","VE_KW","LE_GEAR", "LE_MET_level6"))  # i.e. when metier=='NA'
 
 
         # clean up
