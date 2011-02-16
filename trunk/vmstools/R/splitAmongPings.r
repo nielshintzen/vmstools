@@ -41,12 +41,15 @@ remainTacsat            <- sort(unique(tacsatTrip$ID))
   #- Subset eflalo file
 eflaloTrip              <- subset(eflalo,       FT_REF %in% sort(unique(tacsatTrip$FT_REF)))
 eflaloNoTrip            <- subset(eflalo,      !FT_REF %in% sort(unique(tacsatTrip$FT_REF)))
-eflaloVessel            <- subset(eflaloNoTrip, VE_REF %in% sort(unique(tacsatTrip$VE_REF)))
-eflaloNoVessel          <- subset(eflaloNoTrip,!VE_REF %in% sort(unique(tacsatTrip$VE_REF)))
+#eflaloVessel            <- subset(eflaloNoTrip, VE_REF %in% sort(unique(tacsatTrip$VE_REF)))
+#eflaloNoVessel          <- subset(eflaloNoTrip,!VE_REF %in% sort(unique(tacsatTrip$VE_REF)))
+eflaloVessel            <- eflaloNoTrip[which(paste(eflaloNoTrip$VE_REF,year(eflaloNoTrip$LE_CDATIM)) %in% unique(paste(tacsatTrip$VE_REF,year(tacsatTrip$SI_DATIM)))),]
+eflaloNoVessel          <- eflaloNoTrip[which(!paste(eflaloNoTrip$VE_REF,year(eflaloNoTrip$LE_CDATIM)) %in% unique(paste(tacsatTrip$VE_REF,year(tacsatTrip$SI_DATIM)))),]
 
 #-------------------------------------------------------------------------------
 # 1a) Merge eflalo to tacsat with matching FT_REF
 #-------------------------------------------------------------------------------
+
 if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
   if("day" %in% level){
     if(!"SI_YEAR" %in% colnames(tacsatTrip))  tacsatTrip$SI_YEAR    <- an(format(tacsatTrip$SI_DATIM,format="%Y"))

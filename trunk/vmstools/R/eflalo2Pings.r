@@ -16,15 +16,15 @@
       byPing             <- merge(eflalo,data.frame(pings),by=vars,all=F)
       byTacsat           <- merge(tacsat,byPing,by=vars,all=F)
 
-      print(paste("kg in eflalo",round(sum(byPing [,kgeur(colnames(byPing))]))))
-      print(paste("kg in merged tacsat",round(sum(sweep(byTacsat[,kgeur(colnames(byTacsat))],1,byTacsat$pings,"/")))))
+      try(print(paste("kg in eflalo",round(sum(byPing [,kgeur(colnames(byPing))])))))
+      try(print(paste("kg in merged tacsat",round(sum(sweep(byTacsat[,kgeur(colnames(byTacsat))],1,byTacsat$pings,"/"))))))
 
         #- Bookkeeping which tacsat ID's have been merged and which have not yet been merged
       remainTacsat          <- remainTacsat[which(!remainTacsat %in% byTacsat$ID.x)]
 
         #- Bookkeeping which eflalo catches have been merged and which have not yet been merged
       idx                   <- sort(unique(byPing$ID))
-      print(paste("kg removed from eflalo",round(sum(eflalo[idx,kgeur(colnames(eflalo))]))))
+      try(print(paste("kg removed from eflalo",round(sum(eflalo[idx,kgeur(colnames(eflalo))])))))
       eflalo[idx,kgeur(colnames(eflalo))]   <- 0
 
     return(list(eflalo=eflalo,tacsat=byTacsat,remainTacsat=remainTacsat))}
