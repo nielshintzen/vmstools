@@ -51,7 +51,7 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   explo=selectMainSpecies(dat,analysisName,RunHAC=runHACinSpeciesSelection,DiagFlag=FALSE)
 
   # Step 1 : selection of main species
-  Step1=extractTableMainSpecies(dat,explo$NamesMainSpeciesHAC,paramTotal=paramTotal,paramLogevent=paramLogevent)
+  Step1=extractTableMainSpecies(dat,explo$namesMainSpeciesHAC,paramTotal=paramTotal,paramLogevent=paramLogevent)
 
   save(explo,Step1,file="Explo_Step1.Rdata")
   
@@ -103,7 +103,7 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   if (algoClust=="CLARA")   clusters=Step3$clusters$clustering
   if (algoClust=="KMEANS")  clusters=Step3$clusters$cluster  
   
-  compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=clusters,tabClusters=Step3$tabClusters)
+  compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=clusters,targetSpecies=Step3$targetSpecies)
   save(compMetiers,file="compMetiers.Rdata")
   
   
