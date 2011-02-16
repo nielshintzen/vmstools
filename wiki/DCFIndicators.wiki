@@ -40,57 +40,49 @@ To run this indicator function, the following functions are needed:
 {{{
 # load the library
 library(vmstools)
-
-# load the tacsat data
+# Load the tacsat data
 data(tacsat)
 
 # process the tacsat data:
-# pointInHarbour.r
-# filterTacsat.r
-# intervalTacsat.r      # mandatory if we want the gridding based on a time threshold (minimal number of hours)
+pointInHarbour.r
+filterTacsat.r
+intervalTacsat.r      # mandatory if you want the gridding based on a time threshold (minimal number of hours)
 # ...
 
-# DCF Indicator 5
-DCFIndicator5(tacsat,                      # tacsat data
-              minThreshold=0,              # threshold for defining the cell as "fishing", in hours if a ping interval has been calculated otherwise in number of points
-              cellresX=0.05,               # grid cell size
-              cellresY=0.05,               # grid cell size
-              calcAreaMethod="Trapezoid",  # method for cell area calculation ("Trapezoid" or "UTM")
-              plotMapTF=TRUE,              # plot the map
-              exportTableName="")          # export the monthly areas in a csv file
+# load the eflalo
+data(eflalo)
+# merge eflalo and tacsat # mandatory for DCF Indicator 7 to consider only a list of gear codes
 
+# DCF Indicator 5
+indicators(indicatorNum=5,
+           tacsat,
+           minThreshold=0,
+           cellresX=0.05,
+           cellresY=0.05,
+           calcAreaMethod="Trapezoid",
+           plotMapTF=TRUE,
+           exportTableName="",
+           exportGridName="")
 
 # DCF Indicator 6
-DCFIndicator6(tacsat,                      # tacsat data
-              pctThreshold=90,             # percentage of aggregated points to include
-              cellresX=0.05,               # grid cell size
-              cellresY=0.05,               # grid cell size
-              calcAreaMethod="Trapezoid",  # method for cell area calculation ("Trapezoid" or "UTM")
-              plotMapTF=TRUE,              # plot the map
-              exportTableName="")          # export the monthly areas in a csv file
+indicators(indicatorNum=6,
+           tacsat,
+           pctThreshold=90,
+           cellresX=0.05,
+           cellresY=0.05,
+           calcAreaMethod="Trapezoid",
+           plotMapTF=TRUE,
+           exportTableName="",
+           exportGridName="")
 
 # DCF Indicator 7
-# this indicator needs a gear code (or similar) in the tacsat
-# so the tacsat has to be merged with the eflalo
-
-# load the eflalo data
-data(eflalo2)
-
-# merge eflalo and tacsat
-# one option:
-tacsat   <- mergeEflalo2Tacsat(eflalo2,tacsat)
-# add gear code
-tacsat$LE_GEAR <- eflalo2$LE_GEAR[match(tacsat$FT_REF,eflalo2$FT_REF)]
-
-# load the europe polygon
-data(europa)
-
-# run the indicator
-DCFIndicator7(tacsat,                      # tacsat data
-              mobileBottomGear="",         # list of mobile bottom gear codes to consider (exemple: c("TBB","OTB","PTB","DRB","DRH"))
-              inShapeArea=shapeFileArea,   # path and name of the shapefile (without the .shp extention) whose area will be calculated
-              cellresX=0.05,               # grid cell size 
-              cellresY=0.05,               # grid cell size 
-              calcAreaMethod="Trapezoid",  # method for cell area calculation ("Trapezoid" or "UTM")
-              minThreshold=0,              # threshold for defining the cell as "fishing", in hours if a ping interval has been calculated otherwise in number of points
-              plotMapTF=TRUE)              # plot the map
+indicators(indicatorNum=7,
+           tacsat, 
+           ltGear=c("TBB","OTB","PTB","DRB","DRH"),
+           inShapeArea="Shapefile",
+           cellresX=0.05,
+           cellresY=0.05, 
+           calcAreaMethod="Trapezoid",
+           minThreshold=0,
+           plotMapTF=TRUE,
+           exportGridName="")
