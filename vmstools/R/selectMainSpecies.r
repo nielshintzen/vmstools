@@ -145,7 +145,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       nbMainSpeciesTotal[seuil/5]=length(nomespsel)
 
       if(DiagFlag==TRUE) {
-        # We are bulding the table with main species and aggregated other species
+        # We are building the table with main species and aggregated other species
         datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
         if(length(nomespsel)==1){
           vectorNul=rep(0,n)
@@ -179,7 +179,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       for (i in nameSpecies) if (!is.na(any(propdat[,i]>=seuil)) && any(propdat[,i]>=seuil)) nomespsel <- c(nomespsel,i)
       nbMainSpeciesLogevent[seuil/5]=length(nomespsel)
    
-      # We are bulding the table with main species and aggregated other species
+      # We are building the table with main species and aggregated other species
       if(DiagFlag==TRUE) {
         datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
         if(length(nomespsel)==1){
