@@ -84,7 +84,7 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     axis(2,  las=2)
     abline(h=70, col="red")
     text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
-     mtext("Axis", side=1, adj=0.5, outer=FALSE, line=+1, font=1, cex=1.5)
+     mtext("Axes", side=1, adj=0.5, outer=FALSE, line=+1, font=1, cex=1.5)
      mtext("% of Inertia", side=2, adj=0.5, outer=FALSE, line=+2.5, font=1, cex=1.5)
     savePlot(filename = paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"),type ="wmf")
     par(op)
