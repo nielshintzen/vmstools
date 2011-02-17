@@ -23,5 +23,5 @@ function (statsq,midpoint=F)
                         lon <- lon - 0.5
 
                         }
-    return(data.frame(lat, lon))
+    return(data.frame(SI_LATI=lat,SI_LONG=lon))
 }
