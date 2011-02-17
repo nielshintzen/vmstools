@@ -390,7 +390,7 @@ segmentTacsatSpeed <- function(tacsat,
 
   # clean up by removing no longer used columns
   tacsat.this.vessel <- tacsat.this.vessel[, !colnames(tacsat.this.vessel) %in%
-                         c('speed','diff.time.mins','SI_DATIM')]
+                         c('speed','diff.time.mins')]
 
   tacsat[tacsat$VE_REF==a.vesselid,] <- tacsat.this.vessel # output
   } # end of a.vesselid
