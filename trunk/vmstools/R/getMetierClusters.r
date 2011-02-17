@@ -1422,9 +1422,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     sp <- apply(mat,2, sum)
     colnames(mat)[sp<10] <- ""
     cc <- colorRampPalette(c("antiquewhite", "deepskyblue4"),space = "rgb", interpolate="spline")
-    levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100))
+    print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='wmf', restoreConsole = TRUE)
-
+    dev.off()
 
     # Standard deviation profile by cluster
     sdprofil=matrix(0,nrow=nbClust,ncol=nbSpec)
