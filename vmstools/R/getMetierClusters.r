@@ -1354,6 +1354,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     dev.off()
 
+      # for a paper
+    X11(5,5)
+    plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
+    abline(h=0, lty=2) ; abline(v=0, lty=2)
+    savePlot(filename=paste(analysisName,'projections_1_2',sep="_"), type='png', restoreConsole = TRUE)
+    dev.off()
+    X11(5,5)
+    plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 2", ylab="Axis 3")
+    abline(h=0, lty=2) ; abline(v=0, lty=2)
+    savePlot(filename=paste(analysisName,'projections_2_3',sep="_"), type='png', restoreConsole = TRUE)
+    dev.off()
 
     # Mean profile of the dataset
     meanprofile=colMeans(datSpecies)
@@ -1390,6 +1401,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       nameSpPloti[numSpi]=namSpi
       nameSpPlot=rbind(nameSpPlot,nameSpPloti)
     }
+    # plot
     png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
@@ -1401,6 +1413,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     title(main=paste("Mean profile by cluster","\n","\n",sep=""))
     dev.off()
+
+    # for a paper
+    X11(5,10)
+    mat <- t(summaryClusters["Mean",,])
+     rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
+                              "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
+    sp <- apply(mat,2, sum)
+    colnames(mat)[sp<10] <- ""
+    cc <- colorRampPalette(c("antiquewhite", "deepskyblue4"),space = "rgb", interpolate="spline")
+    levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100))
+    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='wmf', restoreConsole = TRUE)
 
 
     # Standard deviation profile by cluster
