@@ -14,8 +14,8 @@ The method returns tacsat (a subset if vessels informed) with the SI_STATE infor
 \usage{segmentTacsatSpeed(tacsat,vessels,general)}
 \arguments{
   \item{tacsat}{tacsat with LE_GEAR informed for each ping}
-  \item{general}{general settings e.g. the output path for saving the plot}
-  \item{...}{a vector of vessel identifiers VE_REF that can be found in tacsat,
+  \item{general}{a list of general settings e.g. the output path for saving the plot}
+  \item{...}{vessels, a vector of vessel identifiers VE_REF that can be found in tacsat,
               force.lower.bound might also be used to fix the lower speed at some value
               for gillnet and seine gear types}
 }
@@ -31,9 +31,10 @@ between fishing grounds and harbours. Low speeds can also correspond, for instan
 to a regulated speed leaving a harbour. 
 
 Speed boundaries were accordingly determined by applying a segmented regression to the 
-cumulative distribution of (calculated) speeds as a practical way to automatically detect 
+cumulative distribution of vessel speeds ('calculated' or 'observed', see the argument of the function)
+as a practical way to automatically detect 
 break points encapsulating the first peak of the speed frequency histogram. 
-The computation is done on calculated speed instead of instantaneous speeds to avoid 
+The computation is preferably done on calculated speed instead of instantaneous (observed) speeds to avoid 
 possible non-representative records of speed (discrete records usually with large time-span between). 
 Peak detection is done for each vessel and for each of its gear types to account for 
 individual skipper behaviour and gear-specific constraints on fishing activity. 
@@ -48,10 +49,11 @@ assuming that fishing start at a given value in speed e.g. 0.5 nm.
 \examples{
 
 \dontrun{
-data(tacsat)
+data(tacsat) 
+tacsat$LE_GEAR <-"OTB" # fake here, but an informed LE_GEAR is required
 tacsat <- segmentTacsatSpeed (tacsat=tacsat, vessels="35", force.lower.bound=0.5,
               general=list(output.path=file.path('C:','output'),
-                       visual.check=TRUE))
+                       visual.check=TRUE), speed="calculated")
 }
 
 }
