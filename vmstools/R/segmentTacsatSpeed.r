@@ -411,7 +411,7 @@ segmentTacsatSpeed <- function(tacsat,
   dev.off()
   
   # save
-  write.table(tacsat2[,c("VE_REF","LE_GEAR","bound1","bound2")], 
+  write.table(tacsat2[,c("VE_REF","LE_GEAR","bound1","bound2")], append=TRUE,
    file = file.path(general$output.path,
       paste("speed_bounds_per_vessel_per_gear_", general$a.year,".txt", sep="")),
         quote=FALSE, col.names=TRUE, row.names=FALSE)
