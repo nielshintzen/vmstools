@@ -36,11 +36,7 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     plot.PCA(log.pca, choix = "ind", axes = 1:2, habillage = "ind", title="", new.plot=FALSE, cex=1.1, label=FALSE)
     savePlot(filename=paste(analysisName,'projection_of_individuals_on_the_first_two_factorial_axis',sep="_"), type='wmf', restoreConsole = TRUE)
     dev.off()
-    X11(5,5)
-    plot.PCA(log.pca, choix = "var", axes = 1:2, label=NULL, new.plot=FALSE, title="")
-    savePlot(filename=paste(analysisName,'projection_of_individuals_on_the_first_two_factorial_axis',sep="_"), type='wmf', restoreConsole = TRUE)
-    dev.off()
-
+ 
 
     # Determine the number of axis to keep
     if(criterion=="70percents"){
