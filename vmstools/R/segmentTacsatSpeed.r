@@ -408,7 +408,8 @@ segmentTacsatSpeed <- function(tacsat,
   boxplot(bound1 ~ LE_GEAR, data=tacsat2, ylim=c(0,8))
   boxplot(bound2 ~ LE_GEAR, data=tacsat2, ylim=c(0,8))
   par(op)
-
+  dev.off()
+  
   # save
   write.table(tacsat2[,c("VE_REF","LE_GEAR","bound1","bound2")], 
    file = file.path(general$output.path,
