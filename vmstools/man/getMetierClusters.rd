@@ -100,6 +100,8 @@ Finally, the function returns a list with a number of results and diagnostics on
   \item{testValuesSpecies}{a tabulated list ranking the most characteristic species in the clusters (ordering species with a test-value > 1.98 by decreasing 
   order of test-value).     
 }
+  \item{percLogevents}{a matrix giving the percentage of logevents catching each species by cluster.
+}
   \item{descClusters}{a data frame giving some descriptive statistics for each cluster, like cluster size, number of species needed to have at least 50% of the
   cluster's total catch, number of species with a test-value > 1.98 in the cluster, number of species caught in at least 50% of the logevents, etc...     
 }
