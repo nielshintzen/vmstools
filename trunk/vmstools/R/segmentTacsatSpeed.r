@@ -377,8 +377,8 @@ segmentTacsatSpeed <- function(tacsat,
   xxx[xxx$speed >= bound1 & xxx$speed < bound2, "SI_STATE"]  <- 1 # fishing
   xxx[xxx$speed >= bound2 , "SI_STATE"]                      <- 2 # steaming
   tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr, "SI_STATE"] <- xxx$SI_STATE # output
-  tacsat.this.vessel[,"bound1"] <- bound1
-  tacsat.this.vessel[,"bound2"] <- bound2
+  tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr,"bound1"] <- bound1
+  tacsat.this.vessel[tacsat.this.vessel$LE_GEAR==gr,"bound2"] <- bound2
   cat(paste(gr," lower", general$speed,"speed bound:",round(bound1,1),"knots\n"))
   cat(paste(gr," upper", general$speed,"speed bound:",round(bound2,1),"knots\n"))
   } else{
@@ -414,7 +414,7 @@ segmentTacsatSpeed <- function(tacsat,
   write.table(tacsat2[,c("VE_REF","LE_GEAR","bound1","bound2")], append=TRUE,
    file = file.path(general$output.path,
       paste("speed_bounds_per_vessel_per_gear_", general$a.year,".txt", sep="")),
-        quote=FALSE, col.names=TRUE, row.names=FALSE)
+        quote=FALSE, col.names=FALSE, row.names=FALSE)
 
 
 return(tacsat[tacsat$VE_REF %in% vessels,!colnames(tacsat.this.vessel) %in% c('bound1','bound2')])
