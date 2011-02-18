@@ -95,7 +95,7 @@ test.values=function(groupes,data){
 
   stats_globales=matrix(0,nr=p,ncol=2)
   row.names(stats_globales)=noms_var
-  colnames(stats_globales)=c("moyenne","variance")
+  colnames(stats_globales)=c("mean","variance")
   for (i in 1:p){
     stats_globales[i,1]=mean(data[,noms_var[i]])
     stats_globales[i,2]=var(data[,noms_var[i]])
@@ -110,7 +110,7 @@ test.values=function(groupes,data){
 
     for (i in 1:p){
       mu_k=mean(data[groupe,noms_var[i]])
-      mu=stats_globales[noms_var[i],"moyenne"]
+      mu=stats_globales[noms_var[i],"mean"]
       V=stats_globales[noms_var[i],"variance"]
       V_mu_k=(n-n_k)*V/(n_k*(n-1))
       
@@ -124,7 +124,7 @@ test.values=function(groupes,data){
       rm(Valeur_test)
     }
     rm(groupe)
-    noms_groupes[j]=paste("groupe",j,sep="_")
+    noms_groupes[j]=paste("Cluster",j,sep=" ")
   }
   colnames(res)=noms_groupes
   return(res)
