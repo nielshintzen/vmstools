@@ -5,7 +5,7 @@ function(tacsat
                           ,margin   #Specify the margin in minutes it might deviate from the interval time, in minutes
                        ){
 VMS         <- tacsat
-if(!"SI_DATIM" %in% colnames(VMS))   <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+if(!"SI_DATIM" %in% colnames(VMS)) VMS$SI_DATIM   <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
 
 startVMS    <- startTacsat
 clStartVMS  <- startVMS #Total VMS list starting point instead of subset use
