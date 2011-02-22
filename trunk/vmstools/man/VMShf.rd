@@ -20,10 +20,10 @@ and date of ping.
   }
 }
 \source{
-niels.hintzen 'at' wur.nl
+niels.hintzen@wur.nl
 }
 \references{
-niels.hintzen 'at' wur.nl
+niels.hintzen@wur.nl
 }
 \examples{
 data(VMShf)

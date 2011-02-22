@@ -36,15 +36,14 @@ Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite s
 \examples{
 data(tacsat)
 tacsat <- formatTacsat(tacsat)
-  #shorten the tacsat file for example use and add date-time combination
+#shorten the tacsat file for example use and add date-time combination
 tacsat <- tacsat[1:10,]
 lon <- tacsat$SI_LONG[c(3,4)]
 lat <- tacsat$SI_LATI[c(3,4)]
-#  #Calculate maximum range to be used within Confidence Interval calculation
-timeDiff <- sum(an(unlist(strsplit(tacsat$SI_TIME[4],":"))) * c(60,1,1/60)) - sum(an(unlist(strsplit(tacsat$SI_TIME[3],":"))) * c(60,1,1/60))
+#Calculate maximum range to be used within Confidence Interval calculation
+timeDiff <- sum(an(unlist(strsplit(tacsat$SI_TIME[4],":"))) * c(60,1,1/60))
+            - sum(an(unlist(strsplit(tacsat$SI_TIME[3],":"))) * c(60,1,1/60))
 res      <- maxRangeCI(lon,lat,timeDiff,tacsat$SI_SP[c(3,4)])
-
-
 
 }
 

@@ -30,5 +30,6 @@ tacsat     <- sortTacsat(tacsat)
 tacsat     <- tacsat[1:1000,]
 
   #Filter the VMS data
-tacsat     <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T) #A warning is given that duplicated VMS points have been removed
+  #A warning is given that duplicated VMS points have been removed
+tacsat     <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
 }

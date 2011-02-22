@@ -8,8 +8,9 @@ This includes the aggregation of fishing pings (VMS effort and logbook landings)
 by CSquare area code and month. 
 }
 \usage{
-pings2Fishframe (general=list(output.path=file.path("C:","output"), a.year=2009, a.country="NLD") )}
-%- maybe also 'usage' for other objects documented here.
+pings2Fishframe (general=list(output.path=file.path("C:","output"),
+                 a.year=2009, a.country="NLD") )}
+
 \arguments{
   \item{general}{a list with general settings, e.g. the output.path}
 }
@@ -30,16 +31,15 @@ Francois Bastardie
 
 \examples{
   
-  data(tacsat)
-  
-  # CONVERT TO FISHFRAME FORMAT (might take some time running)
-  # (by default, this will keep all the species in the output table)
-  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.keep=character(), 
-                      folder = file.path("C:","output"), all.in.one.table=FALSE)
-  
-  ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
-                                                   a.year=2009, a.country="NLD") )
+data(tacsat)
 
-                                        
+# CONVERT TO FISHFRAME FORMAT (might take some time running)
+# (by default, this will keep all the species in the output table)
+tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF),
+          species.to.keep=character(),
+          folder = file.path("C:","output"), all.in.one.table=FALSE)
+
+ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
+                        a.year=2009, a.country="NLD") )
 
 }

@@ -33,17 +33,21 @@ A data frame in tacsat format is returned with estimated locations, speeds and h
 \examples{
 
 data(tacsat)
-   
-input   <- tacsat[1:100,]     # Take out first 100 rows
-res1    <- 100                # set resolution for number of locations or pings required between each real or actual vessel location.
+# Take out first 100 rows
+input   <- tacsat[1:100,]
+# set resolution for number of locations or pings required
+#   between each real or actual vessel location.
+res1    <- 100
 
 #Do the interpolation
 interpolation <- interpolateTacsat(tacsat=input,interval=120,
-                                          margin=12,res=res1,
-                                          method="cHs",
-                                          params=list(fm=0.4,distscale=20,sigline=0.2,st=c(4,8)),headingAdjustment=0)
+                                   margin=12,res=res1,method="cHs",
+                                   params=list(fm=0.4,distscale=20,sigline=0.2,
+                                   st=c(4,8)),headingAdjustment=0)
                                           
-#Convert the interpolated data back to tacsat with 10 locations or pings between each real or actual vessel location.
-tacsat        <- interpolation2Tacsat(interpolation=interpolation, tacsat=input,npoints=10)
+#Convert the interpolated data back to tacsat with 10 locations or
+# pings between each real or actual vessel location.
+tacsat        <- interpolation2Tacsat(interpolation=interpolation,
+                                      tacsat=input,npoints=10)
   
 }

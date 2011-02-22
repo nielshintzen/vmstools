@@ -26,9 +26,14 @@ The result is a new ASCII grid file.
 \examples{
 # Each country can create a ASCII grid using vmsGridCreate, for example
 # Uk
-UkVmsGrid<-vmsGridCreate(UkTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=0.05, cellsizeY=0.05, nameVarToSum="", outGridFile="UkVmsGrid.asc")
+UkVmsGrid<-vmsGridCreate(UkTacsat, nameLon = "SI_LONG",
+            nameLat = "SI_LATI",cellsizeX=0.05, cellsizeY=0.05,
+            nameVarToSum="",outGridFile="UkVmsGrid.asc")
 # Dutch
-NLVmsGrid<-vmsGridCreate(NLTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=0.05, cellsizeY=0.05, nameVarToSum="", outGridFile="NLVmsGrid.asc")
+NLVmsGrid<-vmsGridCreate(NLTacsat, nameLon = "SI_LONG",
+             nameLat = "SI_LATI",cellsizeX=0.05, cellsizeY=0.05,
+             nameVarToSum="",outGridFile="NLVmsGrid.asc")
+
 # and so on with other countries...
 
 # List of grids to merge

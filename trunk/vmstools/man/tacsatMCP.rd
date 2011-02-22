@@ -27,12 +27,13 @@ The nodes of the MCP are also returned.
 \examples{
 data(tacsat)
 
-# Flag the pings inside a polygon gathering 90% of the pings
+# Flag the pings inside a polygon gathering 90\% of the pings
 tacsat<-tacsatMCP(tacsat, pctThreshold=90)
 # Filter the tacsat data to remove the points outside the MCP
 tacsat<-subset(tacsat, tacsat$INMCP!=0)
 # Grid the filtered vms points
-vmsgrid<-vmsGridCreate(tacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=0.05, cellsizeY=0.05, plotMap=TRUE)
+vmsgrid<-vmsGridCreate(tacsat, nameLon = "SI_LONG", nameLat = "SI_LATI",
+                       cellsizeX=0.05, cellsizeY=0.05, plotMap=TRUE)
 # Add the MCP to the map
 plot_mcp(plotnew=FALSE, plotpoints=FALSE, titletxt="")
 }

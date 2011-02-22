@@ -50,7 +50,7 @@ These indicators aggregate the tacsat point data into a gridded data frame using
 
 DCF 5 calculates the total area of a grid of cells with fishing activity which is above a minimum threshold of number of pings or number of fishing hours (if the tacsat data contains a field with time interval between two points called SI_INTV, then the threshold will be a minimal number of hours, otherwise it will be a minimal number of points). The area of each cell is calculated with the function surface.r either via a fast and rough method using a trapezoid approximation (option "Trapezoid"), either via a more precise but slow method using a Universal Transverse Mercator projection (option "UTM"). The first method is fine for big grids of small cell sizes, the second one is better for large cell sizes. This total fishing area is processed by month.
 
-DCF 6 also calculates the total area of a grid with fishing activity but keeps only the 90 percent of the points by discarding the outer 10% points (or any other specified percentage). It uses the function tacsatMCP.r adapted from the aspace library. This function draws a minimum convex polygon around the central points to keep. Then these points are gridded and the total area of the cells is calculated with the surface.r function with the same optional methods as DCF 5. This total fishing area is processed by month.
+DCF 6 also calculates the total area of a grid with fishing activity but keeps only the 90 percent of the points by discarding the outer 10\% points (or any other specified percentage). It uses the function tacsatMCP.r adapted from the aspace library. This function draws a minimum convex polygon around the central points to keep. Then these points are gridded and the total area of the cells is calculated with the surface.r function with the same optional methods as DCF 5. This total fishing area is processed by month.
 
 DCF 7 calculates the total area of a specified polygon not impacted by mobile bottom gear. It therefore needs that the tacsat data has been merged with the logbooks in order to have a gear code (or others) for each vms point. The indicator needs a list of gear code to include as mobile bottom gears (if empty, all the points will be included). The specified area to be processed is a polygon shapefile. This polygon (or group of polygons) is then clipped with the Europe polygon to be sure that the indicator won't include land in its area calculation. If no shapefile is defined, the area of the bounding box containing all the vms points will be considered. The result is the area of the polygon less the area of the grid where fishing activity occurs. The vms pings are gridded with an optional threshold in either minimal of fishing hours or minimal number of points (see DCF 5). The area of each grid cell is calculated with the surface.r function (see DCF 5 or DCF 6).
 }
@@ -74,14 +74,17 @@ library(vmstools)
 data(tacsat)
 
 # process the tacsat data:
-pointInHarbour.r
-filterTacsat.r
-intervalTacsat.r      # mandatory if you want the gridding based on a time threshold (minimal number of hours)
-# ...
+# mandatory if you want the gridding based on a time threshold
+#   (minimal number of hours)
+#pointInHarbour.r
+#filterTacsat.r
+#intervalTacsat.r
+
 
 # load the eflalo
 data(eflalo)
-# merge eflalo and tacsat # mandatory for DCF Indicator 7 to consider only a list of gear codes
+# merge eflalo and tacsat # mandatory for DCF Indicator 7 to
+#   consider only a list of gear codes
 
 # DCF Indicator 5
 indicators(indicatorNum=5,

@@ -31,7 +31,8 @@ Returnes the destination point(s) as matrix}
 \code{addWidth}
 }
 \examples{
-res <- destFromBearing(rep(2.5,10),rep(51.5,10),runif(10,0,360),runif(10,0,0.1))
+res <- destFromBearing(rep(2.5,10),rep(51.5,10),
+                       runif(10,0,360),runif(10,0,0.1))
 plot(res[,1],res[,2])
 points(2.5,51.5,cex=1.1,pch=19)
 }

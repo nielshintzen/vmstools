@@ -9,7 +9,6 @@ information is returned
 }
 \usage{
 findEndTacsat(tacsat, startTacsat, interval, margin)
-Also used within 'interpolateVMS()'.
 }
 \arguments{
   \item{tacsat}{The Tacsat dataset}
@@ -39,6 +38,8 @@ This function is called inside interpolateTacsat()
 \examples{
 data(tacsat)
 startTacsat <- 2
-findEndTacsat(tacsat,startTacsat,interval=120,margin=10) #result: 3 0 Succeeding point = tacsat[3,] and end dataset has not been reached yet.
+#result: 3 0 Succeeding point = tacsat[3,]
+# and end dataset has not been reached yet.
+findEndTacsat(tacsat,startTacsat,interval=120,margin=10)
 }
 

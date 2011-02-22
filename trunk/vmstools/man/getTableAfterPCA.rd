@@ -1,6 +1,5 @@
 \name{getTableAfterPCA}
 \alias{getTableAfterPCA}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
 Finding Metiers from a reduced EFLALO dataset, step 2: Options for running a PCA on the selected species. 
 }
@@ -17,7 +16,8 @@ cumulating 70 percent of explained inertia (criterion '70percents').
 }
 
 \usage{
-getTableAfterPCA(datSpecies,analysisName="",pcaYesNo="pca",criterion="70percents")
+getTableAfterPCA(datSpecies,analysisName="",
+                 pcaYesNo="pca",criterion="70percents")
 
 }
 
@@ -48,10 +48,11 @@ If no PCA is run, the function returns the same matrix as the input, with percen
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\author{Nicolas Deporte, Sebastien Demanèche, Stéphanie Mahévas, Clara Ulrich, Francois Bastardie}
-\note{A number of libraries are initially called for the whole métier analyses and must be installed: (FactoMineR),(cluster),(SOAR),(amap) }
+\author{Nicolas Deporte, Sebastien Demanèche, Stephanie Mahevas, Clara Ulrich, Francois Bastardie}
+\note{A number of libraries are initially called for the whole metier analyses and must be installed: (FactoMineR),(cluster),(SOAR),(amap) }
 
-\seealso{\code{getEflaloMetierLevel7(), selectMainSpecies(), extractTableMainSpecies(),getMetierClusters()}}
+\seealso{getEflaloMetierLevel7(), selectMainSpecies(),
+               extractTableMainSpecies(),getMetierClusters()}
 
 \examples{
 
@@ -62,8 +63,8 @@ If no PCA is run, the function returns the same matrix as the input, with percen
   eflalo <- formatEflalo(eflalo)
 
   eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
-
-  analysisName <- "metier_analysis_OTB" # note that output plots will be sent to getwd()
+  # note that output plots will be sent to getwd()
+  analysisName <- "metier_analysis_OTB"
   
   explo <- selectMainSpecies(
              dat=eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
@@ -76,7 +77,8 @@ If no PCA is run, the function returns the same matrix as the input, with percen
     #=> send the LE_ID and LE_KG_SP columns only             
 
   # Run a PCA
-  Step2 <- getTableAfterPCA(Step1, analysisName, pcaYesNo="pca", criterion="70percents")
+  Step2 <- getTableAfterPCA(Step1, analysisName, pcaYesNo="pca",
+                            criterion="70percents")
  
   
   }

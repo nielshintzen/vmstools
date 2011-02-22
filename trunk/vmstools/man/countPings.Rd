@@ -15,11 +15,11 @@ countPings(formula, tacsat, grid = NULL)
   \item{grid}{ if in formulate 'gridcell' is chosen, a SpatialGrid must be provided}
 }
 \details{
-Formula has form: ~Variable+timeVariable+anotherTimeVariable+spatialVariable \\*
+Formula has form: ~Variable+timeVariable+anotherTimeVariable+spatialVariable \cr
 
-options in formula for Variable: any column name of tacsat file   \\*
-options in formula for timeVariable: day, week, month, quarter, year    \\*
-options in formula for spatialVariable: icesrectangle, icesarea, gridcell \\*
+options in formula for Variable: any column name of tacsat file   \cr
+options in formula for timeVariable: day, week, month, quarter, year    \cr
+options in formula for spatialVariable: icesrectangle, icesarea, gridcell \cr
 }
 \value{
 Returns the matrix with counted pings by each specified variable
@@ -38,7 +38,8 @@ data(tacsat)
 #make the tacsat file a bit smaller
 tacsat  <- tacsat[1:10000,]
 
-grid          <- createGrid(range(tacsat$SI_LONG,na.rm=T),range(tacsat$SI_LATI,na.rm=T),0.5,0.5)
+grid          <- createGrid(range(tacsat$SI_LONG,na.rm=T),
+                  range(tacsat$SI_LATI,na.rm=T),0.5,0.5)
 grid          <- SpatialGrid(grid=grid);
 gridded(grid) = TRUE
 result        <- countPings(~VE_REF+year+gridcell,tacsat,grid=grid)

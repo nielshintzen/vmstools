@@ -39,9 +39,11 @@ no <- 58
 
 #Map number of pings
 
-output.mat<-vmsGridCreate(input, we=we,ea=ea,so=so,no=no,nameLon = "SI_LONG", nameLat = "SI_LATI",plotMap=T,
-nameVarToSum="",cellsizeX = grid.size.x, cellsizeY = grid.size.y,
-legendx='bottomright',numCats=9,plotPoints=F,legendncol=2,legendtitle="npings")
+output.mat<-vmsGridCreate(input, we=we,ea=ea,so=so,no=no,
+              nameLon = "SI_LONG", nameLat = "SI_LATI",plotMap=T,
+              nameVarToSum="",cellsizeX = grid.size.x,
+              cellsizeY = grid.size.y,legendx='bottomright',
+              numCats=9,plotPoints=F,legendncol=2,legendtitle="npings")
 
 
 Grid2KML(output.mat=output.mat,what.quantity='npings')

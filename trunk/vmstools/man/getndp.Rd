@@ -12,7 +12,7 @@ getndp(x, tol = 2 * .Machine$double.eps)
   \item{tol}{Tolerance to use}
 }
 \references{EU lot 2 project}
-\author{Found on R-help page}
+\author{See R-help pages}
 \note{Function not created under EU lot 2 project but found under R-help. Please look there
 for credits.
 }

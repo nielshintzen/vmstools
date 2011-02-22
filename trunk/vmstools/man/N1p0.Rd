@@ -21,12 +21,14 @@ N1p0(x, mu, sig, p)
 \seealso{\code{plotCIinterpolation()}}
 \examples{
 
-x   <- matrix(c(5,4,3,4,5,4,3,2,3,4,3,2,1,2,3,3,2,1,2,3,4,3,2,3,4,5,4,3,4,5),nrow=6,ncol=5,byrow=T)
+x   <- matrix(c(5,4,3,4,5,4,3,2,3,4,3,2,1,2,3,
+                3,2,1,2,3,4,3,2,3,4,5,4,3,4,5),nrow=6,ncol=5,byrow=T)
 mu  <- 0
 sig <- x^0.5
 p   <- 0
 
 res <- matrix(N1p0(x,mu,sig,p),nrow=6,ncol=5)
+
   #Plot the results
 image(res)
 }
