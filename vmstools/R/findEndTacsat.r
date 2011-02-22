@@ -5,13 +5,13 @@ function(tacsat
                           ,margin   #Specify the margin in minutes it might deviate from the interval time, in minutes
                        ){
 VMS         <- tacsat
-VMS$datim   <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
+if(!"SI_DATIM" %in% colnames(VMS))   <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
 
 startVMS    <- startTacsat
 clStartVMS  <- startVMS #Total VMS list starting point instead of subset use
 iShip       <- VMS$VE_REF[startVMS]
 VMS.        <- subset(VMS,VE_REF==iShip)
-startVMS    <- which(VMS$VE_REF[startVMS] == VMS.$VE_REF & VMS$datim[startVMS] == VMS.$datim)
+startVMS    <- which(VMS$VE_REF[startVMS] == VMS.$VE_REF & VMS$SI_DATIM[startVMS] == VMS.$SI_DATIM)
 if(clStartVMS != dim(VMS)[1]){
   if(VMS$VE_REF[clStartVMS] != VMS$VE_REF[clStartVMS+1]){
       #End of dataset reached
@@ -19,7 +19,7 @@ if(clStartVMS != dim(VMS)[1]){
     endVMS <- NA
   } else {
         #Calculate the difference in time between the starting VMS point and its succeeding points
-      diffTime  <- difftime(VMS.$datim[(startVMS+1):dim(VMS.)[1]],VMS.$datim[startVMS],units=c("mins"))
+      diffTime  <- difftime(VMS.$SI_DATIM[(startVMS+1):dim(VMS.)[1]],VMS.$SI_DATIM[startVMS],units=c("mins"))
       if(length(which(diffTime >= (interval-margin) & diffTime <= (interval+margin)))==0){
         warning("No succeeding point found, no interpolation possible")
         endVMS  <- NA
@@ -38,7 +38,7 @@ if(clStartVMS != dim(VMS)[1]){
           }
         #Build-in check
       if(is.na(endVMS)==F){
-        if(!an(difftime(VMS.$datim[endVMS],VMS.$datim[startVMS],units=c("mins"))) %in% seq((interval-margin),(interval+margin),1)) stop("found endVMS point not within interval range")
+        if(!an(difftime(VMS.$SI_DATIM[endVMS],VMS.$SI_DATIM[startVMS],units=c("mins"))) %in% seq((interval-margin),(interval+margin),1)) stop("found endVMS point not within interval range")
         endVMS <- clStartVMS + (endVMS - startVMS)
       }
 

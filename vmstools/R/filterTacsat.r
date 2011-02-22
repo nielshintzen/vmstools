@@ -5,10 +5,10 @@ function(tacsat
                          ,remDup=T                 #Specify if you want to remove duplicated VMS records (these should not occur in the first place)
                          ){
   VMS <- tacsat
-  VMS$datim     <- as.POSIXct(paste(VMS$SI_DATE,  VMS$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
+if(!"SI_DATIM" %in% colnames(VMS))  VMS$SI_DATIM     <- as.POSIXct(paste(VMS$SI_DATE,  VMS$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
   #Remove duplicate records
 if(is.null(remDup)==F){
-  uniqueVMS <- which(duplicated(VMS[,c("VE_REF","datim")])==F)
+  uniqueVMS <- which(duplicated(VMS[,c("VE_REF","SI_DATIM")])==F)
   VMS.      <- VMS[uniqueVMS,]
   if(dim(VMS.)[1] != dim(VMS)[1]) warning("duplicate records have been removed")
 } else {
@@ -33,6 +33,6 @@ if(is.null(st)==F){
   if(length(st)>2) stop("More than two speed values selected")
   VMS. <- VMS.[which(VMS.$SI_SP >= st[1] & VMS.$SI_SP <= st[2]),]
 }
-colnames(VMS.) <- c(colnames(tacsat),"SI_DATIM")
+if(!"SI_DATIM" %in% colnames(VMS)) colnames(VMS.) <- c(colnames(tacsat),"SI_DATIM")
 return(VMS.[,-grep("SI_DATIM",colnames(VMS.))])}
 
