@@ -38,12 +38,12 @@ compareToOrdination=function(dat, Step2, clusters, targetSpecies){
   names(nbLogFirstSp)=substr(names(nbLogFirstSp),1,3)
   
   # Number of logevents linked to each species from the method "first species in catch"
-  png("Number of logevents by ordination métier level7.png", width = 1200, height = 800)
-  barplot(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)], main="Number of logevents by ordination métier level7", xlab="Main species", ylab="Number of Logevents", las=3)
+  png("Number of logevents by ordination metier level7.png", width = 1200, height = 800)
+  barplot(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)], main="Number of logevents by ordination metier level7", xlab="Main species", ylab="Number of Logevents", las=3)
   dev.off()
   # idem without the species with the biggest number of logevents
-  png(paste("Number of logevents by ordination métier level7 without ",names(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)])[1],".png",sep=""), width = 1200, height = 800)
-  barplot(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)][-1], main=paste("Number of logevents by ordination métier level7 without",names(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)])[1],sep=" "), xlab="Main species", ylab="Number of Logevents", las=3)
+  png(paste("Number of logevents by ordination metier level7 without ",names(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)])[1],".png",sep=""), width = 1200, height = 800)
+  barplot(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)][-1], main=paste("Number of logevents by ordination metier level7 without",names(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)])[1],sep=" "), xlab="Main species", ylab="Number of Logevents", las=3)
   dev.off()
                                   
   
@@ -80,14 +80,14 @@ compareToOrdination=function(dat, Step2, clusters, targetSpecies){
   # Graphics
   png("Ordination_metiersL7_by_cluster.png", width = 1200, height = 800)
   op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
-  for(i in 1:nbClust){  
+  for(i in 1:nbClust){
     op2 <- par(las=2)
     barplot(nbLogEspOrdiPlot[i,],names.arg=nomEspOrdiPlot[i,], las=3)
     par(op2)
     mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
   }
   par(op)
-  title(main=paste("Number of logevents linked to each metier from the ordination method by cluster","\n","\n",sep="")) 
+  title(main=paste("Number of logevents linked to each metier from the ordination method by cluster","\n","\n",sep=""))
   dev.off()
   
   # Projections on the first factorial plans
@@ -153,7 +153,7 @@ compareToOrdination=function(dat, Step2, clusters, targetSpecies){
   # LEVELS 7 AND 5 FOR METIERS FROM MULTIVARIATE CLASSIFICATION #
   ###############################################################
 
-#  Les espèces cibles sont maintenant directement calculées dans getMetierClusters.
+#  Les espèces cibles sont maintenant directement calculees dans getMetierClusters.
 #  
 #  # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
 #  seuilCatch=75
