@@ -85,9 +85,6 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
   data(eflalo)
   data(tacsat)
   data(euharbours)
-  # add some missing harbours to the list?
-  #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
-  #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
   # format
   eflalo <- formatEflalo(eflalo)
@@ -98,7 +95,10 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
-  tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG), lat=anf(tacsat$SI_LATI), harbours=euharbours, rowSize=30, returnNames=TRUE)
+  tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG),
+                                   lat=anf(tacsat$SI_LATI),
+                                   harbours=euharbours,
+                                   rowSize=30, returnNames=TRUE)
   inHarb <- tacsat$SI_HARB
   inHarb <- replace(inHarb, !is.na(inHarb), 1)
   inHarb <- replace(inHarb, is.na(inHarb), 0)
@@ -112,39 +112,40 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
   # keep 'out of harbour' points only
   # (but keep the departure point lying in the harbour)
   startTrip <- c(diff(tacsat[,"SI_FT"]),0)
-  tacsat[which(startTrip>0),"SI_FT"] <-  tacsat[which(startTrip>0)+1,"SI_FT"] # tricky here
+  tacsat[which(startTrip>0),"SI_FT"] <-  tacsat[which(startTrip>0)+1,"SI_FT"]
   tacsat <- tacsat[which(inHarb==0 |  startTrip>0),]
 
   # assign a state to each ping (start guesses only)
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
-  tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
+  # fake speed rule for fishing state
+  tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
 
 
-  # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
+  # reduce the size of the eflalo data by merging species
   # (assuming that the other species is coded MZZ)
   eflalo2 <- poolEflaloSpecies (eflalo, threshold=1e6, code="MZZ")
 
   # debug
   eflalo <- eflalo[!eflalo$VE_REF=="NA" &!is.na(eflalo$VE_REF),]
   if(all(is.na(eflalo$VE_FLT))) eflalo$VE_FLT <- "fleet1"
-    if(!match('LE_MET_level6',colnames(eflalo))>0) eflalo$LE_MET_level6 <- eflalo$LE_MET
+    if(!match('LE_MET_level6',colnames(eflalo))>0){
+      eflalo$LE_MET_level6 <- eflalo$LE_MET
+    }
 
   # debug
   eflalo <- eflalo[eflalo$LE_MET!="No_logbook6",]
 
 
   # TEST FOR A GIVEN SET OF VESSELS
-  # (if do.wp3 is at true then do also the automatic detection of fishing states
+  # (if do.wp3 is true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
-                                 general=list(output.path=file.path("C:","output"),
-                                    visual.check=TRUE,
-                                        do.wp3=TRUE, speed="segment"))
+                     general=list(output.path=file.path("C:","output"),
+                     visual.check=TRUE,do.wp3=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
-                                   general=list(output.path=file.path("C:","output"),
-                                      visual.check=TRUE,
-                                         do.wp3=FALSE, speed="segment"))
+                     general=list(output.path=file.path("C:","output"),
+                     visual.check=TRUE,do.wp3=FALSE, speed="segment"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
@@ -156,8 +157,10 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
 
 
   # ...or bind all vessels (keeping only some given species here)
-  bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"),
-                      folder = file.path("C:","output"), all.in.one.table=TRUE)
+  bindAllMergedTables (vessels=c("35", "1518"),
+                      species.to.keep=c("PLE","COD"),
+                      folder = file.path("C:","output"),
+                      all.in.one.table=TRUE)
 
    # ...and load the merged output table for all vessels
   load(file.path("C:","output","all_merged__2009.RData"))
@@ -168,33 +171,30 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
   df1$SI_LATI <- anf(df1$SI_LATI)
   df1 <-   df1[ !is.na(df1$SI_LATI),]
   df1 <-   df1[ !is.na(df1$SI_LONG),]
-  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
-                                 cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)")
+  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI",
+                nameVarToSum = "LE_KG_COD",cellsizeX =0.05,
+                cellsizeY =0.05,  legendtitle = "landings (kg)")
 
   # remove steaming points before gridding!
   df2<-df1[-which(is.na(df1$LE_KG_COD)),]
-  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
-                                cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)",
-                                 breaks0=c(1,2,4,8,16,32,64,100000))
+  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",
+                nameVarToSum = "LE_KG_COD",cellsizeX =0.05,
+                cellsizeY =0.05,  legendtitle = "landings (kg)",
+                breaks0=c(1,2,4,8,16,32,64,100000))
 
 
 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
   # (by default, this will keep all the species in the output table)
-  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.keep=character(),
-                      folder = file.path("C:","output"), all.in.one.table=FALSE)
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF),
+                              species.to.keep=character(),
+                              folder = file.path("C:","output"),
+                              all.in.one.table=FALSE)
 
   ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
-                                                   a.year=2009, a.country="NLD") )
+                          a.year=2009, a.country="NLD") )
 
-
-  
-               
   }
 
 }
 
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line

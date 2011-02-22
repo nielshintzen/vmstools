@@ -26,6 +26,7 @@ y <- seq(50,55,length.out=10)
 xrange <- range(x,na.rm=T)
 yrange <- range(y,na.rm=T)
 
-Grid <- createGrid(xrange,yrange,0.01,0.05) #returns a grid with 1001 cells in the x-direction and 101 in the y-direction
+#returns a grid with 1001 cells in the x-direction and 101 in the y-direction
+Grid <- createGrid(xrange,yrange,0.01,0.05)
 }
 

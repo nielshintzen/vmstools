@@ -9,7 +9,6 @@ reference set.
 \usage{
 diffInter(interpolation, reference)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{interpolation}{Interpolated dataset as output from the function 'interpolateVMS'}
   \item{reference}{Original high higher resolution VMS dataset}
@@ -32,15 +31,20 @@ EU lot 2 project}
 data(VMShf)
 
 #-Put the data in the right format
-VMShf$SI_DATE <- format(as.Date(VMShf$date),"%d/%m/%Y")
-VMShf$SI_TIME <- format(VMShf$date, "%H:%M:%S")
-colnames(VMShf) <- c("VE_REF","SI_LATI","SI_LONG","SI_SP","SI_HE","SI_DATIM","SI_DATE","SI_TIME")
+VMShf$SI_DATE <- format(as.Date(VMShf$date),"\%d/\%m/\%Y")
+VMShf$SI_TIME <- format(VMShf$date, "\%H:\%M:\%S")
+colnames(VMShf) <- c("VE_REF","SI_LATI","SI_LONG","SI_SP",
+                     "SI_HE","SI_DATIM","SI_DATE","SI_TIME")
 
 #-Sort the data and remove non-fishing pings
 VMShf   <- sortTacsat(VMShf)
 VMShf   <- filterTacsat(VMShf,c(2,6),NULL,T)
 
-interpolation <- interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.3,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolation <- interpolateTacsat(VMShf,interval=120,margin=10,res=100,
+                    method="cHs",params=list(fm=0.3,distscale=20,
+                    sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
-cHs <- diffInter(interpolation,VMShf) #Returns a matrix with 21 rows (each row represents 1 interpolation) and 5 measures
+#Returns a matrix with 21 rows (each row represents 1 interpolation)
+# and 5 measures
+cHs <- diffInter(interpolation,VMShf)
 }

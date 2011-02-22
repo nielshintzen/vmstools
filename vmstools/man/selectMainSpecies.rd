@@ -18,15 +18,15 @@ In the HAC method, a first group of species, the residual ones, is identified by
 Other species are pooled in the group of principals. New similar HACs are run through a loop on this group of residuals species, to identify if any new species
 might have been left aside in the first run. It is important to note though that HAC method might quickly reach memory limits on standard PCs, and may thus
 not be run on very large datasets.
-In the Total method, the percentage threshold is being increased with 5% steps from 5 to 100, and the ranked species summing up to this value
+In the Total method, the percentage threshold is being increased with 5\% steps from 5 to 100, and the ranked species summing up to this value
 is recorded. 
-In the Logevent method, the percentage threshold is also being increased with 5% steps from 5 to 100, and all species representing at least this value in
+In the Logevent method, the percentage threshold is also being increased with 5\% steps from 5 to 100, and all species representing at least this value in
 at least one line are recorded. 
 
 This function allows thus to explore the variability and the sensitivity of the definition of key species to differences in concepts and subjective
 thresholds. A plot showing the number of species retained according to these two criteria is produced, allowing the user to make a qualitative choice
-when this will be used for identyfing metiers. Empirical experience led us to suggest that the combination of species entering either the HAC, or 95% of the 
-total cumulated catch, or 100% of at least one logevent would be sufficient to cover the main target species of a standard logbook dataset, but other
+when this will be used for identyfing metiers. Empirical experience led us to suggest that the combination of species entering either the HAC, or 95\% of the
+total cumulated catch, or 100\% of at least one logevent would be sufficient to cover the main target species of a standard logbook dataset, but other
 choices could be made.          
 
   
@@ -67,29 +67,29 @@ The function returns also a list of diagnostics of the three methods :
 }
   \item{nbMainSpeciesHAC}{Number of species retained by the HAC method  
 }
-  \item{nbMainSpeciesTotal}{Number of species retained by the Total method with a percentage threshold increasing at 5% step from 5% to 100% 
+  \item{nbMainSpeciesTotal}{Number of species retained by the Total method with a percentage threshold increasing at 5\% step from 5\% to 100\%
 }
-  \item{nbMainSpeciesLogevent}{Number of species retained by the Logevent method with a percentage threshold increasing at 5% step from 5% to 100% 
+  \item{nbMainSpeciesLogevent}{Number of species retained by the Logevent method with a percentage threshold increasing at 5\% step from 5\% to 100\%
 }
   \item{namesMainSpeciesHAC}{Names of species retained by the HAC method 
 }
-  \item{namesMainSpeciesTotalAlphabetical}{Names of species retained by the Total method with 95% threshold in alphabetical order, for easier comparison 
+  \item{namesMainSpeciesTotalAlphabetical}{Names of species retained by the Total method with 95\% threshold in alphabetical order, for easier comparison
   with the two other methods
 }
-  \item{namesMainSpeciesTotalByImportance}{Names of species retained by the Total method with 95% threshold in ranked order of importance 
+  \item{namesMainSpeciesTotalByImportance}{Names of species retained by the Total method with 95\% threshold in ranked order of importance
 }
-  \item{namesMainSpeciesLogevent}{Names of species retained by the Logevent method with 100% threshold
+  \item{namesMainSpeciesLogevent}{Names of species retained by the Logevent method with 100\% threshold
 }
-  \item{namesMainSpeciesAll}{Unique combination of the species retained in either HAC method, Total method with 95% threshold, and Logevent method 
-  with 100% threshold 
+  \item{namesMainSpeciesAll}{Unique combination of the species retained in either HAC method, Total method with 95\% threshold, and Logevent method
+  with 100\% threshold
 }
   \item{propCatchMainSpeciesAll}{Proportion of the total catch represented by the selected species (species in namesMainSpeciesAll)
 }
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\author{Nicolas Deporte, Sébastien Demanèche, Stéphanie Mahévas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
-\note{A number of libraries are initially called for the whole métier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
+\author{Nicolas Deporte, Sebastien Demanèche, Stephanie Mahevas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
+\note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
 
 \seealso{\code{extractTableMainSpecies()}}
 
@@ -103,7 +103,8 @@ The function returns also a list of diagnostics of the three methods :
 
   eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
 
-  analysisName <- "metier_analysis_OTB" # note that output plots will be sent to getwd()
+  # note that output plots will be sent to getwd()
+  analysisName <- "metier_analysis_OTB"
   
   explo=selectMainSpecies(
            dat=eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],

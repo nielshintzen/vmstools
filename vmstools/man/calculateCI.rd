@@ -8,7 +8,8 @@ this function the CI's are computed.
 
 }
 \usage{    
-calculateCI(intLon,intLat,vmsIdx1,vmsIdx2,tacsat,grid,sPDF,interpolation,int,params)
+calculateCI(intLon,intLat,vmsIdx1,vmsIdx2,tacsat,
+            grid,sPDF,interpolation,int,params)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -41,15 +42,21 @@ tacsat     <- tacsat[1:1000,]
 tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
 
   #Interpolate the VMS data
-interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
+                    res=100,method="cHs",params=list(fm=0.5,distscale=20,
+                    sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
   #Create the final grid where all interpolations should fit on
-xrange  <- range(unlist(lapply(lapply(interpolation,function(x){return(x[-1,])}),function(x){return(x[,1])})),na.rm=T)
-yrange  <- range(unlist(lapply(lapply(interpolation,function(x){return(x[-1,])}),function(x){return(x[,2])})),na.rm=T)
-xrange  <- range(c(xrange,range(tacsat$SI_LONG,na.rm=T))); xrange <- c(min(xrange) - min(xrange)*0.05,
-                                                                       max(xrange) + max(xrange)*0.05)
-yrange  <- range(c(yrange,range(tacsat$SI_LATI,na.rm=T))); yrange <- c(min(yrange) - min(yrange)*0.05,
-                                                                       max(yrange) + max(yrange)*0.05)
+xrange  <- range(unlist(lapply(lapply(interpolation,function(x){
+            return(x[-1,])}),function(x){return(x[,1])})),na.rm=T)
+yrange  <- range(unlist(lapply(lapply(interpolation,function(x){
+            return(x[-1,])}),function(x){return(x[,2])})),na.rm=T)
+xrange  <- range(c(xrange,range(tacsat$SI_LONG,na.rm=T)));
+xrange  <- c(min(xrange) - min(xrange)*0.05,
+             max(xrange) + max(xrange)*0.05)
+yrange  <- range(c(yrange,range(tacsat$SI_LATI,na.rm=T)));
+yrange  <- c(min(yrange) - min(yrange)*0.05,
+             max(yrange) + max(yrange)*0.05)
 grid          <- createGrid(xrange,yrange,0.1,0.05)
 spatialGrid   <- SpatialGrid(grid=grid);
 gridded(spatialGrid) = TRUE
@@ -62,6 +69,7 @@ lon <- tacsat$SI_LONG[c(3,4)]
 lat <- tacsat$SI_LATI[c(3,4)]
 
 
-res <- calculateCI(intLon=lon,intLat=lat,vmsIdx1=3,vmsIdx2=4,VMS.=tacsat,grid=grid,sPDF=sPDF,
-                   interpolation=interpolation,int=3,params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)))
+res <- calculateCI(intLon=lon,intLat=lat,vmsIdx1=3,vmsIdx2=4,VMS.=tacsat,
+                   grid=grid,sPDF=sPDF,interpolation=interpolation,int=3,
+                   params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)))
 }

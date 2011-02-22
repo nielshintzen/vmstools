@@ -31,10 +31,12 @@ tacsat     <- sortTacsat(tacsat)
 tacsat     <- tacsat[1:1000,]
 
   #Get the ranges of the tacsat data
-xrange  <- range(tacsat$SI_LONG,na.rm=T); xrange <- c(min(xrange) - min(xrange)*0.05,
-                                                      max(xrange) + max(xrange)*0.05)
-yrange  <- range(tacsat$SI_LATI,na.rm=T); yrange <- c(min(yrange) - min(yrange)*0.05,
-                                                      max(yrange) + max(yrange)*0.05)
+xrange  <- range(tacsat$SI_LONG,na.rm=T);
+xrange  <- c(min(xrange) - min(xrange)*0.05,
+             max(xrange) + max(xrange)*0.05)
+yrange  <- range(tacsat$SI_LATI,na.rm=T);
+yrange  <- c(min(yrange) - min(yrange)*0.05,
+             max(yrange) + max(yrange)*0.05)
   #Setup a grid
 grid          <- createGrid(xrange,yrange,0.1,0.05)
 spatialGrid   <- SpatialGrid(grid=grid);

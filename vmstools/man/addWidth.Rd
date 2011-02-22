@@ -41,7 +41,9 @@ tacsat     <- tacsat[1:1000,]
 tacsat     <- filterTacsat(tacsat,c(4,8),hd=NULL,remDup=T)
 
   #Interpolate the VMS data
-interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,
+                  method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,
+                  st=c(2,6)),headingAdjustment=0)
 
 res           <- addWidth(interpolation,0.024)
 plot(res)

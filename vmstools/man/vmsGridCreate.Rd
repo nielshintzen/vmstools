@@ -63,26 +63,25 @@ vmsGridCreate(dF
 \note{}
 \seealso{\code{mapGrid()}}
 \examples{
-#vmsGridCreate(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE", cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',plotPoints=T )
+#vmsGridCreate(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE",
+# cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',plotPoints=T )
 #get the example data
-data(VMS)
+data(tacsat)
 #subset the first 2000 points to avoid problems with NAs
-dFVMS <- VMS[1:2000,]
+dFVMS <- tacsat[1:2000,]
 #create vms grid minimum call with defaults
 vmsGridCreate(dF2,nameLat='declat',nameLon='declon')
 #making the grid finer
-vmsGridCreate(dF2,nameLat='declat',nameLon='declon',cellsizeX=0.05,cellsizeY=0.05)
+vmsGridCreate(dF2,nameLat='declat',nameLon='declon',
+              cellsizeX=0.05,cellsizeY=0.05)
 #summing a data column and adding a title
-vmsGridCreate(dF2,nameLat='declat',nameLon='declon',cellsizeX=0.05,cellsizeY=0.05,nameVarToSum='heading',plotTitle='lot2 paris')
+vmsGridCreate(dF2,nameLat='declat',nameLon='declon',
+              cellsizeX=0.05,cellsizeY=0.05,nameVarToSum='heading',
+              plotTitle='lot2 paris')
 #changing the number of categories in the plot
-vmsGridCreate(dF2,nameLat='declat',nameLon='declon',cellsizeX=0.05,cellsizeY=0.05,numCats=10)
+vmsGridCreate(dF2,nameLat='declat',nameLon='declon',
+              cellsizeX=0.05,cellsizeY=0.05,numCats=10)
 #outputting to a gridAscii file that can be loaded into ArcGIS
-vmsGridCreate(dF2,nameLat='declat',nameLon='declon',cellsizeX=0.05,cellsizeY=0.05,outGridFile='test.asc')
-
-
+vmsGridCreate(dF2,nameLat='declat',nameLon='declon',
+              cellsizeX=0.05,cellsizeY=0.05,outGridFile='test.asc')
 }
-
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }

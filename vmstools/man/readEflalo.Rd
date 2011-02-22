@@ -23,7 +23,8 @@ Returns the formatted Eflalo dataset}
 data(eflalo)
 
 #temporarily write tacsat file to disk to thereafter read it back in again
-write.table(eflalo, file = "C:\\eflalo.csv", quote = TRUE, sep = ",",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
+write.table(eflalo, file = "C:\\eflalo.csv", quote = TRUE, sep = ",",
+    eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
 
 #Read in tacsat file
 eflalo <- readEflalo("C:\\eflalo.csv")

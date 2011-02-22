@@ -7,9 +7,10 @@ methods can be applied: the cubic Hermite spline method as developed in Hintzen 
 an interpolation of a straight line (on a x-y plane, not a sphere)
 }
 \usage{
-interpolateTacsat(tacsat, interval = 120, margin = 12, res = 100, method = "cHs", params = list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolateTacsat(tacsat, interval = 120, margin = 12, res = 100,
+                  method = "cHs", params = list(fm=0.2,distscale=20,
+                  sigline=0.2,st=c(2,6)),headingAdjustment=0)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tacsat}{Tacsat dataset with GPS points that need to be interpolated}
   \item{interval}{Time in minutes between the succeeding datapoints}
@@ -42,7 +43,8 @@ indicates the number of interpolations created.
 \references{Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite spline interpolation
 of position registration data, EU lot 2 project }
 \author{Niels T. Hintzen}
-\seealso{\code{findEndTacsat(),distance(),lonLatRatio(),plotInterpolation(),sortTacsat(),filterTacsat()}}
+\seealso{findEndTacsat(),distance(),lonLatRatio(),plotInterpolation(),
+               sortTacsat(),filterTacsat()}
 \examples{
   #Load the Tacsat data
 data(tacsat)
@@ -55,5 +57,7 @@ tacsat     <- tacsat[1:1000,]
 tacsat     <- filterTacsat(tacsat,st=c(2,6),hd=NULL,remDup)
 
   #Interpolate the VMS data
-interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,
+                                   method="cHs",params=list(fm=0.5,distscale=20,
+                                   sigline=0.2,st=c(2,6)),headingAdjustment=0)
 }

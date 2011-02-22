@@ -7,7 +7,6 @@ calculated between these specified datapoints}
 \usage{
 distanceTacsat(tacsat, index)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tacsat}{tacsat (normal or high ping rate) dataset}
   \item{index}{Matrix with specification of succeeding datapoints (see details for format)}
@@ -21,8 +20,10 @@ index is designed as a matrix where rows represent succeeding datapoints, column
 \examples{
 
 data(tacsat)
-st        <- c(2,6)       #Speed threshold points (two values), NULL means use all points
-remDup    <- T            #Remove duplicate records in VMS dataset
+#Speed threshold points (two values), NULL means use all points
+st        <- c(2,6)
+#Remove duplicate records in VMS dataset
+remDup    <- T
 
   #Sort the VMS data
 tacsat     <- sortTacsat(tacsat)
@@ -31,6 +32,8 @@ tacsat     <- tacsat[1:1000,]
   #Filter the VMS data
 tacsat     <- filterTacsat(tacsat,st,NULL,remDup)
 
-distanceTacsat(tacsat,matrix(c(2,3,3,4),nrow=2,ncol=2,dimnames=list(1:2,c("startpoint","endpoint")))) #4.452723 18.476743
+distanceTacsat(tacsat,matrix(c(2,3,3,4),nrow=2,ncol=2,
+                dimnames=list(1:2,c("startpoint","endpoint"))))
+#4.452723 18.476743
 }
 

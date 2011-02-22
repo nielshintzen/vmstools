@@ -8,7 +8,6 @@ to be effectively used in other EU lot 2 project generic functions.
 \usage{
 sortTacsat(tacsat)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tacsat}{tacsat dataframe}
 }

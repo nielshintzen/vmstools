@@ -23,7 +23,8 @@ the relevant thresholds for the two other methods Total and Logevent must be sel
 }
 
 \usage{
-extractTableMainSpecies(dat,namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
+extractTableMainSpecies(dat,namesMainSpeciesHAC,
+                        paramTotal=95,paramLogevent=100)
 
 }
 
@@ -34,10 +35,10 @@ extractTableMainSpecies(dat,namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
   \item{namesMainSpeciesHAC}{character. The names of species retained by the HAC method selectMainSpecies() function. If omitted, only the two other methods will be used for selecting species. 
 }
   \item{paramTotal}{numeric. The percentage threshold for the Total method. All species ranked in terms of percentage in total catches and cumulating up to this 
-  percentage value will be retained. Default value is 95%. 
+  percentage value will be retained. Default value is 95\%.
 }
   \item{paramLogevent}{numeric. The percentage threshold for the Logevent method. All species representing at least this threshold of at least one logevent (one line)
-  will be retained. Default value is 100% (logevents catching one and only one species).   
+  will be retained. Default value is 100\% (logevents catching one and only one species).
 }
 }
 \details{
@@ -49,7 +50,7 @@ Logevent ID (LE_ID) are returned as row names.
 }
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
-\author{Nicolas Deporte, Sébastien Demanèche, Stéphanie Mahévas, Clara Ulrich, Francois Bastardie}
+\author{Nicolas Deporte, Sebastien Demanèche, Stephanie Mahevas, Clara Ulrich, Francois Bastardie}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
 
 \seealso{\code{selectMainSpecies()}}
@@ -63,8 +64,8 @@ Logevent ID (LE_ID) are returned as row names.
   eflalo <- formatEflalo(eflalo)
 
   eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
-
-  analysisName <- "metier_analysis_OTB" # note that output plots will be sent to getwd()
+  # note that output plots will be sent to getwd()
+  analysisName <- "metier_analysis_OTB"
   
   explo <- selectMainSpecies(
              dat=eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
@@ -73,7 +74,7 @@ Logevent ID (LE_ID) are returned as row names.
            
   Step1 <- extractTableMainSpecies(
               eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
-                 explo$namesMainSpeciesHAC, paramTotal=95, paramLogevent=100)
+              explo$namesMainSpeciesHAC, paramTotal=95,paramLogevent=100)
   #=> send the LE_ID and LE_KG_SP columns only             
                
   }

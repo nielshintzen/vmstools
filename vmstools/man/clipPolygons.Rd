@@ -9,7 +9,6 @@ This function removes from a set of polygons A the areas overlapping with anothe
 \usage{
 clipPolygons(shapeAll, europa)
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{shapeAll}{These are the polygons A (as shapefiles) that need to be clipped}
   \item{europa}{These are the polygons B (as a polyset format) used for the clipping}
@@ -27,7 +26,8 @@ A clipped resulting polyset is returned.
 \seealso{\code{indicators()}}
 \examples{
 # Load the shapefile containing the set of polygons to be clipped
-inShapeArea<-"testClosedAreaMultiple"  # Name of the shapefile without the .shp extension
+# Name of the shapefile without the .shp extension
+inShapeArea<-"testClosedAreaMultiple"
 shapeAll<-read.shapefile(inShapeArea)
 
 # Load the set of polygons used for the clipping, in our case, lands

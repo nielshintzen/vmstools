@@ -51,10 +51,8 @@ mapGrid(sGDF
 \note{}
 \seealso{\code{vmsGridCreate()}}
 \examples{
-#mapGrid(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE", cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',plotPoints=T )
+#mapGrid(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE",
+#        cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',
+#        plotPoints=T )
 }
 
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }

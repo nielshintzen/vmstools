@@ -9,7 +9,8 @@ while taking different levels into account such as by day, ICESrectangle or by t
 Also there is a possibility to merge the eflalo records without a matching tacsat trip.
 }
 \usage{
-splitAmongPings(tacsat, eflalo, variable = "all", level = "day", conserve = T)
+splitAmongPings(tacsat, eflalo, variable = "all",
+                level = "day", conserve = T)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -47,5 +48,6 @@ data(tacsat)
 data(eflalo)
 
 tacsatp           <- mergeEflalo2Tacsat(eflalo,tacsat)
-tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,variable="all",level="day",conserve=T)
+tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
+                        variable="all",level="day",conserve=T)
 }

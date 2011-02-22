@@ -23,7 +23,8 @@ Returns the rectangles as a vector}
 \code{ICESarea(), ICESrectangle2LonLat()}
 }
 \examples{
-res <- data.frame(SI_LONG = c(1,2,2,4,2),SI_LATI = c(53,53.2,54,56.7,55.2))
+res <- data.frame(SI_LONG = c(1,2,2,4,2),
+                  SI_LATI = c(53,53.2,54,56.7,55.2))
 ICESrectangle(res)
 
 }

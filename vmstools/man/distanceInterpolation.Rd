@@ -20,8 +20,10 @@ for each interpolation. Returned are 5 }
 \seealso{\code{distance(), distanceVMS()}}
 \examples{
 data(tacsat)
-st        <- c(2,6)       #Speed threshold points (two values), NULL means use all points
-remDup    <- T            #Remove duplicate records in VMS dataset
+#Speed threshold points (two values), NULL means use all points
+st        <- c(2,6)
+#Remove duplicate records in VMS dataset
+remDup    <- T
 
   #Sort the tacsat data
 tacsat     <- sortTacsat(tacsat)
@@ -30,9 +32,13 @@ tacsat     <- tacsat[1:1000,]
   #Filter the tacsat data
 tacsat     <- filterTacsat(tacsat,st,NULL,remDup)
 
-interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.3,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
+                  res=100,method="cHs",params=list(fm=0.3,distscale=20,
+                  sigline=0.2,st=c(2,6)),headingAdjustment=0)
   #Number of interpolations:
 length(interpolation)
   #Calculate distance:
-distanceInterpolation(interpolation) #Returns 159 values, which represents the distance travelled in each of the 159 interpolations
+  #Returns 159 values, which represents the distance travelled in
+  #each of the 159 interpolations
+distanceInterpolation(interpolation)
 }
