@@ -9,7 +9,7 @@ function(tacsat                          #VMS datapoints
                               ){
 
 VMS. <- tacsat
-VMS.$datim     <- as.POSIXct(paste(VMS.$SI_DATE,  VMS.$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
+if(!"SI_DATIM" %in% colnames(VMS.)) VMS.$SI_DATIM     <- as.POSIXct(paste(VMS.$SI_DATE,  VMS.$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
                               
   #Start interpolating the data
 if(!method %in% c("cHs","SL"))  stop("method selected that does not exist")
