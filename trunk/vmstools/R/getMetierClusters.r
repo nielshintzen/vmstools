@@ -145,7 +145,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       par(op)
       dev.off()
 
-      
+
       # Rectangles plotting
       png(paste(analysisName,numSample,"Sample_Dendogram.png",sep="_"), width = 1200, height = 800)
       plclust(log.hac,labels=F,hang=-1,ann=F)
@@ -359,6 +359,14 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     target=targetspecies(resval)
     rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
 
+
+    # Compute the percentage of logevents catching each species by cluster
+    mainSpecies=colnames(datSpecies)
+    percLogevents=matrix(0,ncol=length(mainSpecies),nrow=nbClust,dimnames=list(paste("Cluster ",1:nbClust,sep=""),mainSpecies))
+    for(i in 1:nbClust){
+      percLogevents[i,]=round(sapply(mainSpecies,function(x) (sizeClusters[i]-length(which(Step1[clusters==i,x]==0)))/sizeClusters[i]*100),digits=1)
+    }
+    
 
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
@@ -642,7 +650,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, sizeClusters=sizeClusters,
      betweenVarClassifOnTot=betweenVarClassifOnTot, mProfilSample=mProfilSample, 
      nbClust=nbClust, summaryClusters=summaryClusters, testValues=resval, 
-     testValuesSpecies=target$tabnomespcib, descClusters=clusterDesc2, tabClusters=tabClusters,
+     testValuesSpecies=target$tabnomespcib, percLogevents=percLogevents,
+     descClusters=clusterDesc2, tabClusters=tabClusters,
      targetSpecies=listTargetSpeciesByCluster))
 
   }   else
@@ -693,6 +702,15 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbClust=length(clusters$size)
     rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
     
+    
+    # Compute the percentage of logevents catching each species by cluster
+    mainSpecies=colnames(datSpecies)
+    percLogevents=matrix(0,ncol=length(mainSpecies),nrow=nbClust,dimnames=list(paste("Cluster ",1:nbClust,sep=""),mainSpecies))
+    for(i in 1:nbClust){
+      percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$size[i]-length(which(Step1[clusters$cluster==i,x]==0)))/clusters$size[i]*100),digits=1)
+    }
+    
+    
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
 #    gc(reset=TRUE)
 
@@ -712,7 +730,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     dev.off()
 
-          # for a paper
+    # for a paper
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
@@ -968,7 +986,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, 
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, 
-    summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib,
+    summaryClusters=summaryClusters, testValues=resval, 
+    testValuesSpecies=target$tabnomespcib, percLogevents=percLogevents,
     descClusters=clusterDesc2, tabClusters=tabClusters,
     targetSpecies=listTargetSpeciesByCluster))
 
@@ -1032,6 +1051,14 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbClust=length(clusters$id.med)
     rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
     
+    
+    # Compute the percentage of logevents catching each species by cluster
+    mainSpecies=colnames(datSpecies)
+    percLogevents=matrix(0,ncol=length(mainSpecies),nrow=nbClust,dimnames=list(paste("Cluster ",1:nbClust,sep=""),mainSpecies))
+    for(i in 1:nbClust){
+      percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$clusinfo[i,1]-length(which(Step1[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)
+    }
+    
 
     # Projections on the first factorial plans
     png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
@@ -1048,7 +1075,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     dev.off()
 
-        # for a paper
+    # for a paper
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
@@ -1059,7 +1086,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_2_3_PAM',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
-
 
     # Mean profile of the dataset
     meanprofile=colMeans(datSpecies)
@@ -1305,7 +1331,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters, 
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust, 
-    summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib,
+    summaryClusters=summaryClusters, testValues=resval, 
+    testValuesSpecies=target$tabnomespcib, percLogevents=percLogevents,
     descClusters=clusterDesc2, tabClusters=tabClusters,
     targetSpecies=listTargetSpeciesByCluster))
 
@@ -1373,6 +1400,14 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
     
     
+    # Compute the percentage of logevents catching each species by cluster
+    mainSpecies=colnames(datSpecies)
+    percLogevents=matrix(0,ncol=length(mainSpecies),nrow=nbClust,dimnames=list(paste("Cluster ",1:nbClust,sep=""),mainSpecies))
+    for(i in 1:nbClust){
+      percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$clusinfo[i,1]-length(which(Step1[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)
+    }
+    
+    
     # Projections on the first factorial plans
     png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
@@ -1388,7 +1423,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     dev.off()
 
-      # for a paper
+    # for a paper
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
@@ -1649,7 +1684,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     return(list(LE_ID_clust=LE_ID_clust, clusters=clusters,
     betweenVarClassifOnTot=betweenVarClassifOnTot, nbClust=nbClust,
-    summaryClusters=summaryClusters, testValues=resval, testValuesSpecies=target$tabnomespcib, 
+    summaryClusters=summaryClusters, testValues=resval, 
+    testValuesSpecies=target$tabnomespcib, percLogevents=percLogevents, 
     descClusters=clusterDesc2, tabClusters=tabClusters,
     targetSpecies=listTargetSpeciesByCluster))                                   
 
