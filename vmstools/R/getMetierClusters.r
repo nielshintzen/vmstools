@@ -97,7 +97,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+sum(withinVarClusters))*100
       classifVarExplain=c(classifVarExplain,betweenVarClassifOnTot)
 
-      # Mean profiles by cluster for each sample
+      # Catch profile by cluster for each sample
       nbSpec=ncol(datSpecies)
       mprofil=numeric()
       blank=rep(00,nbSpec)
@@ -154,17 +154,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       dev.off()
 
 
-      # Mean profile of the dataset
+      # Catch profile of the dataset
       meanprofile=colMeans(sampleDatSpecies)
-      png(paste(analysisName,numSample,"Sample_Mean profile of the sample.png",sep="_"), width = 1200, height = 800)
+      png(paste(analysisName,numSample,"Sample_Catch profile of the sample.png",sep="_"), width = 1200, height = 800)
       op <- par(las=2)
-      barplot(meanprofile, main="Mean profile of the sample", xlab="Species", ylab="Percentage of catch")
+      barplot(meanprofile, main="Catch profile of the sample", xlab="Species", ylab="Percentage of catch")
       par(op)
       mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
       dev.off()
 
 
-      # Mean profiles by cluster
+      # Catch profile by cluster
       nbSpec=ncol(sampleDatSpecies)
       summarySampleClusters=array(0,dim=c(6,nbSpec,nbClust))
       dimnames(summarySampleClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
@@ -198,7 +198,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
         mtext(paste("Cluster",k), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
       }
       par(op)
-      title(main=paste("Mean profile by cluster of the sample","\n","\n",sep=""))
+      title(main=paste("Catch profile by cluster of the sample","\n","\n",sep=""))
       dev.off()
 
 
@@ -406,17 +406,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
 
-    # Mean profile of the dataset
+    # Catch profile of the dataset
     meanprofile=colMeans(datSpecies)
-    png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Catch profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
-    barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
+    barplot(meanprofile, main="Catch profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
     mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     dev.off()
 
 
-    # Mean profiles by cluster
+    # Catch profile by cluster
     nbSpec=ncol(datSpecies)
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
@@ -441,7 +441,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       nameSpPloti[numSpi]=namSpi
       nameSpPlot=rbind(nameSpPlot,nameSpPloti)
     }
-    png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Catch profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -450,7 +450,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main=paste("Mean profile by cluster","\n","\n",sep=""))
+    title(main=paste("Catch profile by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -597,29 +597,37 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       sizeTabClusters[i]=min(length(namesSpecies[i,!is.na(namesSpecies[i,])]),length(tabPropCatch[i,!is.na(tabPropCatch[i,])]),length(tabTestVal[i,!is.na(tabTestVal[i,])]),length(tabPropLog[i,!is.na(tabPropLog[i,])]))
     }
 
+
     # Target Species
-    # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
-    seuilCatch=75
+    # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
+    #                                                   - Test-value > thresholdTestValue
+    #                                                   - % Logevents > thresholdLogevents 
+    thresholdCatch=75
+    thresholdTestValue=50
+    thresholdLogevents=50
     
-    targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
-    for(i in 1:nbClust){
+    sppCumCatch=list()
+    sppTestValue=list()
+    sppLogevents=list()
+    targetSpeciesByCluster=list()
+    
+    for (i in 1:nbClust){
       percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
-      nbSpSel=length(which(percCatchCum<seuilCatch))+1
-      targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
+      nbSpSel=length(which(percCatchCum<thresholdCatch))+1
+      sppCumCatch[[i]]=tabClusters[1:nbSpSel,"FAO",i]
+      
+      sppTestValue[[i]]=tabClusters[which(as.numeric(tabClusters[,"Test-value",i])>thresholdTestValue),"FAO",i]
+      
+      sppLogevents[[i]]=tabClusters[which(as.numeric(tabClusters[,"% Logevents",i])>thresholdLogevents),"FAO",i]
+    
+      targetSpeciesByCluster[[i]]=intersect(sppCumCatch[[i]],sppTestValue[[i]])
+      targetSpeciesByCluster[[i]]=intersect(targetSpeciesByCluster[[i]],sppLogevents[[i]])
     }
-    
-    # Maximum number of species in the table
-    maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
-    targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
-    
-    # List of target species by cluster
-    listTargetSpeciesByCluster=list()
-    for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
-  
+
     # List of metiers (level 7)
     listMetiersL7=list()
     for (i in 1:nbClust){
-      metiersClusteri=listTargetSpeciesByCluster[[i]]
+      metiersClusteri=targetSpeciesByCluster[[i]]
       metiersClusteri=as.character(unique(unlist(metiersClusteri)))
       metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
       listMetiersL7[[i]]=metiersClusteri
@@ -628,21 +636,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Metier (level 7) of each logevent
     metierByLogeventL7=unlist(sapply(clusters,function(x) listMetiersL7[[x]]))
 
-  
+
 
     # Create csv tables
-    write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
+    write.table(clusterDesc2,file="descClusters.csv",col.names=NA,sep=";")
     
     dfClust=data.frame()
     dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
-      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA)
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA)  
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")  
     }
     
     
-    #LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters)
     LE_ID_clust=data.frame(LE_ID=LE_ID,clust=metierByLogeventL7)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
@@ -652,7 +659,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
      nbClust=nbClust, summaryClusters=summaryClusters, testValues=resval, 
      testValuesSpecies=target$tabnomespcib, percLogevents=percLogevents,
      descClusters=clusterDesc2, tabClusters=tabClusters,
-     targetSpecies=listTargetSpeciesByCluster))
+     targetSpecies=targetSpeciesByCluster))
 
   }   else
 
@@ -742,17 +749,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     savePlot(filename=paste(analysisName,'projections_2_3_Kmeans',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
-    # Mean profile of the dataset
+    # Catch profile of the dataset
     meanprofile=colMeans(datSpecies)
-    png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Catch profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
-    barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
+    barplot(meanprofile, main="Catch profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
     mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     dev.off()
 
 
-    # Mean profiles by cluster
+    # Catch profile by cluster
     nbSpec=ncol(datSpecies)
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
@@ -777,7 +784,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       nameSpPloti[numSpi]=namSpi
       nameSpPlot=rbind(nameSpPlot,nameSpPloti)
     }
-    png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Catch profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -786,7 +793,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main=paste("Mean profile by cluster","\n","\n",sep=""))
+    title(main=paste("Catch profile by cluster","\n","\n",sep=""))
     dev.off()
 
 #    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
@@ -935,28 +942,35 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Target Species
-    # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
-    seuilCatch=75
+    # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
+    #                                                   - Test-value > thresholdTestValue
+    #                                                   - % Logevents > thresholdLogevents 
+    thresholdCatch=75
+    thresholdTestValue=50
+    thresholdLogevents=50
     
-    targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
-    for(i in 1:nbClust){
+    sppCumCatch=list()
+    sppTestValue=list()
+    sppLogevents=list()
+    targetSpeciesByCluster=list()
+    
+    for (i in 1:nbClust){
       percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
-      nbSpSel=length(which(percCatchCum<seuilCatch))+1
-      targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
+      nbSpSel=length(which(percCatchCum<thresholdCatch))+1
+      sppCumCatch[[i]]=tabClusters[1:nbSpSel,"FAO",i]
+      
+      sppTestValue[[i]]=tabClusters[which(as.numeric(tabClusters[,"Test-value",i])>thresholdTestValue),"FAO",i]
+      
+      sppLogevents[[i]]=tabClusters[which(as.numeric(tabClusters[,"% Logevents",i])>thresholdLogevents),"FAO",i]
+    
+      targetSpeciesByCluster[[i]]=intersect(sppCumCatch[[i]],sppTestValue[[i]])
+      targetSpeciesByCluster[[i]]=intersect(targetSpeciesByCluster[[i]],sppLogevents[[i]])
     }
-    
-    # Maximum number of species in the table
-    maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
-    targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
-    
-    # List of target species by cluster
-    listTargetSpeciesByCluster=list()
-    for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
-  
+
     # List of metiers (level 7)
     listMetiersL7=list()
     for (i in 1:nbClust){
-      metiersClusteri=listTargetSpeciesByCluster[[i]]
+      metiersClusteri=targetSpeciesByCluster[[i]]
       metiersClusteri=as.character(unique(unlist(metiersClusteri)))
       metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
       listMetiersL7[[i]]=metiersClusteri
@@ -968,18 +982,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Create csv tables
-    write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
+    write.table(clusterDesc2,file="descClusters.csv",col.names=NA,sep=";")
     
     dfClust=data.frame()
     dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
-      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA)
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA)  
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")  
     }
     
     
-    #LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters$cluster)
     LE_ID_clust=data.frame(LE_ID=LE_ID,clust=metierByLogeventL7)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
@@ -989,7 +1002,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     summaryClusters=summaryClusters, testValues=resval, 
     testValuesSpecies=target$tabnomespcib, percLogevents=percLogevents,
     descClusters=clusterDesc2, tabClusters=tabClusters,
-    targetSpecies=listTargetSpeciesByCluster))
+    targetSpecies=targetSpeciesByCluster))
 
   } else
 
@@ -1087,17 +1100,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     savePlot(filename=paste(analysisName,'projections_2_3_PAM',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
-    # Mean profile of the dataset
+    # Catch profile of the dataset
     meanprofile=colMeans(datSpecies)
-    png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Catch profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
-    barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
+    barplot(meanprofile, main="Catch profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
     mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     dev.off()
 
 
-    # Mean profile by cluster
+    # Catch profile by cluster
     nbSpec=ncol(datSpecies)
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
@@ -1122,7 +1135,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       nameSpPloti[numSpi]=namSpi
       nameSpPlot=rbind(nameSpPlot,nameSpPloti)
     }
-    png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Catch profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -1131,7 +1144,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main=paste("Mean profile by cluster","\n","\n",sep=""))
+    title(main=paste("Catch profile by cluster","\n","\n",sep=""))
     dev.off()
 
 
@@ -1280,28 +1293,35 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Target Species
-    # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
-    seuilCatch=75
+    # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
+    #                                                   - Test-value > thresholdTestValue
+    #                                                   - % Logevents > thresholdLogevents 
+    thresholdCatch=75
+    thresholdTestValue=50
+    thresholdLogevents=50
     
-    targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
-    for(i in 1:nbClust){
+    sppCumCatch=list()
+    sppTestValue=list()
+    sppLogevents=list()
+    targetSpeciesByCluster=list()
+    
+    for (i in 1:nbClust){
       percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
-      nbSpSel=length(which(percCatchCum<seuilCatch))+1
-      targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
+      nbSpSel=length(which(percCatchCum<thresholdCatch))+1
+      sppCumCatch[[i]]=tabClusters[1:nbSpSel,"FAO",i]
+      
+      sppTestValue[[i]]=tabClusters[which(as.numeric(tabClusters[,"Test-value",i])>thresholdTestValue),"FAO",i]
+      
+      sppLogevents[[i]]=tabClusters[which(as.numeric(tabClusters[,"% Logevents",i])>thresholdLogevents),"FAO",i]
+    
+      targetSpeciesByCluster[[i]]=intersect(sppCumCatch[[i]],sppTestValue[[i]])
+      targetSpeciesByCluster[[i]]=intersect(targetSpeciesByCluster[[i]],sppLogevents[[i]])
     }
-    
-    # Maximum number of species in the table
-    maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
-    targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
-    
-    # List of target species by cluster
-    listTargetSpeciesByCluster=list()
-    for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
-  
+
     # List of metiers (level 7)
     listMetiersL7=list()
     for (i in 1:nbClust){
-      metiersClusteri=listTargetSpeciesByCluster[[i]]
+      metiersClusteri=targetSpeciesByCluster[[i]]
       metiersClusteri=as.character(unique(unlist(metiersClusteri)))
       metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
       listMetiersL7[[i]]=metiersClusteri
@@ -1311,20 +1331,18 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     metierByLogeventL7=unlist(sapply(clusters$clustering,function(x) listMetiersL7[[x]]))
 
 
-
     # Create csv tables
-    write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
+    write.table(clusterDesc2,file="descClusters.csv",col.names=NA,sep=";")
     
     dfClust=data.frame()
     dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
-      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA)
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA)  
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")  
     }
 
 
-    #LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters$clustering)
     LE_ID_clust=data.frame(LE_ID=LE_ID,clust=metierByLogeventL7)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
@@ -1334,7 +1352,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     summaryClusters=summaryClusters, testValues=resval, 
     testValuesSpecies=target$tabnomespcib, percLogevents=percLogevents,
     descClusters=clusterDesc2, tabClusters=tabClusters,
-    targetSpecies=listTargetSpeciesByCluster))
+    targetSpecies=targetSpeciesByCluster))
 
   } else
 
@@ -1435,17 +1453,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     savePlot(filename=paste(analysisName,'projections_2_3_CLARA',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
-    # Mean profile of the dataset
+    # Catch profile of the dataset
     meanprofile=colMeans(datSpecies)
-    png(paste(analysisName,"Mean profile of the dataset.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Catch profile of the dataset.png",sep="_"), width = 1200, height = 800)
     op <- par(las=2)
-    barplot(meanprofile, main="Mean profile of the dataset", xlab="Species", ylab="Percentage of catch")
+    barplot(meanprofile, main="Catch profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
     mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     dev.off()
 
 
-    # Mean profile by cluster
+    # Catch profile by cluster
     nbSpec=ncol(datSpecies)
     summaryClusters=array(0,dim=c(6,nbSpec,nbClust))
     dimnames(summaryClusters)[[1]]=c("Min.","1st Qu.","Median", "Mean", "3rd Qu.", "Max.")
@@ -1471,7 +1489,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       nameSpPlot=rbind(nameSpPlot,nameSpPloti)
     }
     # plot
-    png(paste(analysisName,"Mean profile by cluster.png",sep="_"), width = 1200, height = 800)
+    png(paste(analysisName,"Catch profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
       op2 <- par(las=2)
@@ -1480,7 +1498,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
-    title(main=paste("Mean profile by cluster","\n","\n",sep=""))
+    title(main=paste("Catch profile by cluster","\n","\n",sep=""))
     dev.off()
 
     # for a paper
@@ -1633,28 +1651,35 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     
     
     # Target Species
-    # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
-    seuilCatch=75
+    # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
+    #                                                   - Test-value > thresholdTestValue
+    #                                                   - % Logevents > thresholdLogevents 
+    thresholdCatch=75
+    thresholdTestValue=50
+    thresholdLogevents=50
     
-    targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
-    for(i in 1:nbClust){
+    sppCumCatch=list()
+    sppTestValue=list()
+    sppLogevents=list()
+    targetSpeciesByCluster=list()
+    
+    for (i in 1:nbClust){
       percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
-      nbSpSel=length(which(percCatchCum<seuilCatch))+1
-      targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
+      nbSpSel=length(which(percCatchCum<thresholdCatch))+1
+      sppCumCatch[[i]]=tabClusters[1:nbSpSel,"FAO",i]
+      
+      sppTestValue[[i]]=tabClusters[which(as.numeric(tabClusters[,"Test-value",i])>thresholdTestValue),"FAO",i]
+      
+      sppLogevents[[i]]=tabClusters[which(as.numeric(tabClusters[,"% Logevents",i])>thresholdLogevents),"FAO",i]
+    
+      targetSpeciesByCluster[[i]]=intersect(sppCumCatch[[i]],sppTestValue[[i]])
+      targetSpeciesByCluster[[i]]=intersect(targetSpeciesByCluster[[i]],sppLogevents[[i]])
     }
-    
-    # Maximum number of species in the table
-    maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
-    targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
-    
-    # List of target species by cluster
-    listTargetSpeciesByCluster=list()
-    for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
-  
+
     # List of metiers (level 7)
     listMetiersL7=list()
     for (i in 1:nbClust){
-      metiersClusteri=listTargetSpeciesByCluster[[i]]
+      metiersClusteri=targetSpeciesByCluster[[i]]
       metiersClusteri=as.character(unique(unlist(metiersClusteri)))
       metiersClusteri=paste(unlist(strsplit(metiersClusteri," ")),collapse=" ")
       listMetiersL7[[i]]=metiersClusteri
@@ -1666,18 +1691,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Create csv tables
-    write.table(clusterDesc2,file="descClusters.csv",col.names=NA)
+    write.table(clusterDesc2,file="descClusters.csv",col.names=NA,sep=";")
     
     dfClust=data.frame()
     dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
-      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA)
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA)  
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")  
     }     
 
 
-    #LE_ID_clust=data.frame(LE_ID=LE_ID,clust=clusters$clustering)
     LE_ID_clust=data.frame(LE_ID=LE_ID,clust=metierByLogeventL7)
     print(" --- end of step 3 ---")
     print(Sys.time()-t1)
@@ -1687,7 +1711,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     summaryClusters=summaryClusters, testValues=resval, 
     testValuesSpecies=target$tabnomespcib, percLogevents=percLogevents, 
     descClusters=clusterDesc2, tabClusters=tabClusters,
-    targetSpecies=listTargetSpeciesByCluster))                                   
+    targetSpecies=targetSpeciesByCluster))                                   
 
   }  else stop("methMetier must be hac, kmeans, pam or clara")
   # end of the methods
