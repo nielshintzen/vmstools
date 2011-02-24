@@ -1,5 +1,5 @@
 intervalTacsat <- function(tacsat,level="trip"){
-                    tacsat$SI_DATIM  <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME,sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M:%S")
+                    if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM  <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
                     if(level=="trip"){
                       if(is.null(tacsat$FT_REF)==T) stop("no tripnumber available to merge on trip level")
                       sptacsat      <- split(tacsat,tacsat$VE_REF)
