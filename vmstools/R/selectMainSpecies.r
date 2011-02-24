@@ -19,8 +19,6 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
     propdat=transformation_proportion(dat[,2:p])
     nameSpecies=colnames(propdat)
-    #Store(dat)
-    
     nbAllSpecies=ncol(propdat)
     
     t1=Sys.time()           
@@ -36,7 +34,9 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       print("cluster...")
       cah_var=hcluster(table_var, method="euclidean", link="ward")
   
-  
+      Store(objects())
+      gc(reset=TRUE)
+
       # Select the number of clusters by scree-test
       inerties.vector=cah_var$height[order(cah_var$height,decreasing=T)]
       nb.finalclusters=which(scree(inerties.vector)[,"epsilon"]<0)[1]
@@ -108,9 +108,13 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
         medianPourcentCatchMainSpeciesHAC=median(pourcentCatchMainSpeciesHAC)
       }
 
+      Store(objects())
+      gc(reset=TRUE)
+      
   print(Sys.time()-t1)
 
   }else{ namesMainSpeciesHAC=NA; nbMainSpeciesHAC=as.numeric(NA); medianPourcentCatchMainSpeciesHAC=as.numeric(NA); propNbMainSpeciesHAC=NA }
+ 
  
     # TOTALE
     
@@ -162,6 +166,9 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     
     if (DiagFlag) medianPourcentCatchMainSpeciesTotal=c(0,medianPourcentCatchMainSpeciesTotal)
 
+    Store(objects())
+    gc(reset=TRUE)
+      
     print(Sys.time()-t1)
 
 
