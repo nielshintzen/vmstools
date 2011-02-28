@@ -65,7 +65,7 @@ mergeEflalo2Pings(eflalo, tacsat, general = general, ...)
 }
   \item{tacsat}{data.frame, tacsat format
 }
-  \item{general}{list, general settings to go through all sub-functions
+  \item{general}{list, general settings to go through all sub-functions e.g. detect.fishing
 }
   \item{vessels}{(optional) name of the vessel(s) to process e.g. those in tacsat 
 }
@@ -150,16 +150,16 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
 
 
   # TEST FOR A GIVEN SET OF VESSELS
-  # (if detectFishing is true then do also detection of fishing activity 
+  # (if detect.fishing is true then do also detection of fishing activity 
   # e.g. if speed='segment' the segmentTacsatSpeed() automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("35", "1518"),
                      general=list(output.path=file.path("C:","output"),
-                     visual.check=TRUE, detectFishing=TRUE, speed="segment"))
+                     visual.check=TRUE, detect.fishing=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
                      general=list(output.path=file.path("C:","output"),
-                     visual.check=TRUE, detectFishing=TRUE, speed="segment"))
+                     visual.check=TRUE, detect.fishing=TRUE, speed="segment"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
