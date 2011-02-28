@@ -962,7 +962,7 @@ return()
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("35", "1518"),
                                  general=list(output.path=file.path("C:","output"),
                                     visual.check=TRUE,
-                                        detectFishing=TRUE, speed="segment"))
+                                        detect.fishing=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
                                    general=list(output.path=file.path("C:","output"),
