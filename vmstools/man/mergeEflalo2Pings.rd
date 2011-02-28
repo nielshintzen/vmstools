@@ -153,7 +153,7 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
   # (if detectFishing is true then do also detection of fishing activity 
   # e.g. if speed='segment' the segmentTacsatSpeed() automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
-  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("35", "1518"),
                      general=list(output.path=file.path("C:","output"),
                      visual.check=TRUE, detectFishing=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo
