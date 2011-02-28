@@ -121,7 +121,7 @@ mergeEflalo2Pings <-
       #!#!##!#!##!#!##!#!##!#!##!#!#
       all.vesselid     <- as.character(unique(eflalo[anf(eflalo$VE_LEN)>=0,]$VE_REF))
       all.vesselid     <- all.vesselid[!is.na(all.vesselid)] # e.g. when VE_LEN at NA exists
-      if(length(lstargs$a.vesselid)!=0) all.vesselid <- lstargs$a.vesselid
+      if(length(lstargs$vessels)!=0) all.vesselid <- lstargs$vessels
        # => IF ARG INFORMED, THEN KEEP ONLY ONE OR SEVERAL VESSELS AS NEEDED....
 
       for(a.vesselid in all.vesselid){  # PER VESSEL
