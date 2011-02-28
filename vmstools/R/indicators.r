@@ -89,7 +89,7 @@ indicators <- function    ( indicatorNum=5,             # indicator 5, 6 or 7
   if (indicatorNum==5 | indicatorNum==6)
     {
     # commons for DCF 5 and 6
-    if (!"SI_DATIM" %in% colnames(tacsat)) {tacsat$SI_DATIM  <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME,sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M:%S")}
+    if (!"SI_DATIM" %in% colnames(tacsat)) {tacsat$SI_DATIM  <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME,sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M")}
     ltMonth<-unique(as.numeric(format(tacsat$SI_DATIM, format="%m")))
     ltMonth<-sort(ltMonth)
     tableResultDCF=data.frame(month=ltMonth, DCF=rep(0, length(ltMonth)))
