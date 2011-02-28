@@ -959,7 +959,7 @@ return()
   # TEST FOR A GIVEN SET OF VESSELS
   # (if detectFishing is at true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
-  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("35", "1518"),
                                  general=list(output.path=file.path("C:","output"),
                                     visual.check=TRUE,
                                         detectFishing=TRUE, speed="segment"))
