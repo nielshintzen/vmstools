@@ -44,7 +44,7 @@
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeEflalo2Pings <-
            function(eflalo, tacsat, general=list(output.path=file.path("C:"),
-                     visual.check=TRUE, do.wp3=FALSE, speed="segment", conserve.all=TRUE), ...){
+                     visual.check=TRUE, detectFishing=FALSE, speed="segment", conserve.all=TRUE), ...){
 
   lstargs <- list(...)
 
@@ -227,7 +227,7 @@ mergeEflalo2Pings <-
 
         if(a.flag==FALSE) {  # i.e. vms-equipped
 
-           if(all(is.na(vms.this.vessel$SI_STATE)) && general$do.wp3==FALSE)
+           if(all(is.na(vms.this.vessel$SI_STATE)) && general$detectFishing==FALSE)
                   stop('the SI_STATE column has to be informed before making the merging')
            if(all(is.na(logbk.this.vessel$VE_FLT)))
                   stop('the VE_FLT column has to be informed before making the merging')
@@ -240,7 +240,7 @@ mergeEflalo2Pings <-
          #!  DO THE LINK - APPROACH 1 #!#!!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!!#!#!#!#!#!#!#!!#!#!#!#!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-NIELS <- FALSE
+       NIELS <- FALSE
        if(NIELS){
            eftim <- .logbk[which(duplicated(.logbk$FT_REF)==F),c("LE_DTIME","LE_LTIME","FT_REF")]
            dtime <- eftim[,1]
@@ -337,7 +337,7 @@ NIELS <- FALSE
             windows(width=8, height=4)
             ltrunk <- (nrow(table.midtime)/5)
             idxtrunk <-  (trunk+(trunk-1)*ltrunk):(trunk*ltrunk)
-        #    plot(table.midtime$SI_DTIME[idxtrunk],rep(1,length(table.midtime$SI_DTIME[idxtrunk])),
+             # plot(table.midtime$SI_DTIME[idxtrunk],rep(1,length(table.midtime$SI_DTIME[idxtrunk])),
              plot(table.midtime$SI_DTIME, rep(1,length(table.midtime$SI_DTIME)),
                  ylim=c(0,0.52), type="n", ylab="", axes=FALSE)
             r <- as.POSIXct(round(range(table.midtime$SI_DTIME), "days"))
@@ -498,7 +498,7 @@ NIELS <- FALSE
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # ASSIGN FISHING/NON-FISHING (optional)!#!#!#!#!#
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
-         if(general$do.wp3 && general$speed=="segment") {
+         if(general$detectFishing && general$speed=="segment") {
              ## add a gear form tacsat from the logbook info (after the first merging)
              ## because the assignement of a state is gear-specific.
              ## caution here: we assume only one gear used inside a trip...
@@ -523,9 +523,9 @@ NIELS <- FALSE
             .vms <- .vms[, !colnames(.vms) %in% "LE_GEAR"] # remove after use to avoid future conflict.
          }
          # some alternatives TO DO:
-         #if(general$do.wp3 && general$speed=="lookuptable")
+         #if(general$detectFishing && general$speed=="lookuptable")
          #   .vms <- lookupSpeedTacsat (tacsat=.vms, vessels=a.vesselid)
-         #if(general$do.wp3 && general$speed=="bayesian")
+         #if(general$detectFishing && general$speed=="bayesian")
          #   .vms <- bayesianFiltering (tacsat=.vms, vessels=a.vesselid)
 
 
@@ -957,17 +957,17 @@ return()
 
 
   # TEST FOR A GIVEN SET OF VESSELS
-  # (if do.wp3 is at true then do also the automatic detection of fishing states
+  # (if detectFishing is at true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
                                  general=list(output.path=file.path("C:","output"),
                                     visual.check=TRUE,
-                                        do.wp3=TRUE, speed="segment"))
+                                        detectFishing=TRUE, speed="segment"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
                                    general=list(output.path=file.path("C:","output"),
                                       visual.check=TRUE,
-                                         do.wp3=FALSE, speed="segment"))
+                                         detectFishing=FALSE, speed="segment"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
