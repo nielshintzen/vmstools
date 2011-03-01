@@ -153,29 +153,6 @@ compareToOrdination=function(dat, Step2, clusters, targetSpecies){
   # LEVELS 7 AND 5 FOR METIERS FROM MULTIVARIATE CLASSIFICATION #
   ###############################################################
 
-#  Les espèces cibles sont maintenant directement calculees dans getMetierClusters.
-#  
-#  # We are taking all species in the tabClusters until having at least seuilCatch% of cumulated "% Catch".
-#  seuilCatch=75
-#  
-#  targetSpeciesByCluster=matrix(NA,nrow=nbClust,ncol=10)
-#  for(i in 1:nbClust){
-#    percCatchCum=cumsum(as.numeric(tabClusters[,"% Catch",i]))
-#    nbSpSel=length(which(percCatchCum<seuilCatch))+1
-#    targetSpeciesByCluster[i,1:nbSpSel]=tabClusters[1:nbSpSel,"FAO",i]
-#  }
-#  
-#  # Maximum number of species in the table
-#  maxColNomEspSelByCluster=max(unlist(lapply((apply(!is.na(targetSpeciesByCluster),1,which)),length)))
-#  targetSpeciesByCluster=targetSpeciesByCluster[,1:maxColNomEspSelByCluster]
-#  
-#  # List of selected species names by cluster (= List of metiers level 7)
-#  listTargetSpeciesByCluster=list()
-#  for(cl in 1:nbClust) listTargetSpeciesByCluster[[cl]]=unlist(targetSpeciesByCluster[cl,which(!is.na(targetSpeciesByCluster[cl,]))])
-#
-#  targetSpecies (passé en paramètre) = listTargetSpeciesByCluster
-
-  
   # List of metiers (level 5.7)
   listMetiersLevel57=list()
   for (i in 1:nbClust){
@@ -199,11 +176,6 @@ compareToOrdination=function(dat, Step2, clusters, targetSpecies){
   mixedMetiersClustersL5=unlist(sapply(clusters,function(x) listMixedMetiersLevel57[x]))
 
   
-  ## Changement dans la définition des espèces cibles (niveau 7) : on ne prend plus les espèces les plus capturées dans la classe
-  ## jusqu'à avoir au moins 75% de la capture totale de la classe
-  ## on prend maintenant les espèces présentes dans le tableau de synthèse de la classe jusqu'à avoir un %Catch cumulé au moins 
-  ## égal à 75% 
-  ## (Rappel : %Catch d'une espèce = la moyenne des pourcentages de capture de cette espèce pour tous les logevents de la classe)
 
 
   
