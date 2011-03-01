@@ -8,7 +8,7 @@
 getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara",param1="euclidean",param2=NULL){
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
-  data(correspLevel7to5)
+  #data(correspLevel7to5)
 
   LE_ID  <- rownames(datSpecies)
   nbSpec <- dim(datSpecies)[2]
@@ -345,7 +345,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mainSpecies=colnames(datSpecies)
     percLogevents=matrix(0,ncol=length(mainSpecies),nrow=nbClust,dimnames=list(paste("Cluster ",1:nbClust,sep=""),mainSpecies))
     for(i in 1:nbClust){
-      percLogevents[i,]=round(sapply(mainSpecies,function(x) (sizeClusters[i]-length(which(Step1[clusters==i,x]==0)))/sizeClusters[i]*100),digits=1)
+      percLogevents[i,]=round(sapply(mainSpecies,function(x) (sizeClusters[i]-length(which(datSpecies[clusters==i,x]==0)))/sizeClusters[i]*100),digits=1)
     }
     
 
@@ -691,7 +691,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mainSpecies=colnames(datSpecies)
     percLogevents=matrix(0,ncol=length(mainSpecies),nrow=nbClust,dimnames=list(paste("Cluster ",1:nbClust,sep=""),mainSpecies))
     for(i in 1:nbClust){
-      percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$size[i]-length(which(Step1[clusters$cluster==i,x]==0)))/clusters$size[i]*100),digits=1)
+      percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$size[i]-length(which(datSpecies[clusters$cluster==i,x]==0)))/clusters$size[i]*100),digits=1)
     }
     
 
@@ -1038,7 +1038,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mainSpecies=colnames(datSpecies)
     percLogevents=matrix(0,ncol=length(mainSpecies),nrow=nbClust,dimnames=list(paste("Cluster ",1:nbClust,sep=""),mainSpecies))
     for(i in 1:nbClust){
-      percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$clusinfo[i,1]-length(which(Step1[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)
+      percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$clusinfo[i,1]-length(which(datSpecies[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)
     }
     
 
@@ -1383,7 +1383,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mainSpecies=colnames(datSpecies)
     percLogevents=matrix(0,ncol=length(mainSpecies),nrow=nbClust,dimnames=list(paste("Cluster ",1:nbClust,sep=""),mainSpecies))
     for(i in 1:nbClust){
-      percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$clusinfo[i,1]-length(which(Step1[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)
+      percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$clusinfo[i,1]-length(which(datSpecies[clusters$clustering==i,x]==0)))/clusters$clusinfo[i,1]*100),digits=1)
     }
     
     
