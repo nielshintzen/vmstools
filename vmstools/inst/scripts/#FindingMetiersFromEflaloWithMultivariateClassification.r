@@ -52,10 +52,10 @@ Gear <- c("OTB")
 
 analysisName=paste(country,"_",Gear,year,"_",AreaCodename,sep="")
 
-dat=read.table(file="EFLALO_2008_DRB_EURO_NA.txt", sep=";",header = TRUE, quote="\"", dec=".")
-
-test=getEflaloMetierLevel7(dat,analysisName,path,critData="EURO",runHACinSpeciesSelection=TRUE,paramTotal=95,paramLogevent=100,critPca="PCA_70",algoClust="CLARA")
-
+#dat=read.table(file="EFLALO_2008_DRB_EURO_NA.txt", sep=";",header = TRUE, quote="\"", dec=".")
+#
+#test=getEflaloMetierLevel7(dat,analysisName,path,critData="EURO",runHACinSpeciesSelection=TRUE,paramTotal=95,paramLogevent=100,critPca="PCA_70",algoClust="CLARA")
+#
 # load your own dataset (called dat1 here)
 load("All_eflalo_2007OTB3a4.Rdata")
 
@@ -100,7 +100,7 @@ Step1=extractTableMainSpecies(dat1,explo$namesMainSpeciesHAC,paramTotal=95,param
 
 save(explo,Step1,file="Explo_Step1.Rdata")
 
-load("Explo_Step1.Rdata")
+#load("Explo_Step1.Rdata")
 
 #-----------------------------
 # III. STEP 2 - PCA - NO-PCA
@@ -122,7 +122,7 @@ if (option_step2=="PCA_SC") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="
 if (option_step2=="NO_PCA") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="nopca",criterion=NULL)    
 
 save(Step2,file="Step2.Rdata")
-
+                                      
 #load("Step2.Rdata")
 
 #-----------------------------
@@ -175,7 +175,7 @@ eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
 
 # load previous R objects (Step1,Step2,Step3)
 setwd(paste(path,analysisName,sep="/"))
-load("dat_cleaned.Rdata")
+load("dat1_2007.Rdata")
 load("Explo_Step1.Rdata")
 option_step2="PCA_70"
 setwd(paste(path,analysisName,option_step2,sep="/"))
@@ -187,7 +187,7 @@ compOrdin="CompOrdin"
 if (!file.exists(compOrdin)) dir.create(compOrdin)
 setwd(paste(path,analysisName,option_step2,option_step3,compOrdin,sep="/"))
 if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)  
-compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=Step3$clusters$clustering,targetSpecies=Step3$targetSpecies)
+compMetiers=compareToOrdination(dat=dat1,Step2=Step2,clusters=Step3$clusters$clustering,targetSpecies=Step3$targetSpecies)
 save(compMetiers,file="compMetiers.Rdata")
 
 
@@ -221,7 +221,8 @@ new_AreaCodename <- "3a4"
 new_Gear <- c("OTB")
 newAnalysisName=paste(new_country,"_",new_Gear,new_year,"_",new_AreaCodename,sep="")
 #load("All_eflalo_2008OTB3a4.Rdata")
-load(paste(newAnalysisName,"dat1_2008.Rdata",sep="/"))
+setwd(paste(path,newAnalysisName,sep="/"))
+load("dat1_2008.Rdata")
 
 # if dat1 is ready, use :
     datPred=dat1
