@@ -7,12 +7,6 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
     p=ncol(dat)   # Number of species
     n=nrow(dat)
-    
-    # Delete logevents without catch  - THIS SHOULD BE DONE OUTSIDE 
-    #logWithoutCatch=which(apply(dat[,2:p],1,sum)==0)
-    #logWithCatch=setdiff(1:n,logWithoutCatch)
-    #dat=dat[logWithCatch,]
-    #n=nrow(dat)
       
     # Transform quantities to proportions of total quantity caught by logevent
     print("calculating proportions...") 
@@ -25,7 +19,8 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
     if (RunHAC == TRUE) {
 
-      # HAC
+      # METHOD : 'HAC'
+      
       print("######## SPECIES EXPLORATION METHOD 1: HAC ########")
       # Transposing data
       table_var=table_variables(propdat)
@@ -41,7 +36,6 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       inerties.vector=cah_var$height[order(cah_var$height,decreasing=T)]
       nb.finalclusters=which(scree(inerties.vector)[,"epsilon"]<0)[1]
   
-  
       # Dendogram cutting at the selected level
       cah_cluster_var=cutree(cah_var,k=nb.finalclusters)
   
@@ -56,20 +50,20 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
   
       fait=FALSE
       nb_cut=1
-      while (( fait == FALSE) && (nb_cut < (p-nb.finalclusters))) {
+      while ((fait == FALSE) && (nb_cut < (p-nb.finalclusters))) {
         # cutting below
-        print(paste("-----------   nb_cut =",nb_cut))
+        print(paste("----------- nb_cut =",nb_cut))
         cah_cluster_var_step=cutree(cah_var,k=(nb.finalclusters+nb_cut))
         # testing residual species
         print(paste("------------- Residual species cluster(s) ",unique(cah_cluster_var_step[namesResidualSpecies])))
         if (length(unique(cah_cluster_var_step[namesResidualSpecies]))==1) {
           print(paste("-------------  No residual cut -----"))
-          nb_cut = nb_cut+1 #cutting below
+          nb_cut = nb_cut+1 # cutting below
         }else{
           print("-------------  Residual cut -----")
           nbSpeciesClusters=table(cah_cluster_var_step[namesResidualSpecies])
-          #testing if a species is alone in a group
-          if (sort(nbSpeciesClusters)[1]>1) { #if not alone
+          # testing if a species is alone in a group
+          if (sort(nbSpeciesClusters)[1]>1) { # if not alone
             print("------- I stop and have a beer ------")
             fait = TRUE # then I stop
           }else{
@@ -90,12 +84,10 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       title(main="HAC dendogram - Step",xlab="Species",ylab="Height")
       rect.hclust(cah_var, k=(nb.finalclusters+nb_cut))
       dev.off()
-         
-         
+            
       # Selection of main species
       nomespsel=setdiff(nameSpecies,namesResidualSpecies)
       cat("main species : ",nomespsel,"\n")
-  
   
       # Return the dataset retaining only the main species
       nbMainSpeciesHAC=length(nomespsel)
@@ -116,7 +108,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
   }else{ namesMainSpeciesHAC=NA; nbMainSpeciesHAC=as.numeric(NA); medianPourcentCatchMainSpeciesHAC=as.numeric(NA); propNbMainSpeciesHAC=NA }
  
  
-    # TOTALE
+    # METHOD : 'TOTALE'
     
     print("######## SPECIES EXPLORATION METHOD 2: 'TOTAL' ########")
     
@@ -135,7 +127,6 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     propesp=cumsum(propesp[order(propesp,decreasing=T)])
 
     # We are taking all species until having at least seuil% of total catch
-
     nbMainSpeciesTotal=numeric()
     medianPourcentCatchMainSpeciesTotal=numeric()
 
@@ -145,7 +136,6 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       # We are taking the name of selected species
       espsel=numesp[1:(length(pourcent)+1)]
       nomespsel=nameSpecies[espsel]
-#      nomespsel=names(pourcent)
       nbMainSpeciesTotal[seuil/5]=length(nomespsel)
 
       if(DiagFlag==TRUE) {
@@ -173,7 +163,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
 
 
-    # LOGEVENT
+    # METHOD : 'LOGEVENT'
     
     print("######## SPECIES EXPLORATION METHOD 3: 'LOGEVENT' ########")
     
@@ -183,6 +173,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     for(seuil in seq(5,100,5)){
       cat("seuil:",seuil,"\n")
       nomespsel=character()
+      # We are taking all species with a % of catch >= seuil% for at least one logevent
       for (i in nameSpecies) if (!is.na(any(propdat[,i]>=seuil)) && any(propdat[,i]>=seuil)) nomespsel <- c(nomespsel,i)
       nbMainSpeciesLogevent[seuil/5]=length(nomespsel)
    
@@ -206,26 +197,18 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
     print(Sys.time()-t1)
 
-   # GRAPHICS
-    # Number of main species
-    #png(paste(analysisName,"Number of main species.png",sep="_"), width = 1200, height = 800)
-    #plot(seq(0,100,5),nbMainSpeciesTotal,type='l',col="blue",lwd=2, main="Number of main species selected depending of the threshold", xlab="Threshold (%)",ylab="Number of species")
-    #lines(seq(0,100,5),nbMainSpeciesLogevent,col="green",lwd=2)
-    #if(!is.na(nbMainSpeciesHAC)) abline(nbMainSpeciesHAC,0, col="red",lwd=2)
-    #mtext(paste(p-1," Species"),col='darkblue')
-    #legend(70, p*0.9, c( "HAC", "Total", "Logevent"),lwd=2,col=c("red", "blue", "green"))
-    #dev.off()
+    # GRAPHICS
 
-    # Number of main species (rendering slightly improved)
+    # Number of main species
     X11(5,5)
     plot(seq(0,100,5),nbMainSpeciesTotal,type='l',col="blue",lwd=3, axes=FALSE, xlab="Threshold (%)",ylab="Number of species")
     lines(seq(0,100,5),nbMainSpeciesLogevent,col="green",lwd=3)
-    if(!is.na(nbMainSpeciesHAC)) segments(0,nbMainSpeciesHAC,100,nbMainSpeciesHAC, col="red",lwd=3)
+    if(!is.na(nbMainSpeciesHAC)) segments(0,nbMainSpeciesHAC,100,nbMainSpeciesHAC,col="red",lwd=3)
     axis(1)
     axis(2, las=2)
     box()
     legend(20, p*0.9, c( "HAC", "PerTotal", "PerLogevent"),lwd=3,col=c("red", "blue", "green"),bty="n")
-    savePlot(filename = paste(analysisName, "Number of main species.wmf",sep="_"),type ="wmf")
+    savePlot(filename = paste(analysisName,'Number of main species',sep="_"),type ="png")
     dev.off()
 
     # Median percentage of catch represented by main species by logevent
