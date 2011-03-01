@@ -9,13 +9,11 @@
 extractTableMainSpecies = function(dat,namesMainSpeciesHAC,paramTotal=95,paramLogevent=100){
 
     print("######## STEP 1 COMBINATION OF MAIN SPECIES FROM THE THREE EXPLORATORY METHODS ########")
-
     t1 <- Sys.time()
 
     # TOTALE
     
     p=ncol(dat)   # Number of species +1
-
     print("Calculating proportions...")
     propdat=transformation_proportion(dat[,2:p])
     namesSpecies=colnames(propdat)
@@ -51,8 +49,6 @@ extractTableMainSpecies = function(dat,namesMainSpeciesHAC,paramTotal=95,paramLo
 
     threshold=paramLogevent
     # Selection of species making up over param1% of logevent's captures
-#    pourcent <- apply(propdat,1,function(x) which(x>=threshold))
-#    namesSelSpeciesLogevent <- names(propdat)[unique(unlist(pourcent))]
     namesSelSpeciesLogevent=character()
     for (i in namesSpecies) {
        if (!is.na(any(propdat[,i]>=threshold)) && any(propdat[,i]>=threshold)) namesSelSpeciesLogevent=c(namesSelSpeciesLogevent,i)
