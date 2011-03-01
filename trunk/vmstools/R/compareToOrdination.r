@@ -87,7 +87,7 @@ compareToOrdination=function(dat, Step2, clusters, targetSpecies){
     mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
   }
   par(op)
-  title(main=paste("Number of logevents linked to each metier from the ordination method by cluster","\n","\n",sep=""))
+  title(main=paste("Number of logevents linked to each metier from the ordination method 'first species' by cluster","\n","\n",sep=""))
   dev.off()
   
   # Projections on the first factorial plans
