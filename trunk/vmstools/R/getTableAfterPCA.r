@@ -7,34 +7,37 @@
 
 
 getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion="70percents"){
-  #LE_ID <- datSpecies[,1]
+
   LE_ID <- rownames(datSpecies)
   NbSpecies <- dim(datSpecies)[2]
-  #datSpecies <- datSpecies[,-1]
   datSpecies <- as.matrix(datSpecies,ncol=NbSpecies,nrow=length(LE_ID))
-
 
   print("######## STEP 2 PCA/NO PCA ON CATCH PROFILES ########")
 
   t1 <- Sys.time()
-  print(paste(" --- selected method :",pcaYesNo, "---"))
+  print(paste("--- Selected method :",pcaYesNo, "---"))
 
 
   if(pcaYesNo=="pca"){
-    print("running PCA on all axes...")
+  
+    print("Running PCA on all axes...")
+    
     # PCA (Principal Component Analysis)
-    log.pca <- PCA(datSpecies, graph=FALSE, ncp=ncol(datSpecies))
+    log.pca = PCA(datSpecies, graph=FALSE, ncp=ncol(datSpecies))
+    
     X11(5,5)
     plot.PCA(log.pca, choix = "var", axes = 1:2, new.plot=FALSE, title="", lim.cos2.var = 0.1)
-    savePlot(filename=paste(analysisName,'species_projection_on_the_1_and_2_factorial_axis',sep="_"), type='wmf', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'species_projection_on_the_1_and_2_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+    
     X11(5,5)
     plot.PCA(log.pca, choix = "var", axes = 2:3, new.plot=FALSE, title="", lim.cos2.var = 0.1)
-    savePlot(filename=paste(analysisName,'species_projection_on_the_2_and_3_factorial_axis',sep="_"), type='wmf', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'species_projection_on_the_2_and_3_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+    
     X11(5,5)
     plot.PCA(log.pca, choix = "ind", axes = 1:2, habillage = "ind", title="", new.plot=FALSE, cex=1.1, label=FALSE)
-    savePlot(filename=paste(analysisName,'projection_of_individuals_on_the_first_two_factorial_axis',sep="_"), type='wmf', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projection_of_individuals_on_the_first_two_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
  
 
@@ -51,6 +54,7 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
       cat("--- percentage inertia explained:",log.pca$eig[nbaxes,3],"\n")
     } else stop("Criterion for PCA must be 70percents or screetest")
 
+
     # Eigenvalues and relative graphics
     log.pca$eig
 
@@ -65,38 +69,23 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     barplot(log.pca$eig[,2],names.arg=x, col=color, main="Percentage of Inertia of factorial axis", xlab="Axis", ylab="% of Inertia")
     dev.off()
    
-    #png(paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"), width = 1200, height = 800)
-    #color=rep("grey",length(log.pca$eig[,1]))
-    #if(criterion=="70percents") color[1:nbaxes]="green"
-    #barplot(log.pca$eig[,3],names.arg= x, col=color,  xlab="Axis", ylab="% of Inertia", axes=FALSE, cex.names=0.85)
-    #axis(2, las=2)
-    #abline(h=70, col="red")
-    #text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
-    #dev.off()
-
-    # rendering of the plot slightly improved
     X11(5,5)
     op <- par(no.readonly = TRUE) 
     par(mar=c(4,4,1,1))
     color=rep("grey",length(log.pca$eig[,1]))
     if(criterion=="70percents") color[1:nbaxes]="green"
-    barplot(log.pca$eig[,3], col=color, ylab="", xlab="",  axes=FALSE, cex.names=2)
+    barplot(log.pca$eig[,3], col=color, ylab="", xlab="", axes=FALSE, cex.names=2)
     axis(2,  las=2)
     abline(h=70, col="red")
     text(1,72, "70% of Inertia", col = "red", adj = c(0, -.1))
-     mtext("Axes", side=1, adj=0.5, outer=FALSE, line=+1, font=1, cex=1.5)
-     mtext("% of Inertia", side=2, adj=0.5, outer=FALSE, line=+2.5, font=1, cex=1.5)
-    savePlot(filename = paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"),type ="wmf")
+    mtext("Axes", side=1, adj=0.5, outer=FALSE, line=+1, font=1, cex=1.5)
+    mtext("% of Inertia", side=2, adj=0.5, outer=FALSE, line=+2.5, font=1, cex=1.5)
+    savePlot(filename = paste(analysisName,"Cumulative Percentage of Inertia.png",sep="_"),type ="png")
     par(op)
     dev.off()
    
 
-
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','param1','param2','pcaYesNo','methMetier','param3','param4'))])
-#    gc(reset=TRUE)
-
-
-    # Projection of variables Species on the first factorial axis
+    # Projection of variables "species" on the first factorial axis
     png(paste(analysisName,"Projection of Species on first factorial axis.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
     plot(log.pca,choix="var",axes = c(1, 2),new.plot=FALSE,lim.cos2.var = 0.3)
@@ -110,13 +99,11 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     dev.off()
 
 
-
     # PCA with the good number of axis
-    print("retaining Principal Components of selected axes...")
+    print("Retaining Principal Components of selected axes...")
     log.pca=log.pca$ind$coord[,1:nbaxes]
     datLog=round(log.pca,4)
 
-    #write.table(datLog, file="datLog_OTB2008euroNA_26_11_10.txt", quote=T, dec='.', sep=';', col.names=T, row.names=F)
 
   } else
 
