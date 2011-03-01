@@ -8,7 +8,7 @@
 getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara",param1="euclidean",param2=NULL){
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
-  #data(correspLevel7to5)
+  data(correspLevel7to5)
 
   LE_ID  <- rownames(datSpecies)
   nbSpec <- dim(datSpecies)[2]
