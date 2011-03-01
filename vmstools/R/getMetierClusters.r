@@ -9,10 +9,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
   #data(correspLevel7to5)
-  
-  #le_id <- datSpecies[,1]
-  #datSpecies <- datSpecies[,-1]
-  #datSpecies <- as.matrix(as.numeric(datSpecies[,-1]))
 
   LE_ID  <- rownames(datSpecies)
   nbSpec <- dim(datSpecies)[2]
@@ -35,7 +31,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mProfilSample=numeric()
     classifVarExplain=numeric()
 
-    #totaleVarPart=numeric()   #(used for the calcul of totale variance)
     nbLog=nrow(datLog)
     nbDim=ncol(datLog)
 
@@ -66,8 +61,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       # Cut the dendogram at the selected level
       sampleClusters=cutree(log.hac,k=nbClust)
 
-#      Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#      gc(reset=TRUE)
+      Store(objects())
+      gc(reset=TRUE)
 
       # Add the cluster to each logevent of the sample
       sampleDatLogWithClusters=cbind(sampleDatLog,sampleClusters)
@@ -122,12 +117,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       resval=test.values(sampleClusters,sampleDatSpecies)
       # Determine the target species
       target=targetspecies(resval)
-      #cat("target species:", target,"\n")
-      #print(target$tabnomespcib)
-
-
-#      Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#      gc(reset=TRUE)
 
 
       # Projections on the first factorial plans
@@ -179,7 +168,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
             function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
         }
       }
-      # Species names for mean profile plots
+      # Species names for catch profile plots
       nameSpPlot=character()
       catchMeanThreshold=2
       for(k in 1:nbClust){
@@ -265,8 +254,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
       dev.off()
 
-#      Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#      gc(reset=TRUE)
+      Store(objects())
+      gc(reset=TRUE)
 
     } # end of for(i in 1:5)
 
@@ -281,12 +270,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbLogSample=nrow(sampleDatLog)
     nbDim=ncol(sampleDatLog)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
 
     # HAC with the best sample
     print("Final HAC")
     log.hac=hcluster(sampleDatLog, method=param1, link=param2)
+
 
     # Determine the number of cluster thanks to the scree-test
     inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
@@ -296,8 +284,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     sampleClusters=cutree(log.hac,k=nbClust)
     sampleClusters=as.factor(sampleClusters)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
     sampleDatLogWithClusters=data.frame()
     sampleDatLogWithClusters=cbind(sampleDatLog,sampleClusters)
     sampleDatLogWithClusters=as.data.frame(sampleDatLogWithClusters)
@@ -310,8 +296,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     # Predict the cluster for the other logevent
     pred=predict(learning,otherLog)
-
-    #otherDatLogWithClusters=cbind(otherLog, result.lda$class)
     otherDatLogWithClusters=cbind(otherLog,pred$class)
     colnames(otherDatLogWithClusters)=colnames(sampleDatLogWithClusters)
 
@@ -320,9 +304,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusters[sam]=sampleClusters
     clusters[outofsam]=pred$class
     datLogWithClusters=cbind(datLog,clusters)
-
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
 
 
     # Within and between variance of clusters and classification
@@ -368,9 +349,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     }
     
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
-
     # Projections on the first factorial plans
     png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(2,3))
@@ -386,17 +364,19 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     dev.off()
 
-    # for a paper
+    # For a paper
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_1_2_HAC',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+    
     X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_2_3_HAC',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+
 
     # Rectangles plotting
     png(paste(analysisName,"Dendogram.png",sep="_"), width = 1200, height = 800)
@@ -431,7 +411,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
           function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
       }
     }
-    # Species names for mean profile plots
+    # Species names for catch profile plots
     nameSpPlot=character()
     catchMeanThreshold=2
     for(i in 1:nbClust){
@@ -482,10 +462,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
-
-
     # Number of Logevents by cluster
     x=c(1:nbClust)
     png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
@@ -524,7 +500,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
 
-    # Descriptive and summary tables of clusters
+    # Descriptive tables of the clusters
     clusterDesc=matrix(0,nrow=8,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
@@ -545,6 +521,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusterDesc2=as.data.frame(clusterDesc)
 
 
+    # Summary tables of the clusters
     namesSpecies=matrix(NA,nrow=nbClust,ncol=10)
     namesCapt=matrix(NA,nrow=nbClust,ncol=5)
     nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
@@ -681,8 +658,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     plot(varintra,main="Within clusters variance",xlab="Number of clusters",ylab="Within Variance")
     dev.off()
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
+    Store(objects())
+    gc(reset=TRUE)
 
     diffvarintra=diff(varintra,na.rm=T)
     diffdiffvar=diff(diffvarintra,na.rm=T)
@@ -704,7 +681,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     # Compute the test-values for species
     resval=test.values(clusters$cluster,datSpecies)
-    #Determine the target species
+    # Determine the target species
     target=targetspecies(resval)
     nbClust=length(clusters$size)
     rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
@@ -717,10 +694,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       percLogevents[i,]=round(sapply(mainSpecies,function(x) (clusters$size[i]-length(which(Step1[clusters$cluster==i,x]==0)))/clusters$size[i]*100),digits=1)
     }
     
-    
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
-
 
     # Projections on the first factorial plans
     png(paste(analysisName,"Projections.png",sep="_"), width = 1200, height = 800)
@@ -737,17 +710,19 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     dev.off()
 
-    # for a paper
+    # For a paper
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_1_2_Kmeans',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+    
     X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_2_3_Kmeans',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+
 
     # Catch profile of the dataset
     meanprofile=colMeans(datSpecies)
@@ -774,7 +749,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
           function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
       }
     }
-    # Species names for mean profile plots
+    # Species names for catch profile plots
     nameSpPlot=character()
     catchMeanThreshold=2
     for(i in 1:nbClust){
@@ -795,9 +770,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     title(main=paste("Catch profile by cluster","\n","\n",sep=""))
     dev.off()
-
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
 
 
     # Standard deviation profile by cluster
@@ -837,7 +809,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
 
-
     # Profile of test-values by cluster
     targetresval=numeric()
     nameTargetPlot=character()
@@ -867,7 +838,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
 
-    # Descriptive and summary tables of clusters
+    # Descriptive tables of the clusters
     clusterDesc=matrix(0,nrow=8,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
@@ -888,6 +859,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusterDesc2=as.data.frame(clusterDesc)
 
 
+    # Summary tables of the clusters
     namesSpecies=matrix(NA,nrow=nbClust,ncol=10)
     namesCapt=matrix(NA,nrow=nbClust,ncol=5)
     nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
@@ -1029,15 +1001,12 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     max=max(clustersPam.silcoeff, na.rm=T)
     k=which(clustersPam.silcoeff==max)
 
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
+    Store(objects())
+    gc(reset=TRUE)
 
     # PAM with optimal k
     clusters=pam(datLog,k)
     summary(clusters)
-
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
 
     # Quality of classification
     nbLog=nrow(datLog)
@@ -1088,18 +1057,21 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     dev.off()
 
-    # for a paper
+
+    # For a paper
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_1_2_PAM',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+    
     X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_2_3_PAM',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
+    
     # Catch profile of the dataset
     meanprofile=colMeans(datSpecies)
     png(paste(analysisName,"Catch profile of the dataset.png",sep="_"), width = 1200, height = 800)
@@ -1125,7 +1097,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
           function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
       }
     }
-    # Species names for mean profile plots
+    # Species names for catch profile plots
     nameSpPlot=character()
     catchMeanThreshold=2
     for(i in 1:nbClust){
@@ -1146,10 +1118,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     title(main=paste("Catch profile by cluster","\n","\n",sep=""))
     dev.off()
-
-
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
 
 
     # Standard deviation profile by cluster
@@ -1178,7 +1146,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
     dev.off()
-
 
 
     # Number of Logevents by cluster
@@ -1218,7 +1185,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
 
-    # Descriptive and summary tables of clusters
+    # Descriptive tables of the clusters
     clusterDesc=matrix(0,nrow=8,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
@@ -1239,6 +1206,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusterDesc2=as.data.frame(clusterDesc)
 
 
+    # Summary tables of the clusters
     namesSpecies=matrix(NA,nrow=nbClust,ncol=10)
     namesCapt=matrix(NA,nrow=nbClust,ncol=5)
     nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
@@ -1376,7 +1344,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     plot(clustersClara.silcoeff, main="Silhouette of the classification", xlab="Number of clusters", ylab="Silhouette")               # k optimal corresponds to maximum of silhouette's coefficients
     dev.off()
 
-    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
+    Store(objects())
     gc(reset=TRUE)
 
     cat("silcoeff",clustersClara.silcoeff,"\n")
@@ -1385,9 +1353,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # CLARA with optimal k
     clusters=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))  # CLARA with optimal k
     summary(clusters)
-
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
 
     # Quality of classification
     centerOfGravityClassif=numeric()
@@ -1404,10 +1369,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     classifQuality=classifWithinVar/classifBetweenVar
     withinVarClustersOnTot=(clusters$clusinfo[,1]*clusters$clusinfo[,3]/nbLog)*100/(classifWithinVar+classifBetweenVar)
     betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
-
-
-#    Store(objects()[-which(objects() %in% c('dat','methSpecies','pcaYesNo','methMetier','param1','param2'))])
-#    gc(reset=TRUE)
 
 
     # Compute the test-values for species
@@ -1441,17 +1402,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     par(op)
     dev.off()
 
-    # for a paper
+
+    # For a paper
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_1_2_CLARA',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+    
     X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_2_3_CLARA',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+
 
     # Catch profile of the dataset
     meanprofile=colMeans(datSpecies)
@@ -1478,7 +1442,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
           function(x) rbind(min(as.vector(x)),quantile(as.vector(x),0.25),quantile(as.vector(x),0.50),mean(as.vector(x)),quantile(as.vector(x),0.75),max(as.vector(x))))
       }
     }
-    # Species names for mean profile plots
+    # Species names for catch profile plots
     nameSpPlot=character()
     catchMeanThreshold=2
     for(i in 1:nbClust){
@@ -1488,7 +1452,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       nameSpPloti[numSpi]=namSpi
       nameSpPlot=rbind(nameSpPlot,nameSpPloti)
     }
-    # plot
+    # Plot
     png(paste(analysisName,"Catch profile by cluster.png",sep="_"), width = 1200, height = 800)
     op <- par(mfrow=c(ceiling(sqrt(nbClust)),round(sqrt(nbClust))))
     for(i in 1:nbClust){
@@ -1501,17 +1465,19 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     title(main=paste("Catch profile by cluster","\n","\n",sep=""))
     dev.off()
 
-    # for a paper
+
+    # For a paper : levelplot
     X11(5,10)
     mat <- t(summaryClusters["Mean",,])
-     rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
+    rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
                               "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
     sp <- apply(mat,2, sum)
     colnames(mat)[sp<10] <- ""
     cc <- colorRampPalette(c("antiquewhite", "deepskyblue4"),space = "rgb", interpolate="spline")
     print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100)))
-    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='wmf', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
+
 
     # Standard deviation profile by cluster
     sdprofil=matrix(0,nrow=nbClust,ncol=nbSpec)
@@ -1576,7 +1542,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
 
-    # Descriptive and summary tables of clusters
+    # Descriptive tables of the clusters
     clusterDesc=matrix(0,nrow=8,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
@@ -1597,6 +1563,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusterDesc2=as.data.frame(clusterDesc)
 
 
+    # Summary tables of the clusters
     namesSpecies=matrix(NA,nrow=nbClust,ncol=10)
     namesCapt=matrix(NA,nrow=nbClust,ncol=5)
     nbSpeciesCatch = min(5,dim(t(summaryClusters["Mean",,]))[[2]])
