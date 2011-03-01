@@ -32,10 +32,10 @@ source("predictMetier.r")
 source("getEflaloMetierLevel7.r")
 memory.limit(size=4000)
 
-# Load correspLevel7to5 (when the package will be compilated, the following lines will be to remove)
-# (data(correspLevel7to5) at the start of getEflaloMetierLevel7 will be enough)
-correspLevel7to5=read.table(file="ASFIS_sp_Feb_2010_DCF-Level5.txt", sep="\t",header = TRUE, quote="\"", dec=".")
-correspLevel7to5=correspLevel7to5[,c(1,3,4,5,6,12,13)]
+# Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
+load("correspLevel7to5.rda")
+# Load the table linking mixed metiers (composed by 2 simple metiers) to their official code of mixed metiers level 5 (FAO - 3 characters).
+load("correspMixedMetier.rda")
 
 path <- "C:/Nicolas/Scripts/R/Analyses/Donnees_completes"
 setwd(path)
