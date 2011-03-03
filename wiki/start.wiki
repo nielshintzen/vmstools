@@ -14,7 +14,7 @@ a suite of tools written in R for
 i) analysing and interpreting VMS raw data,
 
 
-ii) assign a metier level 7 (EU DCF) to each logbook declaration,
+ii) assign a metier level 7 (EU DCF) to each logbook declaration ((http://code.google.com/p/vmstools/wiki/metierLogbook),
 
  
 iii) coupling both information (http://code.google.com/p/vmstools/wiki/examples_coupling),
