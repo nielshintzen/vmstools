@@ -2,11 +2,12 @@
 
 = Introduction =
 
-WP2 goal was to investigate a range of multivariate statistical methods and to develop a tool selecting the most appropriate one for assigning one or several métier(s)(as defined in the Data Collection Framework regulation, DCF) to each logbook data.  A métier is a group of fishing operations targeting a similar (assemblage of) species, using similar gear types, during the same period of the year and/or within the same area and which are characterized by a similar exploitation pattern. In WP2, we thereby refer to a more precise target assemblage defined as the true species level by opposition to the DCF Level5 dealing with assemblage of species only (DCF Level7 suggested in EC 2008 as national strata). The tool developed incorporate to the vmstools library allows defining métiers at DCF Level7 and aggregating them into the DCF Level5.
+WP2 goal was to investigate a range of multivariate statistical methods and to develop a tool selecting the most appropriate one for assigning one métier (as defined in the Data Collection Framework regulation, DCF) to each logbook event. 
+This tool allows defining métiers at DCF Level7 and aggregates them into the DCF Level5.
 
 Logbooks data are the main source of data for getting information on the fishing activities. From logbooks data, information of EU level gear type (DCF Level4 e.g., Bottom Otter trawl OTB, Bottom pair trawl PTB) and selectivity feature of the gear are directly available. However, fishers do not declare which species they are actually targeting when fishing, and therefore the DCF Level5 and the more precise DCF Level7, expected to reflect the fishing intention, has to be inferred from the available data, and in particular the catch data.
 
-In WP2 a tool is developed that classifies trips (more precisely, logbook events defined in WP1) into métiers based on the species composition from the logbooks landings declaration. The detailed objectives in this WP were to:
+In WP2 a tool is developed that classifies trips (more precisely, logbook events defined in WP1) into métiers based on the species composition from the logbooks landings declaration.
 
 
 
