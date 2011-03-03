@@ -9,15 +9,15 @@ Logbooks data are the main source of data for getting information on the fishing
 The work consisted in designing several sequential steps to have a complete tool firstly allowing identifying métiers from logbooks raw data and then assigning a métier to a new dataset.
 These sequential steps aim at:
 
-i) Identifying the main species out of all species recorded and reducing the dataset to these key species only (Step 1). The species were first selected from the application of three different filtering methods provided that species which succeed in at least one were kept for the further analyses.
+i) Identifying the main species out of all species recorded and reducing the dataset to these key species only (Step 1). These key species were selected from the application of three different filtering methods.
 
 ii) Investigating the gain when running a PCA on the quality of the final classification (PCA is likely to discard potential irrelevant information) (Step 2).
 
-iii) Running a selection of clustering methods and settings to group similar logbook events (Step 3); including the following: a PCA analysis combined with clustering analysis using either HAC, or K-Means or CLARA algorithm. 
+iii) Running a selection of clustering methods (HAC, or K-Means or CLARA algorithm) and settings to group similar logbook events (Step 3).
 
-iv) Defining the characteristic species-based assemblage of the cluster (DCF Level7) and converting them to a corresponding DCF Level5 category (Step 4).
+iv) Defining the characteristic species-based assemblage of each cluster (DCF Level7) and converting them to a corresponding DCF Level5 category (Step 4).
 
-v) Comparing with simpler ordination method (Step5).
+v) Comparing with simpler ordination methods (Step5).
 
 vi) Predicting the classification of any new logbook event into the categories of defined métiers (Step 6). 
 
