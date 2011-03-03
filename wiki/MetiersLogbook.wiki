@@ -1,4 +1,4 @@
-#Assign one metier to each Logbook event.
+#Assign one metier to each logbook event.
 
 = Introduction =
 
