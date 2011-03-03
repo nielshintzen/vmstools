@@ -2,12 +2,13 @@
 
 = Introduction =
 
-WP2 goal was to investigate a range of multivariate statistical methods and to develop a tool selecting the most appropriate one for assigning one métier (as defined in the Data Collection Framework regulation, DCF) to each logbook event. 
-This tool allows defining métiers at DCF Level7 and aggregates them into the DCF Level5.
+WP2 goal was to investigate a range of multivariate statistical methods and to develop a tool selecting the most appropriate one for assigning one métier to each logbook event. This tool allows defining métiers at DCF Level7 and aggregates them into the DCF Level5.
 
-Logbooks data are the main source of data for getting information on the fishing activities. From logbooks data, information of EU level gear type (DCF Level4 e.g., Bottom Otter trawl OTB, Bottom pair trawl PTB) and selectivity feature of the gear are directly available. However, fishers do not declare which species they are actually targeting when fishing, and therefore the DCF Level5 and the more precise DCF Level7, expected to reflect the fishing intention, has to be inferred from the available data, and in particular the catch data.
+Logbooks data are the main source of data for getting information on the fishing activities. From logbooks data, information of EU level gear type and selectivity feature of the gear are directly available. However, fishers do not declare which species they are actually targeting when fishing, and therefore the DCF Level5 and the more precise DCF Level7, expected to reflect the fishing intention, has to be inferred from the available data, and in particular the catch data. Following, the ICES (2003) recommendation, analyses have been performed on landings composition expressed in cash value as this may reflect more accurately the actual targeting choices of the fishermen.
 
-In WP2 a tool is developed that classifies trips (more precisely, logbook events defined in WP1) into métiers based on the species composition from the logbooks landings declaration.
+The work consisted in designing several sequential steps to have a complete tool firstly allowing identifying métiers from logbooks raw data and then assigning a métier to a new dataset.
+These sequential steps aim at:
+
 
 
 
