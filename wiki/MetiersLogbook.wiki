@@ -31,9 +31,12 @@ vi) Predicting the classification of any new logbook event into the categories o
   data(correspLevel7to5)
   data(correspMixedMetier)
 
+  # working directory
+  path="C:/metier_analysis"
+  setwd(path)
+
   # format
   eflalo=formatEflalo(eflalo)
-
   eflalo=eflalo[eflalo$LE_GEAR=="OTB",]
   # note that output plots will be sent to getwd()
   analysisName="metier_analysis_OTB"
