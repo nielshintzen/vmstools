@@ -194,6 +194,8 @@ vi) Predicting the classification of any new logbook event into the categories o
   null.value <- c(null.value,which(apply(datPred[,2:ncol(datPred)],1,sum,na.rm=T)==0))
     
   if(length(null.value)!=0) {LogEvent.removed <- datPred[sort(unique(null.value)),] ; datPred <- datPred[-sort(unique(null.value)),]} 
+  
+  # Rename species names
   names(datPred)[-1]=unlist(lapply(strsplit(names(datPred[,-1]),"_"),function(x) x[[3]]))
     
   # Removing miscellaneous species
