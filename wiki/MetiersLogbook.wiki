@@ -27,16 +27,16 @@ vi) Predicting the classification of any new logbook event into the categories o
 
 {{{
 
-data(eflalo)
-data(correspLevel7to5)
-data(correspMixedMetier)
+  data(eflalo)
+  data(correspLevel7to5)
+  data(correspMixedMetier)
 
-# format
-eflalo=formatEflalo(eflalo)
+  # format
+  eflalo=formatEflalo(eflalo)
 
-eflalo=eflalo[eflalo$LE_GEAR=="OTB",]
-# note that output plots will be sent to getwd()
-analysisName="metier_analysis_OTB"
+  eflalo=eflalo[eflalo$LE_GEAR=="OTB",]
+  # note that output plots will be sent to getwd()
+  analysisName="metier_analysis_OTB"
 
   #-------------------------------------------------------------------------
   # I. GETTING THE DATA IN AND CLEANING FOR MISSING AND NEGATIVE VALUES ETC
