@@ -17,7 +17,9 @@ iii) Running a selection of clustering methods (HAC or K-Means or CLARA algorith
 
 iv) Converting them to a corresponding DCF Level5 category and comparing with simpler ordination methods (Step 4).
 
-v) Predicting the classification of any new logbook event into the categories of defined métiers (Step 5). 
+v) Returning a complete Eflalo dataset including the métier linked to each logbook event.
+
+vi) Predicting the classification of any new logbook event into the categories of defined métiers (Step 6). 
 
 
 
