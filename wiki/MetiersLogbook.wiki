@@ -193,12 +193,26 @@ vi) Predicting the classification of any new logbook event into the categories o
   for (i in grep("EURO",names(datPred))) null.value <- c(null.value,which(datPred[,i]<0))
   null.value <- c(null.value,which(apply(datPred[,2:ncol(datPred)],1,sum,na.rm=T)==0))
     
-  if(length(null.value)!=0) {LogEvent.removed <- datPred[sort(unique(null.value)),] ; datPred <- datPred[-sort(unique(null.value)),]}
-    
+  if(length(null.value)!=0) {LogEvent.removed <- datPred[sort(unique(null.value)),] ; datPred <- datPred[-sort(unique(null.value)),]} 
   names(datPred)[-1]=unlist(lapply(strsplit(names(datPred[,-1]),"_"),function(x) x[[3]]))
     
   # Removing miscellaneous species
   datPred <- datPred[,!names(datPred)=="MZZ"]
 
+  # Create a new folder for Step 6
+  option_step5 = "Predict_2008"
+  setwd(paste(path,analysisName,option_step2,option_step3,sep="/"))
+  if (!file.exists(option_step5)) dir.create(option_step5)
+  setwd(paste(path,analysisName,option_step2,option_step3,option_step5,sep="/"))
+  if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
+
+  # Prepare datPred
+  le_id_datPred=datPred[,"LE_ID"]
+  datPred=datPred[,-1]
+  datPred=as.matrix(datPred)
+  rownames(datPred)=le_id_datPred
+
+  metierPred2008 = predictMetier(learningData=Step1,clustersAffectation=clust2007,newData=datPred)
+  save(metierPred2008,file="metierPred2008.Rdata")
 
 }}}
