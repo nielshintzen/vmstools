@@ -87,7 +87,7 @@ vi) Predicting the classification of any new logbook event into the categories o
 
 
   #----------------------------------------------------------------------------------------------------------
-  # II. EXPLORING THE VARIOUS METHODS FOR IDENTIFYING MAIN SPECIES AND KEEPING THEM IN THE DATA SET (STEP 1)
+  # II. STEP 1 - EXPLORING THE VARIOUS METHODS FOR IDENTIFYING MAIN SPECIES AND KEEPING THEM IN THE DATA SET
   #----------------------------------------------------------------------------------------------------------
   
   print("--- EXPLORING THE DATA FOR SELECTION OF MAIN SPECIES ---")
@@ -171,6 +171,9 @@ vi) Predicting the classification of any new logbook event into the categories o
   print("Congratulation !! You have now a fully working eflalo dataset with a metier Level 7 !")
   
 
+  #---------------------------------------------------------------------------------
+  # VII. STEP 6 - Predicting the classification of any new logbook event into the categories of defined métiers
+  #---------------------------------------------------------------------------------
 
 
 }}}
