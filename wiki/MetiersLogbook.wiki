@@ -179,27 +179,26 @@ vi) Predicting the classification of any new logbook event into the categories o
   newAnalysisName="metier_analysis_OTB_predict"
   setwd(paste(path,newAnalysisName,sep="/"))
 
-  # format
+  # Format
   newEflalo=formatEflalo(newEflalo)
   newEflalo=newEflalo[newEflalo$LE_GEAR=="OTB",]
 
-    datPred <- newEflalo[,c("LE_ID",grep("EURO",names(newEflalo),value=T))]
-    rm(newEflalo)
-    gc()
-    datPred[is.na(datPred)]=0
+  datPred <- newEflalo[,c("LE_ID",grep("EURO",names(newEflalo),value=T))]
+  rm(newEflalo)
+  gc()
+  datPred[is.na(datPred)]=0
     
-    #removing negative and null values
-    null.value <- vector()
-    for (i in grep("EURO",names(datPred))) null.value <- c(null.value,which(datPred[,i]<0))
-    null.value <- c(null.value,which(apply(datPred[,2:ncol(datPred)],1,sum,na.rm=T)==0))
+  # Removing negative and null values
+  null.value <- vector()
+  for (i in grep("EURO",names(datPred))) null.value <- c(null.value,which(datPred[,i]<0))
+  null.value <- c(null.value,which(apply(datPred[,2:ncol(datPred)],1,sum,na.rm=T)==0))
     
-    if(length(null.value)!=0) {LogEvent.removed <- datPred[sort(unique(null.value)),] ; datPred <- datPred[-sort(unique(null.value)),]}
-    #Store(LogEvent.removed)
+  if(length(null.value)!=0) {LogEvent.removed <- datPred[sort(unique(null.value)),] ; datPred <- datPred[-sort(unique(null.value)),]}
     
-    names(datPred)[-1]=unlist(lapply(strsplit(names(datPred[,-1]),"_"),function(x) x[[3]]))
+  names(datPred)[-1]=unlist(lapply(strsplit(names(datPred[,-1]),"_"),function(x) x[[3]]))
     
-    #removing miscellaneous species
-    datPred <- datPred[,!names(datPred)=="MZZ"]
+  # Removing miscellaneous species
+  datPred <- datPred[,!names(datPred)=="MZZ"]
 
 
 }}}
