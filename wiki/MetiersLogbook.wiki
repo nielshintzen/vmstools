@@ -34,12 +34,11 @@ vi) Predicting the classification of any new logbook event into the categories o
   # working directory
   path="C:/metier_analysis"
   setwd(path)
+  analysisName="metier_analysis_OTB"
 
   # format
   eflalo=formatEflalo(eflalo)
   eflalo=eflalo[eflalo$LE_GEAR=="OTB",]
-  # note that output plots will be sent to getwd()
-  analysisName="metier_analysis_OTB"
 
   #-------------------------------------------------------------------------
   # I. GETTING THE DATA IN AND CLEANING FOR MISSING AND NEGATIVE VALUES ETC
