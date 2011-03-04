@@ -54,27 +54,27 @@ vi) Predicting the classification of any new logbook event into the categories o
   # Delete old R cache
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)                                            
 
-  eflalo_ori = dat # Keeping this in cached memory for making the final merging at the end
+  eflalo_ori = eflalo # Keeping this in cached memory for making the final merging at the end
   Store(eflalo_ori)
 
   # ! KEEPING ONLY LE_ID AND THE OUTPUT YOU WANT TO GET  (KG/EURO)
-  dat=dat[,c("LE_ID",grep(critData,names(dat),value=T))]
-  dat[is.na(dat)]=0
+  eflalo=eflalo[,c("LE_ID",grep(critData,names(eflalo),value=T))]
+  eflalo[is.na(eflalo)]=0
 
   # Removing negative and null values
   null.value <- vector()
-  for (i in grep(critData,names(dat))) null.value <- c(null.value,which(dat[,i]<0))
-  null.value <- c(null.value,which(apply(dat[,2:ncol(dat)],1,sum,na.rm=T)==0))
+  for (i in grep(critData,names(eflalo))) null.value <- c(null.value,which(eflalo[,i]<0))
+  null.value <- c(null.value,which(apply(eflalo[,2:ncol(eflalo)],1,sum,na.rm=T)==0))
 
-  if(length(null.value)!=0) {LogEvent.removed <- dat[sort(unique(null.value)),] ; dat <- dat[-sort(unique(null.value)),]}
+  if(length(null.value)!=0) {LogEvent.removed <- eflalo[sort(unique(null.value)),] ; eflalo<- eflalo[-sort(unique(null.value)),]}
   Store(LogEvent.removed)
 
   # Rename species names
-  names(dat)[-1]=unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
+  names(eflalo)[-1]=unlist(lapply(strsplit(names(eflalo[,-1]),"_"),function(x) x[[3]]))
 
   # Removing miscellaneous species
-  dat <- dat[,!names(dat)=="MZZ"]
-  save(dat, file="dat_cleaned.Rdata")
+  eflalo = eflalo[,!names(eflalo)=="MZZ"]
+  save(eflalo, file="eflalo_cleaned.Rdata")
 
 
   #----------------------------------------------------------------------------------------------------------
@@ -85,10 +85,10 @@ vi) Predicting the classification of any new logbook event into the categories o
   cat("\n") 
 
   # Exploration of main species
-  explo=selectMainSpecies(dat,analysisName,RunHAC=runHACinSpeciesSelection,DiagFlag=FALSE)
+  explo=selectMainSpecies(eflalo,analysisName,RunHAC=runHACinSpeciesSelection,DiagFlag=FALSE)
 
   # Step 1 : selection of main species
-  Step1=extractTableMainSpecies(dat,explo$namesMainSpeciesHAC,paramTotal=paramTotal,paramLogevent=paramLogevent)
+  Step1=extractTableMainSpecies(eflalo,explo$namesMainSpeciesHAC,paramTotal=paramTotal,paramLogevent=paramLogevent)
 
   save(explo,Step1,file="Explo_Step1.Rdata")
   
@@ -139,7 +139,7 @@ vi) Predicting the classification of any new logbook event into the categories o
   if (algoClust=="CLARA")   clusters=Step3$clusters$clustering
   if (algoClust=="KMEANS")  clusters=Step3$clusters$cluster  
   
-  compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=clusters,targetSpecies=Step3$targetSpecies)
+  compMetiers=compareToOrdination(dat=eflalo,Step2=Step2,clusters=clusters,targetSpecies=Step3$targetSpecies)
   save(compMetiers,file="compMetiers.Rdata")
   
   
@@ -152,9 +152,9 @@ vi) Predicting the classification of any new logbook event into the categories o
 
   load(paste(path,analysisName,critPca,algoClust,"Step3.Rdata",sep="/"))
 
-  if(!nrow(dat)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
+  if(!nrow(eflalo)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
 
-  dat <- cbind(dat,CLUSTER=Step3$LE_ID_clust[,"clust"])
+  eflalo <- cbind(eflalo,CLUSTER=Step3$LE_ID_clust[,"clust"])
 
   # Now reload the full data set
   eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
