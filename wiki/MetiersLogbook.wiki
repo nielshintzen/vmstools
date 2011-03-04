@@ -13,13 +13,11 @@ i) Identifying the main species out of all species recorded and reducing the dat
 
 ii) Investigating the gain when running a PCA on the quality of the final classification (PCA is likely to discard potential irrelevant information) (Step 2).
 
-iii) Running a selection of clustering methods (HAC, or K-Means or CLARA algorithm) and settings to group similar logbook events (Step 3).
+iii) Running a selection of clustering methods (HAC, or K-Means or CLARA algorithm) to group similar logbook events and defining the characteristic species-based assemblage of each cluster (DCF Level7)(Step 3).
 
-iv) Defining the characteristic species-based assemblage of each cluster (DCF Level7) and converting them to a corresponding DCF Level5 category (Step 4).
+iv) Converting them to a corresponding DCF Level5 category and comparing with simpler ordination methods (Step 4).
 
-v) Comparing with simpler ordination methods (Step5).
-
-vi) Predicting the classification of any new logbook event into the categories of defined métiers (Step 6). 
+v) Predicting the classification of any new logbook event into the categories of defined métiers (Step 5). 
 
 
 
