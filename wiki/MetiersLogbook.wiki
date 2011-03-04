@@ -37,16 +37,15 @@ vi) Predicting the classification of any new logbook event into the categories o
   setwd(path)
   # choose the name of the analysis directory
   analysisName="metier_analysis_OTB"
-  # settings for the step 1
   critData="EURO"
+  # settings for the step 1
   runHACinSpeciesSelection=TRUE
   paramTotal=95
   paramLogevent=100
-  # choice for the step 2
+  # setting for the step 2
   critPca="PCA_70"
-  # choice for the step 3
+  # setting for the step 3
   algoClust="CLARA"
-
 
   # format
   eflalo=formatEflalo(eflalo)
@@ -64,7 +63,6 @@ vi) Predicting the classification of any new logbook event into the categories o
   setwd(file.path(path,analysisName))
   # Delete old R cache
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)                                            
-
   eflalo_ori = eflalo # Keeping this in cached memory for making the final merging at the end
   Store(eflalo_ori)
 
