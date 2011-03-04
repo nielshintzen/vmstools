@@ -31,10 +31,22 @@ vi) Predicting the classification of any new logbook event into the categories o
   data(correspLevel7to5)
   data(correspMixedMetier)
 
-  # working directory
+  # initialization
+  # choose the working directory
   path="C:/metier_analysis"
   setwd(path)
+  # choose the name of the analysis directory
   analysisName="metier_analysis_OTB"
+  # settings for the step 1
+  critData="EURO"
+  runHACinSpeciesSelection=TRUE
+  paramTotal=95
+  paramLogevent=100
+  # choice for the step 2
+  critPca="PCA_70"
+  # choice for the step 3
+  algoClust="CLARA"
+
 
   # format
   eflalo=formatEflalo(eflalo)
