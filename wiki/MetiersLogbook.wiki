@@ -203,7 +203,7 @@ vi) Predicting the classification of any new logbook event into the categories o
   option_step5 = "predict_Metiers"
   setwd(paste(path,analysisName,critPca,algoClust,sep="/"))
   if (!file.exists(option_step5)) dir.create(option_step5)
-  setwd(paste(path,analysisName,option_step2,option_step3,option_step5,sep="/"))
+  setwd(paste(path,analysisName,critPca,algoClust,option_step5,sep="/"))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
 
   # Prepare datPred
@@ -212,7 +212,11 @@ vi) Predicting the classification of any new logbook event into the categories o
   datPred=as.matrix(datPred)
   rownames(datPred)=le_id_datPred
 
-  metierPred2008 = predictMetier(learningData=Step1,clustersAffectation=clust2007,newData=datPred)
+  if (algoClust=="HAC")     clustersAffectation=Step3$clusters
+  if (algoClust=="CLARA")   clustersAffectation=Step3$clusters$clustering
+  if (algoClust=="KMEANS")  clustersAffectation=Step3$clusters$cluster  
+
+  metierPred = predictMetier(learningData=Step1,clustersAffectation=clustersAffectation,newData=datPred)
   save(metierPred2008,file="metierPred2008.Rdata")
 
 }}}
