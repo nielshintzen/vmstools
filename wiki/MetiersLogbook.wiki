@@ -34,10 +34,9 @@ vi) Predicting the classification of any new logbook event into the categories o
   # initialization
   # choose the working directory
   path="C:/metier_analysis"
-  setwd(path)
-  # choose the name of the analysis directory
-  analysisName="metier_analysis_OTB"
-  critData="EURO"
+  analysisName="metier_analysis_OTB"  
+  setwd(paste(path,analysisName,sep="/"))
+
   # settings for the step 1
   runHACinSpeciesSelection=TRUE
   paramTotal=95
@@ -67,12 +66,12 @@ vi) Predicting the classification of any new logbook event into the categories o
   Store(eflalo_ori)
 
   # ! KEEPING ONLY LE_ID AND THE OUTPUT YOU WANT TO GET  (KG/EURO)
-  eflalo=eflalo[,c("LE_ID",grep(critData,names(eflalo),value=T))]
+  eflalo=eflalo[,c("LE_ID",grep("EURO",names(eflalo),value=T))]
   eflalo[is.na(eflalo)]=0
 
   # Removing negative and null values
   null.value <- vector()
-  for (i in grep(critData,names(eflalo))) null.value <- c(null.value,which(eflalo[,i]<0))
+  for (i in grep("EURO",names(eflalo))) null.value <- c(null.value,which(eflalo[,i]<0))
   null.value <- c(null.value,which(apply(eflalo[,2:ncol(eflalo)],1,sum,na.rm=T)==0))
 
   if(length(null.value)!=0) {LogEvent.removed <- eflalo[sort(unique(null.value)),] ; eflalo<- eflalo[-sort(unique(null.value)),]}
