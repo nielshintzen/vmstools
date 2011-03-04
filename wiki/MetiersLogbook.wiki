@@ -181,6 +181,7 @@ vi) Predicting the classification of any new logbook event into the categories o
   newEflalo=formatEflalo(newEflalo)
   newEflalo=newEflalo[newEflalo$LE_GEAR=="OTB",]
 
+  # GETTING THE NEW DATA IN AND CLEANING FOR MISSING AND NEGATIVE VALUES ETC 
   datPred <- newEflalo[,c("LE_ID",grep("EURO",names(newEflalo),value=T))]
   rm(newEflalo)
   gc()
@@ -200,10 +201,10 @@ vi) Predicting the classification of any new logbook event into the categories o
   datPred <- datPred[,!names(datPred)=="MZZ"]
 
   # Create a new folder for Step 6
-  option_step5 = "predict_Metiers"
+  option_step6 = "predict_Metiers"
   setwd(paste(path,analysisName,critPca,algoClust,sep="/"))
-  if (!file.exists(option_step5)) dir.create(option_step5)
-  setwd(paste(path,analysisName,critPca,algoClust,option_step5,sep="/"))
+  if (!file.exists(option_step6)) dir.create(option_step6)
+  setwd(paste(path,analysisName,critPca,algoClust,option_step6,sep="/"))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
 
   # Prepare datPred
@@ -216,7 +217,8 @@ vi) Predicting the classification of any new logbook event into the categories o
   if (algoClust=="CLARA")   clustersAffectation=Step3$clusters$clustering
   if (algoClust=="KMEANS")  clustersAffectation=Step3$clusters$cluster  
 
+  # Predict the metiers of the new logbook events of newData from the metiers found in the step 3
   metierPred = predictMetier(learningData=Step1,clustersAffectation=clustersAffectation,newData=datPred)
-  save(metierPred2008,file="metierPred2008.Rdata")
+  save(metierPred,file="metierPred.Rdata")
 
 }}}
