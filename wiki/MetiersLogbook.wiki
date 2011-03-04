@@ -23,7 +23,26 @@ v) Predicting the classification of any new logbook event into the categories of
 
 = Details =
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+{{{
+
+
+  #-----------------------------------------------------------------------
+# II. EXPLORING THE VARIOUS METHODS FOR IDENTIFYING MAIN SPECIES AND KEEPING THEM IN THE DATA SET (STEP 1)  #-----------------------------------------------------------------------  
+print("--- EXPLORING THE DATA FOR SELECTION OF MAIN SPECIES ---")
+cat("\n") 
+
+# Exploration of main species
+  explo=selectMainSpecies(dat,analysisName,RunHAC=runHACinSpeciesSelection,DiagFlag=FALSE)
+
+# Step 1 : selection of main species
+  Step1=extractTableMainSpecies(dat,explo$namesMainSpeciesHAC,paramTotal=paramTotal,paramLogevent=paramLogevent)
+
+save(explo,Step1,file="Explo_Step1.Rdata")
+  
+
+
+
+
+
+
+}}}
