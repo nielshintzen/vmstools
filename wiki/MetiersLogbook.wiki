@@ -223,7 +223,7 @@ vi) Predicting the classification of any new logbook event into the categories o
 }}}
 
 
-Remark : The steps 1 to 5 (included) are resumed in the function getEflaloMetierLevel7. This latter allows to obtain the metier of each logevent at DCF Level7 accompanied by several graphics and results about the classification. 
+Remark : The steps 1 to 5 (included) can be summarized by the function getEflaloMetierLevel7. This latter allows to obtain the metier of each logevent at DCF Level7 accompanied by several graphics and results about the classification. 
 
 
 {{{
