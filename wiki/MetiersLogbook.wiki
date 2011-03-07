@@ -221,3 +221,26 @@ vi) Predicting the classification of any new logbook event into the categories o
   save(metierPred,file="metierPred.Rdata")
 
 }}}
+
+
+Remark : The steps 1 to 5 (included) are resumed in the function getEflaloMetierLevel7.
+
+
+{{{
+
+  data(eflalo)
+ 
+  # choose the working directory
+  path="C:/metier_analysis"
+  analysisName="metier_analysis_OTB"  
+  setwd(paste(path,analysisName,sep="/"))
+
+  # format
+  eflalo=formatEflalo(eflalo)
+  eflalo=eflalo[eflalo$LE_GEAR=="OTB",]
+
+  eflalo_metiers_level7=getEflaloMetierLevel7(eflalo, analysisName, path, critData="EURO", runHACinSpeciesSelection=TRUE, paramTotal=95, paramLogevent=100, critPca="PCA_70", algoClust="CLARA")
+
+  save(eflalo_metiers_level7,file="eflalo_metiers_level7.Rdata")
+
+}}}
