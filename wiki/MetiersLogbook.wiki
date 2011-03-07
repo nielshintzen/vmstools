@@ -31,22 +31,22 @@ vi) Predicting the classification of any new logbook event into the categories o
   data(correspLevel7to5)
   data(correspMixedMetier)
 
-  # initialization
-  # choose the working directory
+  # Initialization
+  # Choose the working directory
   path="C:/metier_analysis"
   analysisName="metier_analysis_OTB"  
   setwd(paste(path,analysisName,sep="/"))
 
-  # settings for the step 1
+  # Settings for the step 1
   runHACinSpeciesSelection=TRUE
   paramTotal=95
   paramLogevent=100
-  # setting for the step 2
+  # Setting for the step 2
   critPca="PCA_70"
-  # setting for the step 3
+  # Setting for the step 3
   algoClust="CLARA"
 
-  # format
+  # Format
   eflalo=formatEflalo(eflalo)
   eflalo=eflalo[eflalo$LE_GEAR=="OTB",]
 
@@ -230,15 +230,16 @@ Remark : The steps 1 to 5 (included) can be summarized by the function getEflalo
 
   data(eflalo)
  
-  # choose the working directory
+  # Choose the working directory
   path="C:/metier_analysis"
   analysisName="metier_analysis_OTB"  
   setwd(paste(path,analysisName,sep="/"))
 
-  # format
+  # Format
   eflalo=formatEflalo(eflalo)
   eflalo=eflalo[eflalo$LE_GEAR=="OTB",]
 
+  # Get the metier of each logbook event at DCF Level7
   eflalo_metiers_level7=getEflaloMetierLevel7(eflalo, analysisName, path, critData="EURO", runHACinSpeciesSelection=TRUE, paramTotal=95, paramLogevent=100, critPca="PCA_70", algoClust="CLARA")
 
   save(eflalo_metiers_level7,file="eflalo_metiers_level7.Rdata")
