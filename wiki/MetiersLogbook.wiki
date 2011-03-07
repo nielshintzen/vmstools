@@ -225,7 +225,7 @@ vi) Predicting the classification of any new logbook event into the categories o
 
 ----
 Note : The steps 1 to 5 (included) can be summarized by the function getEflaloMetierLevel7. This latter returns a fully working eflalo dataset with a metier at DCF Level7 for each logbook event, accompanied by several graphics and results about the classification. 
-----
+
 
 {{{
 
