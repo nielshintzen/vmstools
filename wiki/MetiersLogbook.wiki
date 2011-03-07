@@ -70,11 +70,11 @@ vi) Predicting the classification of any new logbook event into the categories o
   eflalo[is.na(eflalo)]=0
 
   # Removing negative and null values
-  null.value <- vector()
-  for (i in grep("EURO",names(eflalo))) null.value <- c(null.value,which(eflalo[,i]<0))
-  null.value <- c(null.value,which(apply(eflalo[,2:ncol(eflalo)],1,sum,na.rm=T)==0))
+  null.value = vector()
+  for (i in grep("EURO",names(eflalo))) null.value = c(null.value,which(eflalo[,i]<0))
+  null.value = c(null.value,which(apply(eflalo[,2:ncol(eflalo)],1,sum,na.rm=T)==0))
 
-  if(length(null.value)!=0) {LogEvent.removed <- eflalo[sort(unique(null.value)),] ; eflalo<- eflalo[-sort(unique(null.value)),]}
+  if(length(null.value)!=0) {LogEvent.removed = eflalo[sort(unique(null.value)),] ; eflalo = eflalo[-sort(unique(null.value)),]}
   Store(LogEvent.removed)
 
   # Rename species names
@@ -162,10 +162,10 @@ vi) Predicting the classification of any new logbook event into the categories o
 
   if(!nrow(eflalo)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
 
-  eflalo <- cbind(eflalo,CLUSTER=Step3$LE_ID_clust[,"clust"])
+  eflalo = cbind(eflalo,CLUSTER=Step3$LE_ID_clust[,"clust"])
 
   # Now reload the full data set
-  eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
+  eflalo_ori[-sort(unique(null.value)),"CLUSTER"] = Step3$LE_ID_clust[,"clust"]
 
   print("Congratulation !! You have now a fully working eflalo dataset with a metier Level 7 !")
   
@@ -181,23 +181,23 @@ vi) Predicting the classification of any new logbook event into the categories o
   newEflalo=newEflalo[newEflalo$LE_GEAR=="OTB",]
 
   # GETTING THE NEW DATA IN AND CLEANING FOR MISSING AND NEGATIVE VALUES ETC 
-  datPred <- newEflalo[,c("LE_ID",grep("EURO",names(newEflalo),value=T))]
+  datPred = newEflalo[,c("LE_ID",grep("EURO",names(newEflalo),value=T))]
   rm(newEflalo)
   gc()
   datPred[is.na(datPred)]=0
     
   # Removing negative and null values
-  null.value <- vector()
-  for (i in grep("EURO",names(datPred))) null.value <- c(null.value,which(datPred[,i]<0))
-  null.value <- c(null.value,which(apply(datPred[,2:ncol(datPred)],1,sum,na.rm=T)==0))
+  null.value = vector()
+  for (i in grep("EURO",names(datPred))) null.value = c(null.value,which(datPred[,i]<0))
+  null.value = c(null.value,which(apply(datPred[,2:ncol(datPred)],1,sum,na.rm=T)==0))
     
-  if(length(null.value)!=0) {LogEvent.removed <- datPred[sort(unique(null.value)),] ; datPred <- datPred[-sort(unique(null.value)),]} 
+  if(length(null.value)!=0) {LogEvent.removed = datPred[sort(unique(null.value)),] ; datPred = datPred[-sort(unique(null.value)),]} 
   
   # Rename species names
   names(datPred)[-1]=unlist(lapply(strsplit(names(datPred[,-1]),"_"),function(x) x[[3]]))
     
   # Removing miscellaneous species
-  datPred <- datPred[,!names(datPred)=="MZZ"]
+  datPred = datPred[,!names(datPred)=="MZZ"]
 
   # Create a new folder for Step 6
   option_step6 = "predict_Metiers"
