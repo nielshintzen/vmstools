@@ -25,7 +25,7 @@ vi) Predicting the classification of any new logbook event into the categories o
 
 = Functions =
 
-To run this analysis needs the following functions :
+This analysis needs the following functions to run:
 
  * multivariateClassificationUtils.r
  * selectMainSpecies.r
