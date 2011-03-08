@@ -169,9 +169,9 @@ vi) Predicting the classification of any new logbook event into the categories o
   print("Congratulation !! You have now a fully working eflalo dataset with a metier Level 7 !")
   
 
-  #---------------------------------------------------------------------------------------------------------------
+  #--------------------------------------------------------------------------------------------------------------
   # VII. STEP 6 - PREDICTING THE CLASSIFICATION OF ANY NEW LOGBOOK EVENT INTO THE CATEGORIES OF DEFINED MÉTIERS
-  #---------------------------------------------------------------------------------------------------------------
+  #--------------------------------------------------------------------------------------------------------------
 
   load("newEflalo.Rdata")
 
