@@ -21,7 +21,7 @@ v) Returning a complete Eflalo dataset including the métier linked to each logb
 
 vi) Predicting the classification of any new logbook event into the categories of defined métiers (Step 6). 
 
-
+=====  =====
 
 = Functions =
 
@@ -36,7 +36,7 @@ This analysis needs the following functions to run:
  * predictMetier.r
  * getEflaloMetierLevel7.r
 
-
+=====  =====
 
 = Details =
 
