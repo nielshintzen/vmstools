@@ -11,7 +11,7 @@ These sequential steps aim at:
 
 i) Identifying the main species out of all species recorded and reducing the dataset to these key species only (Step 1). These key species are selected from the application of three different filtering methods.
 
-ii) Choosing to run or not a PCA to increase the quality of the final classification (PCA is likely to discard potential irrelevant information) (Step 2).
+ii) Running or not a PCA to increase the quality of the final classification (PCA is likely to discard potential irrelevant information) (Step 2).
 
 iii) Running a selection of clustering methods (HAC or K-Means or CLARA algorithm) to group similar logbook events and defining the characteristic species-based assemblage of each cluster (DCF Level7) (Step 3).
 
