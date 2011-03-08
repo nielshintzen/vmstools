@@ -27,14 +27,14 @@ vi) Predicting the classification of any new logbook event into the categories o
 
 To run this analysis needs the following functions :
 
-* multivariateClassificationUtils.r
-* selectMainSpecies.r
-* extractTableMainSpecies.r
-* getTableAfterPCA.r
-* getMetierClusters.r
-* compareToOrdination.r
-* predictMetier.r
-* getEflaloMetierLevel7.r
+* bullet multivariateClassificationUtils.r
+* bullet selectMainSpecies.r
+* bullet extractTableMainSpecies.r
+* bullet getTableAfterPCA.r
+* bullet getMetierClusters.r
+* bullet compareToOrdination.r
+* bullet predictMetier.r
+* bullet getEflaloMetierLevel7.r
 
 
 
