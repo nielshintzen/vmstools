@@ -1,5 +1,10 @@
 #Assign one métier to each logbook event.
 
+=== Authors ===
+
+Nicolas Deporte, Sébastien Demanèche, Stéphanie Mahévas (IFREMER, France), Clara Ulrich, François Bastardie (DTU Aqua, Denmark)
+
+
 = Introduction =
 
 The goal of this part was to investigate a range of multivariate statistical methods and to develop a tool selecting the most appropriate one for assigning one métier to each logbook event. This tool allows defining métiers at DCF Level7 and aggregates them into the DCF Level5.
