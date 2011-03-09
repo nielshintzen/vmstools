@@ -3,6 +3,7 @@
 == Authors ==
 
 Nicolas Deporte, Sébastien Demanèche, Stéphanie Mahévas (IFREMER, France)
+
 Clara Ulrich, François Bastardie (DTU Aqua, Denmark)
 
 ====  ====
