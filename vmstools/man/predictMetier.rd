@@ -41,6 +41,41 @@ in newData. The cluster number "0" corresponds to the unknown metier.
 \author{Nicolas Deporte, Sebastien Demaneche, Stephanie Mahevas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
 
-\seealso{\code{extractTableMainSpecies(),getMetierClusters()}}
+\seealso{\code{selectMainSpecies(), extractTableMainSpecies(), getTableAfterPCA(), getMetierClusters()}}
 
+
+\examples{
+
+  \dontrun{
+
+  load("newEflalo.Rdata")
+
+  # Format
+  newEflalo <- formatEflalo(newEflalo)
+  newEflalo <- newEflalo[newEflalo$LE_GEAR=="OTB",]
+  
+  # Note that output plots will be sent to getwd()
+  analysisName <- "metier_analysis_OTB"
+
+  # Prepare datPred
+  datPred <- newEflalo[,c("LE_ID",grep("EURO",names(newEflalo),value=T))]
+  datPred[is.na(datPred)] <- 0
+  names(datPred)[-1] <- unlist(lapply(strsplit(names(datPred[,-1]),"_"),function(x) x[[3]]))
+  le_id_datPred <- datPred[,"LE_ID"]
+  datPred <- datPred[,-1]
+  datPred <- as.matrix(datPred)
+  rownames(datPred) <- le_id_datPred
+
+  if (algoClust=="HAC")     clustersAffectation <- Step3$clusters
+  if (algoClust=="CLARA")   clustersAffectation <- Step3$clusters$clustering
+  if (algoClust=="KMEANS")  clustersAffectation <- Step3$clusters$cluster  
+
+  # Predict the metiers of the new logbook events of newData from the metiers found in Step 3
+  metierPred <- predictMetier(learningData=Step1,clustersAffectation=clustersAffectation,newData=datPred)
+    
+  }
+
+}
+
+\keyword{}
                                        
