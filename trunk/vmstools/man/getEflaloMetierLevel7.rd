@@ -55,7 +55,7 @@ Beside, a number of sub-directories are created, with intermediate results and p
 
 \references{Development of tools for logbook and VMS data analysis. Studies for carrying out the common fisheries policy No MARE/2008/10 Lot 2}
 \author{Nicolas Deporte, Sebastien Demaneche, Stephanie Mahevas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
-\note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(RODBC) }
+\note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
 
 \seealso{selectMainSpecies(),extractTableMainSpecies(),getTableAfterPCA(),
                getMetierClusters(),compareToOrdination()}
@@ -64,8 +64,24 @@ Beside, a number of sub-directories are created, with intermediate results and p
 
   \dontrun{
 
+  data(eflalo)
+  
+  eflalo <- formatEflalo(eflalo)
+
+  eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
+
+  # Note that output plots will be sent to getwd()
+  path <- "C:/metier_analysis"
+  analysisName <- "metier_analysis_OTB"
+  
+  # Return a fully working eflalo dataset with a metier at DCF Level7 for each logbook event
+  eflalo_metiers_level7 <- getEflaloMetierLevel7(eflalo, analysisName, path, critData="EURO", 
+      runHACinSpeciesSelection=TRUE, paramTotal=95, paramLogevent=100, 
+      critPca="PCA_70", algoClust="CLARA")
+          
   }
 
 }
 
 \keyword{}
+
