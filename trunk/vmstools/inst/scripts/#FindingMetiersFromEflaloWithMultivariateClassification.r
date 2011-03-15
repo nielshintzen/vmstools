@@ -78,14 +78,17 @@ null.value <- vector()
 for (i in grep("EURO",names(dat1))) null.value <- c(null.value,which(dat1[,i]<0))
 null.value <- c(null.value,which(apply(dat1[,2:ncol(dat1)],1,sum,na.rm=T)==0))
 
-if(length(null.value)!=0) {LogEvent.removed <- dat1[sort(unique(null.value)),] ; dat1 <- dat1[-sort(unique(null.value)),]}
-Store(LogEvent.removed)
+if(length(null.value)!=0) {
+  LogEvent.removed <- dat1[sort(unique(null.value)),]
+  dat1 <- dat1[-sort(unique(null.value)),]
+  Store(LogEvent.removed)
+}
 
 names(dat1)[-1]=unlist(lapply(strsplit(names(dat1[,-1]),"_"),function(x) x[[3]]))
 
 #removing miscellaneous species
-
 dat1 <- dat1[,!names(dat1)=="MZZ"]
+
 save(dat1, file="dat1_2007.Rdata")
 #load("dat1_2007.Rdata")
 
@@ -159,13 +162,13 @@ setwd(paste(path,analysisName,sep=""))
 
 load("PCA_70/CLARA/Step3.Rdata")
 
- if(!nrow(dat1)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
+if(!nrow(dat1)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
 
 dat1 <- cbind(dat1,CLUSTER=Step3$LE_ID_clust[,"clust"])
+
 #now reload the full data set
-
-eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
-
+if(length(null.value)!=0) eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
+else eflalo_ori[,"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
 
 
 
