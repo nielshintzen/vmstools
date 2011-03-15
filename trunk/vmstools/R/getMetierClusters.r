@@ -8,15 +8,15 @@
 getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara",param1="euclidean",param2=NULL){
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
-  data(correspLevel7to5)
+  #data(correspLevel7to5)
 
-  LE_ID  <- rownames(datSpecies)
-  nbSpec <- dim(datSpecies)[2]
-  datSpecies <- as.matrix(datSpecies,ncol=nbSpec,nrow=length(le_id))
+  LE_ID=rownames(datSpecies)
+  nbSpec=ncol(datSpecies)
+  datSpecies=as.matrix(datSpecies,ncol=nbSpec,nrow=length(LE_ID))
 
   print("######## STEP 3 CLUSTERING ########")
 
-  t1 <- Sys.time()
+  t1=Sys.time()
   print(paste(" --- selected method :",methMetier, "---"))
 
 
@@ -77,7 +77,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       for(k in 1:nbClust){  # Within variance by cluster
 
         clusti=sampleDatLogWithClusters[which(sampleClusters==k),1:nbDim]
-        centerOfGravityClusti=colMeans(clusti)
+        if(length(which(sampleClusters==k))==1)  centerOfGravityClusti=clusti
+        else centerOfGravityClusti=colMeans(clusti)
         centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
         sizeClusti=nrow(clusti)
         centerOfGravityClusti=colMeans(clusti)
@@ -313,8 +314,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
     for(k in 1:nbClust){  # Within variance by cluster
 
-      clusti=datLogWithClusters[which(clusters==k),1:nbDim]
-      centerOfGravityClusti=colMeans(clusti)
+      clusti=datLogWithClusters[which(clusters==k),1:nbDim] 
+      if(length(which(clusters==k))==1)  centerOfGravityClusti=clusti
+      else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
       sizeClusti=nrow(clusti)
       withinVarClusters[k]=1/sizeClusti*sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
@@ -1016,7 +1018,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     for(i in 1:k){
       clusti=datLog[which(clusters$clustering==i),]
-      centerOfGravityClusti=colMeans(clusti)
+      if(length(which(clusters$clustering==i))==1)  centerOfGravityClusti=clusti
+      else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
     }
     classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
@@ -1361,7 +1364,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     for(i in 1:k){
       clusti=datLog[which(clusters$clustering==i),]
-      centerOfGravityClusti=colMeans(clusti)
+      if(length(which(clusters$clustering==i))==1)  centerOfGravityClusti=clusti
+      else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
     }
     classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
