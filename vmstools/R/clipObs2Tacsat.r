@@ -7,7 +7,7 @@ obs$SI_LATI   <- jitter(obs$SI_LATI,factor=0.25)
 obs$SI_LONG   <- jitter(obs$SI_LONG,factor=0.5)
 
 a <- clipObs2Tacsat(tacsat,obs,method="grid",control.grid=list(resx=0.1,resy=0.05,gridBbox="obs"),temporalRange=c(-30,120),all.t=F)
-a <- clipObs2Tacsat(tacsat,obs,method="euclidean",control.euclidean=list(threshold=0.05),temporalRange=c(-30,120))
+a <- clipObs2Tacsat(tacsat,obs,method="euclidean",control.euclidean=list(threshold=1),temporalRange=c(-1e10,-1) ,all.t=F) 
 
 
 clipObs2Tacsat <- function(tacsat,        #The tacsat dataset
@@ -81,7 +81,7 @@ if(method == "euclidean"){
   obs$GR_ID   <- 1:nrow(obs)
 
   #- Create storage of tacsat records to save
-  totRes      <- numeric()
+  totRes      <- cbind(numeric(), numeric())
 
   obsLon      <- obs$SI_LONG
   obsLat      <- obs$SI_LATI
@@ -127,13 +127,13 @@ if(method == "euclidean"){
                                                                                     if(is.null(temporalRange)==F){ retrn       <- which(restime <= temporalRange[2] & restime >= temporalRange[1])
                                                                                     } else { retrn <- 1:length(restime) }
                                                                                     if(length(tacRows[idx[retrn]])>0){ toReturn <- cbind(tacRows[idx[retrn]],obs$GR_ID[obsRows[x]])
-                                                                                    } else { toReturn <- c(NA,NA) }
+                                                                                    } else { toReturn <- cbind(NA,NA) }
                                                                                     
                                                                                 return(toReturn)}))
 
 
 
-        totRes  <- rbind(totRes,res)
+        totRes  <- rbind(totRes,na.omit(res))
       }
       if(iNO != nChunkObs & iNT != nChunkTac){
 
@@ -151,16 +151,17 @@ if(method == "euclidean"){
        if(is.null(temporalRange)==F){ retrn       <- which(restime <= temporalRange[2] & restime >= temporalRange[1])
        } else { retrn <- 1:length(restime) }
        res              <- cbind(tacRows[idx[retrn,2]],obs$GR_ID[obsRows[idx[,1]]])
-       totRes           <- c(totRes,res)
+       totRes           <- rbind(totRes,na.omit(res))
       }
       
       
     }#End iNT loop
   }#End iNO loop
   tacsat$GR_ID <- NA
-  tacsat$GR_ID[totRes[,1]] <- totRes[,2]
+  tacsat$GR_ID[totRes[,1]] <-totRes[,2]
 
-  retrn   <- list(obs,tacsat[totRes,])
+
+  retrn   <- list(obs,tacsat[totRes[,1],])
 }#End method euclidean
 
 if(all.t) retrn[[2]] <- merge(retrn[[2]],tacsatOrig,by=colnames(tacsatOrig),all=T)
