@@ -44,7 +44,7 @@ if(method == "grid" & is.null(control.grid$spatGrid) == T){
 }
 
 #- Perform calculations on gridcell
-if(method == "grid" & is.null(spatGrid) == F){
+if(method == "grid" & is.null(control.grid$spatGrid) == F){
   sPDFObs     <- SpatialPointsDataFrame(data.frame(cbind(obs$SI_LONG,obs$SI_LATI)),data=obs)
   sPDFTac     <- SpatialPointsDataFrame(data.frame(cbind(tacsat$SI_LONG,tacsat$SI_LATI)),data=tacsat)
   resObs      <- overlay(spatGrid,sPDFObs)
