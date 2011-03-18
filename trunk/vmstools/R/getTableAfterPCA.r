@@ -31,6 +31,11 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     dev.off()
     
     X11(5,5)
+    plot.PCA(log.pca, choix = "var", axes = 1:2, new.plot=FALSE, title="", lim.cos2.var = 0.1)
+    savePlot(filename=paste(analysisName,'species_projection_on_the_1_and_2_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
+    dev.off()
+    
+    X11(5,5)
     plot.PCA(log.pca, choix = "var", axes = 2:3, new.plot=FALSE, title="", lim.cos2.var = 0.1)
     savePlot(filename=paste(analysisName,'species_projection_on_the_2_and_3_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
