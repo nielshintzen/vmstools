@@ -374,6 +374,12 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
     
     X11(5,5)
+    plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="", xlab="Axis 1", ylab="Axis 2")
+    abline(h=0, lty=2) ; abline(v=0, lty=2)
+    savePlot(filename=paste(analysisName,'projections_1_2_HAC',sep="_"), type='png', restoreConsole = TRUE)
+    dev.off()
+    
+    X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_2_3_HAC',sep="_"), type='png', restoreConsole = TRUE)
@@ -713,6 +719,12 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
     # For a paper
+    X11(5,5)
+    plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="", xlab="Axis 1", ylab="Axis 2")
+    abline(h=0, lty=2) ; abline(v=0, lty=2)
+    savePlot(filename=paste(analysisName,'projections_1_2_Kmeans',sep="_"), type='png', restoreConsole = TRUE)
+    dev.off()
+    
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
@@ -1069,6 +1081,12 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
     
     X11(5,5)
+    plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
+    abline(h=0, lty=2) ; abline(v=0, lty=2)
+    savePlot(filename=paste(analysisName,'projections_1_2_PAM',sep="_"), type='png', restoreConsole = TRUE)
+    dev.off()
+    
+    X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_2_3_PAM',sep="_"), type='png', restoreConsole = TRUE)
@@ -1415,6 +1433,12 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
     
     X11(5,5)
+    plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
+    abline(h=0, lty=2) ; abline(v=0, lty=2)
+    savePlot(filename=paste(analysisName,'projections_1_2_CLARA',sep="_"), type='png', restoreConsole = TRUE)
+    dev.off()
+    
+    X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_2_3_CLARA',sep="_"), type='png', restoreConsole = TRUE)
@@ -1477,11 +1501,12 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
                               "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
     sp <- apply(mat,2, sum)
     colnames(mat)[sp<10] <- ""
-    cc <- colorRampPalette(c("antiquewhite", "deepskyblue4"),space = "rgb", interpolate="spline")
-    print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100)))
+    cc <- colorRampPalette(c("navajowhite", "steelblue2", "deepskyblue4"),space = "rgb", interpolate="spline")
+    print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100), scales=list(cex=0.75)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
+  
 
     # Standard deviation profile by cluster
     sdprofil=matrix(0,nrow=nbClust,ncol=nbSpec)
