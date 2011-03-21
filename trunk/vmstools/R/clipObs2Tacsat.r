@@ -1,3 +1,9 @@
+if(FALSE){    # TO BE ABLE TO COMPILE THE PACKAGE
+
+
+
+
+
 obs <- tacsat[round(seq(1,nrow(tacsat),length.out=30)),]
 obs <- obs[,c(1,2,3,4,5,6)]
 obs$OB_TYP <- "Benthos"
@@ -167,3 +173,8 @@ if(method == "euclidean"){
 if(all.t) retrn[[2]] <- merge(retrn[[2]],tacsatOrig,by=colnames(tacsatOrig),all=T)
 
 return(retrn)}
+
+
+
+
+}
