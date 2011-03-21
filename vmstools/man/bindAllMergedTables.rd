@@ -33,7 +33,7 @@ Possibly, keep only the weight, or the value per species. Both by default, but p
 \author{
 Francois Bastardie
 }
-\example{
+\examples{
 \dontrun{
   data(eflalo2)
   data(tacsat)
