@@ -19,7 +19,7 @@ mosaicASCIIGrids <- function (ascgridfilelist,
     # do the merging and export as a ascii file
     mergedRaster<-mosaic(mergedRaster, raster2, fun=sum)
     }
-  writeRaster(mergedRaster, outputFileName, format="ascii")
+  writeRaster(mergedRaster, outputFileName, format="ascii", overwrite=TRUE)
 }
 
 
