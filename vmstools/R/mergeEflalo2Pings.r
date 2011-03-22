@@ -196,6 +196,7 @@ mergeEflalo2Pings <-
           tacsat.this.vessel[tacsat.this.vessel$SI_TIME=="24:00", "SI_TIME"] <- "00:00"  # debug
           tacsat.this.vessel$SI_DATIM <- as.POSIXct(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) ,
                                  tz='GMT',   "%d/%m/%Y %H:%M" )
+          tacsat.this.vessel <- tacsat.this.vessel[!is.na(tacsat.this.vessel$SI_DATIM),]   # debug e.g. when 29/02/1801
          }
 
          # keep only the essential
@@ -317,6 +318,7 @@ mergeEflalo2Pings <-
            }
          } else{stop("no 'SI_DATIM' found in vms")}
          SI_MIDTIME <- rep(0, nrow(table.midtime))
+
          for(r in 1: nrow(table.midtime)){
            SI_MIDTIME[r] <-  as.character(seq(from=table.midtime$SI_DTIME[r], to=table.midtime$SI_ATIME[r], length.out = 3)[2])
 
