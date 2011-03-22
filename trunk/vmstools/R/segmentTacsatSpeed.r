@@ -6,7 +6,7 @@
 segmentTacsatSpeed <- function(tacsat,
                          general=list(
                            output.path=file.path('C:','output'),
-                                       visual.check=TRUE, a.year=2009, speed="calculated"), ...){
+                                       visual.check=TRUE, a.year=2009, what.speed="calculated"), ...){
 
  
   lstargs <- list(...)

@@ -44,7 +44,7 @@
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeEflalo2Pings <-
            function(eflalo, tacsat, general=list(output.path=file.path("C:"),
-                     visual.check=TRUE, detectFishing=FALSE, speed="segment", conserve.all=TRUE), ...){
+                     visual.check=TRUE, detectFishing=FALSE, speed="segment", what.speed="calculated", conserve.all=TRUE), ...){
 
   lstargs <- list(...)
 
@@ -516,7 +516,7 @@ mergeEflalo2Pings <-
              #according to a segemented regression on the (apparent) speed histogram
             .vms <- segmentTacsatSpeed (tacsat=.vms, vessels=a.vesselid,
                                   force.lower.bound=0.5, general=list(a.year=general$a.year,
-                                   output.path=general$output.path, visual.check=TRUE))
+                                   output.path=general$output.path, what.speed=general$what.speed, visual.check=TRUE))
                 #=> (semi)automatic detection of the fishing peak
                 # (put here because the LE_GEAR need to be informed)
 
@@ -962,12 +962,12 @@ return()
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("35", "1518"),
                                  general=list(output.path=file.path("C:","output"),
                                     visual.check=TRUE,
-                                        detect.fishing=TRUE, speed="segment"))
+                                        detect.fishing=TRUE, speed="segment", what.speed="calculated"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
                                    general=list(output.path=file.path("C:","output"),
                                       visual.check=TRUE,
-                                         detectFishing=FALSE, speed="segment"))
+                                         detectFishing=FALSE, speed="segment", what.speed="calculated"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
