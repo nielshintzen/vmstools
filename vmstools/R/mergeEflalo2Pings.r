@@ -416,6 +416,7 @@ mergeEflalo2Pings <-
             tmp <- table(suspicious$SI_LONG)
             long.suspicious <- names(tmp[tmp>5])
             if(length(long.suspicious)!=0) cat(paste("potential harbour likely near long ",long.suspicious,"\n",sep=""))
+ # browser()
             }  # if at least one trip >30 days
         rm(table.midtime) ; gc(reset=TRUE)
 
@@ -713,7 +714,7 @@ mergeEflalo2Pings <-
          .vms$FT_REF_SQ <- factor(paste(.vms$FT_REF, ".", .vms$SI_RECT, sep=''))
          .vms$FT_REF_SQ_DAY <- factor(paste(.vms$FT_REF, ".", .vms$SI_RECT,".", an(format(.vms$SI_DATIM,  '%j')), sep=''))
 
-   
+
    
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
          # AGGREGATE WEIGHT PER SPECIES !#!#!#!#!#!#!#!#!#
