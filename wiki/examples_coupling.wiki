@@ -71,19 +71,19 @@ This method can be routinely applied to various EU countries to the extent that 
   eflalo <- eflalo[eflalo$LE_MET!="No_logbook6",]
 
 
-  # TEST FOR A GIVEN SET OF VESSELS
-  # (if do.wp3 is at true then do also the automatic detection of fishing states
+  # TEST FOR A GIVEN SET OF VESSELS (> vmstools 0.53)
+  # (if detectFishing=TRUE is at true then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
-  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, a.vesselid=c("35", "1518"),
-                                 general=list(output.path=file.path("C:","output"),
-                                    visual.check=TRUE,
-                                        do.wp3=TRUE, speed="segment"))
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("35", "1518"), 
+          general=list(output.path=file.path("C:","outputs"), 
+                visual.check=TRUE, detectFishing=TRUE, speed="segment", what.speed="calculated", conserve.all=TRUE))
+  
   # ...OR APPLY FOR ALL VESSELS IN eflalo
-  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
-                                   general=list(output.path=file.path("C:","output"),
-                                      visual.check=TRUE,
-                                         do.wp3=FALSE, speed="segment"))
-  gc(reset=TRUE)
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, 
+          general=list(output.path=file.path("C:","outputs"), 
+                visual.check=TRUE, detectFishing=TRUE, speed="segment", what.speed="calculated", conserve.all=TRUE))
+ 
+ gc(reset=TRUE)
 
   # load the merged output table for one vessel
   load(file.path("C:","output","merged_35_2009.RData"))
