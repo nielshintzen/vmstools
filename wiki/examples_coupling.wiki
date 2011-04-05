@@ -23,7 +23,7 @@ This method can be routinely applied to various EU countries to the extent that 
   data(eflalo)
   data(tacsat)
   data(euharbours)
-  # add some missing harbours to the list?
+  # add some missing harbours to the list (very essential)?
   #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
   #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
@@ -72,7 +72,7 @@ This method can be routinely applied to various EU countries to the extent that 
 
 
   # TEST FOR A GIVEN SET OF VESSELS (> vmstools 0.53)
-  # (if detectFishing=TRUE is at true then do also the automatic detection of fishing states
+  # (if detectFishing is at TRUE then do also the automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("35", "1518"), 
           general=list(output.path=file.path("C:","outputs"), 
@@ -86,7 +86,7 @@ This method can be routinely applied to various EU countries to the extent that 
  gc(reset=TRUE)
 
   # load the merged output table for one vessel
-  load(file.path("C:","output","merged_35_2009.RData"))
+  load(file.path("C:","outputs","merged_35_2009.RData"))
 
   # check the conservation of landings
   sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
@@ -95,10 +95,10 @@ This method can be routinely applied to various EU countries to the extent that 
 
   # ...or bind all vessels (keeping only some given species here)
   bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"),
-                      folder = file.path("C:","output"), all.in.one.table=TRUE)
+                      folder = file.path("C:","outputs"), all.in.one.table=TRUE)
 
    # ...and load the merged output table for all vessels
-  load(file.path("C:","output","all_merged__2009.RData"))
+  load(file.path("C:","outputs","all_merged__2009.RData"))
 
   # map landing of cod from all studied vessels
   df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD")]
@@ -120,9 +120,9 @@ This method can be routinely applied to various EU countries to the extent that 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
   # (by default, this will keep all the species in the output table)
   tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.keep=character(),
-                      folder = file.path("C:","output"), all.in.one.table=FALSE)
+                      folder = file.path("C:","outputs"), all.in.one.table=FALSE)
 
-  ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
+  ff  <- pings2Fishframe (general=list(output.path=file.path("C:","outputs"),
                                                    a.year=2009, a.country="NLD") )
 
 
