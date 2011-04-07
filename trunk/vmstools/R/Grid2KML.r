@@ -24,8 +24,8 @@ par(mar=c(0,0,0,0), xaxs="i", yaxs="i",cex=.25)
 image(as.image.SpatialGridDataFrame(gd.1[1]), col=heat.colors(9),xlim=vms.kml$xlim, ylim=vms.kml$ylim)
 kmlOverlay(vms.kml, kmlfile=kmlfile, imagefile=imagefile, name=what.quantity)
 
-legend(x='bottomright', legend=as.character(labs), pch = 22,pt.bg=heat.colors(length(labs)), 
-title=what.quantity, ncol=1,bg="transparent",pt.cex=1 )
+legend(x='topleft', legend=as.character(labs), pch = 22,pt.bg=heat.colors(length(labs)),
+title=what.quantity, ncol=2,bg="transparent",pt.cex=1.5 )
 
 
 
