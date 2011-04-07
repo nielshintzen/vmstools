@@ -1,5 +1,5 @@
 
-Grid2KML <- function(output.mat=output.mat, what.quantity = 'effort')  {
+Grid2KML <- function(output.mat=output.mat, what.quantity = 'effort',kmlfile='vms.kml',imagefile='vms.png')  {
 #Takes the output from vmsGridCreate ie. when plotMap is set to FALSE.
 #output.mat[["fishing"]] <- log(output.mat[["fishing"]])
 dd <- output.mat@grid
