@@ -19,13 +19,13 @@ gd.1 <- as.SpatialGridDataFrame.im(as.im(gd))
 proj4string(gd.1) <- CRS("+proj=longlat +datum=WGS84")
 vms.kml <- GE_SpatialGrid(gd.1)
 #tf <- tempfile(tmpdir=getwd())
-png(file="vms.png", width=vms.kml$width, height=vms.kml$height, bg="transparent",res=576)
+png(file=imagefile, width=vms.kml$width, height=vms.kml$height, bg="transparent",res=576)
 par(mar=c(0,0,0,0), xaxs="i", yaxs="i",cex=.25)
 image(as.image.SpatialGridDataFrame(gd.1[1]), col=heat.colors(9),xlim=vms.kml$xlim, ylim=vms.kml$ylim)
-kmlOverlay(vms.kml, kmlfile="vms.kml", imagefile="vms.png", name=what.quantity)
+kmlOverlay(vms.kml, kmlfile=kmlfile, imagefile=imagefile, name=what.quantity)
 
 legend(x='bottomright', legend=as.character(labs), pch = 22,pt.bg=heat.colors(length(labs)), 
-title=what.quantity, ncol=1,bg="transparent",pt.cex=1.5 )
+title=what.quantity, ncol=1,bg="transparent",pt.cex=1 )
 
 
 
