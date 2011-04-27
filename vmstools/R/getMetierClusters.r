@@ -17,7 +17,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
   print("######## STEP 3 CLUSTERING ########")
 
   t1=Sys.time()
-  print(paste(" --- selected method :",methMetier, "---"))
+  print(paste(" --- selected method :",methMetier, " ---"))
 
 
 ########################################################################################################################################   HAC
@@ -72,6 +72,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       # Within and between variance of clusters and classification
       centerOfGravityClassif=numeric()
       withinVarClusters=numeric()
+      sizeClusti=numeric()
       centerOfGravitySampleDatLog=colMeans(sampleDatLog)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravitySampleDatLog)
       for(k in 1:nbClust){  # Within variance by cluster
@@ -80,18 +81,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
         if(length(which(sampleClusters==k))==1)  centerOfGravityClusti=clusti
         else centerOfGravityClusti=colMeans(clusti)
         centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-        sizeClusti=nrow(clusti)
-        centerOfGravityClusti=colMeans(clusti)
-        withinVarClustiPart=numeric()
-        withinVarClusters[k]=1/sizeClusti*sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+        sizeClusti[k]=nrow(clusti)
+        withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
 
       }
       # Between variance
-      classifBetweenVar=1/nbLog*sum(sizeClusti*((dist(centerOfGravityClassif)[1:nbClust])^2))
+      classifBetweenVar=(1/nbLog)*sum(sizeClusti*((dist(centerOfGravityClassif)[1:nbClust])^2))
       # Within variance of clusters on totale variance (pourcent) and between variance on totale variance of classification
-      withinVarClusterOnTot=withinVarClusters/(classifBetweenVar+sum(withinVarClusters))*100
-      betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+sum(withinVarClusters))*100
+      withinVarClusterOnTot=(1/nbLog)*sum(withinVarClusters)/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
+      betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
       classifVarExplain=c(classifVarExplain,betweenVarClassifOnTot)
+
 
       # Catch profile by cluster for each sample
       nbSpec=ncol(datSpecies)
@@ -304,29 +304,30 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusters=numeric(length=nbLog)
     clusters[sam]=sampleClusters
     clusters[outofsam]=pred$class
-    datLogWithClusters=cbind(datLog,clusters)
+    #datLogWithClusters=cbind(datLog,clusters)
 
 
     # Within and between variance of clusters and classification
     centerOfGravityClassif=numeric()
     withinVarClusters=numeric()
+    sizeClusti=numeric()
     centerOfGravityDatLog=colMeans(datLog)
     centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
     for(k in 1:nbClust){  # Within variance by cluster
 
-      clusti=datLogWithClusters[which(clusters==k),1:nbDim] 
+      clusti=datLog[which(clusters==k),1:nbDim]
       if(length(which(clusters==k))==1)  centerOfGravityClusti=clusti
       else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-      sizeClusti=nrow(clusti)
-      withinVarClusters[k]=1/sizeClusti*sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+      sizeClusti[k]=nrow(clusti)
+      withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
 
     }
     # Between variance
-    classifBetweenVar=1/nbLog*sum(sizeClusti*((dist(centerOfGravityClassif)[1:nbClust])^2))
+    classifBetweenVar=(1/nbLog)*sum(sizeClusti*((dist(centerOfGravityClassif)[1:nbClust])^2))
     # Within variance of clusters on totale variance (pourcent) and between variance on totale variance of classification
-    withinVarClusterOnTot=withinVarClusters/(classifBetweenVar+sum(withinVarClusters))*100
-    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+sum(withinVarClusters))*100
+    withinVarClusterOnTot=(1/nbLog)*sum(withinVarClusters)/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
+    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
 
 
     # Calculation of each cluster size
@@ -658,6 +659,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Calculation of optimal k thanks to within variance
     varintra=numeric()
     nbLog=nrow(datLog)
+
     for (k in 2:15){
       clustersKmeans=kmeans(datLog, k, iter.max=40, nstart=20)
       varintra[k]=1/nbLog*sum(clustersKmeans$withinss)
@@ -671,27 +673,50 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     diffvarintra=diff(varintra,na.rm=T)
     diffdiffvar=diff(diffvarintra,na.rm=T)
-    k=which.max(diffdiffvar)+1
+    nbClust=which.max(diffdiffvar)+1
 
     # KMEANS with k optimal
-    clusters=kmeans(datLog, k, iter.max=40, nstart=20, algorithm="Hartigan-Wong")
+    clusters=kmeans(datLog, nbClust, iter.max=40, nstart=20, algorithm="Hartigan-Wong")
 
 
-    # Quality of classification
+#    # Quality of classification
+#    centerOfGravityClassif=numeric()
+#    centerOfGravityDatLog=colMeans(datLog)
+#    centerOfGravityClassif=rbind(centerOfGravityDatLog,clusters$centers)
+#    classifBetweenVar=1/nbLog*sum(clusters$size*((dist(centerOfGravityClassif)[1:nbClust])^2))
+#    classifWithinVar=1/nbLog*sum(clusters$withinss)
+#    classifQuality=classifWithinVar/classifBetweenVar
+#    withinVarClassifOnTot=classifWithinVar/(classifBetweenVar+classifWithinVar)*100
+#    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
+#
+
+    # Within and between variance of clusters and classification
     centerOfGravityClassif=numeric()
+    withinVarClusters=numeric()
+    sizeClusti=numeric()
     centerOfGravityDatLog=colMeans(datLog)
-    centerOfGravityClassif=rbind(centerOfGravityDatLog,clusters$centers)
-    classifBetweenVar=1/nbLog*sum(clusters$size*((dist(centerOfGravityClassif)[1:k])^2))
-    classifWithinVar=1/nbLog*sum(clusters$withinss)
-    classifQuality=classifWithinVar/classifBetweenVar
-    withinVarClustersOnTot=(clusters$withinss/nbLog)*100/(classifBetweenVar+classifWithinVar)
-    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
+    centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
+    for(k in 1:nbClust){  # Within variance by cluster
+
+      clusti=datLog[which(clusters$cluster==k),]
+      if(length(which(clusters$cluster==k))==1)  centerOfGravityClusti=clusti
+      else centerOfGravityClusti=colMeans(clusti)
+      centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
+      sizeClusti[k]=nrow(clusti)
+      withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+
+    }
+    # Between variance
+    classifBetweenVar=(1/nbLog)*sum(sizeClusti*((dist(centerOfGravityClassif)[1:nbClust])^2))
+    # Within variance of clusters on totale variance (pourcent) and between variance on totale variance of classification
+    withinVarClusterOnTot=(1/nbLog)*sum(withinVarClusters)/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
+    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
+
 
     # Compute the test-values for species
     resval=test.values(clusters$cluster,datSpecies)
     # Determine the target species
     target=targetspecies(resval)
-    nbClust=length(clusters$size)
     rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
     
     
@@ -1001,6 +1026,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
   if(methMetier=="pam"){
 
     # Calculation of optimal k thanks to the silhouette
+    nbLog=nrow(datLog)
+
     clustersPam.silcoeff=numeric()
     for (k in 2:15){
       clustersPam=pam(datLog,k)
@@ -1013,32 +1040,56 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     clustersPam.silcoeff
     max=max(clustersPam.silcoeff, na.rm=T)
-    k=which(clustersPam.silcoeff==max)
+    nbClust=which(clustersPam.silcoeff==max)
 
     Store(objects())
     gc(reset=TRUE)
 
     # PAM with optimal k
-    clusters=pam(datLog,k)
+    clusters=pam(datLog,nbClust)
     summary(clusters)
 
-    # Quality of classification
-    nbLog=nrow(datLog)
+
+#    # Quality of classification
+#    nbLog=nrow(datLog)
+#    centerOfGravityClassif=numeric()
+#    centerOfGravityDatLog=colMeans(datLog)
+#    centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
+#
+#    for(i in 1:nbClust){
+#      clusti=datLog[which(clusters$clustering==i),]
+#      if(length(which(clusters$clustering==i))==1)  centerOfGravityClusti=clusti
+#      else centerOfGravityClusti=colMeans(clusti)
+#      centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
+#    }
+#    classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
+#    classifWithinVar=1/nbLog*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
+#    classifQuality=classifWithinVar/classifBetweenVar
+#    withinVarClassifOnTot=(clusters$clusinfo[,1]*clusters$clusinfo[,3]/nbLog)*100/(classifWithinVar+classifBetweenVar)
+#    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
+
+
+    # Within and between variance of clusters and classification
     centerOfGravityClassif=numeric()
+    withinVarClusters=numeric()
+    sizeClusti=numeric()
     centerOfGravityDatLog=colMeans(datLog)
     centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
+    for(k in 1:nbClust){  # Within variance by cluster
 
-    for(i in 1:k){
-      clusti=datLog[which(clusters$clustering==i),]
-      if(length(which(clusters$clustering==i))==1)  centerOfGravityClusti=clusti
+      clusti=datLog[which(clusters$clustering==k),]
+      if(length(which(clusters$clustering==k))==1)  centerOfGravityClusti=clusti
       else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
+      sizeClusti[k]=nrow(clusti)
+      withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+
     }
-    classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
-    classifWithinVar=1/nbLog*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
-    classifQuality=classifWithinVar/classifBetweenVar
-    withinVarClustersOnTot=(clusters$clusinfo[,1]*clusters$clusinfo[,3]/nbLog)*100/(classifWithinVar+classifBetweenVar)
-    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
+    # Between variance
+    classifBetweenVar=(1/nbLog)*sum(sizeClusti*((dist(centerOfGravityClassif)[1:nbClust])^2))
+    # Within variance of clusters on totale variance (pourcent) and between variance on totale variance of classification
+    withinVarClusterOnTot=(1/nbLog)*sum(withinVarClusters)/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
+    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
 
 
     # Compute the test-values for species
@@ -1369,35 +1420,58 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     gc(reset=TRUE)
 
     cat("silcoeff",clustersClara.silcoeff,"\n")
-    k=which.max(clustersClara.silcoeff)
+    nbClust=which.max(clustersClara.silcoeff)
+
 
     # CLARA with optimal k
-    clusters=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))  # CLARA with optimal k
+    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))  # CLARA with optimal k
     summary(clusters)
 
-    # Quality of classification
+#    # Quality of classification
+#    centerOfGravityClassif=numeric()
+#    centerOfGravityDatLog=colMeans(datLog)
+#    centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
+#
+#    for(i in 1:k){
+#      clusti=datLog[which(clusters$clustering==i),]
+#      if(length(which(clusters$clustering==i))==1)  centerOfGravityClusti=clusti
+#      else centerOfGravityClusti=colMeans(clusti)
+#      centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
+#    }
+#    classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
+#    classifWithinVar=1/nbLog*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
+#    classifQuality=classifWithinVar/classifBetweenVar
+#    withinVarClassifOnTot=(clusters$clusinfo[,1]*clusters$clusinfo[,3]/nbLog)*100/(classifWithinVar+classifBetweenVar)
+#    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
+
+
+    # Within and between variance of clusters and classification
     centerOfGravityClassif=numeric()
+    withinVarClusters=numeric()
+    sizeClusti=numeric()
     centerOfGravityDatLog=colMeans(datLog)
     centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
+    for(k in 1:nbClust){  # Within variance by cluster
 
-    for(i in 1:k){
-      clusti=datLog[which(clusters$clustering==i),]
-      if(length(which(clusters$clustering==i))==1)  centerOfGravityClusti=clusti
+      clusti=datLog[which(clusters$clustering==k),]
+      if(length(which(clusters$clustering==k))==1)  centerOfGravityClusti=clusti
       else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
+      sizeClusti[k]=nrow(clusti)
+      withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+      
     }
-    classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
-    classifWithinVar=1/nbLog*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
-    classifQuality=classifWithinVar/classifBetweenVar
-    withinVarClustersOnTot=(clusters$clusinfo[,1]*clusters$clusinfo[,3]/nbLog)*100/(classifWithinVar+classifBetweenVar)
-    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
+    # Between variance
+    classifBetweenVar=(1/nbLog)*sum(sizeClusti*((dist(centerOfGravityClassif)[1:nbClust])^2))
+    # Within variance of clusters on totale variance (pourcent) and between variance on totale variance of classification
+    withinVarClusterOnTot=(1/nbLog)*sum(withinVarClusters)/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
+    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+(1/nbLog)*sum(withinVarClusters))*100
 
 
     # Compute the test-values for species
     resval=test.values(clusters$cluster,datSpecies)
     # Determine the target species
     target=targetspecies(resval)
-    nbClust=length(clusters$i.med)
     rownames(target$tabnomespcib)=paste("Cluster",1:nbClust)
     
     
@@ -1499,13 +1573,23 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mat <- t(summaryClusters["Mean",,])
     rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
                               "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
+    #rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
     sp <- apply(mat,2, sum)
     colnames(mat)[sp<10] <- ""
     cc <- colorRampPalette(c("navajowhite", "steelblue2", "deepskyblue4"),space = "rgb", interpolate="spline")
     print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100), scales=list(cex=0.75)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
-
+    
+    # OR #
+    mat <- t(summaryClusters["Mean",,])
+    rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
+    sp <- apply(mat,2, sum)
+    colnames(mat)[sp<10] <- ""
+    cc <- colorRampPalette(c("navajowhite", "steelblue2", "deepskyblue4"),space = "rgb", interpolate="spline")
+    png(filename = paste(paste(analysisName,'mean_profile_by_cluster_levelplot_2',sep="_"),".png",sep=""), width = 400, height = 800)
+    print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100), scales=list(cex=0.8)))
+    dev.off()
   
 
     # Standard deviation profile by cluster
