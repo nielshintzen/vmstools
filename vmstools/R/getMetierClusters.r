@@ -1424,7 +1424,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # CLARA with optimal k
-    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))  # CLARA with optimal k
+    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*nbClust)))  # CLARA with optimal k
     summary(clusters)
 
 #    # Quality of classification
