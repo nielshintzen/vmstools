@@ -81,8 +81,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
         if(length(which(sampleClusters==k))==1)  centerOfGravityClusti=clusti
         else centerOfGravityClusti=colMeans(clusti)
         centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-        sizeClusti[k]=nrow(clusti)
-        withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+        sizeClusti[k]=length(which(sampleClusters==k))
+        if(length(which(sampleClusters==k))==1)  withinVarClusters[k]=0
+        else withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
 
       }
       # Between variance
@@ -319,8 +320,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       if(length(which(clusters==k))==1)  centerOfGravityClusti=clusti
       else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-      sizeClusti[k]=nrow(clusti)
-      withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+      sizeClusti[k]=length(which(clusters==k))
+      if(length(which(clusters==k))==1)  withinVarClusters[k]=0
+      else withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
 
     }
     # Between variance
@@ -702,8 +704,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       if(length(which(clusters$cluster==k))==1)  centerOfGravityClusti=clusti
       else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-      sizeClusti[k]=nrow(clusti)
-      withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+      sizeClusti[k]=length(which(clusters$cluster==k))
+      if(length(which(clusters$cluster==k))==1)  withinVarClusters[k]=0
+      else withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
 
     }
     # Between variance
@@ -1081,8 +1084,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       if(length(which(clusters$clustering==k))==1)  centerOfGravityClusti=clusti
       else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-      sizeClusti[k]=nrow(clusti)
-      withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+      sizeClusti[k]=length(which(clusters$clustering==k))
+      if(length(which(clusters$clustering==k))==1)  withinVarClusters[k]=0
+      else withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
 
     }
     # Between variance
@@ -1407,8 +1411,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     # Calculation of optimal k thanks to the silhouette
     clustersClara.silcoeff=numeric()
-    for (k in 3:15){
-      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*k)))
+    for (k in 3:20){
+      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(param2*nbLog+10*k)))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
     }
 
@@ -1424,7 +1428,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # CLARA with optimal k
-    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(0.01*nbLog+10*nbClust)))  # CLARA with optimal k
+    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(param2*nbLog+10*nbClust)))  # CLARA with optimal k
     summary(clusters)
 
 #    # Quality of classification
@@ -1457,8 +1461,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       if(length(which(clusters$clustering==k))==1)  centerOfGravityClusti=clusti
       else centerOfGravityClusti=colMeans(clusti)
       centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-      sizeClusti[k]=nrow(clusti)
-      withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
+      sizeClusti[k]=length(which(clusters$clustering==k))
+      if(length(which(clusters$clustering==k))==1)  withinVarClusters[k]=0
+      else withinVarClusters[k]=sum(apply(clusti,1,function(x) withinVar(x,centerOfGravityClusti)))
       
     }
     # Between variance
