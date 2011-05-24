@@ -1410,11 +1410,28 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbLog=nrow(datLog)
 
     # Calculation of optimal k thanks to the silhouette
+#    clustersClara.silcoeff=numeric()
+#    for (k in 3:20){
+#      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(param2*nbLog+10*k)))
+#      clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
+#    }
+
     clustersClara.silcoeff=numeric()
-    for (k in 3:20){
+    diffSilCoeff=numeric()
+    clustersClara.silcoeff[2]=0
+    k=2
+    repeat{
+      k=k+1
       clustersClara=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(param2*nbLog+10*k)))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
+      diffSilCoeff[k]=clustersClara.silcoeff[k]-clustersClara.silcoeff[k-1]
+      if(diffSilCoeff[k]<=0){
+        nbClust=k-1
+        break
+      }
     }
+    
+
 
     png(paste(analysisName,"Silhouette of the classification.png",sep="_"), width = 1200, height = 800)
     plot(clustersClara.silcoeff, main="Silhouette of the classification", xlab="Number of clusters", ylab="Silhouette")               # k optimal corresponds to maximum of silhouette's coefficients
@@ -1424,7 +1441,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     gc(reset=TRUE)
 
     cat("silcoeff",clustersClara.silcoeff,"\n")
-    nbClust=which.max(clustersClara.silcoeff)
+#    nbClust=which.max(clustersClara.silcoeff)
 
 
     # CLARA with optimal k
