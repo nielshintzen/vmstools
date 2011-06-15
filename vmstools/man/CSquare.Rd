@@ -2,7 +2,7 @@
 \alias{CSquare}
 \title{Calculate the CSquare notation from the GPS locations}
 \description{
-Compute the CSquare notatation from the GPS location where you can define what resolution
+Compute the CSquare notation from the GPS location where you can define what resolution
 you want the CSquare notation to be.
 }
 \usage{
