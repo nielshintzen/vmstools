@@ -100,15 +100,20 @@ plotTreeMap <-
       y1 <- an(ac(byRect[iRect,"SI_LATI"]))
 
       size <- an(ac(byRect[iRect, idx.col]))
-      size <- replace(size, is.na(size) | size==0,1)
+      size <- replace(size, is.na(size) | size==0,0.0001)
   
       z <- data.frame(size=size, one=acolors[1:((1+length(idx.col))-1)])
       z <- z[order(-z$size), ]
       squarified.treemap(z, x=x1, y=y1, w=gridcell[1], h=gridcell[2], hook=simple.hook)
 
       }
+    # add a grid
+    for(i in seq(xlim[1],xlim[2], by=gridcell[1])) abline(v=i, col=grey(0.9))
+    for(i in seq(ylim[1], ylim[2], by=gridcell[2])) abline(h=i,  col=grey(0.9))
+
+    # add the map again
     map("worldHires",add=TRUE,res=1,xlim=range(x$SI_LONG),ylim=range(x$SI_LATI),fill=T,col="darkgreen");map.axes();box()
-    legend("topright", legend=names(byRect[,idx.col]), fill=acolors[1:((1+length(idx.col))-1)])
+    legend("topright", legend=names(byRect[,idx.col]), fill=acolors[1:((1+length(idx.col))-1)], bg="white")
   
  
  
