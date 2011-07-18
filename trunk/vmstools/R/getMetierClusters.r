@@ -44,8 +44,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
       numSample=i
       print(paste("sample",i))
-      # Sample of size 10000 logevents
-      minsam=min(nbLog,10000)
+      # Sample of size 10000 logevents or 30% of all logevents
+      minsam=min(nbLog,max(10000,round(nbLog*30/100)))
       sam=sample(1:nbLog,size=minsam,replace=F)
       # Record the 5 samples
       sampleList=rbind(sampleList,sam)
@@ -56,7 +56,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       # HAC on the sample
       log.hac=hcluster(sampleDatLog, method=param1, link=param2)
       inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
-      nbClust=which(scree(inerties.vector)[,"epsilon"]<0)[2]
+      nbClust=which(scree(inerties.vector)[,"epsilon"]<0)[3]
 
       # Cut the dendogram at the selected level
       sampleClusters=cutree(log.hac,k=nbClust)
@@ -280,7 +280,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     # Determine the number of cluster thanks to the scree-test
     inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
-    nbClust=which(scree(inerties.vector)[,"epsilon"]<0)[2]
+    nbClust=which(scree(inerties.vector)[,"epsilon"]<0)[3]
 
     # Cut the dendogram at the selected level
     sampleClusters=cutree(log.hac,k=nbClust)
@@ -592,7 +592,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
     thresholdTestValue=50
-    thresholdLogevents=50
+    thresholdLogevents=30
     
     sppCumCatch=list()
     sppTestValue=list()
@@ -659,13 +659,16 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
   if(methMetier=="kmeans"){
     # Calculation of optimal k thanks to within variance
-    varintra=numeric()
     nbLog=nrow(datLog)
 
+    varintra=numeric()
     for (k in 2:15){
-      clustersKmeans=kmeans(datLog, k, iter.max=40, nstart=20)
+      clustersKmeans=kmeans(datLog, k, iter.max=60, nstart=10)
       varintra[k]=1/nbLog*sum(clustersKmeans$withinss)
     }
+    nbClust=which(scree(varintra)[,"epsilon"]<0)[3]
+    
+
     png(paste(analysisName,"Within variance of the classification.png",sep="_"), width = 1200, height = 800)
     plot(varintra,main="Within clusters variance",xlab="Number of clusters",ylab="Within Variance")
     dev.off()
@@ -673,24 +676,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     Store(objects())
     gc(reset=TRUE)
 
-    diffvarintra=diff(varintra,na.rm=T)
-    diffdiffvar=diff(diffvarintra,na.rm=T)
-    nbClust=which.max(diffdiffvar)+1
-
     # KMEANS with k optimal
-    clusters=kmeans(datLog, nbClust, iter.max=40, nstart=20, algorithm="Hartigan-Wong")
+    clusters=kmeans(datLog, nbClust, iter.max=60, nstart=10, algorithm="Hartigan-Wong")
 
-
-#    # Quality of classification
-#    centerOfGravityClassif=numeric()
-#    centerOfGravityDatLog=colMeans(datLog)
-#    centerOfGravityClassif=rbind(centerOfGravityDatLog,clusters$centers)
-#    classifBetweenVar=1/nbLog*sum(clusters$size*((dist(centerOfGravityClassif)[1:nbClust])^2))
-#    classifWithinVar=1/nbLog*sum(clusters$withinss)
-#    classifQuality=classifWithinVar/classifBetweenVar
-#    withinVarClassifOnTot=classifWithinVar/(classifBetweenVar+classifWithinVar)*100
-#    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
-#
 
     # Within and between variance of clusters and classification
     centerOfGravityClassif=numeric()
@@ -961,7 +949,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
     thresholdTestValue=50
-    thresholdLogevents=50
+    thresholdLogevents=30
     
     sppCumCatch=list()
     sppTestValue=list()
@@ -1051,25 +1039,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # PAM with optimal k
     clusters=pam(datLog,nbClust)
     summary(clusters)
-
-
-#    # Quality of classification
-#    nbLog=nrow(datLog)
-#    centerOfGravityClassif=numeric()
-#    centerOfGravityDatLog=colMeans(datLog)
-#    centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
-#
-#    for(i in 1:nbClust){
-#      clusti=datLog[which(clusters$clustering==i),]
-#      if(length(which(clusters$clustering==i))==1)  centerOfGravityClusti=clusti
-#      else centerOfGravityClusti=colMeans(clusti)
-#      centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-#    }
-#    classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
-#    classifWithinVar=1/nbLog*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
-#    classifQuality=classifWithinVar/classifBetweenVar
-#    withinVarClassifOnTot=(clusters$clusinfo[,1]*clusters$clusinfo[,3]/nbLog)*100/(classifWithinVar+classifBetweenVar)
-#    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
 
 
     # Within and between variance of clusters and classification
@@ -1342,7 +1311,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
     thresholdTestValue=50
-    thresholdLogevents=50
+    thresholdLogevents=30
     
     sppCumCatch=list()
     sppTestValue=list()
@@ -1410,28 +1379,47 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     nbLog=nrow(datLog)
 
     # Calculation of optimal k thanks to the silhouette
-#    clustersClara.silcoeff=numeric()
-#    for (k in 3:20){
-#      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(param2*nbLog+10*k)))
-#      clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
-#    }
-
     clustersClara.silcoeff=numeric()
-    diffSilCoeff=numeric()
+    clustersClara.silcoeff[1]=0
     clustersClara.silcoeff[2]=0
+    clustersClara.silcoeff[3]=0
     k=2
+    compMax=1
     repeat{
-      k=k+1
-      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(param2*nbLog+10*k)))
+      k=k+2
+      print(k)
+      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(param2*nbLog+10*k)))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
-      diffSilCoeff[k]=clustersClara.silcoeff[k]-clustersClara.silcoeff[k-1]
-      if(diffSilCoeff[k]<=0){
-        nbClust=k-1
-        break
+      clustersClara=clara(datLog, k+1, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(param2*nbLog+10*(k+1))))
+      clustersClara.silcoeff[k+1]=clustersClara$silinfo$avg.width
+      if((clustersClara.silcoeff[k-2]<clustersClara.silcoeff[k-1] & clustersClara.silcoeff[k-1]>clustersClara.silcoeff[k]) & compMax<=2){
+        if(compMax==2){
+          nbClust=k-1
+          print(paste("2e max =",k-1))
+          print(paste("nbClust =",nbClust))
+          break
+        } else {
+          compMax=compMax+1
+          print(paste("compMax1 =",compMax))
+          print(paste("1er max =",k-1))
+        }
       }
+      if((clustersClara.silcoeff[k-1]<clustersClara.silcoeff[k] & clustersClara.silcoeff[k]>clustersClara.silcoeff[k+1]) & compMax<=2){
+        if(compMax==2){
+          nbClust=k
+          print(paste("2e max =",k))
+          print(paste("nbClust =",nbClust))
+          break
+        } else {
+          compMax=compMax+1
+          print(paste("compMax2 =",compMax))
+          print(paste("1er max =",k))
+        }
+      }
+    Store(objects())
+    gc(reset=TRUE)
     }
     
-
 
     png(paste(analysisName,"Silhouette of the classification.png",sep="_"), width = 1200, height = 800)
     plot(clustersClara.silcoeff, main="Silhouette of the classification", xlab="Number of clusters", ylab="Silhouette")               # k optimal corresponds to maximum of silhouette's coefficients
@@ -1441,29 +1429,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     gc(reset=TRUE)
 
     cat("silcoeff",clustersClara.silcoeff,"\n")
-#    nbClust=which.max(clustersClara.silcoeff)
 
 
     # CLARA with optimal k
-    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=10, sampsize=min(nbLog,round(param2*nbLog+10*nbClust)))  # CLARA with optimal k
+    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(param2*nbLog+10*nbClust)))  # CLARA with optimal k
     summary(clusters)
-
-#    # Quality of classification
-#    centerOfGravityClassif=numeric()
-#    centerOfGravityDatLog=colMeans(datLog)
-#    centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityDatLog)
-#
-#    for(i in 1:k){
-#      clusti=datLog[which(clusters$clustering==i),]
-#      if(length(which(clusters$clustering==i))==1)  centerOfGravityClusti=clusti
-#      else centerOfGravityClusti=colMeans(clusti)
-#      centerOfGravityClassif=rbind(centerOfGravityClassif,centerOfGravityClusti)
-#    }
-#    classifBetweenVar=1/nbLog*sum(clusters$clusinfo[,1]*((dist(centerOfGravityClassif)[1:k])^2))
-#    classifWithinVar=1/nbLog*sum(clusters$clusinfo[,1]*clusters$clusinfo[,3])
-#    classifQuality=classifWithinVar/classifBetweenVar
-#    withinVarClassifOnTot=(clusters$clusinfo[,1]*clusters$clusinfo[,3]/nbLog)*100/(classifWithinVar+classifBetweenVar)
-#    betweenVarClassifOnTot=classifBetweenVar/(classifBetweenVar+classifWithinVar)*100
 
 
     # Within and between variance of clusters and classification
@@ -1539,7 +1509,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     abline(h=0, lty=2) ; abline(v=0, lty=2)
     savePlot(filename=paste(analysisName,'projections_2_3_CLARA',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
-
 
     # Catch profile of the dataset
     meanprofile=colMeans(datSpecies)
@@ -1758,7 +1727,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
     thresholdTestValue=50
-    thresholdLogevents=50
+    thresholdLogevents=30
     
     sppCumCatch=list()
     sppTestValue=list()
