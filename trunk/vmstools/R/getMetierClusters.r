@@ -1377,8 +1377,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
   if(methMetier=="clara"){
     nbLog=nrow(datLog)
+    param2=0.1
 
-    # Calculation of optimal k thanks to the silhouette
+    # Calculation of optimal k thanks to the silhouette (second maximum)
     clustersClara.silcoeff=numeric()
     clustersClara.silcoeff[1]=0
     clustersClara.silcoeff[2]=0
