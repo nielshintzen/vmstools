@@ -17,13 +17,13 @@ a classification of all individuals (logevents), but they differ in their nature
 The HAC method works by calculating the distance between individuals using the method selected with param1 ("euclidean", "maximum", "manhattan", "canberra", "binary" or "minkowski")
 and aggregating them based on the distance between clusters, using the link selected with param2 ("ward", "single", "complete", "average", "mcquitty", "median" or "centroid").
 In HAC, the number of classes is determined afterwards, once all combinations have been calculated, by using the objective criteria of scree test which
-detects the largest marginal loss of inertia between two consecutive numbers of classes. Therefore, the computing time and memory request for this method
+detects the third largest marginal loss of inertia between two consecutive numbers of classes. Therefore, the computing time and memory request for this method
 can be quite comprehensive, and may reach memory limits on standard PC when operating with very large datasets. 
 
 The K-Means method works by randomly choosing k individuals, or kernels (k corresponding to the final number of classes), and then affecting each individuals of the 
 dataset to the closest kernel. Each time, the gravity center of the class is recalculated, thus reinitialising the calculation of distances to the next 
 individual. In order to define the most appropriate number of classes, this procedure is repeated with differents values for k, from 2 to 15. The final number
-of classes is identified by detecting the largest marginal loss of inertia between two consecutive numbers of classes. 
+of classes is identified by detecting the largest marginal loss of inertia between two consecutive numbers of classes by using the criteria of scree test.
 
 The PAM method works slightly around the same principle, starting with the initialisation of k medoids. The medoid is the individual in a class which shows
 least dissimilarity with other individuals in the same class, and the remaining individuals are affected to their closest medoid. Then the sum of dissimilarities
@@ -35,7 +35,7 @@ class, and is therefore an objective measurement of the quality of the classific
 value is closest from 1. It is to be noted that the PAM method is not designed for working with very large datasets (>10 000 lines), and may quickly reach memory limits. 
  
 The CLARA method is an extension of the PAM algorithm aiming at working with large datasets, and is therefore more efficient and powerful than PAM. 
-It works by sampling 10 subsets of the dataset and running the PAM algorithm explained above on these subsets, and then to keep only the subset giving 
+It works by sampling 5 subsets of the dataset and running the PAM algorithm explained above on these subsets, and then to keep only the subset giving
 the best classification (silhouette). Afterwards, all remaining individuals are affected to their closest medoid, using user-defined method (param1) for calculating
 distances ('euclidean' being used as the default, but 'manhattan' could also be used). 
 
