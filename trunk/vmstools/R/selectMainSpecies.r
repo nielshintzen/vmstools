@@ -211,6 +211,18 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     savePlot(filename = paste(analysisName,'Number of main species',sep="_"),type ="png")
     dev.off()
 
+    # Black and white version
+    X11(5,5)
+    plot(seq(0,100,5),nbMainSpeciesTotal, type='l' ,lty='dashed', col="black",lwd=3, axes=FALSE, xlab="Threshold (%)",ylab="Number of species")
+    lines(seq(0,100,5),nbMainSpeciesLogevent, type='l', lty='dotted', col="black",lwd=3)
+    if(!is.na(nbMainSpeciesHAC)) segments(0,nbMainSpeciesHAC,100,nbMainSpeciesHAC,col="black",lwd=3)
+    axis(1)
+    axis(2, las=2)
+    box()
+    legend(20, p*0.9, c( "HAC", "PerTotal", "PerLogevent"),lwd=3,col=c("black", "black", "black"),bty="n",lty=c('solid','dashed','dotted'),box.lty = par("lty"))
+    savePlot(filename = paste(analysisName,'Number of main species_BW',sep="_"),type ="png")
+    dev.off()
+    
     # Median percentage of catch represented by main species by logevent
     if(DiagFlag){
       png(paste(analysisName,"Median percentage of catch represented by main species by logevent.png",sep="_"), width = 1200, height = 800)
