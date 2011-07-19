@@ -71,4 +71,4 @@ legend("bottomleft",legend=c("Land",ac(unique(habitat[[what.habitat.grouping]]))
 
 
 
-plot.habitat.map(read.in.shapefile=FALSE,what.habitat.grouping="SubsGrpPlu",min.lon= -5,max.lon=10, min.lat=45,max.lat=65)
+#plot.habitat.map(read.in.shapefile=FALSE,what.habitat.grouping="SubsGrpPlu",min.lon= -5,max.lon=10, min.lat=45,max.lat=65)
