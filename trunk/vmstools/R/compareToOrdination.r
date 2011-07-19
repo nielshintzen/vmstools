@@ -13,10 +13,10 @@
 compareToOrdination=function(dat, Step2, clusters, targetSpecies){
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
-  data(correspLevel7to5)
+  #data(correspLevel7to5)
   
   # Load the table linking mixed metiers (composed by 2 simple metiers) to their official code of mixed metiers level 5 (FAO - 3 characters).
-  data(correspMixedMetier)
+  #data(correspMixedMetier)
   
   
   ##########################
