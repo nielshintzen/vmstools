@@ -60,7 +60,7 @@ extractTableMainSpecies = function(dat,namesMainSpeciesHAC,paramTotal=95,paramLo
 
     # We are building the table with main species and aggregated other species
     datSpecies=building_tab_pca(propdat,listSpeciesAll)
-    rownames(datSpecies)=dat$LE_ID
+    rownames(datSpecies)=dat[,1]
 
 
     print(" --- end of step 1 ---")
