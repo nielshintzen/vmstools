@@ -4,13 +4,13 @@
 ##              LOT 2 - VMS LOGBOOKS (WP2)                                       ##
 ##                                                                               ##
 ##                                                                               ##
-## Authors : Nicolas Deporte (IFREMER / OCEANIC DEVELOPMENT)                     ## 
+## Authors : Nicolas Deporte (IFREMER / OCEANIC DEVELOPMENT)                     ##
 ##           Stephanie Mahévas, Sebastien Demaneche (IFREMER)                    ##
 ##           Clara Ulrich, Francois Bastardie (DTU Aqua)                         ##
 ##                                                                               ##
-## Last update : February 2011   ,                                               ##
+## Last update : July 2011   ,                                                   ##
 ##                                                                               ##
-## Runs with R 2.11.1                                                            ##
+## Runs with R 2.13.0                                                            ##
 ##                                                                               ##
 ###################################################################################
 
@@ -19,8 +19,10 @@
 rm(list=ls(all=TRUE))
 gc(reset=TRUE)
 
-path <- "C:/Nicolas/Scripts/R/Analyses"
+path <- "Q:/Nicolas/Scripts/R/Analyses"
 setwd(path) # you must choose the path of your working directory
+
+path="/home4/nantes/commun/mequapro/Action3Methode/Stat-Methode-Mequapro/EtudePCP/R/Rjuin2011"
 
 source("multivariateClassificationUtils.r")
 source("extractTableMainSpecies.r")
@@ -38,7 +40,7 @@ memory.limit(size=4000)
 load("correspLevel7to5.rda")
 load("correspMixedMetier.rda")
 
-path <- "C:/Nicolas/Scripts/R/Analyses/Donnees_completes"
+path <- "Q:/Nicolas/Scripts/R/Analyses/Donnees_completes_3"
 setwd(path)
 
 #-----------------------------
@@ -56,8 +58,10 @@ analysisName=paste(country,"_",Gear,year,"_",AreaCodename,sep="")
 #
 #test=getEflaloMetierLevel7(dat,analysisName,path,critData="EURO",runHACinSpeciesSelection=TRUE,paramTotal=95,paramLogevent=100,critPca="PCA_70",algoClust="CLARA")
 #
-# load your own dataset (called dat1 here)
-load("All_eflalo_2007OTB3a4.Rdata")
+# load your own dataset (called dat here)
+#load("All_eflalo_2007OTB3a4.Rdata")
+
+load("2007_Combined_AllCountries_30mar2011.Rdata")
 
 # creating the directory of the analysis
 if (!file.exists(analysisName)) dir.create(analysisName)
@@ -66,40 +70,40 @@ setwd(paste(path,analysisName,sep="/"))
 if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)      
 
 
-eflalo_ori <- dat1 # keeping this in cached memory for making the final merging at the end
+eflalo_ori <- dat # keeping this in cached memory for making the final merging at the end
 Store(eflalo_ori)
 
 # ! KEEPING ONLY LE_ID AND THE OUTPUT YOU WANT TO GET  (KG/EURO)
-dat1 <- dat1[,c("LE_ID",grep("EURO",names(dat1),value=T))]
-dat1[is.na(dat1)]=0
+dat <- dat[,c("LE_ID",grep("EURO",names(dat),value=T))]
+dat[is.na(dat)]=0
 
 #removing negative and null values
 null.value <- vector()
-for (i in grep("EURO",names(dat1))) null.value <- c(null.value,which(dat1[,i]<0))
-null.value <- c(null.value,which(apply(dat1[,2:ncol(dat1)],1,sum,na.rm=T)==0))
+for (i in grep("EURO",names(dat))) null.value <- c(null.value,which(dat[,i]<0))
+null.value <- c(null.value,which(apply(dat[,2:ncol(dat)],1,sum,na.rm=T)==0))
 
 if(length(null.value)!=0) {
-  LogEvent.removed <- dat1[sort(unique(null.value)),]
-  dat1 <- dat1[-sort(unique(null.value)),]
-  Store(LogEvent.removed)
+  LogEvent.removed <- dat[sort(unique(null.value)),]
+  dat <- dat[-sort(unique(null.value)),]
+  #Store(LogEvent.removed)
 }
 
-names(dat1)[-1]=unlist(lapply(strsplit(names(dat1[,-1]),"_"),function(x) x[[3]]))
+names(dat)[-1]=unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 
 #removing miscellaneous species
-dat1 <- dat1[,!names(dat1)=="MZZ"]
+dat <- dat[,!names(dat)=="MZZ"]
 
-save(dat1, file="dat1_2007.Rdata")
-#load("dat1_2007.Rdata")
+save(dat, file="dat_2007.Rdata")
+#load("dat_2007.Rdata")
 
 #-----------------------------
 # II. EXPLORING THE VARIOUS METHODS FOR IDENTIFYING MAIN SPECIES AND KEEPING THEM IN THE DATA SET (STEP 1)
 #-----------------------------
 #EXPLORATION
-explo=selectMainSpecies(dat1,analysisName,RunHAC=TRUE,DiagFlag=FALSE)
+explo=selectMainSpecies(dat,analysisName,RunHAC=TRUE,DiagFlag=FALSE)
 
 # Step 1 : selection of main species
-Step1=extractTableMainSpecies(dat1,explo$namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
+Step1=extractTableMainSpecies(dat,explo$namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
 
 save(explo,Step1,file="Explo_Step1.Rdata")
 
@@ -158,18 +162,21 @@ save(Step3,file="Step3.Rdata")
 #-----------------------------
 
 #choosing the final option
-setwd(paste(path,analysisName,sep=""))
+setwd(paste(path,analysisName,sep="/"))
 
 load("PCA_70/CLARA/Step3.Rdata")
 
-if(!nrow(dat1)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
+if(!nrow(dat)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
 
-dat1 <- cbind(dat1,CLUSTER=Step3$LE_ID_clust[,"clust"])
+dat_WithClusters <- cbind(dat,CLUSTER=Step3$LE_ID_clust[,"clust"])
 
 #now reload the full data set
-if(length(null.value)!=0) eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
-else eflalo_ori[,"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
+if(length(null.value)!=0){ eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
+} else { eflalo_ori[,"CLUSTER"] <- Step3$LE_ID_clust[,"clust"] }
+eflalo_ori_WithClusters=eflalo_ori
 
+save(dat_WithClusters,file="dat_WithClusters.Rdata")
+save(eflalo_ori_WithClusters,file="eflalo_ori_WithClusters.Rdata")
 
 
 #-----------------------------------------------------
@@ -178,7 +185,7 @@ else eflalo_ori[,"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
 
 # load previous R objects (Step1,Step2,Step3)
 setwd(paste(path,analysisName,sep="/"))
-load("dat1_2007.Rdata")
+load("dat_2007.Rdata")
 load("Explo_Step1.Rdata")
 option_step2="PCA_70"
 setwd(paste(path,analysisName,option_step2,sep="/"))
@@ -190,7 +197,7 @@ compOrdin="CompOrdin"
 if (!file.exists(compOrdin)) dir.create(compOrdin)
 setwd(paste(path,analysisName,option_step2,option_step3,compOrdin,sep="/"))
 if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)  
-compMetiers=compareToOrdination(dat=dat1,Step2=Step2,clusters=Step3$clusters$clustering,targetSpecies=Step3$targetSpecies)
+compMetiers=compareToOrdination(dat=dat,Step2=Step2,clusters=Step3$clusters$clustering,targetSpecies=Step3$targetSpecies)
 save(compMetiers,file="compMetiers.Rdata")
 
 
@@ -216,7 +223,7 @@ load(paste(analysisName,"/Explo_Step1.Rdata",sep=""))
 rm(explo)
 gc()
 
-# load your new dataset (called dat1 here)
+# load your new dataset (called dat here)
 #! KEEPING ONLY LE_ID AND THE OUTPUT YOU WANT TO GET  (KG/EURO)
 new_country <- "All"
 new_year <- 2008
@@ -225,16 +232,16 @@ new_Gear <- c("OTB")
 newAnalysisName=paste(new_country,"_",new_Gear,new_year,"_",new_AreaCodename,sep="")
 #load("All_eflalo_2008OTB3a4.Rdata")
 setwd(paste(path,newAnalysisName,sep="/"))
-load("dat1_2008.Rdata")
+load("dat_2008.Rdata")
 
-# if dat1 is ready, use :
-    datPred=dat1
-    rm(dat1)
+# if dat is ready, use :
+    datPred=dat
+    rm(dat)
     gc()
 
-# else, if dat1 is a EFLALO format dataset, use :
-    datPred <- dat1[,c("LE_ID",grep("EURO",names(dat1),value=T))]
-    rm(dat1)
+# else, if dat is a EFLALO format dataset, use :
+    datPred <- dat[,c("LE_ID",grep("EURO",names(dat),value=T))]
+    rm(dat)
     gc()
     datPred[is.na(datPred)]=0
     
