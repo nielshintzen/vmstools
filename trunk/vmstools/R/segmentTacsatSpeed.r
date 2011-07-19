@@ -402,14 +402,15 @@ segmentTacsatSpeed <- function(tacsat,
   b2 <- tapply(tacsat2$bound2, tacsat2$LE_GEAR, mean, na.rm=TRUE)
   cat(paste("lower speed bound mean:",round(b1,1),"knots\n"))
   cat(paste("upper speed bound mean:",round(b2,1),"knots\n"))
-  X11()
-  op <- par(no.readonly = TRUE) 
-  par(mfrow=c(1,2))
-  boxplot(bound1 ~ LE_GEAR, data=tacsat2, ylim=c(0,8))
-  boxplot(bound2 ~ LE_GEAR, data=tacsat2, ylim=c(0,8))
-  par(op)
-  dev.off()
-  
+  if(general$visual.check){
+    X11()
+    op <- par(no.readonly = TRUE)
+    par(mfrow=c(1,2))
+    boxplot(bound1 ~ LE_GEAR, data=tacsat2, ylim=c(0,8))
+    boxplot(bound2 ~ LE_GEAR, data=tacsat2, ylim=c(0,8))
+    par(op)
+    dev.off()
+  }
   # save
   write.table(tacsat2[,c("VE_REF","LE_GEAR","bound1","bound2")], append=TRUE,
    file = file.path(general$output.path,
