@@ -305,7 +305,6 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusters=numeric(length=nbLog)
     clusters[sam]=sampleClusters
     clusters[outofsam]=pred$class
-    #datLogWithClusters=cbind(datLog,clusters)
 
 
     # Within and between variance of clusters and classification
@@ -442,6 +441,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     }
     par(op)
     title(main=paste("Catch profile by cluster","\n","\n",sep=""))
+    dev.off()
+
+
+    # For a paper : levelplot
+    X11(5,10)
+    mat <- t(summaryClusters["Mean",,])
+    rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
+                              "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
+    #rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
+    sp <- apply(mat,2, sum)
+    colnames(mat)[sp<10] <- ""
+    cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
+    print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100), scales=list(cex=0.75)))
+    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
 
@@ -802,6 +815,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     dev.off()
 
 
+    # For a paper : levelplot
+    X11(5,10)
+    mat <- t(summaryClusters["Mean",,])
+    rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
+                              "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
+    #rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
+    sp <- apply(mat,2, sum)
+    colnames(mat)[sp<10] <- ""
+    cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
+    print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100), scales=list(cex=0.75)))
+    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
+    dev.off()
+
+
     # Standard deviation profile by cluster
     sdprofil=matrix(0,nrow=nbClust,ncol=nbSpec)
     namSdPlot=character()
@@ -1016,25 +1043,59 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
   if(methMetier=="pam"){
 
-    # Calculation of optimal k thanks to the silhouette
+    # Calculation of optimal k thanks to the silhouette (second maximum)
     nbLog=nrow(datLog)
 
     clustersPam.silcoeff=numeric()
-    for (k in 2:15){
+    clustersPam.silcoeff[1]=0
+    clustersPam.silcoeff[2]=0
+    clustersPam.silcoeff[3]=0
+    
+    k=2
+    compMax=1
+    repeat{
+      k=k+2
+      print(k)
       clustersPam=pam(datLog,k)
       clustersPam.silcoeff[k]=clustersPam$silinfo$avg.width
+      clustersPam=pam(datLog,k+1)
+      clustersPam.silcoeff[k+1]=clustersPam$silinfo$avg.width
+      if((clustersPam.silcoeff[k-2]<clustersPam.silcoeff[k-1] & clustersPam.silcoeff[k-1]>clustersPam.silcoeff[k]) & compMax<=2){
+        if(compMax==2){
+          nbClust=k-1
+          print(paste("2e max =",k-1))
+          print(paste("nbClust =",nbClust))
+          break
+        } else {
+          compMax=compMax+1
+          print(paste("compMax1 =",compMax))
+          print(paste("1er max =",k-1))
+        }
+      }
+      if((clustersPam.silcoeff[k-1]<clustersPam.silcoeff[k] & clustersPam.silcoeff[k]>clustersPam.silcoeff[k+1]) & compMax<=2){
+        if(compMax==2){
+          nbClust=k
+          print(paste("2e max =",k))
+          print(paste("nbClust =",nbClust))
+          break
+        } else {
+          compMax=compMax+1
+          print(paste("compMax2 =",compMax))
+          print(paste("1er max =",k))
+        }
+      }
+    Store(objects())
+    gc(reset=TRUE)
     }
 
     png(paste(analysisName,"Silhouette of the classification.png",sep="_"), width = 1200, height = 800)
-    plot(clustersPam.silcoeff, main="Silhouette of the classification", xlab="Number of clusters", ylab="Silhouette") # k optimal corresponds to maximum of silhouette's coefficients
+    plot(clustersPam.silcoeff, main="Silhouette of the classification", xlab="Number of clusters", ylab="Silhouette") # k optimal corresponds to second maximum of silhouette's coefficients
     dev.off()
-
-    clustersPam.silcoeff
-    max=max(clustersPam.silcoeff, na.rm=T)
-    nbClust=which(clustersPam.silcoeff==max)
 
     Store(objects())
     gc(reset=TRUE)
+
+    cat("PamSilCoeff",clustersPam.silcoeff,"\n")
 
     # PAM with optimal k
     clusters=pam(datLog,nbClust)
@@ -1162,6 +1223,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     }
     par(op)
     title(main=paste("Catch profile by cluster","\n","\n",sep=""))
+    dev.off()
+
+
+    # For a paper : levelplot
+    X11(5,10)
+    mat <- t(summaryClusters["Mean",,])
+    rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
+                              "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
+    #rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
+    sp <- apply(mat,2, sum)
+    colnames(mat)[sp<10] <- ""
+    cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
+    print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100), scales=list(cex=0.75)))
+    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
 
@@ -1377,7 +1452,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
   if(methMetier=="clara"){
     nbLog=nrow(datLog)
-    param2=0.1
+    propSample=0.1
 
     # Calculation of optimal k thanks to the silhouette (second maximum)
     clustersClara.silcoeff=numeric()
@@ -1389,9 +1464,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     repeat{
       k=k+2
       print(k)
-      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(param2*nbLog+10*k)))
+      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(propSample*nbLog+10*k)))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
-      clustersClara=clara(datLog, k+1, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(param2*nbLog+10*(k+1))))
+      clustersClara=clara(datLog, k+1, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(propSample*nbLog+10*(k+1))))
       clustersClara.silcoeff[k+1]=clustersClara$silinfo$avg.width
       if((clustersClara.silcoeff[k-2]<clustersClara.silcoeff[k-1] & clustersClara.silcoeff[k-1]>clustersClara.silcoeff[k]) & compMax<=2){
         if(compMax==2){
@@ -1429,11 +1504,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     Store(objects())
     gc(reset=TRUE)
 
-    cat("silcoeff",clustersClara.silcoeff,"\n")
+    cat("ClaraSilCoeff",clustersClara.silcoeff,"\n")
 
 
     # CLARA with optimal k
-    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(param2*nbLog+10*nbClust)))  # CLARA with optimal k
+    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(propSample*nbLog+10*nbClust)))  # CLARA with optimal k
     summary(clusters)
 
 
@@ -1568,7 +1643,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
     sp <- apply(mat,2, sum)
     colnames(mat)[sp<10] <- ""
-    cc <- colorRampPalette(c("navajowhite", "steelblue2", "deepskyblue4"),space = "rgb", interpolate="spline")
+    cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
     print(levelplot(mat, cut=20, aspect=3, xlab="", ylab="", col.regions=cc(100), scales=list(cex=0.75)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
