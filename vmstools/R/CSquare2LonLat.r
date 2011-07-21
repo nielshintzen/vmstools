@@ -46,23 +46,3 @@ if(degrees == 0.01){
   lon <- ((tenslond*10)+ unitslond + (tenthslond*0.1)+(hundlond*0.01)+0.005)*gqlon-ra
 }
 return(data.frame(SI_LATI=lat,SI_LONG=lon))}
-
-
-
-
-
-
-
-data(tacsat)
-tacsat$CSquare  <- CSquare(tacsat$SI_LONG,tacsat$SI_LATI,0.01)
-tacsat$SI_LONG2 <- CSquare2LonLat(tacsat$CSquare,0.01)$SI_LONG
-tacsat$SI_LATI2 <- CSquare2LonLat(tacsat$CSquare,0.01)$SI_LATI
-tacsat$CSquare2 <- CSquare(tacsat$SI_LONG2,tacsat$SI_LATI2,0.01)
-head(tacsat[which(tacsat$CSquare != tacsat$CSquare2),])
-
-data(tacsat)
-tacsat$CSquare  <- CSquare(tacsat$SI_LONG,tacsat$SI_LATI,0.05)
-tacsat$SI_LONG2 <- CSquare2LonLat(tacsat$CSquare,0.5)$SI_LONG
-tacsat$SI_LATI2 <- CSquare2LonLat(tacsat$CSquare,0.5)$SI_LATI
-tacsat$CSquare2 <- CSquare(tacsat$SI_LONG2,tacsat$SI_LATI2,1)
-head(tacsat[which(tacsat$CSquare != tacsat$CSquare2),])
