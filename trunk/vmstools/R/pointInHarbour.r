@@ -1,8 +1,8 @@
 pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE){
 
-    xharb     <- unlist(lapply(harbours,function(x){return(x[,"lon"])}))
-    yharb     <- unlist(lapply(harbours,function(x){return(x[,"lat"])}))
-    rharb     <- unlist(lapply(harbours,function(x){return(x[,"range"])}))
+    xharb     <- harbours$lon
+    yharb     <- harbours$lat
+    rharb     <- harbours$range
     harb      <- cbind(xharb,yharb,rharb)
     harb      <- orderBy(~xharb+yharb,data=harb)
 
