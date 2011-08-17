@@ -16,7 +16,6 @@ kgeur(colnames(eflalo))
   Colnames of eflalo dataset
 }
 }
-}
 \references{EU Lot 2 project}
 \author{Niels T. Hintzen}
 \examples{
