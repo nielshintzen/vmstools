@@ -59,15 +59,17 @@ Niels T. Hintzen
 \examples{
 data(tacsat)
 
-obs <- tacsat[round(seq(1,nrow(tacsat),length.out=30)),]
-obs <- obs[,c(1,2,3,4,5,6)]
-obs$OB_TYP <- "Benthos"
+obs           <- tacsat[round(seq(1,nrow(tacsat),length.out=30)),]
+obs           <- obs[,c(1,2,3,4,5,6)]
+obs$OB_TYP    <- "Benthos"
 colnames(obs) <- c("OB_COU","OB_REF","SI_LATI","SI_LONG","SI_DATE","SI_TIME","OB_TYP")
-obs$SI_TIME   <- ac(format(as.POSIXct(obs$SI_TIME,format="%H:%M")-runif(30,-60*20,60*20),format="%H:%M"))
+newTime       <- as.POSIXct(paste(obs$SI_DATE,obs$SI_TIME),format="%d/%m/%Y %H:%M:%S") - runif(30,-60*20,60*20)
+obs$SI_TIME   <- format(newTime,format="%H:%M")
 obs$SI_LATI   <- jitter(obs$SI_LATI,factor=0.25)
 obs$SI_LONG   <- jitter(obs$SI_LONG,factor=0.5)
 
-a <- clipObs2Tacsat(tacsat,obs,method="grid",control.grid=list(resx=0.1,resy=0.05,gridBbox="obs"),temporalRange=c(-30,120),all.t=F)
-a <- clipObs2Tacsat(tacsat,obs,method="euclidean",control.euclidean=list(threshold=1),temporalRange=c(-1e10,-1) ,all.t=F)
+
+#a <- clipObs2Tacsat(tacsat,obs,method="grid",control.grid=list(resx=0.1,resy=0.05,gridBbox="obs"),temporalRange=c(-30,120),all.t=F)
+#a <- clipObs2Tacsat(tacsat,obs,method="euclidean",control.euclidean=list(threshold=1),temporalRange=c(-1e10,-1) ,all.t=F)
 }
 
