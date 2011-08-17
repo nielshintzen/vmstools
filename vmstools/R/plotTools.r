@@ -1,5 +1,7 @@
-plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,...){
-  
+plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),...){
+  library(RColorBrewer)
+  library(maps)
+  library(mapdata)
   if(is.null(color)==T) color <- brewer.pal(9,"YlOrRd")
   
     #TACSAT
@@ -13,20 +15,26 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
     x                     <- x[idxx[which(idxx %in% idxy)],]
     x$SI_LONG             <- af(ac(x$SI_LONG))
     x$SI_LATI             <- af(ac(x$SI_LATI))
-    
+    if(is.null(control.tacsat$clm)==T){
+        control.tacsat$clm  <- "idx"
+        x$idx               <- 1:nrow(x)
+    }
+      
     #---------------------------------------------------------------------------
     #- Sum by rectangle
     #---------------------------------------------------------------------------
     if(level == "ICESrectangle"){
       x$SI_LONG             <- af(ICESrectangle2LonLat(ac(x$LE_RECT))[,2])
       x$SI_LATI             <- af(ICESrectangle2LonLat(ac(x$LE_RECT))[,1])
+
       DT                    <- data.table(x)
-      eq1                   <- c.listquote(paste("sum(",colnames(x[,kgeur(colnames(x))]),")",sep=""))
+      eq1                   <- c.listquote(paste("sum(",control.tacsat$clm,")",sep=""))
       eq2                   <- c.listquote(c("SI_LONG","SI_LATI"))
       
-      byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",colnames(x)[kgeur(colnames(x))])
+      byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",control.tacsat$clm)
       byRect                <- byRect[which(is.na(byRect$SI_LONG)==F & is.na(byRect$SI_LATI) == F),]
-      rangeRect             <- range(apply(byRect[,kgeur(colnames(byRect))],1,sum,na.rm=T))
+      if(length(control.tacsat$clm)>1)  rangeRect             <- range(apply(byRect[,control.tacsat$clm],1,sum,na.rm=T))
+      if(length(control.tacsat$clm)==1) rangeRect             <- range(byRect[,control.tacsat$clm],na.rm=T)
       rangeRect             <- c(0,rangeRect[2])
     }
     #---------------------------------------------------------------------------
@@ -42,15 +50,17 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
       DT$x                  <- af(ac(grids@coords[DT$dens,1]))
       DT$y                  <- af(ac(grids@coords[DT$dens,2]))
       
-      eq1                   <- c.listquote(paste("sum(",names(coords[,kgeur(names(coords))]),")",sep=""))
+      eq1                   <- c.listquote(paste("sum(",control.tacsat$clm,")",sep=""))
       eq2                   <- c.listquote(c("x","y"))
       
-      byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",names(coords)[kgeur(names(coords))])
+      byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",control.tacsat$clm)
       byRect$SI_LONG        <- signif(anf(byRect$SI_LONG))
       byRect$SI_LATI        <- signif(anf(byRect$SI_LATI))
-      rangeRect             <- range(apply(byRect[,kgeur(colnames(byRect))],1,sum,na.rm=T))
+      if(length(control.tacsat$clm)>1)  rangeRect             <- range(apply(byRect[,control.tacsat$clm],1,sum,na.rm=T))
+      if(length(control.tacsat$clm)==1) rangeRect             <- range(byRect[,control.tacsat$clm],na.rm=T)
       rangeRect             <- c(0,rangeRect[2])
     }
+    ctrl                    <- control.tacsat
   }
 
 
@@ -66,31 +76,34 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
     x                     <- x[idxx[which(idxx %in% idxy)],]
     
       #- Sum by rectangle
+    if(is.null(control.eflalo$clm)==T) control.eflalo$clm <- colnames(x[,kgeur(colnames(x))])
     DT                    <- data.table(x)
-    eq1                   <- c.listquote(paste("sum(",colnames(x[,kgeur(colnames(x))]),")",sep=""))
+    eq1                   <- c.listquote(paste("sum(",control.eflalo$clm,")",sep=""))
     eq2                   <- c.listquote(c("SI_LONG","SI_LATI"))
     DT$SI_LONG            <- af(ac(DT$SI_LONG)); DT$SI_LATI <- af(ac(DT$SI_LATI))
     
-    byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",colnames(x)[kgeur(colnames(x))])
+    byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",control.eflalo$clm)
     byRect                <- byRect[which(is.na(byRect$SI_LONG)==F & is.na(byRect$SI_LATI) == F),]
-    rangeRect             <- range(apply(byRect[,kgeur(colnames(byRect))],1,sum,na.rm=T))
+    if(length(control.eflalo$clm)>1)  rangeRect             <- range(apply(byRect[,control.eflalo$clm],1,sum,na.rm=T))
+    if(length(control.eflalo$clm)==1) rangeRect             <- range(byRect[,kgeur(colnames(byRect))],na.rm=T)
     rangeRect             <- c(0,rangeRect[2])
+    ctrl                  <- control.eflalo
   }
 
   map("worldHires",res=1,xlim=xlim,ylim=ylim,fill=T,col="darkgreen");map.axes();box()
   for(iRect in 1:nrow(byRect)){
     if(log){
-      if(is.null(zlim)==T){ i         <- round((log(sum(byRect[iRect,kgeur(colnames(byRect))],na.rm=T))-ifelse(rangeRect[1]==0,0,log(rangeRect[1])))
+      if(is.null(zlim)==T){ i         <- round((log(sum(byRect[iRect,ctrl$clm],na.rm=T))-ifelse(rangeRect[1]==0,0,log(rangeRect[1])))
                                                /(log(rangeRect[2]) - ifelse(rangeRect[1]==0,0,log(rangeRect[1])))*(length(color)-1)) +1
       } else {
-          i                           <- round((log(sum(byRect[iRect,kgeur(colnames(byRect))],na.rm=T))-ifelse(zlim[1]==0,0,log(zlim[1])))
+          i                           <- round((log(sum(byRect[iRect,ctrl$clm],na.rm=T))-ifelse(zlim[1]==0,0,log(zlim[1])))
                                                /(log(zlim[2]) -      ifelse(zlim[1]==0,0,log(zlim[1])))          *(length(color)-1)) +1
         }
     } else {
-        if(is.null(zlim)==T){ i       <- round((sum(byRect[iRect,kgeur(colnames(byRect))],na.rm=T)-ifelse(rangeRect[1]==0,0,rangeRect[1]))
+        if(is.null(zlim)==T){ i       <- round((sum(byRect[iRect,ctrl$clm],na.rm=T)-ifelse(rangeRect[1]==0,0,rangeRect[1]))
                                                /(rangeRect[2] -      ifelse(rangeRect[1]==0,0,rangeRect[1]))     *(length(color)-1)) +1
         } else {
-            i                         <- round((sum(byRect[iRect,kgeur(colnames(byRect))],na.rm=T)-ifelse(zlim[1]==0,0,zlim[1]))
+            i                         <- round((sum(byRect[iRect,ctrl$clm],na.rm=T)-ifelse(zlim[1]==0,0,zlim[1]))
                                                /(zlim[2] -           ifelse(zlim[1]==0,0,zlim[1]))               *(length(color)-1)) +1
           }
       }
