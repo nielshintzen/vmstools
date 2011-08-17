@@ -1,0 +1,1 @@
+kgeur <- function(x){return(c(grep("KG",x),grep("EURO",x)))}
