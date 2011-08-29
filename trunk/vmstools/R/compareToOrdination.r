@@ -169,9 +169,9 @@ compareToOrdination=function(dat, Step2, clusters, targetSpecies){
 
 
   # Correspondence of mixed metiers (composed by 2 simple metiers) to their official code of mixed metiers level 5 (FAO - 3 characters). 
-  listMixedMetiersLevel57=lapply(listMetiersLevel57, function(x) if(nchar(x)!=3){correspMixedMetier[which(correspMixedMetier[,"combMetiersL5"]==x),"mixedMetierL5"]}
+  listMixedMetiersLevel57=lapply(listMetiersLevel57, function(x) if(nchar(x)!=3 & is.element(x,correspMixedMetier[,1])){correspMixedMetier[which(correspMixedMetier[,"combMetiersL5"]==x),"mixedMetierL5"]}
                                             else x )
-  
+                                            
   # Metiers (level 5.7) of each logevent found thanks to the getMetierClusters method (with official labels for mixed metiers).                                         
   mixedMetiersClustersL5=unlist(sapply(clusters,function(x) listMixedMetiersLevel57[x]))
 
