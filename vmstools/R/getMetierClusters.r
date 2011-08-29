@@ -603,8 +603,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
-    thresholdCatch=75
-    thresholdTestValue=50
+    thresholdCatch=95
+    thresholdTestValue=30
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -974,8 +974,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
-    thresholdCatch=75
-    thresholdTestValue=50
+    thresholdCatch=95
+    thresholdTestValue=30
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -1384,8 +1384,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
-    thresholdCatch=75
-    thresholdTestValue=50
+    thresholdCatch=95
+    thresholdTestValue=30
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -1801,9 +1801,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
-    thresholdCatch=75
-    thresholdTestValue=50
-    thresholdLogevents=30
+    thresholdCatch=95         # 75
+    thresholdTestValue=30     # 50
+    thresholdLogevents=30     # 30
     
     sppCumCatch=list()
     sppTestValue=list()
