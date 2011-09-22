@@ -121,7 +121,7 @@ if ( nrow(dF) > 0 )
     #to output spatialGridDataFrame to a gridascii file
     if (outGridFile != "")
        {
-        writeAsciiGrid(spatialGridDataFrame, outGridFile, attr=gridValName, dec='.')
+        writeAsciiGrid(spatialGridDataFrame, outGridFile, na.value = -99.99, attr=gridValName, dec='.')
        }
 
     #option to save the plot
