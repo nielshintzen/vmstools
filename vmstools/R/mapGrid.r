@@ -107,7 +107,7 @@ if (plotPoints) {
      legend(x='bottomright', legend=a.legPoints, pch = 16, col=levels(colPoints), title="", ncol=2, bg="white", pt.cex=1)
      }
    }else{
-   points(sPDF, pch=16, col=colPoints,cex=0.1)   
+   points(sPDF, pch='.', col=colPoints,cex=0.1)   
    }
  }
    
