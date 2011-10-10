@@ -36,72 +36,90 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       inerties.vector=cah_var$height[order(cah_var$height,decreasing=T)]
       nb.finalclusters=which(scree(inerties.vector)[,"epsilon"]<0)[1]
   
-      # Dendogram cutting at the selected level
-      cah_cluster_var=cutree(cah_var,k=nb.finalclusters)
-  
-      png(paste(analysisName,"HAC_Dendogram_Step1.png",sep="_"), width = 1200, height = 800)
-      plclust(cah_var,labels=F,hang=-1,ann=F)
-      title(main="HAC dendogram",xlab="Species",ylab="Height")
-      rect.hclust(cah_var, k=nb.finalclusters)
-      dev.off()
-        
-      temp=select_species(dat[,2:p],cah_cluster_var)
-      namesResidualSpecies=nameSpecies[which(cah_cluster_var==temp[[2]])] #list of residual species 
-  
-      fait=FALSE
-      nb_cut=1
-      while ((fait == FALSE) && (nb_cut < (p-nb.finalclusters))) {
-        # cutting below
-        print(paste("----------- nb_cut =",nb_cut))
-        cah_cluster_var_step=cutree(cah_var,k=(nb.finalclusters+nb_cut))
-        # testing residual species
-        print(paste("------------- Residual species cluster(s) ",unique(cah_cluster_var_step[namesResidualSpecies])))
-        if (length(unique(cah_cluster_var_step[namesResidualSpecies]))==1) {
-          print(paste("-------------  No residual cut -----"))
-          nb_cut = nb_cut+1 # cutting below
-        }else{
-          print("-------------  Residual cut -----")
-          nbSpeciesClusters=table(cah_cluster_var_step[namesResidualSpecies])
-          # testing if a species is alone in a group
-          if (sort(nbSpeciesClusters)[1]>1) { # if not alone
-            print("------- I stop and have a beer ------")
-            fait = TRUE # then I stop
-          }else{
-            print("------ Updating residual species -----")
-            nb_cut = nb_cut+1;  # if alone then cutting below and updating nameResidualSpecies to start again
-            numGroupSpeciesAlone = as.numeric(names(sort(nbSpeciesClusters)[1]))
-            namesSpeciesAlone = names(cah_cluster_var_step)[which(cah_cluster_var_step==numGroupSpeciesAlone)]
-            namesResidualSpecies = namesResidualSpecies[ - which(namesResidualSpecies==namesSpeciesAlone)]
-            print(paste("---- Adding new species ---",namesSpeciesAlone))
-          }
-        }
-      } # end of while
-  
-  
-      # Dendogram of the first cut in the residual species cluster
-      png(paste(analysisName,"HAC_Dendogram_Step1_ResidualSpecies.png",sep="_"), width = 1200, height = 800)
-      plclust(cah_var,labels=F,hang=-1,ann=F)
-      title(main="HAC dendogram - Step",xlab="Species",ylab="Height")
-      rect.hclust(cah_var, k=(nb.finalclusters+nb_cut))
-      dev.off()
-            
-      # Selection of main species
-      nomespsel=setdiff(nameSpecies,namesResidualSpecies)
-      cat("main species : ",nomespsel,"\n")
-  
-      # Return the dataset retaining only the main species
-      nbMainSpeciesHAC=length(nomespsel)
-      namesMainSpeciesHAC=nomespsel
-      propNbMainSpeciesHAC=nbMainSpeciesHAC/nbAllSpecies*100   
-      
-      if(DiagFlag==TRUE) {
-        datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
-        pourcentCatchMainSpeciesHAC=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
-        medianPourcentCatchMainSpeciesHAC=median(pourcentCatchMainSpeciesHAC)
-      }
+      if(!is.na(nb.finalclusters)){
+        # Dendogram cutting at the selected level
+        cah_cluster_var=cutree(cah_var,k=nb.finalclusters)
 
-      Store(objects())
-      gc(reset=TRUE)
+        png(paste(analysisName,"HAC_Dendogram_Step1.png",sep="_"), width = 1200, height = 800)
+        plclust(cah_var,labels=F,hang=-1,ann=F)
+        title(main="HAC dendogram",xlab="Species",ylab="Height")
+        rect.hclust(cah_var, k=nb.finalclusters)
+        dev.off()
+
+        temp=select_species(dat[,2:p],cah_cluster_var)
+        namesResidualSpecies=nameSpecies[which(cah_cluster_var==temp[[2]])] #list of residual species
+
+        fait=FALSE
+        nb_cut=1
+        while ((fait == FALSE) && (nb_cut < (p-nb.finalclusters-2))) {
+          # cutting below
+          print(paste("----------- nb_cut =",nb_cut))
+          cah_cluster_var_step=cutree(cah_var,k=(nb.finalclusters+nb_cut))
+          # testing residual species
+          print(paste("------------- Residual species cluster(s) ",unique(cah_cluster_var_step[namesResidualSpecies])))
+          if (length(unique(cah_cluster_var_step[namesResidualSpecies]))==1) {
+            print(paste("-------------  No residual cut -----"))
+            nb_cut = nb_cut+1 # cutting below
+          }else{
+            print("-------------  Residual cut -----")
+            nbSpeciesClusters=table(cah_cluster_var_step[namesResidualSpecies])
+            # testing if a species is alone in a group
+            if (sort(nbSpeciesClusters)[1]>1) { # if not alone
+              print("------- I stop and have a beer ------")
+              fait = TRUE # then I stop
+            }else{
+              print("------ Updating residual species -----")
+              nb_cut = nb_cut+1;  # if alone then cutting below and updating nameResidualSpecies to start again
+              numGroupSpeciesAlone = as.numeric(names(sort(nbSpeciesClusters)[1]))
+              namesSpeciesAlone = names(cah_cluster_var_step)[which(cah_cluster_var_step==numGroupSpeciesAlone)]
+              namesResidualSpecies = namesResidualSpecies[ - which(namesResidualSpecies==namesSpeciesAlone)]
+              print(paste("---- Adding new species ---",namesSpeciesAlone))
+            }
+          }
+        } # end of while
+
+
+        # If all species are selected step by step, the final k is the initial cut (nb.finalclusters)
+        if((nb.finalclusters+nb_cut)>=(p-2)){
+          kFinal=nb.finalclusters
+          cah_cluster_var=cutree(cah_var,k=kFinal)
+          temp=select_species(dat[,2:p],cah_cluster_var)
+          namesResidualSpecies=nameSpecies[which(cah_cluster_var==temp[[2]])] #list of residual species
+        }
+
+
+        # Dendogram of the first cut in the residual species cluster
+        png(paste(analysisName,"HAC_Dendogram_Step1_ResidualSpecies.png",sep="_"), width = 1200, height = 800)
+        plclust(cah_var,labels=F,hang=-1,ann=F)
+        title(main="HAC dendogram - Step",xlab="Species",ylab="Height")
+        if((nb.finalclusters+nb_cut)>=(p-2)){
+          rect.hclust(cah_var, k=kFinal)
+        }else{
+          rect.hclust(cah_var, k=(nb.finalclusters+nb_cut))
+        }
+        dev.off()
+
+        # Selection of main species
+        nomespsel=setdiff(nameSpecies,namesResidualSpecies)
+        cat("main species : ",nomespsel,"\n")
+
+        # Return the dataset retaining only the main species
+        nbMainSpeciesHAC=length(nomespsel)
+        namesMainSpeciesHAC=nomespsel
+        propNbMainSpeciesHAC=nbMainSpeciesHAC/nbAllSpecies*100
+
+        if(DiagFlag==TRUE) {
+          datSpeciesWithoutProp=building_tab_pca(dat[,2:p],nomespsel)
+          pourcentCatchMainSpeciesHAC=apply(datSpeciesWithoutProp,1,sum)/apply(dat[,2:p],1,sum)*100
+          medianPourcentCatchMainSpeciesHAC=median(pourcentCatchMainSpeciesHAC)
+        }
+
+        Store(objects())
+        gc(reset=TRUE)
+
+      } else {
+         namesMainSpeciesHAC=NA; nbMainSpeciesHAC=as.numeric(NA); medianPourcentCatchMainSpeciesHAC=as.numeric(NA); propNbMainSpeciesHAC=NA
+      }
       
   print(Sys.time()-t1)
 
@@ -211,6 +229,17 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     savePlot(filename = paste(analysisName,'Number of main species',sep="_"),type ="png")
     dev.off()
 
+    X11(5,5)
+    plot(seq(0,100,5),nbMainSpeciesTotal,type='l',col="blue",lwd=3, axes=FALSE, xlab="Threshold (%)",ylab="Number of species")
+    lines(seq(0,100,5),nbMainSpeciesLogevent,col="green",lwd=3)
+    if(!is.na(nbMainSpeciesHAC)) segments(0,nbMainSpeciesHAC,100,nbMainSpeciesHAC,col="red",lwd=3)
+    axis(1)
+    axis(2, las=2)
+    box()
+    legend(20, p*0.9, c( "HAC", "PerTotal", "PerLogevent"),lwd=3,col=c("red", "blue", "green"),bty="n")
+    savePlot(filename = paste(analysisName,'Number of main species',sep="_"),type ="png")
+    dev.off()
+
     # Black and white version
     X11(5,5)
     plot(seq(0,100,5),nbMainSpeciesTotal, type='l' ,lty='dashed', col="black",lwd=3, axes=FALSE, xlab="Threshold (%)",ylab="Number of species")
@@ -220,9 +249,9 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     axis(2, las=2)
     box()
     legend(20, p*0.9, c( "HAC", "PerTotal", "PerLogevent"),lwd=3,col=c("black", "black", "black"),bty="n",lty=c('solid','dashed','dotted'),box.lty = par("lty"))
-    savePlot(filename = paste(analysisName,'Number of main species_BW',sep="_"),type ="png")
+    savePlot(filename = paste(analysisName,'Number of main species_new_2',sep="_"),type ="png")
     dev.off()
-    
+
     # Median percentage of catch represented by main species by logevent
     if(DiagFlag){
       png(paste(analysisName,"Median percentage of catch represented by main species by logevent.png",sep="_"), width = 1200, height = 800)
