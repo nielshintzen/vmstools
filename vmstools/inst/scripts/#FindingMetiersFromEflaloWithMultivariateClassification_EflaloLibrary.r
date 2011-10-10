@@ -8,9 +8,9 @@
 ##           Stephanie Mahévas, Sebastien Demaneche (IFREMER)                    ##
 ##           Clara Ulrich, Francois Bastardie (DTU Aqua)                         ##
 ##                                                                               ##
-## Last update : August 2011,                                                    ##
+## Last update : October 2011,                                                   ##
 ##                                                                               ##
-## Runs with R 2.13.0                                                            ##
+## Runs with R 2.13.2                                                            ##
 ##                                                                               ##
 ###################################################################################
 
