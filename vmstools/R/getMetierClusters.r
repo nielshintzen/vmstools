@@ -603,8 +603,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
-    thresholdCatch=95
-    thresholdTestValue=30
+    thresholdCatch=75
+    thresholdTestValue=50
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -974,8 +974,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
-    thresholdCatch=95
-    thresholdTestValue=30
+    thresholdCatch=75
+    thresholdTestValue=50
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -1384,8 +1384,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
-    thresholdCatch=95
-    thresholdTestValue=30
+    thresholdCatch=75
+    thresholdTestValue=50
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -1756,7 +1756,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
       a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
       colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
-      namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+      if(length(a)!=0){
+        namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+      }
       namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
     }
     
@@ -1801,9 +1803,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     # Intersection of species from tabClusters having : - % Cumulated Catch > thresholdCatch
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
-    thresholdCatch=95         # 75
-    thresholdTestValue=30     # 50
-    thresholdLogevents=30     # 30
+    thresholdCatch=75
+    thresholdTestValue=50
+    thresholdLogevents=30
     
     sppCumCatch=list()
     sppTestValue=list()
