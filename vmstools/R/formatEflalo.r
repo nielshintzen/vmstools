@@ -16,6 +16,7 @@ formatEflalo <- function(x){
   x$FT_LTIME      <- ac(x$FT_LTIME)
   x$LE_ID         <- ac(x$LE_ID)
   x$LE_CDAT       <- ac(x$LE_CDAT)
+  x$LE_UNIT       <- ac(x$LE_UNIT)
   if("LE_STIME" %in% colnames(x)) x$LE_STIME      <- ac(x$LE_STIME)
   if("LE_ETIME" %in% colnames(x)) x$LE_ETIME      <- ac(x$LE_ETIME)
   if("LE_SLAT"  %in% colnames(x)) x$LE_SLAT       <- an(ac(x$LE_SLAT))
