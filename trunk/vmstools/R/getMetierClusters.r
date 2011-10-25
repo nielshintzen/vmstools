@@ -453,7 +453,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     sp <- apply(mat,2, function(x) length(which(x>20)))
     colnames(mat)[sp==0] <- ""
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
-    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100))))
+    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
@@ -525,9 +525,10 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Descriptive tables of the clusters
-    clusterDesc=matrix(0,nrow=8,ncol=nbClust)
+    clusterDesc=matrix(0,nrow=9,ncol=nbClust)
     for(i in 1:nbClust){
-      clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+      clusterDesc[,i]=c(i,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
                         length(which(cumsum(t(summaryClusters["Median",,i])[order(t(summaryClusters["Median",,i]),decreasing=T)])<50))+1,
                         length(which(resval[,i]>1.96)),
@@ -536,7 +537,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
                         length(which(apply(datSpecies,2,function (x) (sizeClusters[i]-length(which(x[clusters==i]==0)))/sizeClusters[i]*100)>90)),
                         sizeClusters[i])
     }
-    rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
+    rownames(clusterDesc)=c("Number of species",
+                            "to have 50% of catch", "to have 90% of catch",
                             "to have 50% of catch in median",  
                             "with a test-value > 1.96", "with a test-value > 3.29",
                             "catch in 50% of the logevents", "catch in 90% of the logevents",
@@ -642,14 +644,14 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Create csv tables
-    write.table(clusterDesc2,file="descClusters.csv",col.names=NA,sep=";")
+    write.table(clusterDesc2,file="descClusters.csv",col.names=FALSE,sep=";")
     
     dfClust=data.frame()
     dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
-      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,row.names=FALSE,sep=";")
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")  
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,row.names=FALSE,sep=";")  
     }
     
     
@@ -826,7 +828,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     sp <- apply(mat,2, function(x) length(which(x>20)))
     colnames(mat)[sp==0] <- ""
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
-    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100))))
+    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
@@ -898,9 +900,10 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Descriptive tables of the clusters
-    clusterDesc=matrix(0,nrow=8,ncol=nbClust)
+    clusterDesc=matrix(0,nrow=9,ncol=nbClust)
     for(i in 1:nbClust){
-      clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+      clusterDesc[,i]=c(i,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
                         length(which(cumsum(t(summaryClusters["Median",,i])[order(t(summaryClusters["Median",,i]),decreasing=T)])<50))+1,                        
                         length(which(resval[,i]>1.96)),
@@ -909,7 +912,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
                         length(which(apply(datSpecies,2,function (x) (clusters$size[i]-length(which(x[clusters$cluster==i]==0)))/clusters$size[i]*100)>90)),
                         clusters$size[i])
     }
-    rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
+    rownames(clusterDesc)=c("Number of species",
+                            "to have 50% of catch", "to have 90% of catch",
                             "to have 50% of catch in median",
                             "with a test-value > 1.96", "with a test-value > 3.29",
                             "catch in 50% of the logevents", "catch in 90% of the logevents",
@@ -1015,14 +1019,14 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Create csv tables
-    write.table(clusterDesc2,file="descClusters.csv",col.names=NA,sep=";")
+    write.table(clusterDesc2,file="descClusters.csv",col.names=FALSE,sep=";")
     
     dfClust=data.frame()
     dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
-      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,row.names=FALSE,sep=";")
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")  
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,row.names=FALSE,sep=";")  
     }
     
     
@@ -1239,7 +1243,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     sp <- apply(mat,2, function(x) length(which(x>20)))
     colnames(mat)[sp==0] <- ""
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
-    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100))))
+    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
@@ -1310,9 +1314,10 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Descriptive tables of the clusters
-    clusterDesc=matrix(0,nrow=8,ncol=nbClust)
+    clusterDesc=matrix(0,nrow=9,ncol=nbClust)
     for(i in 1:nbClust){
-      clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+      clusterDesc[,i]=c(i,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
                         length(which(cumsum(t(summaryClusters["Median",,i])[order(t(summaryClusters["Median",,i]),decreasing=T)])<50))+1,                        
                         length(which(resval[,i]>1.96)),
@@ -1321,7 +1326,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
                         length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)),
                         clusters$clusinfo[i,1])
     }
-    rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
+    rownames(clusterDesc)=c("Number of species",
+                            "to have 50% of catch", "to have 90% of catch",
                             "to have 50% of catch in median",
                             "with a test-value > 1.96", "with a test-value > 3.29",
                             "catch in 50% of the logevents", "catch in 90% of the logevents",
@@ -1426,14 +1432,14 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Create csv tables
-    write.table(clusterDesc2,file="descClusters.csv",col.names=NA,sep=";")
+    write.table(clusterDesc2,file="descClusters.csv",col.names=FALSE,sep=";")
     
     dfClust=data.frame()
     dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
-      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,row.names=FALSE,sep=";")
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")  
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,row.names=FALSE,sep=";")  
     }
 
 
@@ -1650,7 +1656,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     sp <- apply(mat,2, function(x) length(which(x>20)))
     colnames(mat)[sp==0] <- ""
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
-    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100))))
+    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
     
@@ -1729,9 +1735,10 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Descriptive tables of the clusters
-    clusterDesc=matrix(0,nrow=8,ncol=nbClust)
+    clusterDesc=matrix(0,nrow=9,ncol=nbClust)
     for(i in 1:nbClust){
-      clusterDesc[,i]=c(length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
+      clusterDesc[,i]=c(i,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
                         length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
                         length(which(cumsum(t(summaryClusters["Median",,i])[order(t(summaryClusters["Median",,i]),decreasing=T)])<50))+1,
                         length(which(resval[,i]>1.96)),
@@ -1740,7 +1747,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
                         length(which(apply(datSpecies,2,function (x) (clusters$clusinfo[i,1]-length(which(x[clusters$clustering==i]==0)))/clusters$clusinfo[i,1]*100)>90)),
                         clusters$clusinfo[i,1])
     }
-    rownames(clusterDesc)=c("to have 50% of catch", "to have 90% of catch",
+    rownames(clusterDesc)=c("Number of species",
+                            "to have 50% of catch", "to have 90% of catch",
                             "to have 50% of catch in median", 
                             "with a test-value > 1.96", "with a test-value > 3.29",
                             "catch in 50% of the logevents", "catch in 90% of the logevents",
@@ -1846,14 +1854,14 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Create csv tables
-    write.table(clusterDesc2,file="descClusters.csv",col.names=NA,sep=";")
+    write.table(clusterDesc2,file="descClusters.csv",col.names=FALSE,sep=";")
     
     dfClust=data.frame()
     dfClust=paste("Clust ",1:nbClust,sep="")
     for(i in 1:nbClust){
-      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")
+      write.table(dfClust[i],file="tabClusters.csv",append=TRUE,row.names=FALSE,sep=";")
       tabClusti=as.data.frame(tabClusters[1:sizeTabClusters[i],,i])
-      write.table(tabClusti,file="tabClusters.csv",append=TRUE,col.names=NA,sep=";")  
+      write.table(tabClusti,file="tabClusters.csv",append=TRUE,row.names=FALSE,sep=";")  
     }     
 
 
