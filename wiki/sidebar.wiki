@@ -1,0 +1,6 @@
+#summary Side
+  * [Introduction Introduction]
+  * [example_scripts example scripts]
+    * [examples_coupling Couple VMS and Logbooks]
+    * [MetiersLogbook Define metiers]
+    * [DCFIndicators Calculate indicators]
