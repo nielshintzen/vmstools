@@ -10,8 +10,11 @@ calculateCI <- function(intLon
                                ,params){
 
   if(!"SI_DATIM" %in% colnames(VMS.)) VMS.$SI_DATIM <- as.POSIXct(paste(VMS.$SI_DATE,  VMS.$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+  #res1          <- maxRangeCI(intLon,intLat,an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="mins")),
+  #                            c(VMS.$SI_SP[vmsIdx1],VMS.$SI_SP[vmsIdx2]))
   res1          <- maxRangeCI(intLon,intLat,an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="mins")),
-                              c(VMS.$SI_SP[vmsIdx1],VMS.$SI_SP[vmsIdx2]))
+                              rep(distanceInterpolation(list(interpolation[[int]]))/1.852/an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="hours")),2))
+  if(any(point.in.polygon(interpolation[[int]][2:nrow(interpolation[[int]]),1],interpolation[[int]][2:nrow(interpolation[[int]]),1],res1[[1]][,1],res1[[1]][,2]))>0) stop("interpolation not inside maximum range" )
     #First find the boundaries of the mills ellipse, thereafter, add a 10% extra margin, based on the minimum or
     # maximum value. In the longitude direction, take the minimum value, and find the according latitude to go from km to degrees
   res2          <- range(res1[[1]][,1],na.rm=T); boundx <- c(min(res2) - res1[[2]]*0.2*km2Degree(min(res2),
@@ -37,9 +40,8 @@ calculateCI <- function(intLon
     grid                  <- createGrid(xrange=cc2[,"boundx"],yrange=cc2[,"boundy"],grid@cellsize[1],grid@cellsize[2])
     spatialGrid           <- SpatialGrid(grid=grid)
     gridded(spatialGrid) = TRUE
-    sP                    <- as(spatialGrid,"SpatialPixels")
-    sPDF                  <- as(sP,"SpatialPixelsDataFrame")
-    sPDF@data             <- data.frame(rep(0,length(sPDF@grid.index)))
+    sPDF                  <- as(sP,"SpatialGridDataFrame")
+    sPDF@data             <- data.frame(rep(0,sPDF@grid@cells.dim[1]*sPDF@grid@cells.dim[2]))
     sPDF@data[,2]         <- 0
     colnames(sPDF@data)   <- c("data","tmpdata")
     idx                   <- getGridIndex(cc2,grid,all.inside=T)
@@ -56,16 +58,16 @@ calculateCI <- function(intLon
 
     #Calculate the distan matrix based on the idx
   distan <- matrix(NA,nrow=dim(bbox)[1],ncol=dim(bbox)[2])
-
   for (x in 2:length(interpolation[[int]][,1])){
     distan <- pmin(distan,
-                   matrix(distance(lon=sPDF@coords[idx,1],lat=sPDF@coords[idx,2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
+                   matrix(distance(lon=coordinates(sPDF)[idx,1],lat=coordinates(sPDF)[idx,2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
                    nrow=dim(bbox)[1],ncol=dim(bbox)[2]),na.rm=T)
   }
+  
     #Calculate the distance from begin or endpoint
-  begindistan <- matrix(distance(lon=sPDF@coords[idx,1],lat=sPDF@coords[idx,2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
+  begindistan <- matrix(distance(lon=coordinates(sPDF)[idx,1],lat=coordinates(sPDF)[idx,2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
                         nrow=dim(bbox)[1],ncol=dim(bbox)[2])
-  enddistan   <- matrix(distance(lon=sPDF@coords[idx,1],lat=sPDF@coords[idx,2],lonRef=interpolation[[int]][length(interpolation[[1]][,1]),1],
+  enddistan   <- matrix(distance(lon=coordinates(sPDF)[idx,1],lat=coordinates(sPDF)[idx,2],lonRef=interpolation[[int]][length(interpolation[[1]][,1]),1],
                                                                                latRef=interpolation[[int]][length(interpolation[[1]][,2]),2]),
                         nrow=dim(bbox)[1],ncol=dim(bbox)[2])
   linepistan  <- pmin(begindistan, enddistan,na.rm=T)
@@ -77,8 +79,8 @@ calculateCI <- function(intLon
   if(max(CI,na.rm=T) < 0.1) warning("Prediction max(tmpnew) is very small")
   if(length(zeroDistan)>0)  CI[zeroDistan]  <- pmax(CI[zeroDistan],1,na.rm=T)
   
-  if(exists("sP")){ returns <- list(CI,idx,res1,grid,sPDF,sP)
-  } else { returns <- list(CI,idx,res1,grid,sPDF,0)}
+  if(exists("sP")){ returns <- list(CI,idx,res1,grid,sPDF,sP,distan,linepistan)
+  } else { returns <- list(CI,idx,res1,grid,0,0,distan,linepistan)}
   
   
   return(returns)}
