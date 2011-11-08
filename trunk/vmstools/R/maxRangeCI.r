@@ -5,12 +5,17 @@ maxRangeCI <- function(lon,lat,time.,speed){
                     y1 <- lat[1]
                     y2 <- lat[2]
 
+                      #Pre-Calculation to speed up the code
+                    pi180 <- pi/180
+                    cosy1 <- cos(y1*pi180)
+                    cosy2 <- cos(y2*pi180)
+
                       #Calculate maximum distance in km
                     dmax    <- time./60*mean(speed,na.rm=T)*1.852
 
                       #Calculate d from Haversine function
-                    aH  <- sin(((y2-y1)*pi/180)/2)*sin(((y2-y1)*pi/180)/2) + cos(y1*pi/180) * cos(y2*pi/180) *
-                           sin(((x2-x1)*pi/180)/2) * sin(((x2-x1)*pi/180)/2)
+                    aH  <- sin(((y2-y1)*pi180)/2)*sin(((y2-y1)*pi180)/2) + cosy1 * cosy2 *
+                           sin(((x2-x1)*pi180)/2) * sin(((x2-x1)*pi180)/2)
                     c   <- 2*atan2(sqrt(aH),sqrt(1-aH))
                     d   <- 6371*c
                     
@@ -27,9 +32,9 @@ maxRangeCI <- function(lon,lat,time.,speed){
                     if(d == 0){
                       o <- 0
                     } else {
-                        dx      <- (x2 - x1)*pi/180
-                        dy      <- (y2 - y1)*pi/180
-                        o       <- atan2(sin(dx)*cos(y2*pi/180),cos(y1*pi/180)*sin(y2*pi/180)-sin(y1*pi/180)*cos(y2*pi/180)*cos(dx))
+                        dx      <- (x2 - x1)*pi180
+                        dy      <- (y2 - y1)*pi180
+                        o       <- atan2(sin(dx)*cosy2,cosy1*sin(y2*pi180)-sin(y1*pi180)*cosy2*cos(dx))
                         angles  <- o*(180/pi)
 
                         angles <- (angles + 360)%%360
@@ -39,13 +44,13 @@ maxRangeCI <- function(lon,lat,time.,speed){
                         if(angles >=180 & angles < 270) angle2 <- 90 - (angles-180)
                         if(angles >=270 & angles < 360) angle2 <- (angles - 270)
 
-                        o <- angle2*(pi/180)
+                        o <- angle2*(pi180)
                     }
                       #See also: http://www.movable-type.co.uk/scripts/latlong.html
-                    Bx    <- cos(y2*pi/180)*cos((x2-x1)*pi/180)
-                    By    <- cos(y2*pi/180)*sin((x2-x1)*pi/180)
-                    mid.x <- (x1*pi/180) + atan2(By,cos(y1*pi/180)+Bx)
-                    mid.y <- atan2(sin(y1*pi/180) + sin(y2*pi/180),sqrt((cos(y1*pi/180)+Bx)^2 + By^2))
+                    Bx    <- cosy2*cos((x2-x1)*pi180)
+                    By    <- cosy2*sin((x2-x1)*pi180)
+                    mid.x <- (x1*pi180) + atan2(By,cosy1+Bx)
+                    mid.y <- atan2(sin(y1*pi180) + sin(y2*pi180),sqrt((cosy1+Bx)^2 + By^2))
                     mid.x <- mid.x*180/pi
                     mid.y <- mid.y*180/pi
                     x <- numeric()
@@ -56,7 +61,7 @@ maxRangeCI <- function(lon,lat,time.,speed){
 
                       #See also Pfoser and Jensen 1999 Capturing the Uncertainty of Moving-Object representation
                     for (k in 1:360){
-                      u <- k*pi/180
+                      u <- k*pi180
                       x[k] <- mid.x + a[1] * cos(o) * cos(u) - b[1] * sin(o) * sin(u)
                       y[k] <- mid.y + a[2] * sin(o) * cos(u) + b[2] * cos(o) * sin(u)
                     }
