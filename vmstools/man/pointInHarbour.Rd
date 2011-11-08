@@ -24,7 +24,7 @@ range (in km) from these midpoints.
 library(vmstools)
 data(eflalo)
 data(tacsat)
-data(harbours)
+data(euharbours)
 
 #-Remove duplicated records from tacsat
 myf       <- paste(tacsat$VE_REF,tacsat$SI_LATI,tacsat$SI_LONG,
@@ -34,7 +34,7 @@ tacsat    <- tacsat[!duplicated(myf),];
 
 #-Find all the gps locations that are located within the port area
 idx <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,
-                      harbours=harbours))
+                      harbours=euharbours))
 
 #-Plot these port locations on a map
 library(maps); library(mapdata); library(mapproj);
