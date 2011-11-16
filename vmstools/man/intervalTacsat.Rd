@@ -20,13 +20,14 @@ intervalTacsat(tacsat, level,weight,fill.NA)
 \value{
 The original tacsat file is returned including a column: INTV which holds the interval rate in minutes
 }
-\warnings{
+\details{
 Note that the DEFAULT interval given is the difference between ping x and ping x-1. Hence,
 the first ping of a vessel or trip does NOT have an interval rate and will display
 NA.
 
 With weight you can specify if the interval rate is used between ping x and ping x-1 (weight = c(1,0)), if
-the interval rate is used between ping x and ping x+1 (weight = c(0,1)) or an intermediate weight (weight = c(0.4,0.6) /  equal weight = c(0.5,0.5)). }
+the interval rate is used between ping x and ping x+1 (weight = c(0,1)) or an intermediate weight (weight = c(0.4,0.6) /  equal weight = c(0.5,0.5)).
+}
 \references{EU lot 2 project}
 \author{Niels T. Hintzen}
 \seealso{\code{interpolateTacsat()},\code{calculateSpeed()}}
