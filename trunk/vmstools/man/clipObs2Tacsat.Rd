@@ -34,7 +34,7 @@ clipObs2Tacsat(tacsat, obs, method, control.grid, control.euclidean,
    from the observed datapoint needs to be given (in km).
 }
   \item{temporalRange}{
-  The range in which tacsat records may deviate from the observation time stamp
+  The range in which tacsat records may deviate from the observation time stamp (in minutes)
 }
   \item{all.t}{
   If you want to return all tacsat records, all.t=T (return = list, first
