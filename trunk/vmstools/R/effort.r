@@ -1,4 +1,4 @@
-effort <- function(x,level="trip",unit="hours"){
+effort <- function(x,level="trip",unit="hours",weight=c(0.5,0.5),fill.na=F){
 
               if("SI_FT" %in% colnames(x)) x$FT_REF <- x$SI_FT
               #-Add if necessary a datim column
@@ -18,10 +18,12 @@ effort <- function(x,level="trip",unit="hours"){
               x     <- orderBy(~VE_REF+SI_DATIM+FT_REF,data=x)
 
               if(all(c("SI_LATI","SI_LONG") %in% colnames(x))){
-                x$LE_EFF_VMS  <- abs(c(0, as.numeric(x[-nrow(x),"SI_DATIM"] -
-                                          x[-1,"SI_DATIM"], units=unit)))
-                start.trip    <- c(1,diff(an(x[,"FT_REF"])))
-                x[start.trip!=0, "LE_EFF_VMS"] <- 0  # just correct for the trip change points
+                x$LE_EFF_VMS  <- intervalTacsat(x,level="trip",weight=weight,fill.na=fill.na)
+                if(!unit %in% c("secs","mins","hours","days","weeks")) stop("Unit must be in 'secs,mins,hours,days or weeks'")
+                if(unit == "secs")    x$LE_EFF_VMS  <- x$LE_EFF_VMS * 60
+                if(unit == "hours")   x$LE_EFF_VMS  <- x$LE_EFF_VMS/60
+                if(unit == "days")    x$LE_EFF_VMS  <- x$LE_EFF_VMS / 60 / 24
+                if(unit == "weeks")   x$LE_EFF_VMS  <- x$LE_EFF_VMS / 60 / 24 / 7
               }
 
               if(all(c("VE_FLT","VE_KW") %in% colnames(x))){
