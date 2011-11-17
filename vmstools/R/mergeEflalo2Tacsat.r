@@ -1,14 +1,12 @@
 mergeEflalo2Tacsat <- function(eflalo2,tacsat){
 
                           #-Add datim format of time
-                          if(!"D_DATIM" %in% colnames(eflalo2)) D_DATIM   <- as.POSIXct(paste(eflalo2$FT_DDAT, eflalo2$FT_DTIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-                          if(!"L_DATIM" %in% colnames(eflalo2)) L_DATIM   <- as.POSIXct(paste(eflalo2$FT_LDAT, eflalo2$FT_LTIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-                          if(!"SI_DATIM" %in% colnames(tacsat)) SI_DATIM  <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-                          Ta        <- cbind(tacsat,SI_DATIM)
-                          Ef        <- cbind(eflalo2,D_DATIM,L_DATIM)
+                          if(!"D_DATIM" %in% colnames(eflalo2)) eflalo2$D_DATIM   <- as.POSIXct(paste(eflalo2$FT_DDAT, eflalo2$FT_DTIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+                          if(!"L_DATIM" %in% colnames(eflalo2)) eflalo2$L_DATIM   <- as.POSIXct(paste(eflalo2$FT_LDAT, eflalo2$FT_LTIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+                          if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM   <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
                           #-Order the data by time
-                          Ef        <- orderBy(~VE_REF+D_DATIM+L_DATIM,data=Ef)
-                          Ta        <- orderBy(~VE_REF+SI_DATIM,data=Ta)
+                          Ef        <- orderBy(~VE_REF+D_DATIM+L_DATIM,data=eflalo2)
+                          Ta        <- orderBy(~VE_REF+SI_DATIM,data=tacsat)
                           #-Split the Eflalo and Tacsat data by vessel
                           splitEf   <- split(Ef,Ef$VE_REF)
                           splitTa   <- split(Ta,Ta$VE_REF)
