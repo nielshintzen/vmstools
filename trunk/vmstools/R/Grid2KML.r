@@ -1,5 +1,5 @@
 
-Grid2KML <- function(output.mat=output.mat, what.quantity = 'effort',kmlfile='vms.kml',imagefile='vms.png')  {
+Grid2KML <- function(output.mat=output.mat, log.it=F, what.quantity = 'effort',kmlfile='vms.kml',imagefile='vms.png')  {
 #Takes the output from vmsGridCreate ie. when plotMap is set to FALSE.
 #output.mat[["fishing"]] <- log(output.mat[["fishing"]])
 dd <- output.mat@grid
@@ -8,6 +8,7 @@ d2 <- dd@cells.dim[2]
 fishing <- output.mat@data$fishing
 mat <- matrix((fishing),byrow=T,ncol=d1,nrow=d2)
 mat <- t(mat[d2:1,])
+if(log.it) {mat <- log(mat) }
 bbox <- output.mat@bbox
 xxx <- seq(bbox[1,1],bbox[1,2],length=d1)
 yyy <- seq(bbox[2,1],bbox[2,2],length=d2)
@@ -24,10 +25,8 @@ par(mar=c(0,0,0,0), xaxs="i", yaxs="i",cex=.25)
 image(as.image.SpatialGridDataFrame(gd.1[1]), col=heat.colors(9),xlim=vms.kml$xlim, ylim=vms.kml$ylim)
 kmlOverlay(vms.kml, kmlfile=kmlfile, imagefile=imagefile, name=what.quantity)
 
-legend(x='topleft', legend=as.character(labs), pch = 22,pt.bg=heat.colors(length(labs)),
-title=what.quantity, ncol=2,bg="transparent",pt.cex=1.5 )
-
-
+legend(x='bottomright', legend=as.character(round(labs)), pch = 22,border =heat.colors(length(labs)), pt.bg=heat.colors(length(labs)),
+title=what.quantity, ncol=2,bg="white",pt.cex=.2 )
 
 dev.off()
 }
