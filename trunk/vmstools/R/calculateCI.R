@@ -37,10 +37,10 @@ calculateCI <- function(intLon
   idx           <- getGridIndex(cc2,grid,all.inside=F)
     #If grid is too small, then extend grid to fit
   if(any(is.na(idx))){
-    grid                  <- createGrid(xrange=cc2[,"boundx"],yrange=cc2[,"boundy"],grid@cellsize[1],grid@cellsize[2])
+    grid                  <- createGrid(xrange=cc2[,"boundx"],yrange=cc2[,"boundy"],resx=grid@cellsize[1],grid@cellsize[2])
     spatialGrid           <- SpatialGrid(grid=grid)
     gridded(spatialGrid) = TRUE
-    sPDF                  <- as(sP,"SpatialGridDataFrame")
+    sPDF                  <- as(spatialGrid,"SpatialGridDataFrame")
     sPDF@data             <- data.frame(rep(0,sPDF@grid@cells.dim[1]*sPDF@grid@cells.dim[2]))
     sPDF@data[,2]         <- 0
     colnames(sPDF@data)   <- c("data","tmpdata")
@@ -56,19 +56,19 @@ calculateCI <- function(intLon
   if(pxheigth > 0) for(i in 1:(pxheigth)) bbox[i+1,] <- bbox[1,] + grid@cells.dim[1]*i
   idx           <- c(bbox)
 
-    #Calculate the distan matrix based on the idx
   distan <- matrix(NA,nrow=dim(bbox)[1],ncol=dim(bbox)[2])
+  coords <- coordinates(sPDF)[idx,]
   for (x in 2:length(interpolation[[int]][,1])){
     distan <- pmin(distan,
-                   matrix(distance(lon=coordinates(sPDF)[idx,1],lat=coordinates(sPDF)[idx,2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
+                   matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
                    nrow=dim(bbox)[1],ncol=dim(bbox)[2]),na.rm=T)
   }
-  
+
     #Calculate the distance from begin or endpoint
-  begindistan <- matrix(distance(lon=coordinates(sPDF)[idx,1],lat=coordinates(sPDF)[idx,2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
+  begindistan <- matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
                         nrow=dim(bbox)[1],ncol=dim(bbox)[2])
-  enddistan   <- matrix(distance(lon=coordinates(sPDF)[idx,1],lat=coordinates(sPDF)[idx,2],lonRef=interpolation[[int]][length(interpolation[[1]][,1]),1],
-                                                                               latRef=interpolation[[int]][length(interpolation[[1]][,2]),2]),
+  enddistan   <- matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][length(interpolation[[1]][,1]),1],
+                                                               latRef=interpolation[[int]][length(interpolation[[1]][,2]),2]),
                         nrow=dim(bbox)[1],ncol=dim(bbox)[2])
   linepistan  <- pmin(begindistan, enddistan,na.rm=T)
     #Reset very small numbers to 0 to get highest values at begin and end point
