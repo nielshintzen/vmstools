@@ -445,15 +445,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # For a paper : levelplot
-    X11(5,10)
+    X11(4,4)
     mat <- t(summaryClusters["Mean",,])
     #rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
-    #                           "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
+    #                          "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
     rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
     sp <- apply(mat,2, function(x) length(which(x>20)))
-    colnames(mat)[sp==0] <- ""
+    sp2=sp[which(sp>=1)]
+    #colnames(mat)[sp==0] <- ""
+    mat2=mat[,which(colnames(mat)%in%names(sp2))]
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
-    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
+    print(levelplot(mat2, cuts=4, aspect=1, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
@@ -820,15 +822,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # For a paper : levelplot
-    X11(5,10)
+    X11(4,4)
     mat <- t(summaryClusters["Mean",,])
     #rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
     #                          "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
     rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
     sp <- apply(mat,2, function(x) length(which(x>20)))
-    colnames(mat)[sp==0] <- ""
+    sp2=sp[which(sp>=1)]
+    #colnames(mat)[sp==0] <- ""
+    mat2=mat[,which(colnames(mat)%in%names(sp2))]
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
-    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
+    print(levelplot(mat2, cuts=4, aspect=1, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
@@ -1235,15 +1239,17 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # For a paper : levelplot
-    X11(5,10)
+    X11(4,4)
     mat <- t(summaryClusters["Mean",,])
     #rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
     #                          "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
     rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
     sp <- apply(mat,2, function(x) length(which(x>20)))
-    colnames(mat)[sp==0] <- ""
+    sp2=sp[which(sp>=1)]
+    #colnames(mat)[sp==0] <- ""
+    mat2=mat[,which(colnames(mat)%in%names(sp2))]
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
-    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
+    print(levelplot(mat2, cuts=4, aspect=1, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
 
@@ -1648,18 +1654,20 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # For a paper : levelplot
-    X11(5,10)
+    X11(4,4)
     mat <- t(summaryClusters["Mean",,])
     #rownames(mat) <- c("I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII","XIII","XIV","XV",
     #                          "XVI","XVII","XVIII","XIX","XX")[1:nrow(mat)]
     rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
     sp <- apply(mat,2, function(x) length(which(x>20)))
-    colnames(mat)[sp==0] <- ""
+    sp2=sp[which(sp>=1)]
+    #colnames(mat)[sp==0] <- ""
+    mat2=mat[,which(colnames(mat)%in%names(sp2))]
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
-    print(levelplot(mat, cuts=4, aspect=3, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
+    print(levelplot(mat2, cuts=4, aspect=1, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
     savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
-    
+
     # OR #
     mat <- t(summaryClusters["Mean",,])
     #mat=mat[,order(colnames(mat),decreasing=T)]     # si on veut mettre les espèces par ordre descendant
