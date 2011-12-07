@@ -10,3 +10,4 @@ Depends: R (>= 2.11.1), amap, cluster, doBy, data.table, FactoMineR, foreign, ma
 Repository: CRAN
 Suggests: fields, spam, mapdata, RColorBrewer, classInt
 LazyLoad: Yes
+LazyLoad: Yes
