@@ -1,0 +1,2 @@
+=Lecture 1=
+==A brief introduction to the use of R, functions, scripting and installing libraries.==
