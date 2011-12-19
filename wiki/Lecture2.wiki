@@ -3,4 +3,4 @@
 
 What we want to discuss
 
-{{{install.packages("nlme")}}}
+<code>install.packages("nlme")</code>
