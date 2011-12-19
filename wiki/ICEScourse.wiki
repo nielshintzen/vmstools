@@ -22,12 +22,20 @@
   # [http://code.google.com/vmstools/wiki/Practicals9 Play with your own data.] {{{Both - 2h}}}
 
 ==Time schedule==
-Monday morning: Lecture 1 & Practical 1 
-Monday afternoon: Lecture 2 + 3 & Practical 2
-Tuesday morning: Lecture 4 + 5 & Practical 3
-Tuesday afternoon: Practical 4 + 5
-Wednesday morning: Lecture 6 & Practical 7
-Wednesday afternoon: Lecture 7 & Practical 6
-Thursday morning: Lecture 8 & Practical 7
-Thursday afternoon: Lecture 9 & Practical 8
-Friday morning + afternoon: Play with own data
+ Monday morning: Lecture 1 & Practical 1.
+
+ Monday afternoon: Lecture 2 + 3 & Practical 2.
+
+ Tuesday morning: Lecture 4 + 5 & Practical 3.
+
+ Tuesday afternoon: Practical 4 + 5.
+
+ Wednesday morning: Lecture 6 & Practical 7
+ 
+ Wednesday afternoon: Lecture 7 & Practical 6
+ 
+ Thursday morning: Lecture 8 & Practical 7
+
+ Thursday afternoon: Lecture 9 & Practical 8
+ 
+ Friday morning + afternoon: Play with own data
