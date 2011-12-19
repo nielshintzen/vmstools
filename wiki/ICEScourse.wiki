@@ -1,0 +1,21 @@
+=Course outline & material for ICES VMStools course (25-29 June 2012)=
+==Lectures==
+  # A brief introduction to the use of R, functions, scripting and installing libraries.
+  # VMS data – advantages, limitations, data confidentiality issues.
+  # EU logbook data – advantages, limitations, data confidentiality issues.
+  # EU logbook data metier analyses based on species composition of landings.
+  # Combining VMS and logbook data –why it is important?
+  # Standardising VMS and logbook analyses for populating pan European databases, e.g FishFrame.
+  # Indicators – what do they tell us?
+  # Introduction to spatial statistics – shapefiles, points, lines, polygons, map projections, and data-storage.
+  # Exploring the connection between fishing effort and other possibly explanatory variables (e.g. depth, primary production, temperature, wind speed).
+
+==Practicals==
+  # Getting the VMS and logbook data into R
+  # Cleaning and processing the VMS and logbook data, and accounting for potential problems.
+  # Linking VMS and logbook data and exploring the benefits.
+  # How to link VMS, logbook data l to ‘spatial’ grids.
+  # Interpolation methods for VMS tracks.
+  # Calculating indicators (eg. Percentage area trawled) at different spatial scales.
+  # Plotting, exporting to GIS and FishFrame.
+  # How to link VMS data with other spatial datasets.
