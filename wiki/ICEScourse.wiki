@@ -1,6 +1,6 @@
 =Course outline & material for ICES VMStools course (25-29 June 2012)=
 ==Lectures==
-  # [http://code.google.com/p/vmstools/wiki/Lecture1/ A brief introduction to the use of R, functions, scripting and installing libraries.]
+  # [http://code.google.com/p/vmstools/wiki/Lecture1 A brief introduction to the use of R, functions, scripting and installing libraries.]
   # VMS data – advantages, limitations, data confidentiality issues.
   # EU logbook data – advantages, limitations, data confidentiality issues.
   # EU logbook data metier analyses based on species composition of landings.
