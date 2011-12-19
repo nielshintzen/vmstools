@@ -11,11 +11,11 @@
   # [http://code.google.com/p/vmstools/wiki/Lecture9 Exploring the connection between fishing effort and other possibly explanatory variables (e.g. depth, primary production, temperature, wind speed).] {{{Niels - 2h}}}
 
 ==Practicals==
-  # [http://code.google.com/p/vmstools/wiki/Practicals1 Getting the VMS and logbook data into R.]
-  # [http://code.google.com/p/vmstools/wiki/Practicals2 Cleaning and processing the VMS and logbook data, and accounting for potential problems.]
-  # [http://code.google.com/p/vmstools/wiki/Practicals3 Linking VMS and logbook data and exploring the benefits.]
-  # [http://code.google.com/p/vmstools/wiki/Practicals4 How to link VMS, logbook data l to ‘spatial’ grids.]
-  # [http://code.google.com/p/vmstools/wiki/Practicals5 Interpolation methods for VMS tracks.]
-  # [http://code.google.com/p/vmstools/wiki/Practicals6 Calculating indicators (eg. Percentage area trawled) at different spatial scales.]
-  # [http://code.google.com/p/vmstools/wiki/Practicals7 Plotting, exporting to GIS and FishFrame.]
-  # [http://code.google.com/p/vmstools/wiki/Practicals8 How to link VMS data with other spatial datasets.]
+  # [http://code.google.com/p/vmstools/wiki/Practicals1 Getting the VMS and logbook data into R.] {{{Doug - 2h (getting started)}}}
+  # [http://code.google.com/p/vmstools/wiki/Practicals2 Cleaning and processing the VMS and logbook data, and accounting for potential problems.] {{{Niels - 2h}}}
+  # [http://code.google.com/p/vmstools/wiki/Practicals3 Linking VMS and logbook data and exploring the benefits.] {{{Francois / Niels - 2h}}}
+  # [http://code.google.com/p/vmstools/wiki/Practicals4 How to link VMS, logbook data to ‘spatial’ grids.] {{{Doug - 2h}}}
+  # [http://code.google.com/p/vmstools/wiki/Practicals5 Interpolation methods for VMS tracks.] {{{Niels - 2h}}}
+  # [http://code.google.com/p/vmstools/wiki/Practicals6 Calculating indicators (eg. Percentage area trawled) at different spatial scales.] {{{Doug - 2h}}}
+  # [http://code.google.com/p/vmstools/wiki/Practicals7 Plotting, exporting to GIS and FishFrame.] {{{Doug - 2h}}}
+  # [http://code.google.com/p/vmstools/wiki/Practicals8 How to link VMS data with other spatial datasets.] {{{Niels - 2h}}}
