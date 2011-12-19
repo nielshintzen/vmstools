@@ -1,0 +1,4 @@
+=Lecture 2=
+==VMS data – advantages, limitations, data confidentiality issues==
+
+What we want to discuss
