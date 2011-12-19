@@ -1,21 +1,21 @@
 =Course outline & material for ICES VMStools course (25-29 June 2012)=
 ==Lectures==
-  # [http://code.google.com/p/vmstools/wiki/Lecture1 A brief introduction to the use of R, functions, scripting and installing libraries.]
-  # [http://code.google.com/p/vmstools/wiki/Lecture2 VMS data – advantages, limitations, data confidentiality issues.]
-  # EU logbook data – advantages, limitations, data confidentiality issues.
-  # EU logbook data metier analyses based on species composition of landings.
-  # Combining VMS and logbook data –why it is important?
-  # Standardising VMS and logbook analyses for populating pan European databases, e.g FishFrame.
-  # Indicators – what do they tell us?
-  # Introduction to spatial statistics – shapefiles, points, lines, polygons, map projections, and data-storage.
-  # Exploring the connection between fishing effort and other possibly explanatory variables (e.g. depth, primary production, temperature, wind speed).
+  # [http://code.google.com/p/vmstools/wiki/Lecture1 A brief introduction to the use of R, functions, scripting and installing libraries.] {{{Doug - 1h}}}
+  # [http://code.google.com/p/vmstools/wiki/Lecture2 VMS data – advantages, limitations, data confidentiality issues.] {{{Doug - 1h}}}
+  # [http://code.google.com/p/vmstools/wiki/Lecture3 EU logbook data – advantages, limitations, data confidentiality issues.] {{{Doug - 1h}}}
+  # [http://code.google.com/p/vmstools/wiki/Lecture4 EU logbook data metier analyses based on species composition of landings.] {{{Clara / Francois - 2h}}}
+  # [http://code.google.com/p/vmstools/wiki/Lecture5 Combining VMS and logbook data –why it is important?] {{{Niels / Francois - 1.5h}}}
+  # [http://code.google.com/p/vmstools/wiki/Lecture6 Standardising VMS and logbook analyses for populating pan European databases, e.g FishFrame.] {{{Niels - 1h}}}
+  # [http://code.google.com/p/vmstools/wiki/Lecture7 Indicators – what do they tell us?] {{{Doug - 1h}}}
+  # [http://code.google.com/p/vmstools/wiki/Lecture8 Introduction to spatial statistics – shapefiles, points, lines, polygons, map projections, and data-storage.] {{{Doug - 2h}}}
+  # [http://code.google.com/p/vmstools/wiki/Lecture9 Exploring the connection between fishing effort and other possibly explanatory variables (e.g. depth, primary production, temperature, wind speed).] {{{Niels - 2h}}}
 
 ==Practicals==
-  # Getting the VMS and logbook data into R
-  # Cleaning and processing the VMS and logbook data, and accounting for potential problems.
-  # Linking VMS and logbook data and exploring the benefits.
-  # How to link VMS, logbook data l to ‘spatial’ grids.
-  # Interpolation methods for VMS tracks.
-  # Calculating indicators (eg. Percentage area trawled) at different spatial scales.
-  # Plotting, exporting to GIS and FishFrame.
-  # How to link VMS data with other spatial datasets.
+  # [http://code.google.com/p/vmstools/wiki/Practicals1 Getting the VMS and logbook data into R.]
+  # [http://code.google.com/p/vmstools/wiki/Practicals2 Cleaning and processing the VMS and logbook data, and accounting for potential problems.]
+  # [http://code.google.com/p/vmstools/wiki/Practicals3 Linking VMS and logbook data and exploring the benefits.]
+  # [http://code.google.com/p/vmstools/wiki/Practicals4 How to link VMS, logbook data l to ‘spatial’ grids.]
+  # [http://code.google.com/p/vmstools/wiki/Practicals5 Interpolation methods for VMS tracks.]
+  # [http://code.google.com/p/vmstools/wiki/Practicals6 Calculating indicators (eg. Percentage area trawled) at different spatial scales.]
+  # [http://code.google.com/p/vmstools/wiki/Practicals7 Plotting, exporting to GIS and FishFrame.]
+  # [http://code.google.com/p/vmstools/wiki/Practicals8 How to link VMS data with other spatial datasets.]
