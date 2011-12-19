@@ -4,3 +4,4 @@
     * [examples_coupling Couple VMS and Logbooks]
     * [MetiersLogbook Define metiers]
     * [DCFIndicators Calculate indicators]
+  * [ICEScourse]
