@@ -19,3 +19,4 @@
   # [http://code.google.com/p/vmstools/wiki/Practicals6 Calculating indicators (eg. Percentage area trawled) at different spatial scales.] {{{Doug - 2h}}}
   # [http://code.google.com/p/vmstools/wiki/Practicals7 Plotting, exporting to GIS and FishFrame.] {{{Doug - 2h}}}
   # [http://code.google.com/p/vmstools/wiki/Practicals8 How to link VMS data with other spatial datasets.] {{{Niels - 2h}}}
+  # [http://code.google.com/vmstools/wiki/Practicals9 Play with your own data.] {{{Both - 2h}}}
