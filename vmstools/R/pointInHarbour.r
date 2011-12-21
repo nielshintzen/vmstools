@@ -4,6 +4,7 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE){
     yharb     <- harbours$lat
     rharb     <- harbours$range
     harb      <- cbind(xharb,yharb,rharb)
+    rownames(harb) <- harbours$Description
     harb      <- orderBy(~xharb+yharb,data=harb)
 
     xys       <- data.frame(lon,lat)
