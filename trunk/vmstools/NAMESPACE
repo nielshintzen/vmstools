@@ -9,11 +9,8 @@ import("MASS")
 import("sp")
 import("SOAR")
 import("aspace")
-import("PBSmapping")
 import("raster")
-import("shapefiles")
 import("mda")
-import("maps")
 export(
 "ac",                             
 "addWidth",                       
@@ -69,13 +66,11 @@ export(
 "mergeEflalo2Pings",              
 "mergeEflalo2Tacsat",             
 "mosaicASCIIGrids",               
-"multivariateClassificationUtils",
 "N1p0",                           
 "outsideMaxRange",                
 "pings2EffortMaps",               
 "pings2Fishframe",                
-"pings2LandingsMaps",             
-"plotHabitatMap",                 
+"pings2LandingsMaps",                            
 "plotTools",                      
 "plotTreeMap",                    
 "pointInHarbour",                 
@@ -87,8 +82,7 @@ export(
 "readEflalo",                     
 "readTacsat",                     
 "segmentTacsatSpeed",             
-"selectMainSpecies",              
-"ShortenEflalo2",                 
+"selectMainSpecies",                              
 "sortTacsat",                     
 "splitAmongPings",                
 "surface",                        
