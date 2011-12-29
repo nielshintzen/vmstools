@@ -21,7 +21,7 @@ Hence, hd does not equal the heading as given in the Tacsat dataset
 }
 \references{EU lot 2 project, see also: Mills et al. 2006}
 \author{Niels T. Hintzen}
-\seealso{\code{sortTacsat()}}
+\seealso{\code{\link{sortTacsat}}}
 \examples{
 data(tacsat)
 

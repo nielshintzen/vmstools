@@ -20,7 +20,7 @@ Degrees resolution of returned GPS notation : 10, 5, 1, 0.5, 0.1, 0.05, 0.01
 }
 \references{EU Lot 2 project, based on CSquare: http://www.marine.csiro.au/csquares/ }
 \author{Niels T. Hintzen}
-\seealso{\code{km2Degree(), degree2Km(), lonLatRatio(),distance()}}
+\seealso{\code{\link{km2Degree}}, \code{\link{degree2Km}}, \code{\link{lonLatRatio}}, \code{\link{distance}}}
 \examples{
 data(tacsat)
 tacsat$CSquare  <- CSquare(tacsat$SI_LONG,tacsat$SI_LATI,0.05)

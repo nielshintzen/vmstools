@@ -17,7 +17,7 @@ distanceInterpolation(interpolation)
 for each interpolation. Returned are 5 }
 \references{EU lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{distance(), distanceVMS()}}
+\seealso{\code{\link{distance}}, \code{\link{distanceTacsat}}}
 \examples{
 data(tacsat)
 #Speed threshold points (two values), NULL means use all points

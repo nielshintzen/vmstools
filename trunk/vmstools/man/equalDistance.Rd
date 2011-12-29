@@ -14,7 +14,7 @@ distance from each other, with the number of points to retreive remaining.
 }
 \references{EU lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{filterTacsat(),data(tacsat),interpolateTacsat()}}
+\seealso{\code{\link{filterTacsat}}, \code{\link{tacsat}}, \code{\link{interpolateTacsat}}}
 \examples{
 data(tacsat)
 

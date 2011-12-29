@@ -1,0 +1,60 @@
+\name{activityTacsat}
+\alias{activityTacsat}
+\title{Define activity of fishing vessel based on speed.
+}
+\description{
+Analyse tacsat data by gear of vessel and define, based on speed profile and
+fitting normal distributions through these speed profiles, fishing and other
+activities.
+}
+\usage{
+activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NULL)
+}
+%- maybe also 'usage' for other objects documented here.
+\arguments{
+  \item{tacsat}{tacsat dataset}
+  \item{units}{Analyse by: "year", "month" and "week". "month" and "week" cannot
+               be used at same time.}
+  \item{analyse.by}{Analyse tacsat by gear ("LE_GEAR") or vessel ("VE_REF").}
+  \item{storeScheme}{If \code{\link{activityTacsatAnalyse}} is used, supply
+        output here.}
+}
+\details{
+The analyses assumes that the speed profile close to 0 can be mirrored to create
+a good normal distribution.
+}
+\value{
+Returnes SI_STATE column. 1=In harbour. 2=Fishing. 3=Steaming.
+}
+\references{}
+\author{Niels T. Hintzen}
+\seealso{
+\code{\link{activityTacsatAnalyse}}, \code{\link{segmentTacsatSpeed}}
+}
+\examples{
+data(tacsat)
+data(eflalo)
+
+tacsatp         <- mergeEflalo2Tacsat(eflalo,tacsat)
+tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+
+tacsatp$LE_GEAR <- ac(tacsatp$LE_GEAR)
+tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==T)] <- "NO_GEAR"
+tacsat          <- tacsatp
+
+#--------- LE_GEAR -----------
+#- Visual analyses of activity, and define number of peaks / kernels that can be
+#  observed (either 3 or 5)
+storeScheme   <- activityTacsatAnalyse(subset(tacsat,LE_GEAR == "OTM" &
+                      year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
+res           <- activityTacsat(subset(tacsat,LE_GEAR == "OTM" &
+                      year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",
+                      storeScheme)
+
+#--------- VE_REF -----------
+tacsat        <- subset(tacsat,VE_REF == names(rev(sort(table(tacsat$VE_REF)))[1]))
+storeScheme   <- activityTacsatAnalyse(tacsat,units="year",analyse.by="VE_REF")
+
+#- Run activityTacsat
+res           <- activityTacsat(tacsat,units="year",analyse.by="VE_REF",storeScheme)
+}

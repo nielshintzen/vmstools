@@ -24,7 +24,7 @@ Grid2KML(output.mat = output.mat, what.quantity = "effort")
 \note{}
 
 
-\seealso{vmsGridCreate}
+\seealso{\code{\link{vmsGridCreate}}, \code{\link{createGrid}}}
 \examples{
 
 data(tacsat)
@@ -39,7 +39,7 @@ no <- 58
 
 #Map number of pings
 
-output.mat<-vmsGridCreate(input, we=we,ea=ea,so=so,no=no,
+output.mat<-vmsGridCreate(tacsat,we=we,ea=ea,so=so,no=no,
               nameLon = "SI_LONG", nameLat = "SI_LATI",plotMap=T,
               nameVarToSum="",cellsizeX = grid.size.x,
               cellsizeY = grid.size.y,legendx='bottomright',

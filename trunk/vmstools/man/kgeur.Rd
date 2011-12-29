@@ -19,7 +19,7 @@ kgeur(colnames(eflalo))
 \references{EU Lot 2 project}
 \author{Niels T. Hintzen}
 \examples{
-data(eflal0)
+data(eflalo)
 kgeur(colnames(eflalo))
 }
 

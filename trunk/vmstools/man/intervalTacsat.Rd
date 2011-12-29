@@ -30,7 +30,7 @@ the interval rate is used between ping x and ping x+1 (weight = c(0,1)) or an in
 }
 \references{EU lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{interpolateTacsat()},\code{calculateSpeed()}}
+\seealso{\code{\link{interpolateTacsat}},\code{\link{calculateSpeed}}}
 \examples{
 data(tacsat)
 result <- intervalTacsat(tacsat[1:100,],level="vessel")
@@ -38,7 +38,7 @@ result <- intervalTacsat(tacsat[1:100,],level="vessel",weight=c(2,1),fill.na=T)
 
 data(eflalo)
 tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
-result  <- intervalTacsat(tacsat[1:100,],level="trip",weight=c(1,1),fill.na=F)
+result  <- intervalTacsat(tacsatp[1:100,],level="trip",weight=c(1,1),fill.na=F)
 
 }
 

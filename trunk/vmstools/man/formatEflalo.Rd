@@ -16,7 +16,7 @@ formatEflalo(eflalo)
 Returns original Eflalo file but now with reformatted data}
 \references{EU lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{formatTacsat()}
+\seealso{\code{\link{formatTacsat}}
 }
 \examples{
 data(eflalo)

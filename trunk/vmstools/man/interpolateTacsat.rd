@@ -43,8 +43,12 @@ indicates the number of interpolations created.
 \references{Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite spline interpolation
 of position registration data, EU lot 2 project }
 \author{Niels T. Hintzen}
-\seealso{findEndTacsat(),distance(),lonLatRatio(),plotInterpolation(),
-               sortTacsat(),filterTacsat()}
+\seealso{\code{\link{findEndTacsat}},
+         \code{\link{distance}},
+         \code{\link{lonLatRatio}},
+         \code{\link{plotInterpolation}},
+         \code{\link{sortTacsat}},
+         \code{\link{filterTacsat}}}
 \examples{
   #Load the Tacsat data
 data(tacsat)

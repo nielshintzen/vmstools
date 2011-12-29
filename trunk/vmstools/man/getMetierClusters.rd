@@ -1,5 +1,5 @@
-\name{getMetiersClusters}
-\alias{getMetiersClusters}
+\name{getMetierClusters}
+\alias{getMetierClusters}
 \title{
 Finding metiers from a reduced EFLALO dataset, step 3: clustering logevents using various multivariate methods 
 }

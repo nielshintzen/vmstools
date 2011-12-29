@@ -53,32 +53,27 @@ Logevent ID (LE_ID) are returned as row names.
 \author{Nicolas Deporte, Sebastien Demaneche, Stephanie Mahevas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
 
-\seealso{\code{selectMainSpecies()}}
+\seealso{\code{\link{selectMainSpecies}}}
 
 \examples{
 
-  \dontrun{
+data(eflalo)
   
-   data(eflalo)
-  
-  eflalo <- formatEflalo(eflalo)
+eflalo <- formatEflalo(eflalo)
 
-  eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
-  # note that output plots will be sent to getwd()
-  analysisName <- "metier_analysis_OTB"
-  
-  explo <- selectMainSpecies(
-             dat=eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
-               analysisName, RunHAC=TRUE, DiagFlag=FALSE)
-    #=> send the LE_ID and LE_KG_SP columns only
-           
-  Step1 <- extractTableMainSpecies(
-              eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
-              explo$namesMainSpeciesHAC, paramTotal=95,paramLogevent=100)
-  #=> send the LE_ID and LE_KG_SP columns only             
-               
-  }
+eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
+# note that output plots will be sent to getwd()
+analysisName <- "metier_analysis_OTB"
 
+explo <- selectMainSpecies(
+           dat=eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
+             analysisName, RunHAC=TRUE, DiagFlag=FALSE)
+  #=> send the LE_ID and LE_KG_SP columns only
+         
+Step1 <- extractTableMainSpecies(
+            eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))],
+            explo$namesMainSpeciesHAC, paramTotal=95,paramLogevent=100)
+#=> send the LE_ID and LE_KG_SP columns only             
+             
 }
 
-\keyword{}

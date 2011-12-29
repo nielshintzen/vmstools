@@ -17,7 +17,7 @@ as.character attempts to coerce its argument to character type
 }
 \references{EU Lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{ \code{as.character()}}
+\seealso{\code{\link{as.character}}}
 \examples{
 as.character(5) #returns the number 5 as class 'character'
 ac(5)           #returns the number 5 also as class 'character'

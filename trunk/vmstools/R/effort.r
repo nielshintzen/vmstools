@@ -18,7 +18,7 @@ effort <- function(x,level="trip",unit="hours",weight=c(0.5,0.5),fill.na=F){
               x     <- orderBy(~VE_REF+SI_DATIM+FT_REF,data=x)
 
               if(all(c("SI_LATI","SI_LONG") %in% colnames(x))){
-                x$LE_EFF_VMS  <- intervalTacsat(x,level="trip",weight=weight,fill.na=fill.na)
+                x$LE_EFF_VMS  <- intervalTacsat(x,level="trip",weight=weight,fill.na=fill.na)$INTV
                 if(!unit %in% c("secs","mins","hours","days","weeks")) stop("Unit must be in 'secs,mins,hours,days or weeks'")
                 if(unit == "secs")    x$LE_EFF_VMS  <- x$LE_EFF_VMS * 60
                 if(unit == "hours")   x$LE_EFF_VMS  <- x$LE_EFF_VMS/60

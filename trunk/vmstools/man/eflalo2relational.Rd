@@ -26,7 +26,7 @@ Niels T. Hintzen
 }
 
 \seealso{
- \code{formatEflalo(),readEflalo()}
+ \code{\link{formatEflalo}},\code{\link{readEflalo}}
 }
 \examples{
 data(eflalo)

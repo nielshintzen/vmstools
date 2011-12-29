@@ -23,8 +23,7 @@ Returns dataframe with longitude and latitude columns}
 \references{EU Lot 2 project}
 \author{Neil Campbell}
 \seealso{
-\code{ICESarea(), ICESrectangle()}
-}
+\code{\link{ICESarea}}, \code{\link{ICESrectangle}}}
 \examples{
 res       <- data.frame(SI_LONG = c(1,2,2,4,2),
                         SI_LATI = c(53,53.2,54,56.7,55.2))

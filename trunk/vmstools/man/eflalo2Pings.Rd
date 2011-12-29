@@ -38,5 +38,5 @@ have not been merged yet}
 \references{EU Lot 2 project}
 \author{Niels T. Hintzen}
 \seealso{
-\code{splitAmongPings(), mergeEflalo2Tacsat(),mergeEflalo2Pings()}
+\code{\link{splitAmongPings}}, \code{\link{mergeEflalo2Tacsat}}, \code{\link{mergeEflalo2Pings}}
 }

@@ -18,7 +18,7 @@ bearing(lon, lat, lonRef, latRef)
 }
 \references{EU Lot 2 project, based on the Haversine formula, see also: Hintzen et al. 2010 Fisheries Research }
 \author{Niels T. Hintzen}
-\seealso{\code{km2Degree(), degree2Km(), lonLatRatio(),distance()}}
+\seealso{\code{\link{km2Degree}}, \code{\link{degree2Km}}, \code{\link{lonLatRatio}},\code{\link{distance}}}
 \examples{
 lon <- -4
 lat <- 50

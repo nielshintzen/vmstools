@@ -9,10 +9,15 @@ import("MASS")
 import("sp")
 import("SOAR")
 import("aspace")
+import("PBSmapping")
 import("raster")
+import("shapefiles")
 import("mda")
+import("maps")
 export(
-"ac",                             
+"ac",    
+"activityTacsat",
+"activityTacsatAnalyse",                         
 "addWidth",                       
 "af",                             
 "an",                             
@@ -70,7 +75,8 @@ export(
 "outsideMaxRange",                
 "pings2EffortMaps",               
 "pings2Fishframe",                
-"pings2LandingsMaps",                            
+"pings2LandingsMaps",
+"plotHabitatMap",                            
 "plotTools",                      
 "plotTreeMap",                    
 "pointInHarbour",                 
@@ -83,6 +89,7 @@ export(
 "readTacsat",                     
 "segmentTacsatSpeed",             
 "selectMainSpecies",                              
+"shortenEflalo2",
 "sortTacsat",                     
 "splitAmongPings",                
 "surface",                        
