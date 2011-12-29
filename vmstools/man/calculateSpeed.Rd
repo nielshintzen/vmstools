@@ -32,7 +32,7 @@ the speed is calculated between ping x and ping x+1 (weight = c(0,1)) or an inte
 
 \references{EU lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{interpolateTacsat()},\code{intervalTacsat()}}
+\seealso{\code{\link{interpolateTacsat}},\code{\link{intervalTacsat}}}
 \examples{
 data(tacsat)
 result <- calculateSpeed(tacsat[1:100,],level="vessel")

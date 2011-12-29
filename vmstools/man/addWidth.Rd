@@ -26,7 +26,7 @@ polygons per interpolation, where each interpolation consists of several polygon
 \references{EU Lot 2 project}
 \author{Niels T. Hintzen}
 \seealso{
-\code{interpolateTacsat(),destFromBearing()}
+\code{\link{interpolateTacsat}}, \code{\link{destFromBearing}}
 }
 \examples{
 library(vmstools)

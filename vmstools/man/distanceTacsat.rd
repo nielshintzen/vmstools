@@ -16,7 +16,7 @@ index is designed as a matrix where rows represent succeeding datapoints, column
 }
 \references{EU lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{distance(),distanceInterpolation(),diffInter()}}
+\seealso{\code{\link{distance}}, \code{\link{distanceInterpolation}}, \code{\link{diffInter}}}
 \examples{
 
 data(tacsat)
@@ -34,6 +34,6 @@ tacsat     <- filterTacsat(tacsat,st,NULL,remDup)
 
 distanceTacsat(tacsat,matrix(c(2,3,3,4),nrow=2,ncol=2,
                 dimnames=list(1:2,c("startpoint","endpoint"))))
-#4.452723 18.476743
+#6.335944 14.847291
 }
 

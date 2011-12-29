@@ -16,7 +16,7 @@ formatTacsat(tacsat)
 Returns original tacsat file but now with reformatted data}
 \references{EU lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{formatEflalo()}
+\seealso{\code{\link{formatEflalo}}
 }
 \examples{
 data(tacsat)

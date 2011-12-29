@@ -19,11 +19,11 @@ related trip can be found, tripnumber assigned to tacsat equals NA.
 }
 \references{EU lot 2 project }
 \author{Niels T. Hintzen}
-\seealso{\code{findEndTacsat(),distance(),lonLatRatio(),sortTacsat(),
-               filterTacsat()}}
+\seealso{\code{\link{findEndTacsat}}, \code{\link{sortTacsat}},
+               \code{\link{filterTacsat}}}
 \examples{
   #Load the eflalo2 and tacsat data
-data(eflalo2)
+data(eflalo)
 data(tacsat)
 
 #-Remove duplicated records from tacsat
@@ -33,5 +33,5 @@ tacsat    <- tacsat[!duplicated(myf),];
 
 #-Merge the tacsat and eflalo2 data
 #computation time approx 30 seconds
-result <- mergeEflalo2Tacsat(eflalo2,tacsat)
+result <- mergeEflalo2Tacsat(eflalo,tacsat)
 }

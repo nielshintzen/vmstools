@@ -26,7 +26,7 @@ The mean, logmean, standard deviation, sdlog and total sum of these distances is
 \references{Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite spline interpolation of position registration data,
 EU lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{distance(),distanceInterpolation(),distanceVMS()}}
+\seealso{\code{\link{distance}}, \code{\link{distanceInterpolation}}, \code{\link{distanceVMS}}}
 \examples{
 data(VMShf)
 

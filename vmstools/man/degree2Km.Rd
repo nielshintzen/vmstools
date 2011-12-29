@@ -18,7 +18,7 @@ degree2Km(lon, lat, degree)
 \author{Niels T. Hintzen}
 \note{Computation of Km is approximation based on the Haversine formula
 }
-\seealso{\code{distance(),km2Degree(),lonLatRatio()}}
+\seealso{\code{\link{distance}}, \code{\link{km2Degree}}, \code{\link{lonLatRatio}}}
 \examples{
 lon <- -4
 lat <- 50

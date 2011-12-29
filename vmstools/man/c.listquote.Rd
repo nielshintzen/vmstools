@@ -22,7 +22,7 @@ character vector could contain e.g. colnames(x) or c("COL1","COL2","COL3") where
 Returnes quoted list
 }
 \references{
-See data.table() documentation
+See \code{\link{data.table}} documentation
 }
 \author{
 Niels T. Hintzen
@@ -31,7 +31,7 @@ Niels T. Hintzen
 With great thanks to original author.
 }
 \seealso{
-data.table()
+See \code{\link{data.table}} documentation
 }
 \examples{
 c.listquote(c("COL1","COL2","COL3")) #Returns: list(COL1,COL2,COL3)

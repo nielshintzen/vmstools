@@ -34,7 +34,7 @@ If 1st: value then 2nd will be 0, succeeding Tacsat point is found and is specif
 \note{
 This function is called inside interpolateTacsat()
 }
-\seealso{\code{filterTacsat(),interpolateTacsat()}}
+\seealso{\code{\link{filterTacsat}}, \code{\link{interpolateTacsat}}}
 \examples{
 data(tacsat)
 startTacsat <- 2

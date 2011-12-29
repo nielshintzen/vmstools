@@ -32,7 +32,8 @@ Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite s
 \author{Niels T. Hintzen}
 \note{Used within the plotCIinterpolation() function.
 }
-\seealso{\code{plotCIinterpolation(),interpolateVMS(),N1p0(),plotInterpolation()}}
+\seealso{\code{\link{plotCIinterpolation}}, \code{\link{interpolateTacsat}},
+         \code{\link{N1p0}}, \code{\link{plotInterpolation}}}
 \examples{
 data(tacsat)
 tacsat <- formatTacsat(tacsat)

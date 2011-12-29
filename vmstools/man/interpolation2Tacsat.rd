@@ -28,7 +28,7 @@ A data frame in tacsat format is returned with estimated locations, speeds and h
 }
 
 \seealso{
-\code{interpolateTacsat()}
+\code{\link{interpolateTacsat}}
 }
 \examples{
 

@@ -28,7 +28,7 @@ Returnes the destination point(s) as matrix}
 \references{EU Lot 2 project}
 \author{Niels T. Hintzen}
 \seealso{
-\code{addWidth}
+\code{\link{addWidth}}
 }
 \examples{
 res <- destFromBearing(rep(2.5,10),rep(51.5,10),

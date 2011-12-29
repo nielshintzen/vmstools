@@ -30,7 +30,7 @@ EU lot 2 project}
 \note{
 if Tacsat is a big file, the overlay function might fail resulting in terminating the function}
 \seealso{
-\code{createGrid(),vmsGridCreate()}
+\code{\link{createGrid}}, \code{\link{vmsGridCreate}}
 }
 \examples{
 data(tacsat)

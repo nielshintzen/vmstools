@@ -16,7 +16,7 @@ CSquare(lon, lat, degrees)
 }
 \references{EU Lot 2 project, based on CSquare: http://www.marine.csiro.au/csquares/ }
 \author{Niels T. Hintzen}
-\seealso{\code{km2Degree(), degree2Km(), lonLatRatio(),distance()}}
+\seealso{\code{\link{km2Degree}}, \code{\link{degree2Km}}, \code{\link{lonLatRatio}},  \code{\link{distance}}}
 \examples{
 lon <- -4
 lat <- 50

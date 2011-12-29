@@ -19,7 +19,7 @@ as.numeric attempts to coerce its argument to numeric type
 }
 \references{EU Lot 2 project}
 \author{Francois Bastardie}
-\seealso{ \code{as.numeric(),as.character()}}
+\seealso{ \code{\link{as.numeric}}, \code{\link{as.character}}}
 \examples{
 
 res <- as.factor(5.1)

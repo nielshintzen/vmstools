@@ -18,7 +18,7 @@ lonLatRatio(lon, lat)
 \author{Niels T. Hintzen}
 \note{Computation is approximation based on the Haversine formula
 }
-\seealso{\code{distance(),degree2Km(),km2Degree()}}
+\seealso{\code{\link{distance}}, \code{\link{degree2Km}}, \code{\link{km2Degree}}}
 \examples{
 lon <- -4
 lat <- 50

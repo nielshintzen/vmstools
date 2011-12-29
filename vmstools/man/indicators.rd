@@ -61,11 +61,11 @@ For DCF Indicator 7: a annual value is returned and a grid is exported (if expor
 }
 \references{EU lot 2 project}
 \author{Fabrizio Manco}
-\seealso{\code{mapGrids()}
-         \code{vmsGridCreate()}
-         \code{tacsatMCP()}
-         \code{surface()}
-         \code{clipPolygons()}
+\seealso{\code{\link{mapGrids}}
+         \code{\link{vmsGridCreate}}
+         \code{\link{tacsatMCP}}
+         \code{\link{surface}}
+         \code{\link{clipPolygons}}
 }
 \examples{
 # load the library
