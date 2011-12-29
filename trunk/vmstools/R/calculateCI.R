@@ -13,7 +13,8 @@ calculateCI <- function(intLon
   #res1          <- maxRangeCI(intLon,intLat,an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="mins")),
   #                            c(VMS.$SI_SP[vmsIdx1],VMS.$SI_SP[vmsIdx2]))
   res1          <- maxRangeCI(intLon,intLat,an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="mins")),
-                              rep(distanceInterpolation(list(interpolation[[int]]))/1.852/an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="hours")),2))
+                              rep((distanceInterpolation(list(interpolation[[int]]))/1.852)/an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="hours")),2))
+  if(res1[[2]] > distance(intLon[1],intLat[1],intLon[2],intLat[2])) res1[[2]] <- 2* distance(intLon[1],intLat[1],intLon[2],intLat[2])
   if(any(point.in.polygon(interpolation[[int]][2:nrow(interpolation[[int]]),1],interpolation[[int]][2:nrow(interpolation[[int]]),1],res1[[1]][,1],res1[[1]][,2]))>0) stop("interpolation not inside maximum range" )
     #First find the boundaries of the mills ellipse, thereafter, add a 10% extra margin, based on the minimum or
     # maximum value. In the longitude direction, take the minimum value, and find the according latitude to go from km to degrees
@@ -63,7 +64,7 @@ calculateCI <- function(intLon
                    matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
                    nrow=dim(bbox)[1],ncol=dim(bbox)[2]),na.rm=T)
   }
-
+  
     #Calculate the distance from begin or endpoint
   begindistan <- matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
                         nrow=dim(bbox)[1],ncol=dim(bbox)[2])
@@ -79,7 +80,7 @@ calculateCI <- function(intLon
   if(max(CI,na.rm=T) < 0.1) warning("Prediction max(tmpnew) is very small")
   if(length(zeroDistan)>0)  CI[zeroDistan]  <- pmax(CI[zeroDistan],1,na.rm=T)
   
-  if(exists("sP")){ returns <- list(CI,idx,res1,grid,sPDF,sP,distan,linepistan)
+  if(exists("spatialGrid")){ returns <- list(CI,idx,res1,grid,sPDF,spatialGrid,distan,linepistan)
   } else { returns <- list(CI,idx,res1,grid,0,0,distan,linepistan)}
   
   
