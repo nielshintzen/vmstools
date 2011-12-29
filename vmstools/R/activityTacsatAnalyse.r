@@ -1,0 +1,49 @@
+activityTacsatAnalyse <- function(tacsat,units="year",analyse.by="LE_GEAR"){
+
+  if(!"LE_GEAR" %in% colnames(tacsat)) stop("Provide gear type (as column 'LE_GEAR' and if unknown, provide it as 'MIS'")
+  if(!analyse.by %in% c("LE_GEAR","VE_REF")) warning("Analysing by unknown column variable, please check!")
+  if(analyse.by %in% colnames(tacsat)){
+    if(units == "all"){   yrs <- 0}
+    if(units == "year"){  yrs <- sort(unique(year(tacsat$SI_DATIM))); mths  <- 0;                                    wks  <- 0}
+    if(units == "month"){ yrs <- sort(unique(year(tacsat$SI_DATIM))); mths  <- sort(unique(month(tacsat$SI_DATIM))); wks  <- 0}
+    if(units == "week"){  yrs <- sort(unique(year(tacsat$SI_DATIM))); wks   <- sort(unique(week(tacsat$SI_DATIM)));  mths <- 0}
+
+    runScheme                 <- expand.grid(years=yrs,months=mths,weeks=wks)
+    storeScheme               <- expand.grid(years=yrs,months=mths,weeks=wks,analyse.by=unique(tacsat[,analyse.by]))
+    storeScheme$peaks         <- NA
+    for(iRun in 1:nrow(runScheme)){
+      yr  <- runScheme[iRun,"years"]
+      mth <- runScheme[iRun,"months"]
+      wk  <- runScheme[iRun,"weeks"]
+      if(nrow(runScheme)==1){ sTacsat <- tacsat
+      } else {
+          if(mth == 0 & wk == 0) sTacsat <- subset(tacsat,year(tacsat$SI_DATIM) == yr)
+          if(mth == 0 & wk != 0) sTacsat <- subset(tacsat,year(tacsat$SI_DATIM) == yr & week( tacsat$SI_DATIM) == wk)
+          if(mth != 0 & wk == 0) sTacsat <- subset(tacsat,year(tacsat$SI_DATIM) == yr & month(tacsat$SI_DATIM) == mth)
+        }
+
+      for(iBy in na.omit(unique(sTacsat[,analyse.by]))){
+        dat     <- subset(sTacsat,sTacsat[,analyse.by] == iBy)
+        datmr   <- dat; datmr$SI_SP <- -1*dat$SI_SP; datmr <- rbind(dat,datmr)
+        xrange  <- pmin(20,range(datmr$SI_SP),na.rm=T); datmr$SI_SP[which(abs(datmr$SI_SP) >20)] <- NA
+        hist(datmr$SI_SP,breaks=seq(-20,20,1),main=paste(iBy,ifelse(yr>0,yr,""),ifelse(mth>0,mth,""),ifelse(wk>0,wk,"")))
+
+        require(tcltk)
+        tt <- tktoplevel()
+        peaks <- tclVar(5)
+
+        f1 <- tkframe(tt)
+        tkpack(f1, side='top')
+        tkpack(tklabel(f1, text='peaks: '), side='left')
+        tkpack(tkentry(f1, textvariable=peaks), side='left')
+
+        tkpack(tkbutton(tt, text='Next', command=function() tkdestroy(tt)),
+                side='right', anchor='s')
+
+        tkwait.window(tt)
+        storeScheme[which(storeScheme$years == yr & storeScheme$months    == mth &
+                          storeScheme$weeks == wk & storeScheme$analyse.by== iBy),"peaks"] <- as.numeric(tclvalue(peaks))
+      }
+    }
+  }
+return(storeScheme)}
