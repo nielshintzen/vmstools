@@ -1,4 +1,4 @@
-plot.habitat.map <- function(read.in.shapefile=TRUE,what.habitat.grouping="Grouped",min.lon=-5, max.lon=10, min.lat=48, max.lat=62,OS='Windoze')
+plotHabitatMap <- function(read.in.shapefile=TRUE,what.habitat.grouping="Grouped",min.lon=-5, max.lon=10, min.lat=48, max.lat=62,OS='Windoze')
 {
 #what.habitat.grouping = "substrate"
 #what.habitat.grouping = "SubsGroups"
