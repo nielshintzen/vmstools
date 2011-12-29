@@ -1,5 +1,3 @@
-
-
 shortenEflalo2 <- function(data=eflalo2,which.species = c("ANE","BIB","BLL","COD","DAB","HAD","HER","MAC","NEP","PLE","SOL","WHG") )
 {
 #Eflalo is an unwieldy format so this is handy if you want to select a few species
@@ -9,5 +7,3 @@ for(ss in which.species){yp <- c(yp,grep(ss,dn)) }
 short.eflalo2 <- data[,c(1:26,yp)]
 short.eflalo2
 }
-
-#short.eflalo2 <- shortenEflalo2(eflalo2,which.species=c("COD","PLE","SOL"))
