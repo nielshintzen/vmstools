@@ -18,7 +18,6 @@ N1p0(x, mu, sig, p)
 \references{EU lot 2 project}
 \author{Niels T. Hintzen}
 \note{Function is called inside plotCIinterpolation()}
-\seealso{\code{plotCIinterpolation()}}
 \examples{
 
 x   <- matrix(c(5,4,3,4,5,4,3,2,3,4,3,2,1,2,3,

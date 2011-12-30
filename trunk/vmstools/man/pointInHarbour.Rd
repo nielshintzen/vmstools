@@ -18,8 +18,8 @@ range (in km) from these midpoints.
 }
 \references{EU lot 2 project }
 \author{Niels T. Hintzen}
-\seealso{\code{findEndVMS(),distance(),lonLatRatio(),plotInterpolation(),sortVMS(),
-               filterVMS(),mergeEflalo2Tacsat()}}
+\seealso{\code{\link{distance}}, \code{\link{lonLatRatio}}, \code{\link{sortTacsat}},
+         \code{\link{filterTacsat}}, \code{\link{mergeEflalo2Tacsat}}}
 \examples{
 library(vmstools)
 data(eflalo)
@@ -34,10 +34,11 @@ tacsat    <- tacsat[!duplicated(myf),];
 
 #-Find all the gps locations that are located within the port area
 idx <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,
-                      harbours=euharbours))
+                      harbours=euharbours)
+idx <- which(idx==1)
 
 #-Plot these port locations on a map
-library(maps); library(mapdata); library(mapproj);
+library(maps); library(mapdata)
 #map the world, but plot only the northsea by lon and lat limits,
 # in high resolution
 xrange <- range(tacsat$SI_LONG[idx])

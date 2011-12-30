@@ -17,8 +17,8 @@ development of R scripts to setup the workflow of vms and logbook data
 \tabular{ll}{
 Package: \tab VMStools\cr
 Type: \tab Package\cr
-Version: \tab 0.50\cr
-Date: \tab 2011-01-24\cr
+Version: \tab 0.58\cr
+Date: \tab 2011-12-30\cr
 License: \tab \cr
 LazyLoad: \tab yes\cr
 }}

@@ -21,8 +21,8 @@ rbindEflalo(set1, set2)
 }
 \references{EU Lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{rbindTacsat(),do.call()}
-}
+\seealso{\code{\link{rbindTacsat}}, \code{\link{do.call}}}
+
 \examples{
 data(eflalo)
 set1 <- eflalo

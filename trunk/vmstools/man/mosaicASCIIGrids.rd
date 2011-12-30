@@ -22,22 +22,24 @@ The result is a new ASCII grid file.
 }
 \references{EU lot 2 project}
 \author{Fabrizio Manco}
-\seealso{\code{indicators()}}
+\seealso{\code{\link{indicators}}}
 \examples{
+data(tacsat)
+tacsat <- sortTacsat(tacsat)
 # Each country can create a ASCII grid using vmsGridCreate, for example
-# Uk
-UkVmsGrid<-vmsGridCreate(UkTacsat, nameLon = "SI_LONG",
+# year 1800 from tacsat file
+VmsGrid00<-vmsGridCreate(subset(tacsat,year(SI_DATIM)==1800), nameLon = "SI_LONG",
             nameLat = "SI_LATI",cellsizeX=0.05, cellsizeY=0.05,
-            nameVarToSum="",outGridFile="UkVmsGrid.asc")
-# Dutch
-NLVmsGrid<-vmsGridCreate(NLTacsat, nameLon = "SI_LONG",
+            nameVarToSum="",outGridFile="VmsGrid00.asc")
+# year 1801 from tacsat file
+VmsGrid01<-vmsGridCreate(subset(tacsat,year(SI_DATIM)==1801), nameLon = "SI_LONG",
              nameLat = "SI_LATI",cellsizeX=0.05, cellsizeY=0.05,
-             nameVarToSum="",outGridFile="NLVmsGrid.asc")
+             nameVarToSum="",outGridFile="VmsGrid01.asc")
 
-# and so on with other countries...
+# and so on with other countries or years...
 
 # List of grids to merge
-ascgridfilelist<-c("UkVmsGrid.asc","NLVmsGrid.asc")
+ascgridfilelist<-c("VmsGrid00.asc","VmsGrid01.asc")
 
-mosaicASCIIGrids(ascgridfilelist, "Uk+NLVmsGrids.asc")
+mosaicASCIIGrids(ascgridfilelist, "VmsGrids.asc")
 }

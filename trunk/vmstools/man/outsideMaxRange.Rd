@@ -32,7 +32,7 @@ The interpolation is the list of interpolations returned by the 'interpolateVMS'
 \references{Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite spline interpolation of position registration data,
 EU lot 2 project}
 \author{Niels T. Hintzen}
-\seealso{\code{createGrid(),calculateCI(),point.in.polygon()}}
+\seealso{\code{\link{createGrid}}, \code{\link{calculateCI}}, \code{\link{point.in.polygon}}}
 \examples{
 data(tacsat)
 
@@ -44,37 +44,25 @@ tacsat     <- tacsat[1:1000,]
 tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
 
   #Interpolate the VMS data
-interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,
-                   method="cHs",params=list(fm=0.5,distscale=20,
-                   sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
+                    res=100,method="cHs",params=list(fm=0.5,distscale=20,
+                    sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
   #Create the final grid where all interpolations should fit on
-xrange  <- range(unlist(lapply(lapply(interpolation,function(x){
-              return(x[-1,])}),function(x){return(x[,1])})),na.rm=T)
-yrange  <- range(unlist(lapply(lapply(interpolation,function(x){
-              return(x[-1,])}),function(x){return(x[,2])})),na.rm=T)
-xrange  <- range(c(xrange,range(tacsat$SI_LONG,na.rm=T)));
-xrange  <- c(min(xrange) - min(xrange)*0.05,
-             max(xrange) + max(xrange)*0.05)
-yrange  <- range(c(yrange,range(tacsat$SI_LATI,na.rm=T)));
-yrange  <- c(min(yrange) - min(yrange)*0.05,
-             max(yrange) + max(yrange)*0.05)
-
-grid          <- createGrid(xrange,yrange,0.1,0.05)
-spatialGrid   <- SpatialGrid(grid=grid);
-gridded(spatialGrid) = TRUE
-sP            <- as(spatialGrid,"SpatialPixels");
-sPDF          <- as(sP,"SpatialPixelsDataFrame")
+xrange        <- c(2,3); yrange <- c(51,52)
+grid          <- createGrid(xrange,yrange,resx=0.01,resy=0.005)
+sPDF          <- createGrid(xrange,yrange,resx=0.01,resy=0.005,type="SpatialPixelsDataFrame")
 sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
 
-lon           <- tacsat$SI_LONG[c(3,4)]
-lat           <- tacsat$SI_LATI[c(3,4)]
 
-result <- outsideMaxRange(intLon=lon,intLat=lat,vmsIdx1=3,vmsIdx2=4,
-            tacsat,grid,sPDF,interpolation,10,params=
-            list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)))
+lon <- tacsat$SI_LONG[c(12,13)]
+lat <- tacsat$SI_LATI[c(12,13)]
 
-#0\% of the total value of the CI is located outside the maximum range
+result <- outsideMaxRange(intLon=lon,intLat=lat,vmsIdx1=12,vmsIdx2=13,
+            tacsat,grid,sPDF,interpolation,4,params=
+            list(fm=0.45,distscale=3.1,sigline=0.42,st=c(2,6)))
+
+#3.7\% of the total value of the CI is located outside the maximum range
 print(result[[2]]/result[[1]])
 
 }

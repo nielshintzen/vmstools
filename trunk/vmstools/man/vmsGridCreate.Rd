@@ -61,7 +61,7 @@ vmsGridCreate(dF
 \references{EU VMS tools project}
 \author{Andy South}
 \note{}
-\seealso{\code{mapGrid()}}
+\seealso{\code{\link{mapGrid}}}
 \examples{
 #vmsGridCreate(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE",
 # cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',plotPoints=T )
@@ -70,18 +70,12 @@ data(tacsat)
 #subset the first 2000 points to avoid problems with NAs
 dFVMS <- tacsat[1:2000,]
 #create vms grid minimum call with defaults
-vmsGridCreate(dF2,nameLat='declat',nameLon='declon')
+vmsGridCreate(dFVMS,nameLat='SI_LATI',nameLon='SI_LONG')
 #making the grid finer
-vmsGridCreate(dF2,nameLat='declat',nameLon='declon',
+vmsGridCreate(dFVMS,nameLat='SI_LATI',nameLon='SI_LONG',
               cellsizeX=0.05,cellsizeY=0.05)
 #summing a data column and adding a title
 vmsGridCreate(dF2,nameLat='declat',nameLon='declon',
               cellsizeX=0.05,cellsizeY=0.05,nameVarToSum='heading',
               plotTitle='lot2 paris')
-#changing the number of categories in the plot
-vmsGridCreate(dF2,nameLat='declat',nameLon='declon',
-              cellsizeX=0.05,cellsizeY=0.05,numCats=10)
-#outputting to a gridAscii file that can be loaded into ArcGIS
-vmsGridCreate(dF2,nameLat='declat',nameLon='declon',
-              cellsizeX=0.05,cellsizeY=0.05,outGridFile='test.asc')
-}
+              }
