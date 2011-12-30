@@ -1,4 +1,4 @@
-shortenEflalo2 <- function(data=eflalo2,which.species = c("ANE","BIB","BLL","COD","DAB","HAD","HER","MAC","NEP","PLE","SOL","WHG") )
+shortenEflalo <- function(data=eflalo2,which.species = c("ANE","BIB","BLL","COD","DAB","HAD","HER","MAC","NEP","PLE","SOL","WHG") )
 {
 #Eflalo is an unwieldy format so this is handy if you want to select a few species
 dn <- dimnames(data)[[2]]

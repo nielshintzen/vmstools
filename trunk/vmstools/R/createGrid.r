@@ -24,15 +24,16 @@ function(xrange
                   grid      <- SpatialGrid(grid=grid);
                   gridded(grid) = TRUE
                   grid      <- as(grid,"SpatialPixels");
-                  grid      <- as(grid,"SpatialPixelsDataFrame")
+                  sPDF      <- as(grid,"SpatialPixelsDataFrame")
+                  sPDF@data     <- data.frame(rep(0,nrow(coordinates(sPDF))))
+                  colnames(sPDF@data) <- "data"
+                  grid          <- sPDF
                 }
                 if(type=="SpatialGridDataFrame"){
                   grid      <- SpatialGrid(grid=grid);
-                  gridded(grid) = TRUE
-                  grid      <- as(grid,"SpatialPixels");
-
                   sPDF          <- as(grid,"SpatialGridDataFrame")
-                  sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
+                  sPDF@data     <- data.frame(rep(0,nrow(coordinates(sPDF))))
+                  colnames(sPDF@data) <- "data"
                   grid          <- sPDF
                 }
                 
