@@ -27,6 +27,7 @@ clipObs2Tacsat(tacsat, obs, method, control.grid, control.euclidean,
    (spatGrid, of class "SpatialGrid") or the resolution in x and y values hwere the
    the outermargins can be given by the tacsat dataset (gridBox="tacsat") or the
    observation dataset (gridBox="obs").
+
    Example: control.grid=list(spatGrid=NULL,resx=c(0.5,1),resy=NULL,gridBbox="obs")
 }
   \item{control.euclidean}{
@@ -68,7 +69,9 @@ obs$SI_LATI   <- jitter(obs$SI_LATI,factor=0.25)
 obs$SI_LONG   <- jitter(obs$SI_LONG,factor=0.5)
 
 
-a <- clipObs2Tacsat(tacsat,obs,method="grid",control.grid=list(resx=0.1,resy=0.05,gridBbox="obs"),temporalRange=c(-30,120),all.t=F)
-a <- clipObs2Tacsat(tacsat,obs,method="euclidean",control.euclidean=list(threshold=1),temporalRange=c(-1e10,-1) ,all.t=F)
+a <- clipObs2Tacsat(tacsat,obs,method="grid",control.grid=list(resx=0.1,resy=0.05,
+                    gridBbox="obs"),temporalRange=c(-30,120),all.t=F)
+a <- clipObs2Tacsat(tacsat,obs,method="euclidean",control.euclidean=list(threshold=1),
+                    temporalRange=c(-1e10,-1) ,all.t=F)
 }
 

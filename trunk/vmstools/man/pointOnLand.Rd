@@ -37,7 +37,8 @@ tacsat  <- tacsat[1:1000,]
 tacsat  <- sortTacsat(tacsat)
 
 pols    <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
-                                  function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,SI_LATI=subset(europa,SID==x)$Y)}))
+                function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,
+                                       SI_LATI=subset(europa,SID==x)$Y)}))
 idx     <- pointOnLand(tacsat,pols);
 idx     <- which(idx == 1)
 

@@ -36,7 +36,8 @@ getEflaloMetierLevel7(dat,analysisName,path,critData="EURO",
   \item{critPca}{character. Choice if a PCA must be run or not (="NO_PCA"), and if yes, which criterion is used for selecting the number of axes, to be chosen between
   scree test (="PCA_SC") or 70\% of cumulated inertia (="PCA_70")
 }
-  \item{algoClust}{character. Choice of the clustering algorithm, either "CLARA","HAC" or "KMEANS".
+  \item{algoClust}{character. Choice of the clustering algorithm, either "CLARA","HAC"
+  or "KMEANS".
 }
 }
 
@@ -57,29 +58,31 @@ Beside, a number of sub-directories are created, with intermediate results and p
 \author{Nicolas Deporte, Sebastien Demaneche, Stephanie Mahevas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
 
-\seealso{selectMainSpecies(),extractTableMainSpecies(),getTableAfterPCA(),
-               getMetierClusters(),compareToOrdination()}
+\seealso{\code{\link{selectMainSpecies}}, \code{\link{extractTableMainSpecies}},
+\code{\link{getTableAfterPCA}},\code{\link{getMetierClusters}},
+\code{\link{compareToOrdination}}}
 
 \examples{
 
-  \dontrun{
+\dontrun{
 
-  data(eflalo)
-  
-  eflalo <- formatEflalo(eflalo)
+data(eflalo)
 
-  eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
+eflalo <- formatEflalo(eflalo)
 
-  # Note that output plots will be sent to getwd()
-  path <- "C:/metier_analysis"
-  analysisName <- "metier_analysis_OTB"
-  
-  # Return a fully working eflalo dataset with a metier at DCF Level7 for each logbook event
-  eflalo_metiers_level7 <- getEflaloMetierLevel7(eflalo, analysisName, path, critData="EURO", 
-      runHACinSpeciesSelection=TRUE, paramTotal=95, paramLogevent=100, 
-      critPca="PCA_70", algoClust="CLARA")
-          
-  }
+eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
+
+# Note that output plots will be sent to getwd()
+path <- "C:/metier_analysis"
+analysisName <- "metier_analysis_OTB"
+
+# Return a fully working eflalo dataset with a metier at DCF Level7 for each
+# logbook event
+eflalo_metiers_level7 <- getEflaloMetierLevel7(eflalo, analysisName, path,
+    critData="EURO",runHACinSpeciesSelection=TRUE, paramTotal=95,
+    paramLogevent=100,critPca="PCA_70", algoClust="CLARA")
+        
+}
 
 }
 
