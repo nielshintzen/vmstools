@@ -21,16 +21,17 @@ Returns the formatted Tacsat dataset}
 \seealso{\code{readEflalo()}}
 \examples{
 data(tacsat)
+dir.create("C:/tmpTacsat")
 
 #temporarily write tacsat file to disk to thereafter read it back in again
 tacsat$SI_HE[which(tacsat$SI_HE>360 | tacsat$SI_HE < 0)] <- NA
 tacsat$SI_LONG[which(tacsat$SI_LONG < -180 | tacsat$SI_LONG > 180)] <- NA
 tacsat$SI_LATI[which(tacsat$SI_LATI < -90 | tacsat$SI_LATI > 90)] <- NA
-write.table(tacsat, file = "C:\\tacsat.csv", quote = TRUE, sep = ",",
+write.table(tacsat, file = "C:/tmpTacsat/tacsat.csv", quote = TRUE, sep = ",",
         eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
 
 #Read in tacsat file
-tacsat <- readTacsat("C:\\tacsat.csv")
+tacsat <- readTacsat("C:/tmpTacsat/tacsat.csv")
 
 
 }

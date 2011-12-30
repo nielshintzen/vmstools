@@ -34,20 +34,29 @@ Logical, if kgs or value needs to be conserved if merging by trip number is not 
 Levels have hierachy, so if "day" is specified, also "ICESrectangle" and "trip" will be used.
 If "ICESrectangle" is specified also "trip" will be used.
 "Trip" can be used on its own. Same hierachy applies to merging when conserve = T (except for trip level).
+
+Note that tacsat file needs a column SI_STATE which has 0 for non-fishing and 1 for fishing records.
 }
 \value{
-Merged tacsat file will be returned including the splitted values over the tacsat pings where SI_STATE = fishing.
+Merged tacsat file will be returned including the splitted values over the tacsat pings where SI_STATE is not zero.
 }
 \references{EU Lot 2 project}
 \author{Niels T. Hintzen}
 \seealso{
-\code{mergeEflalo2Tacsat(), mergeEflalo2Pings()}
-}
+\code{\link{mergeEflalo2Tacsat}}, \code{\link{mergeEflalo2Pings}}}
 \examples{
 data(tacsat)
 data(eflalo)
 
 tacsatp           <- mergeEflalo2Tacsat(eflalo,tacsat)
+
+#- Create a column names SI_STATE which holds values 0 or 1 which denotes no
+#  fishing & fishing.
+tacsatp$IDX       <- 1:nrow(tacsatp)
+tacsatFilter      <- filterTacsat(tacsatp,st=c(1,6),hd=NULL,remDup=T)
+tacsatp$SI_STATE  <- 0
+tacsatp$SI_STATE[tacsatFilter$IDX] <- 1
+
 tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
                         variable="all",level="day",conserve=T)
 }

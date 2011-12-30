@@ -18,8 +18,8 @@ Polygon of area that is considered to be land
 }
 }
 \details{
-Function uses the inPoly function. However, with many coordinates, the checking
-might take longer.
+With many coordinates, the checking
+
 }
 \value{
 Returns a vector with values 0 and 1. 1 indicating points on land, 0 indicating points not on land.
@@ -27,24 +27,20 @@ Returns a vector with values 0 and 1. 1 indicating points on land, 0 indicating 
 \references{EU Lot 2 project}
 \author{Niels T. Hintzen}
 \seealso{
-\code{pointInHarbour()}
+\code{\link{pointInHarbour}}
 }
 \examples{
 
 data(tacsat)
+data(europa)
 tacsat  <- tacsat[1:1000,]
 tacsat  <- sortTacsat(tacsat)
 
-europe          <- list()
-for(iLand in c("Netherlands","Germany","Belgium","France","UK",
-               "Denmark","Ireland","Norway","Sweden","Iceland")){
-  europe[[iLand]] <- map("worldHires",iLand,main=iLand,plot=F,res=0);
-}
-europe[["Norway"]]$y[which(europe[["Norway"]]$y < 50)]  <- NA
-europe[["UK"]]$y    [which(europe[["UK"]]$y < 45)]      <- NA;
-  europe[["UK"]]$x    [which(europe[["UK"]]$x < -10)]   <- NA
-europe[["France"]]$y[which(europe[["France"]]$y < 40)]  <- NA;
-  europe[["France"]]$x[which(abs(europe[["France"]]$x) > 10)]  <- NA
+pols    <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
+                                  function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,SI_LATI=subset(europa,SID==x)$Y)}))
+idx     <- pointOnLand(tacsat,pols);
+idx     <- which(idx == 1)
 
-idx             <- pointOnLand(tacsat,europe);
+plotMap(europa,xlim=c(0,10),ylim=c(48,62))
+points(tacsat$SI_LONG[idx],tacsat$SI_LATI[idx],col="red",cex=0.5,pch=19)
 }

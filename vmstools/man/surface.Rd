@@ -22,7 +22,7 @@ The vmsGrid is returned with attached a column on cellArea
 }
 \references{EU lot 2 project}
 \author{Fabrizio Manco, Niels T. Hintzen}
-\seealso{\code{createGrid()}}
+\seealso{\code{\link{createGrid}}}
 \examples{
 data(tacsat)
 
@@ -39,11 +39,7 @@ yrange  <- c(min(yrange) - min(yrange)*0.05,
              max(yrange) + max(yrange)*0.05)
   #Setup a grid
 grid          <- createGrid(xrange,yrange,0.1,0.05)
-spatialGrid   <- SpatialGrid(grid=grid);
-gridded(spatialGrid) = TRUE
-sP            <- as(spatialGrid,"SpatialPixels");
-sPDF          <- as(sP,"SpatialGridDataFrame")
-sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
+sPDF          <- createGrid(xrange,yrange,resx=0.1,resy=0.05,type="SpatialGridDataFrame")
 
   #Calculate the cell surface
 result        <- surface(sPDF,method="Trapezoid",includeNA=T)

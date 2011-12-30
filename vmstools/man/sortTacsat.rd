@@ -16,9 +16,10 @@ sortTacsat(tacsat)
 \author{Niels T. Hintzen}
 \note{Uses library(doBy)
 }
-\seealso{Library: doBY, \code{filterTacsat(),data(tacsat)}}
+\seealso{\code{\link{filterTacsat}}}
 \examples{
 data(tacsat)
+require(doBy)
 
   #Sort the Tacsat data
 tacsat     <- sortTacsat(tacsat)

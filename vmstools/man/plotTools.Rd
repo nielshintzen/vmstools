@@ -61,8 +61,8 @@ plotTools(x,level,xlim,ylim,zlim,log,gridcell,color,control.tacsat,control.eflal
 }
 \author{Niels T. Hintzen}
 \seealso{
-\code{plotTreeMap(),Grid2KLM(),landingsMap2GIFanim(),pings2EffortMaps(),pings2LandingsMaps()}
-}
+\code{\link{plotTreeMap}}, \code{\link{Grid2KLM}}, \code{\link{landingsMap2GIFanim}}, \code{\link{pings2EffortMaps}}, \code{\link{pings2LandingsMaps}}}
+
 \examples{
 data(tacsat)
 data(eflalo)

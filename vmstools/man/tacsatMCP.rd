@@ -23,7 +23,7 @@ The nodes of the MCP are also returned.
 }
 \references{EU lot 2 project}
 \author{Fabrizio Manco}
-\seealso{\code{indicators()}}
+\seealso{\code{\link{indicators}}}
 \examples{
 data(tacsat)
 
