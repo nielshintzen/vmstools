@@ -58,8 +58,11 @@ Beside, a number of sub-directories are created, with intermediate results and p
 \author{Nicolas Deporte, Sebastien Demaneche, Stephanie Mahevas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
 
-\seealso{\code{\link{selectMainSpecies}}, \code{\link{extractTableMainSpecies}},
-\code{\link{getTableAfterPCA}},\code{\link{getMetierClusters}},
+\seealso{
+\code{\link{selectMainSpecies}},
+\code{\link{extractTableMainSpecies}},
+\code{\link{getTableAfterPCA}},
+\code{\link{getMetierClusters}},
 \code{\link{compareToOrdination}}}
 
 \examples{
