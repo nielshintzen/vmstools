@@ -40,7 +40,8 @@ tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==T)] <- "NO_GEAR"
 tacsat          <- tacsatp
 
 #--------- LE_GEAR -----------
-#- Visual analyses of activity, and define number of peaks / kernels that can be observed (either 3 or 5)
+#- Visual analyses of activity, and define number of peaks / kernels that can
+#  be observed (either 3 or 5)
 storeScheme   <- activityTacsatAnalyse(subset(tacsat,LE_GEAR == "OTM" &
                       year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
 }

@@ -77,7 +77,9 @@ The function returns a list with a number of tables on the comparison of the thr
 \author{Nicolas Deporte, Sebastien Demaneche, Stephanie Mahevas (IFREMER, France), Clara Ulrich, Francois Bastardie (DTU Aqua, Denmark)}
 \note{A number of libraries are initially called for the whole metier analyses and must be installed : (FactoMineR),(cluster),(SOAR),(amap),(MASS),(mda)}
 
-\seealso{\code{getEflaloMetierLevel7(), selectMainSpecies(), extractTableMainSpecies(), getMetierClusters(), getTableAfterPCA(), getMetierClusters()}}
+\seealso{\code{\link{getEflaloMetierLevel7}}, \code{\link{selectMainSpecies}},
+\code{\link{extractTableMainSpecies}}, \code{\link{getMetierClusters}},
+\code{\link{getTableAfterPCA}}, \code{\link{getMetierClusters}}}
 
 \examples{
 

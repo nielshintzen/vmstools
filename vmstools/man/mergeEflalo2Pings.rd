@@ -86,7 +86,7 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
 \note{}
 
 
-\seealso{vmsGridCreate}
+\seealso{\code{\link{vmsGridCreate}}}
 
 \examples{
 
@@ -155,11 +155,13 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
   # that will overwrite the existing SI_STATE)
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("35", "1518"),
                      general=list(output.path=file.path("C:","output"),
-                     visual.check=TRUE, detect.fishing=TRUE, speed="segment", what.speed="calculated"))
+                     visual.check=TRUE, detect.fishing=TRUE, speed="segment",
+                     what.speed="calculated"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
                      general=list(output.path=file.path("C:","output"),
-                     visual.check=TRUE, detect.fishing=TRUE, speed="segment", what.speed="calculated"))
+                     visual.check=TRUE, detect.fishing=TRUE, speed="segment",
+                     what.speed="calculated"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
