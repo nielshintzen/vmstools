@@ -1,4 +1,4 @@
-pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE){
+pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE,saveHarbourList=TRUE){
 
     xharb     <- harbours$lon
     yharb     <- harbours$lat
@@ -74,6 +74,7 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE){
     store[ordxys] <- store
 
     if(returnNames) store <- replace(store, store=="0", NA)
+    if(saveHarbourList) write.table(harbours,file="harbourList_pointInHarbour.txt",append=F,sep="\t")
 
 return(store)}
     
