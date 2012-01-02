@@ -11,6 +11,9 @@ Method to find the gps positions given with tacsat data that are situated within
   \item{lon}{Longitudinal positions of the TACSAT formatted data}
   \item{lat}{Latitudinal positions of teh TACSAT formatted data}
   \item{harbour}{Latitudinal and Longitudinal position of the harbour and outer range from midpoint of harbour}
+  \item{returnNames}{Logical: return the name of the harbour instead of 1 / 0 indicating if it is inside or
+  outside the harbour. Default to FALSE}
+  \item{saveHarbourList}{Logical: writing harbour list used in function to file. Default to TRUE}
 }
 \details{
 The method returns the index of points that are within a harbour area, given the midpoints of the harbours and a 
@@ -33,6 +36,13 @@ tacsat    <- tacsat[!duplicated(myf),];
 
 
 #-Find all the gps locations that are located within the port area
+idx <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,
+                      harbours=euharbours,returnNames=T)
+print(head(idx))
+getwd() #in this directory, the harbour list will be written to disk
+idx <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,
+                      harbours=euharbours,saveHarbourList=T)
+
 idx <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,
                       harbours=euharbours)
 idx <- which(idx==1)
