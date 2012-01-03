@@ -109,7 +109,7 @@ if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
   tacsatFTREF[,kgeur(colnames(tacsatFTREF))]    <- sweep(tacsatFTREF[,kgeur(colnames(tacsatFTREF))],1,tacsatFTREF$pings,"/")
   tacsatFTREF$ID                                <- af(ac(tacsatFTREF$ID.x))
   DT                                            <- data.table(tacsatFTREF)
-  eq1                                           <- c.listquote(paste("sum(",colnames(tacsatFTREF[,kgeur(colnames(tacsatFTREF))]),")",sep=""))
+  eq1                                           <- c.listquote(paste("sum(",colnames(tacsatFTREF[,kgeur(colnames(tacsatFTREF))]),",na.rm=T)",sep=""))
   tacsatFTREF                                   <- DT[,eval(eq1),by=ID.x]; tacsatFTREF <- data.frame(tacsatFTREF); colnames(tacsatFTREF) <- c("ID",colnames(eflaloTrip[,kgeur(colnames(eflaloTrip))]))
 }
 
@@ -182,7 +182,7 @@ if(conserve == T){
     tacsatVEREF[,kgeur(colnames(tacsatVEREF))]    <- sweep(tacsatVEREF[,kgeur(colnames(tacsatVEREF))],1,tacsatVEREF$pings,"/")
     tacsatVEREF$ID                                <- af(ac(tacsatVEREF$ID.x))
     DT                                            <- data.table(tacsatVEREF)
-    eq1                                           <- c.listquote(paste("sum(",colnames(tacsatVEREF[,kgeur(colnames(tacsatVEREF))]),")",sep=""))
+    eq1                                           <- c.listquote(paste("sum(",colnames(tacsatVEREF[,kgeur(colnames(tacsatVEREF))]),",na.rm=T)",sep=""))
     tacsatVEREF                                   <- DT[,eval(eq1),by=ID.x]; tacsatVEREF <- data.frame(tacsatVEREF); colnames(tacsatVEREF) <- c("ID",colnames(eflaloVessel[,kgeur(colnames(eflaloVessel))]))
   }
   
@@ -244,7 +244,7 @@ if(conserve == T){
     tacsatREF[,kgeur(colnames(tacsatREF))]      <- sweep(tacsatREF[,kgeur(colnames(tacsatREF))],1,tacsatREF$pings,"/")
     tacsatREF$ID                                <- af(ac(tacsatREF$ID.x))
     DT                                          <- data.table(tacsatREF)
-    eq1                                         <- c.listquote(paste("sum(",colnames(tacsatREF[,kgeur(colnames(tacsatREF))]),")",sep=""))
+    eq1                                         <- c.listquote(paste("sum(",colnames(tacsatREF[,kgeur(colnames(tacsatREF))]),",na.rm=T)",sep=""))
     tacsatREF                                   <- DT[,eval(eq1),by=ID.x]; tacsatREF <- data.frame(tacsatREF); colnames(tacsatREF) <- c("ID",colnames(eflaloVessel[,kgeur(colnames(eflaloVessel))]))
   }
 }#End conserve
@@ -259,7 +259,7 @@ if(conserve==T){
   if(exists("tacsatREF"))  {three <- tacsatREF}   else{ three <- numeric()}
   tacsatTot       <- rbind(one,two,three)
   DT              <- data.table(tacsatTot)
-  eq1             <- c.listquote(paste("sum(",colnames(tacsatTot[,kgeur(colnames(tacsatTot))]),")",sep=""))
+  eq1             <- c.listquote(paste("sum(",colnames(tacsatTot[,kgeur(colnames(tacsatTot))]),",na.rm=T)",sep=""))
   tacsatTot       <- DT[,eval(eq1),by=ID]; tacsatTot <- data.frame(tacsatTot); colnames(tacsatTot) <- c("ID",colnames(eflalo[,kgeur(colnames(eflalo))]))
   tacsatReturn    <- merge(tacsat,tacsatTot,by="ID",all.x=T)
   if(variable == "value") tacsatReturn <- tacsatReturn[,c(1:dim(tacsat)[2],grep("EURO",colnames(tacsatReturn)))]

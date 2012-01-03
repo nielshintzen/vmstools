@@ -59,6 +59,8 @@ plotTools(x,level,xlim,ylim,zlim,log,gridcell,color,control.tacsat,
   \item{control.eflalo}{
   list with attribute "clm": column names to display aggregated results over
 }
+  \item{returnRange}{Logical: return range of plotted values (which can be used to
+  define own legend}
 }
 \author{Niels T. Hintzen}
 \seealso{

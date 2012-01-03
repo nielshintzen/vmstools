@@ -1,4 +1,4 @@
-plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),...){
+plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),returnRange=F,...){
   library(RColorBrewer)
   library(maps)
   library(mapdata)
@@ -28,7 +28,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
       x$SI_LATI             <- af(ICESrectangle2LonLat(ac(x$LE_RECT))[,1])
 
       DT                    <- data.table(x)
-      eq1                   <- c.listquote(paste("sum(",control.tacsat$clm,")",sep=""))
+      eq1                   <- c.listquote(paste("sum(",control.tacsat$clm,",na.rm=T)",sep=""))
       eq2                   <- c.listquote(c("SI_LONG","SI_LATI"))
       
       byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",control.tacsat$clm)
@@ -50,7 +50,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
       DT$x                  <- af(ac(grids@coords[DT$dens,1]))
       DT$y                  <- af(ac(grids@coords[DT$dens,2]))
       
-      eq1                   <- c.listquote(paste("sum(",control.tacsat$clm,")",sep=""))
+      eq1                   <- c.listquote(paste("sum(",control.tacsat$clm,",na.rm=T)",sep=""))
       eq2                   <- c.listquote(c("x","y"))
       
       byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",control.tacsat$clm)
@@ -78,7 +78,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
       #- Sum by rectangle
     if(is.null(control.eflalo$clm)==T) control.eflalo$clm <- colnames(x[,kgeur(colnames(x))])
     DT                    <- data.table(x)
-    eq1                   <- c.listquote(paste("sum(",control.eflalo$clm,")",sep=""))
+    eq1                   <- c.listquote(paste("sum(",control.eflalo$clm,",na.rm=T)",sep=""))
     eq2                   <- c.listquote(c("SI_LONG","SI_LATI"))
     DT$SI_LONG            <- af(ac(DT$SI_LONG)); DT$SI_LATI <- af(ac(DT$SI_LATI))
     
@@ -111,6 +111,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
                                          y=c(rep(an(ac(byRect[iRect,"SI_LATI"])),2),rep(an(ac(byRect[iRect,"SI_LATI"]))+0.5,2)),col=color[i],lwd=1,border=NA)
     if(level == "gridcell")      polygon(x=c(an(ac(byRect[iRect,"SI_LONG"])),an(ac(byRect[iRect,"SI_LONG"]))+gridcell[1],an(ac(byRect[iRect,"SI_LONG"]))+gridcell[1],an(ac(byRect[iRect,"SI_LONG"]))),
                                          y=c(rep(an(ac(byRect[iRect,"SI_LATI"])),2),rep(an(ac(byRect[iRect,"SI_LATI"]))+gridcell[2],2)),col=color[i],lwd=1,border=NA)                                          
-  } 
+  }
   map("worldHires",res=1,xlim=xlim,ylim=ylim,fill=T,col="darkgreen",plt=F,add=T);box()
+  if(returnRange) return(rangeRect)
 }
