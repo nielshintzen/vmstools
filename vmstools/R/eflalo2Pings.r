@@ -6,7 +6,7 @@
       }
 
       DT                    <- data.table(eflalo)
-      eq1                   <- c.listquote(paste("sum(",colnames(eflalo[,kgeur(colnames(eflalo))]),")",sep=""))
+      eq1                   <- c.listquote(paste("sum(",colnames(eflalo[,kgeur(colnames(eflalo))]),",na.rm=T)",sep=""))
       eq2                   <- c.listquote(vars)
 
       eflalo            <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(eflalo) <- c(vars,eflaloCol)
