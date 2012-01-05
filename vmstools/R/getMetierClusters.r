@@ -8,7 +8,7 @@
 getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara",param1="euclidean",param2=NULL){
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
-  #data(correspLevel7to5)
+  data(correspLevel7to5)
 
   LE_ID=rownames(datSpecies)
   nbSpec=ncol(datSpecies)
@@ -199,7 +199,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       SdThreshold=2
       for(k in 1:nbClust){
         if(length(which(sampleClusters==k))==1){ sdprofilclusti=rep(0,nbSpec)
-        }else{sdprofilclusti=sd(sampleDatSpecies[which(sampleClusters==k),])}
+        }else{sdprofilclusti=apply(sampleDatSpecies[which(sampleClusters==k),],2,sd)}
         namSDi=names(which(sdprofilclusti>SdThreshold))
         numSDi=which(sdprofilclusti>SdThreshold)
         namSdPloti=rep("",nbSpec)
@@ -466,7 +466,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     SdThreshold=2
     for(i in 1:nbClust){
       if(length(which(clusters==i))==1){ sdprofilclusti=rep(0,nbSpec)
-      }else{sdprofilclusti=sd(datSpecies[which(clusters==i),])}
+      }else{sdprofilclusti=apply(datSpecies[which(clusters==i),],2,sd)}
       namSDi=names(which(sdprofilclusti>SdThreshold))
       numSDi=which(sdprofilclusti>SdThreshold)
       namSdPloti=rep("",nbSpec)
@@ -610,7 +610,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
-    thresholdTestValue=50
+    thresholdTestValue=10
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -843,7 +843,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     SdThreshold=2
     for(i in 1:nbClust){
       if(length(which(clusters$cluster==i))==1){ sdprofilclusti=rep(0,nbSpec)
-      }else{sdprofilclusti=sd(datSpecies[which(clusters$cluster==i),])}
+      }else{sdprofilclusti=apply(datSpecies[which(clusters$cluster==i),],2,sd)}
       namSDi=names(which(sdprofilclusti>SdThreshold))
       numSDi=which(sdprofilclusti>SdThreshold)
       namSdPloti=rep("",nbSpec)
@@ -987,7 +987,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
-    thresholdTestValue=50
+    thresholdTestValue=10
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -1260,7 +1260,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     SdThreshold=2
     for(i in 1:nbClust){
       if(length(which(clusters$clustering==i))==1){ sdprofilclusti=rep(0,nbSpec)
-      }else{sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])}
+      }else{sdprofilclusti=apply(datSpecies[which(clusters$clustering==i),],2,sd)}
       namSDi=names(which(sdprofilclusti>SdThreshold))
       numSDi=which(sdprofilclusti>SdThreshold)
       namSdPloti=rep("",nbSpec)
@@ -1403,7 +1403,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
-    thresholdTestValue=50
+    thresholdTestValue=10
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -1686,7 +1686,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     SdThreshold=5
     for(i in 1:nbClust){
       if(length(which(clusters$clustering==i))==1){ sdprofilclusti=rep(0,nbSpec)
-      }else{sdprofilclusti=sd(datSpecies[which(clusters$clustering==i),])}
+      }else{sdprofilclusti=apply(datSpecies[which(clusters$clustering==i),],2,sd)}
       namSDi=names(which(sdprofilclusti>SdThreshold))
       numSDi=which(sdprofilclusti>SdThreshold)
       namSdPloti=rep("",nbSpec)
@@ -1713,7 +1713,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     png(paste(analysisName,"Number of Logevents by cluster.png",sep="_"), width = 1200, height = 800)
     coord=barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents")
     barplot(clusters$clusinfo[,1], names.arg=x, main="Number of Logevents by cluster", xlab="Cluster", ylab="Number of Logevents", col="skyblue")
-    text(coord,clusters$clusinfo[,1]+100,clusters$clusinfo[,1],font=2,xpd=NA)
+    text(coord,clusters$clusinfo[,1]+5,clusters$clusinfo[,1],font=2,xpd=NA)
     dev.off()
 
 
@@ -1827,7 +1827,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
-    thresholdTestValue=50
+    thresholdTestValue=10
     thresholdLogevents=30
     
     sppCumCatch=list()
