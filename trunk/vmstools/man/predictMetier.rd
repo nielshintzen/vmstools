@@ -49,10 +49,10 @@ in newData. The cluster number "0" corresponds to the unknown metier.
 
   \dontrun{
 
-  load("newEflalo.Rdata")
+  data(eflalo)
 
   # Format
-  newEflalo <- formatEflalo(newEflalo)
+  newEflalo <- formatEflalo(eflalo)
   newEflalo <- newEflalo[newEflalo$LE_GEAR=="OTB",]
   
   # Note that output plots will be sent to getwd()
@@ -68,9 +68,9 @@ in newData. The cluster number "0" corresponds to the unknown metier.
   datPred <- as.matrix(datPred)
   rownames(datPred) <- le_id_datPred
 
-  if (algoClust=="HAC")     clustersAffectation <- Step3$clusters
-  if (algoClust=="CLARA")   clustersAffectation <- Step3$clusters$clustering
-  if (algoClust=="KMEANS")  clustersAffectation <- Step3$clusters$cluster  
+  if (methMetier=="hac")     clustersAffectation <- Step3$clusters
+  if (methMetier=="clara")   clustersAffectation <- Step3$clusters$clustering
+  if (methMetier=="kmeans")  clustersAffectation <- Step3$clusters$cluster
 
   # Predict the metiers of the new logbook events of newData from the metiers
   # found in Step 3
