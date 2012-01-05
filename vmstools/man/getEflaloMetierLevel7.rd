@@ -76,7 +76,7 @@ eflalo <- formatEflalo(eflalo)
 eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
 
 # Note that output plots will be sent to getwd()
-path <- "C:/metier_analysis"
+path <- getwd()
 analysisName <- "metier_analysis_OTB"
 
 # Return a fully working eflalo dataset with a metier at DCF Level7 for each
