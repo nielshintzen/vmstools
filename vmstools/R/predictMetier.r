@@ -33,13 +33,18 @@ predictMetier=function(learningData=Step1,clustersAffectation=clust2007,newData=
     predictedClusters=data.frame(rownames(newDataWithCatch),result)
     dimnames(predictedClusters)[[2]]=c("LE_ID","Class")
     
-    # Give the metier "0" (unknown metier) for the logevents in newDataWithoutCatch
-    notPredictedClusters=data.frame(le_id_newDataWithoutCatch,
-        as.factor(rep(0,length(le_id_newDataWithoutCatch))))
-    dimnames(notPredictedClusters)[[2]]=c("LE_ID","Class")
-    
     # Create a table linking "LE_ID" and metier for each logevent in newData
-    clustersForAllLogevents=rbind(predictedClusters,notPredictedClusters)
+    if(length(le_id_newDataWithoutCatch)==0){
+      clustersForAllLogevents=predictedClusters
+    }else{
+      # Give the metier "0" (unknown metier) for the logevents in newDataWithoutCatch
+      notPredictedClusters=data.frame(le_id_newDataWithoutCatch,
+         as.factor(rep(0,length(le_id_newDataWithoutCatch))))
+      dimnames(notPredictedClusters)[[2]]=c("LE_ID","Class")
+
+      # Create a table linking "LE_ID" and metier for each logevent in newData
+      clustersForAllLogevents=rbind(predictedClusters,notPredictedClusters)
+    }
     
     return(clustersForAllLogevents=clustersForAllLogevents)
 }
