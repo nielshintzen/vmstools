@@ -34,7 +34,6 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   null.value <- c(null.value,which(apply(dat[,2:ncol(dat)],1,sum,na.rm=T)==0))
 
   if(length(null.value)!=0) {LogEvent.removed <- dat[sort(unique(null.value)),] ; dat <- dat[-sort(unique(null.value)),]}
-  Store(LogEvent.removed)
 
   # Rename species names
   names(dat)[-1]=unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
@@ -59,12 +58,13 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
 
   save(explo,Step1,file="Explo_Step1.Rdata")
   
+  rowNamesSave <- row.names(Step1)
+  row.names(Step1) <- 1:nrow(Step1)
   
   #-----------------------------
   # III. STEP 2 - PCA - NO-PCA
   #-----------------------------
 
-  setwd(paste(path,analysisName,sep="/"))
   if (!file.exists(critPca)) dir.create(critPca)
   setwd(file.path(path,analysisName,critPca))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
@@ -73,14 +73,16 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   if (critPca=="PCA_SC") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="pca",criterion="screetest") else    # criterion="screetest"
   if (critPca=="NO_PCA") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="nopca",criterion=NULL)
 
-  save(Step2,file="Step2.Rdata")
+  row.names(Step1) <- rowNamesSave
+  row.names(Step2) <- rowNamesSave
   
+  save(Step1,file="Step1.Rdata")
+  save(Step2,file="Step2.Rdata")
   
   #-------------------------------------------------------
   # IV. STEP 3 - CLUSTERING METHOD : HAC, CLARA OR KMEANS
   #-------------------------------------------------------
 
-  setwd(paste(path,analysisName,critPca,sep="/"))
   if (!file.exists(algoClust)) dir.create(algoClust)
   setwd(file.path(path,analysisName,critPca,algoClust))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
@@ -97,7 +99,6 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   #------------------------------------------------
 
   compOrdin="CompOrdin"
-  setwd(paste(path,analysisName,critPca,algoClust,sep="/"))
   if (!file.exists(compOrdin)) dir.create(compOrdin)
   setwd(file.path(path,analysisName,critPca,algoClust,compOrdin))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
@@ -117,16 +118,22 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   # Choosing the final option
   setwd(file.path(path,analysisName))
 
-  load(paste(path,analysisName,critPca,algoClust,"Step3.Rdata",sep="/"))
+  #load(paste(path,analysisName,critPca,algoClust,"Step3.Rdata",sep="/"))
 
   if(!nrow(dat)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
 
   dat <- cbind(dat,CLUSTER=Step3$LE_ID_clust[,"clust"])
 
   # Now reload the full data set
-  eflalo_ori[-sort(unique(null.value)),"CLUSTER"] <- Step3$LE_ID_clust[,"clust"]
-
+  if(length(null.value)==0){
+    eflalo_ori[,"CLUSTER"]=Step3$LE_ID_clust[,"clust"]
+  }else{
+    eflalo_ori[-sort(unique(null.value)),"CLUSTER"]=Step3$LE_ID_clust[,"clust"]
+  }
+  
+  cat("\n")
   print("Congratulation !! You have now a fully working eflalo dataset with a metier Level 7 !")
+  cat("\n")
   print(Sys.time()-timeStart)
   
   return(eflalo_ori)
