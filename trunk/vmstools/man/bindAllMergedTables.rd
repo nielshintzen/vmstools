@@ -35,84 +35,100 @@ Francois Bastardie
 }
 \examples{
 \dontrun{
-  data(eflalo2)
+  data(eflalo)
   data(tacsat)
   data(euharbours)
-  # add missing harbours? (still to be fix...)
-  #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10')))
-  #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1')))
 
- 
-  library(doBy)
+  # format
+  eflalo <- formatEflalo(eflalo)
+  tacsat <- formatTacsat(tacsat)
+
+  # order tacsat chronologically with library(doBy)
+  tacsat <- sortTacsat(tacsat)
+
+  # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
-  inHarb <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,
-              harbours=euharbours,30)
+  euharbours$Description <- euharbours$harbour
+  tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG),
+                                   lat=anf(tacsat$SI_LATI),
+                                   harbours=euharbours,
+                                   rowSize=30, returnNames=TRUE)
+  inHarb <- tacsat$SI_HARB
+  inHarb <- replace(inHarb, !is.na(inHarb), 1)
+  inHarb <- replace(inHarb, is.na(inHarb), 0)
+  inHarb <- as.numeric(inHarb)
+
+  # assign a trip identifier
   tacsat$SI_FT <- 1 # init
   idx <- which(inHarb==0)
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
-  tacsat <- tacsat[which(inHarb==0),] # keep out of harbour points only
+
+  # keep 'out of harbour' points only
+  # (but keep the departure point and the arrival point lying in the harbour)
+  startTrip <- c(diff(tacsat[,"SI_FT"]), 0)
+  endTrip   <- c(0, diff(tacsat[,"SI_FT"]))
+  tacsat[which(startTrip>0),"SI_FT"]  <-  tacsat[which(startTrip>0)+1,"SI_FT"] 
+  tacsat[which(endTrip<0),"SI_FT"]    <-  tacsat[which(endTrip<0)-1,"SI_FT"] 
+  tacsat <- tacsat[which(inHarb==0 |  startTrip>0 |  endTrip<0),]
+
+
+  # assign a state to each ping (here, useless if detectFishing at TRUE)
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
   # fake speed rule for fishing state
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
 
 
-                       
-  
-  # reduce the size of the eflalo data by merging
-  # species (e.g. <1 millions euros)
-  eflalo <- mergeEflaloSpecies (eflalo2, threshold=1e6) 
-  
-  # debug
-  eflalo2 <- eflalo2[!eflalo2$VE_REF=="NA" &!is.na(eflalo2$VE_REF),]
-  
-  # TEST FOR A GIVEN SET OF VESSELS
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2,
-      tacsat=tacsat, a.vesselid=c("35", "1518"),
-      general=list(output.path=file.path("C:","output"),
-      a.year=2009, visual.check=TRUE,
-      do.wp3=FALSE, speed="segment"))
+  # reduce the size of the eflalo data by merging species
+  # (assuming that the other species is coded MZZ), threshold in euros.
+  eflalo2 <- poolEflaloSpecies (eflalo, threshold=1e6, code="MZZ")
 
-  # ...OR APPLY FOR ALL VESSELS IN eflalo2
-  mergeTacsat2EflaloAndDispatchLandingsAtThePingScale (logbooks=eflalo2,
-      tacsat=tacsat,
-      general=list(output.path=file.path("C:","output"),
-      a.year=2009, visual.check=TRUE,
-      do.wp3=FALSE, speed="segment"))
+  # debug if eflalo has not been cleaned earlier
+  eflalo <- eflalo[!eflalo$VE_REF=="NA" &!is.na(eflalo$VE_REF),]
+  
+  # an informed VE_FLT is also required
+  if(all(is.na(eflalo$VE_FLT))) eflalo$VE_FLT <- "fleet1"
+  
+  # possible mis-naming mistakes
+    if(!match('LE_MET_level6',colnames(eflalo))>0){
+      eflalo$LE_MET_level6 <- eflalo$LE_MET
+    }
+
+  # debug
+  eflalo <- eflalo[eflalo$LE_MET!="No_logbook6",]
+
+
+  # TEST FOR A GIVEN SET OF VESSELS
+  # (if detect.fishing is true then do also detection of fishing activity
+  # e.g. if speed='segment' the segmentTacsatSpeed() automatic detection of fishing states
+  # that will overwrite the existing SI_STATE)
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("738", "804"),
+                     general=list(output.path=file.path("C:","output"),
+                     visual.check=TRUE, detectFishing=TRUE, speed="segment",
+                     what.speed="calculated"))
+  # ...OR APPLY FOR ALL VESSELS IN eflalo
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
+                     general=list(output.path=file.path("C:","output"),
+                     visual.check=TRUE, detectFishing=TRUE, speed="segment",
+                     what.speed="calculated"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
-  load(file.path("C:","output","merged_35_2009.RData"))
-  
-  # ...or bind all vessels
-  tmp <- bindAllMergedTables (vessels=c("35", "1518"),
-            species.to.merge=character(),
-            folder = file.path("C:","output"), all.in.one.table=TRUE)
- 
-   # ...and load the merged output table for all vessels
-  load(file.path("C:","output","all_merged_2009.RData"))
-             
-  # map landing of sole from all studied vessels
-  df1<- all.merged[,colnames(all.merged)\%in\% c("SI_LATI","SI_LONG","LE_KG_SOL")]
-  df1$SI_LONG <-as.numeric(as.character(df1$SI_LONG))
-  df1$SI_LATI <-as.numeric(as.character(df1$SI_LATI))
-  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI",
-      cellsizeX =0.05,cellsizeY =0.05)
+  load(file.path("C:","output","merged_804_1800.RData"))
 
-  # remove steaming points before gridding!
-  df2<-df1[-which(is.na(df1$LE_KG_SOL)),]
-  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI",
-      cellsizeX =0.05,cellsizeY =0.05)
+  # check the conservation of landings
+  sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
+  sum(eflalo[eflalo$VE_REF=="804","LE_KG_PLE"], na.rm=TRUE)
 
 
-  # CONVERT TO FISHFRAME FORMAT (might take some time running)
-  # (by default, will keep all the species in the output table)
-  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF),
-            species.to.keep=character(),
-            folder = file.path("C:","output"), all.in.one.table=FALSE)
-  
-  ff <- mergedTable2Fishframe (general=list(output.path=
-          file.path("C:","output"),a.year=2009, a.country="NLD"))
+   # ...or bind all vessels (keeping only some given species here)
+  bindAllMergedTables (vessels=c("738", "804"), a.year = "1800",
+                      species.to.keep=c("PLE","COD"),
+                      folder = file.path("C:","output"),
+                      all.in.one.table=TRUE)
 
-  }
+    # ...and load the merged output table for all vessels
+  load(file.path("C:","output","all_merged__1800.RData"))
+
+}
 
 }
