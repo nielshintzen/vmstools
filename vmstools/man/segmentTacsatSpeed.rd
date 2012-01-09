@@ -20,7 +20,7 @@ The method returns tacsat (a subset if vessels informed) with the SI_STATE infor
               speed at some value for gillnet and seine gear types}
 }
 \details{
-A vessel and gear-specific method has been suggested by Bastardie et al. 2010 
+A (quick and dirty) vessel and gear-specific method has been suggested by Bastardie et al. 2010 
 for dividing the fishing positions from the non-fishing positions (or 'steaming') 
 based on vessel speed profile. Data from trips with observers on board recording 
 vessel movement with a high spatial resolution (e.g. a position recorded every minute) 
@@ -40,12 +40,12 @@ Peak detection is done for each vessel and for each of its gear types to account
 individual skipper behaviour and gear-specific constraints on fishing activity. 
 The present methodology is however not well suited for the particular gillnet and seine activities because 
 no peak are found from observations of speed histograms. For these fishing activities, 
-only the upper boundary of the automatic peak detection is retained, 
+only the upper boundary of the automatic peak detection should be retained, 
 assuming that fishing start at a given value in speed e.g. 0.5 nm.
 }
 \references{Bastardie et al. 2010. Fisheries Research}
 \author{Francois Bastardie}
-\seealso{\code{}}
+\seealso{\code{mergeEflalo2Pings}}
 \examples{
 
 \dontrun{
