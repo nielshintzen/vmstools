@@ -47,11 +47,29 @@ plot a graph
 
  \dontrun{
 
-    load("C:\\merging\\redo3merged2010\\all_merged_weight_2010.RData")
-    plotTreeMap (all.merged,  gridcell=c(0.1,0.1), gear="OTB", 
-                xlim= c(-1,17), ylim= c(52,62), acolors=rainbow(7),
-                  species.to.keep= c("LE_KG_COD","LE_KG_NEP", "LE_KG_PLE", "LE_KG_SOL") ) 
+  
+  # do mergeEflalo2Pings()....
+  # ...and load the merged output table for all vessels
+  load(file.path("C:","output","all_merged__1800.RData"))
+
+
+  graphics.off()
+  df1 <- all.merged[, c("LE_MET_level6", "LE_GEAR","SI_STATE", "SI_LATI","SI_LONG","LE_KG_COD","LE_KG_PLE")]
+  df1$SI_LONG <- anf(df1$SI_LONG)
+  df1$SI_LATI <- anf(df1$SI_LATI)
+  df1 <-   df1[ !is.na(df1$SI_LATI),]
+  df1 <-   df1[ !is.na(df1$SI_LONG),]
+  df1$LE_MET  <- df1$LE_MET_level6
+
+
+  # call to plotTreeMap()
+  a.metier <- "TBB_DEF_70-99_0_0"
+  a.gear   <-"TBB"
+  plotTreeMap (df1[df1$LE_MET_level6 %in% a.metier & df1$SI_STATE==1,],  gridcell=c(0.1,0.05), gear=a.gear,
+                xlim= c(3,6), ylim= c(50,54), acolors=rainbow(7),
+                  species.to.keep= c("LE_KG_COD","LE_KG_PLE") )
+  mtext("Latitude", 2, 3) ;  mtext("Longitude",1, 2)
 
 }
-
+                                 
 }
