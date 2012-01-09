@@ -52,10 +52,17 @@ assuming that fishing start at a given value in speed e.g. 0.5 nm.
 data(tacsat) 
 # fake here, but an informed LE_GEAR is required
 tacsat$LE_GEAR <-"OTB"
-tacsat <- segmentTacsatSpeed (tacsat=tacsat, vessels="35",
-              force.lower.bound=0.5,
-              general=list(output.path=file.path('C:','output'),
-              visual.check=TRUE), speed="calculated")
+tacsat <- segmentTacsatSpeed (
+              tacsat=tacsat,
+              vessels="35",
+              force.lower.bound= 0.5,
+              gears.to.force= c('GNS','GND','GNC','GNF','GTR','GTN','GEN','GN','SDN','SSC'),
+              general=
+                list(
+                  output.path=file.path('C:','output'),
+                  visual.check=TRUE, speed="calculated"
+                  )
+              )
 }
 
 }
