@@ -17,7 +17,7 @@ failure in the VMS device while fishermen were still fishing. In the processing,
 forced to nearest VMS trips to prevent loss of any reported landings.
 
 After this fist merging, the distinction of fishnig and not-fishing states can be performed
-if the do.wp3 argument is at TRUE. The current default method ('segment') will run an automatic detection 
+if the 'detectFishing' argument is at TRUE. The current default method ('segment') will run an automatic detection 
 of the fishing peak given the gear type in use. After having detected the vessel-specific speed lower and upper boundaries,
 one state (i.e. in SI_STATE) is assigned to each ping. 
 
