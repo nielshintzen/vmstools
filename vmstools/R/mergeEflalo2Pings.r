@@ -44,7 +44,8 @@
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeEflalo2Pings <-
            function(eflalo, tacsat, general=list(output.path=file.path("C:"),
-                     visual.check=TRUE, detectFishing=FALSE, speed="segment", what.speed="calculated", conserve.all=TRUE), ...){
+                     visual.check=TRUE, detectFishing=FALSE, speed="segment", what.speed="calculated", conserve.all=TRUE,
+                       ), ...){
 
   lstargs <- list(...)
 
@@ -416,7 +417,6 @@ mergeEflalo2Pings <-
             tmp <- table(suspicious$SI_LONG)
             long.suspicious <- names(tmp[tmp>5])
             if(length(long.suspicious)!=0) cat(paste("potential harbour likely near long ",long.suspicious,"\n",sep=""))
- # browser()
             }  # if at least one trip >30 days
         rm(table.midtime) ; gc(reset=TRUE)
 
@@ -516,10 +516,18 @@ mergeEflalo2Pings <-
             levels(.vms$LE_GEAR) <- dd
 
              # then do the assignement of the state
-             #according to a segemented regression on the (apparent) speed histogram
-            .vms <- segmentTacsatSpeed (tacsat=.vms, vessels=a.vesselid,
-                                  force.lower.bound=0.5, general=list(a.year=general$a.year,
-                                   output.path=general$output.path, what.speed=general$what.speed, visual.check=TRUE))
+             # according to a segmented regression on the speed histogram
+             .vms <- segmentTacsatSpeed (
+                                 tacsat=.vms,
+                                  vessels=a.vesselid,
+                                   force.lower.bound=0.5,  # to do: create an arg in the parent function instead...
+                                    gears.to.force= c('GNS','GND','GNC','GNF','GTR','GTN','GEN','GN','SDN','SSC'), # to do: create an arg in the parent function instead...
+                                     general=list(a.year=general$a.year,
+                                                  output.path=general$output.path,
+                                                  what.speed=general$what.speed,
+                                                  visual.check=TRUE
+                                                  )
+                                         )
                 #=> (semi)automatic detection of the fishing peak
                 # (put here because the LE_GEAR need to be informed)
 
@@ -908,12 +916,9 @@ return()
 
 
   #\dontrun{
-  data(eflalo)
+   data(eflalo)
   data(tacsat)
   data(euharbours)
-  # add some missing harbours to the list?
-  #euharbours <- c(euharbours, list(a.harbour1=data.frame(lon='10',lat='10', range='3')))
-  #euharbours <- c(euharbours, list(a.harbour2=data.frame(,lon='1',lat='1', range='3')))
 
   # format
   eflalo <- formatEflalo(eflalo)
@@ -924,7 +929,11 @@ return()
 
   # test each ping if in harbour or not
   tacsat$SI_HARB <- NA
-  tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG), lat=anf(tacsat$SI_LATI), harbours=euharbours, rowSize=30, returnNames=TRUE)
+  euharbours$Description <- euharbours$harbour
+  tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG),
+                                   lat=anf(tacsat$SI_LATI),
+                                   harbours=euharbours,
+                                   rowSize=30, returnNames=TRUE)
   inHarb <- tacsat$SI_HARB
   inHarb <- replace(inHarb, !is.na(inHarb), 1)
   inHarb <- replace(inHarb, is.na(inHarb), 0)
@@ -936,84 +945,101 @@ return()
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
 
   # keep 'out of harbour' points only
-  # (but keep the departure point lying in the harbour)
-  startTrip <- c(diff(tacsat[,"SI_FT"]),0)
-  tacsat[which(startTrip>0),"SI_FT"] <-  tacsat[which(startTrip>0)+1,"SI_FT"] # tricky here
-  tacsat <- tacsat[which(inHarb==0 |  startTrip>0),]
+  # (but keep the departure point and the arrival point lying in the harbour)
+  startTrip <- c(diff(tacsat[,"SI_FT"]), 0)
+  endTrip   <- c(0, diff(tacsat[,"SI_FT"]))
+  tacsat[which(startTrip>0),"SI_FT"]  <-  tacsat[which(startTrip>0)+1,"SI_FT"] 
+  tacsat[which(endTrip<0),"SI_FT"]    <-  tacsat[which(endTrip<0)-1,"SI_FT"] 
+  tacsat <- tacsat[which(inHarb==0 |  startTrip>0 |  endTrip<0),]
 
-  # assign a state to each ping (start guesses only)
+
+  # assign a state to each ping (here, useless if detectFishing at TRUE)
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
-  tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1 # fake speed rule for fishing state
+  # fake speed rule for fishing state
+  tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
 
 
-  # reduce the size of the eflalo data by merging species (e.g. <1 millions euros)
-  # (assuming that the other species is coded MZZ)
+  # reduce the size of the eflalo data by merging species
+  # (assuming that the other species is coded MZZ), threshold in euros.
   eflalo2 <- poolEflaloSpecies (eflalo, threshold=1e6, code="MZZ")
 
-  # debug
+  # debug if eflalo has not been cleaned earlier
   eflalo <- eflalo[!eflalo$VE_REF=="NA" &!is.na(eflalo$VE_REF),]
+  
+  # an informed VE_FLT is also required
   if(all(is.na(eflalo$VE_FLT))) eflalo$VE_FLT <- "fleet1"
-    if(!match('LE_MET_level6',colnames(eflalo))>0) eflalo$LE_MET_level6 <- eflalo$LE_MET
+  
+  # possible mis-naming mistakes
+    if(!match('LE_MET_level6',colnames(eflalo))>0){
+      eflalo$LE_MET_level6 <- eflalo$LE_MET
+    }
 
   # debug
   eflalo <- eflalo[eflalo$LE_MET!="No_logbook6",]
 
 
   # TEST FOR A GIVEN SET OF VESSELS
-  # (if detectFishing is at true then do also the automatic detection of fishing states
+  # (if detect.fishing is true then do also detection of fishing activity
+  # e.g. if speed='segment' the segmentTacsatSpeed() automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
-  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("35", "1518"),
-                                 general=list(output.path=file.path("C:","output"),
-                                    visual.check=TRUE,
-                                        detect.fishing=TRUE, speed="segment", what.speed="calculated"))
+  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("738", "804"),
+                     general=list(output.path=file.path("C:","output"),
+                     visual.check=TRUE, detectFishing=TRUE, speed="segment",
+                     what.speed="calculated"))
   # ...OR APPLY FOR ALL VESSELS IN eflalo
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
-                                   general=list(output.path=file.path("C:","output"),
-                                      visual.check=TRUE,
-                                         detectFishing=FALSE, speed="segment", what.speed="calculated"))
+                     general=list(output.path=file.path("C:","output"),
+                     visual.check=TRUE, detectFishing=TRUE, speed="segment",
+                     what.speed="calculated"))
   gc(reset=TRUE)
 
   # load the merged output table for one vessel
-  load(file.path("C:","output","merged_35_2009.RData"))
+  load(file.path("C:","output","merged_804_1800.RData"))
 
   # check the conservation of landings
   sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
-  sum(eflalo[eflalo$VE_REF=="35","LE_KG_PLE"], na.rm=TRUE)
+  sum(eflalo[eflalo$VE_REF=="804","LE_KG_PLE"], na.rm=TRUE)
 
 
-  # ...or bind all vessels (keeping only some given species here)
-  bindAllMergedTables (vessels=c("35", "1518"), species.to.keep=c("PLE","COD"),
-                      folder = file.path("C:","output"), all.in.one.table=TRUE)
+   # ...or bind all vessels (keeping only some given species here)
+  bindAllMergedTables (vessels=c("738", "804"), a.year = "1800",
+                      species.to.keep=c("PLE","COD"),
+                      folder = file.path("C:","output"),
+                      all.in.one.table=TRUE)
 
-   # ...and load the merged output table for all vessels
-  load(file.path("C:","output","all_merged__2009.RData"))
+    # ...and load the merged output table for all vessels
+  load(file.path("C:","output","all_merged__1800.RData"))
 
   # map landing of cod from all studied vessels
+  # ( with debugging if tacsat has not been cleaned earlier)
+  graphics.off()
   df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD")]
   df1$SI_LONG <- anf(df1$SI_LONG)
   df1$SI_LATI <- anf(df1$SI_LATI)
   df1 <-   df1[ !is.na(df1$SI_LATI),]
   df1 <-   df1[ !is.na(df1$SI_LONG),]
-  vmsGridCreate(df1,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
-                                 cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)")
+  vmsGridCreate(df1,nameLon="SI_LONG", nameLat="SI_LATI",
+                nameVarToSum = "LE_KG_COD", cellsizeX =0.1,
+                cellsizeY =0.05,  legendtitle = "COD landings (kg)")
 
-  # remove steaming points before gridding!
+ # but you need to remove steaming points before gridding!
   df2<-df1[-which(is.na(df1$LE_KG_COD)),]
-  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", nameVarToSum = "LE_KG_COD",
-                                cellsizeX =0.05,cellsizeY =0.05,  legendtitle = "landings (kg)",
-                                 breaks0=c(1,2,4,8,16,32,64,100000))
+  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", we = 3, ea = 6, so = 50, no = 54,
+                nameVarToSum = "LE_KG_COD",cellsizeX =0.1,
+                cellsizeY =0.05,  legendtitle = "COD landings (kg)", plotPoints =TRUE, 
+                breaks0=c(1,2,4,8,16,32,64,100000))
 
 
 
   # CONVERT TO FISHFRAME FORMAT (might take some time running)
   # (by default, this will keep all the species in the output table)
-  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF), species.to.keep=character(),
-                      folder = file.path("C:","output"), all.in.one.table=FALSE)
+  tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF),
+                              species.to.keep=character(),
+                              folder = file.path("C:","output"),
+                              all.in.one.table=FALSE)
 
   ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
-                                                   a.year=2009, a.country="NLD") )
-
-
+                          a.year=1800, a.country="NLD") )
 
 
   # TO DO....
