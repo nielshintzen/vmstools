@@ -610,7 +610,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
-    thresholdTestValue=10
+    thresholdTestValue=3
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -987,7 +987,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
-    thresholdTestValue=10
+    thresholdTestValue=3
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -1403,7 +1403,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
-    thresholdTestValue=10
+    thresholdTestValue=3
     thresholdLogevents=30
     
     sppCumCatch=list()
@@ -1827,7 +1827,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     #                                                   - Test-value > thresholdTestValue
     #                                                   - % Logevents > thresholdLogevents 
     thresholdCatch=75
-    thresholdTestValue=10
+    thresholdTestValue=3
     thresholdLogevents=30
     
     sppCumCatch=list()
