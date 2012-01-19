@@ -176,7 +176,7 @@ This analysis needs the following functions to run:
   
   compMetiers=compareToOrdination(dat=eflalo,Step2=Step2,clusters=clusters,targetSpecies=Step3$targetSpecies)
   
-save(compMetiers,file="compMetiers.Rdata")
+  save(compMetiers,file="compMetiers.Rdata")
   
   
   #-------------------------------------
@@ -245,7 +245,7 @@ save(compMetiers,file="compMetiers.Rdata")
   # Predict the metiers of the new logbook events of newData from the metiers found in Step 3
   metierPred=predictMetier(learningData=Step1,clustersAffectation=clustersAffectation,newData=datPred)
   
-save(metierPred,file="metierPred.Rdata")
+  save(metierPred,file="metierPred.Rdata")
 
 }}}
 
