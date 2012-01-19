@@ -187,10 +187,10 @@ This analysis needs the following functions to run:
 
   if(!nrow(eflalo)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
 
-  eflalo = cbind(eflalo,CLUSTER=Step3$LE_ID_clust[,"clust"])
+  eflalo=cbind(eflalo,CLUSTER=Step3$LE_ID_clust[,"clust"])
 
   # Now reload the full data set
-  eflalo_ori[-sort(unique(null.value)),"CLUSTER"] = Step3$LE_ID_clust[,"clust"]
+  eflalo_ori[-sort(unique(null.value)),"CLUSTER"]=Step3$LE_ID_clust[,"clust"]
 
   print("Congratulation !! You have now a fully working eflalo dataset with a metier Level 7 !")
   
