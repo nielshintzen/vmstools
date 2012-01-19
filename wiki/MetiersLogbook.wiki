@@ -1,6 +1,6 @@
 #Assign one métier to each logbook event.
 
-== Authors ==
+= Authors =
 
 Nicolas Deporte, Sébastien Demanèche, Stéphanie Mahévas (IFREMER, France)
 
