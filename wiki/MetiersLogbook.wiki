@@ -87,7 +87,7 @@ This analysis needs the following functions to run:
   setwd(file.path(path,analysisName))
   # Delete old R cache
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)                                            
-  eflalo_ori = eflalo # Keeping this in cached memory for making the final merging at the end
+  eflalo_ori=eflalo # Keeping this in cached memory for making the final merging at the end
   Store(eflalo_ori)
 
   # ! KEEPING ONLY LE_ID AND THE OUTPUT YOU WANT TO GET  (KG/EURO)
@@ -95,17 +95,17 @@ This analysis needs the following functions to run:
   eflalo[is.na(eflalo)]=0
 
   # Removing negative and null values
-  null.value = vector()
-  for (i in grep("EURO",names(eflalo))) null.value = c(null.value,which(eflalo[,i]<0))
-  null.value = c(null.value,which(apply(eflalo[,2:ncol(eflalo)],1,sum,na.rm=T)==0))
+  null.value=vector()
+  for (i in grep("EURO",names(eflalo))) null.value=c(null.value,which(eflalo[,i]<0))
+  null.value=c(null.value,which(apply(eflalo[,2:ncol(eflalo)],1,sum,na.rm=T)==0))
 
-  if(length(null.value)!=0) {LogEvent.removed = eflalo[sort(unique(null.value)),] ; eflalo = eflalo[-sort(unique(null.value)),]}
+  if(length(null.value)!=0) {LogEvent.removed=eflalo[sort(unique(null.value)),] ; eflalo=eflalo[-sort(unique(null.value)),]}
 
   # Rename species names
   names(eflalo)[-1]=unlist(lapply(strsplit(names(eflalo[,-1]),"_"),function(x) x[[3]]))
 
   # Removing miscellaneous species
-  eflalo = eflalo[,!names(eflalo)=="MZZ"]
+  eflalo=eflalo[,!names(eflalo)=="MZZ"]
   save(eflalo, file="eflalo_cleaned.Rdata")
 
 
@@ -133,15 +133,15 @@ This analysis needs the following functions to run:
   setwd(file.path(path,analysisName,critPca))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
 
-  rowNamesSave <- row.names(Step1)
-  row.names(Step1) <- 1:nrow(Step1)
+  rowNamesSave=row.names(Step1)
+  row.names(Step1)=1:nrow(Step1)
 
   if (critPca=="PCA_70") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="pca",criterion="70percents") else    # criterion="70percents"
   if (critPca=="PCA_SC") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="pca",criterion="screetest") else    # criterion="screetest"
   if (critPca=="NO_PCA") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="nopca",criterion=NULL)
 
-  row.names(Step1) <- rowNamesSave
-  row.names(Step2) <- rowNamesSave
+  row.names(Step1)=rowNamesSave
+  row.names(Step2)=rowNamesSave
 
   save(Step2,file="Step2.Rdata")
   
@@ -175,7 +175,8 @@ This analysis needs the following functions to run:
   if (algoClust=="KMEANS")  clusters=Step3$clusters$cluster  
   
   compMetiers=compareToOrdination(dat=eflalo,Step2=Step2,clusters=clusters,targetSpecies=Step3$targetSpecies)
-  save(compMetiers,file="compMetiers.Rdata")
+  
+save(compMetiers,file="compMetiers.Rdata")
   
   
   #-------------------------------------
@@ -243,7 +244,8 @@ This analysis needs the following functions to run:
 
   # Predict the metiers of the new logbook events of newData from the metiers found in Step 3
   metierPred=predictMetier(learningData=Step1,clustersAffectation=clustersAffectation,newData=datPred)
-  save(metierPred,file="metierPred.Rdata")
+  
+save(metierPred,file="metierPred.Rdata")
 
 }}}
 
