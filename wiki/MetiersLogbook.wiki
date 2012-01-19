@@ -226,9 +226,9 @@ This analysis needs the following functions to run:
 
   # Create a new folder for Step 6
   option_step6 = "predict_Metiers"
-  setwd(paste(path,analysisName,critPca,algoClust,sep="/"))
+  setwd(file.path(path,analysisName,critPca,algoClust))
   if (!file.exists(option_step6)) dir.create(option_step6)
-  setwd(paste(path,analysisName,critPca,algoClust,option_step6,sep="/"))
+  setwd(file.path(path,analysisName,critPca,algoClust,option_step6))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
 
   # Prepare datPred
