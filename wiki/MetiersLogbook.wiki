@@ -81,6 +81,8 @@ This analysis needs the following functions to run:
   cat("\n") 
     
   # Creating the directory of the analysis
+  if (!file.exists(path)) dir.create(path)
+  setwd(path)
   if (!file.exists(analysisName)) dir.create(analysisName)
   setwd(file.path(path,analysisName))
   # Delete old R cache
@@ -98,7 +100,6 @@ This analysis needs the following functions to run:
   null.value = c(null.value,which(apply(eflalo[,2:ncol(eflalo)],1,sum,na.rm=T)==0))
 
   if(length(null.value)!=0) {LogEvent.removed = eflalo[sort(unique(null.value)),] ; eflalo = eflalo[-sort(unique(null.value)),]}
-  Store(LogEvent.removed)
 
   # Rename species names
   names(eflalo)[-1]=unlist(lapply(strsplit(names(eflalo[,-1]),"_"),function(x) x[[3]]))
@@ -128,14 +129,19 @@ This analysis needs the following functions to run:
   # III. STEP 2 - PCA - NO-PCA
   #-----------------------------
 
-  setwd(paste(path,analysisName,sep="/"))
   if (!file.exists(critPca)) dir.create(critPca)
   setwd(file.path(path,analysisName,critPca))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
 
+  rowNamesSave <- row.names(Step1)
+  row.names(Step1) <- 1:nrow(Step1)
+
   if (critPca=="PCA_70") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="pca",criterion="70percents") else    # criterion="70percents"
   if (critPca=="PCA_SC") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="pca",criterion="screetest") else    # criterion="screetest"
   if (critPca=="NO_PCA") Step2=getTableAfterPCA(Step1,analysisName,pcaYesNo="nopca",criterion=NULL)
+
+  row.names(Step1) <- rowNamesSave
+  row.names(Step2) <- rowNamesSave
 
   save(Step2,file="Step2.Rdata")
   
@@ -144,7 +150,6 @@ This analysis needs the following functions to run:
   # IV. STEP 3 - CLUSTERING METHOD : HAC, CLARA OR KMEANS
   #-------------------------------------------------------
 
-  setwd(paste(path,analysisName,critPca,sep="/"))
   if (!file.exists(algoClust)) dir.create(algoClust)
   setwd(file.path(path,analysisName,critPca,algoClust))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
@@ -161,7 +166,6 @@ This analysis needs the following functions to run:
   #------------------------------------------------
 
   compOrdin="CompOrdin"
-  setwd(paste(path,analysisName,critPca,algoClust,sep="/"))
   if (!file.exists(compOrdin)) dir.create(compOrdin)
   setwd(file.path(path,analysisName,critPca,algoClust,compOrdin))
   if (file.exists(".R_Cache")) unlink(".R_Cache",recursive=TRUE)
@@ -181,8 +185,6 @@ This analysis needs the following functions to run:
   # Choosing the final option
   setwd(file.path(path,analysisName))
 
-  load(paste(path,analysisName,critPca,algoClust,"Step3.Rdata",sep="/"))
-
   if(!nrow(eflalo)==nrow(Step3$LE_ID_clust)) print("--error : number of lines in step 3 not equal to input eflalo, please check!!--")
 
   eflalo = cbind(eflalo,CLUSTER=Step3$LE_ID_clust[,"clust"])
@@ -197,10 +199,10 @@ This analysis needs the following functions to run:
   # VII. STEP 6 - PREDICTING THE CLASSIFICATION OF ANY NEW LOGBOOK EVENT INTO THE CATEGORIES OF DEFINED MÉTIERS
   #-------------------------------------------------------------------------------------------------------------
 
-  load("newEflalo.Rdata")
+  data(eflalo)
 
   # Format
-  newEflalo=formatEflalo(newEflalo)
+  newEflalo=formatEflalo(eflalo)
   newEflalo=newEflalo[newEflalo$LE_GEAR=="OTB",]
 
   # GETTING THE NEW DATA IN AND CLEANING FOR MISSING AND NEGATIVE VALUES ETC 
@@ -255,9 +257,12 @@ This analysis needs the following functions to run:
   data(eflalo)
  
   # Choose the working directory
-  path="C:/metier_analysis"
+  path="C:/metier_analysis2"
   analysisName="metier_analysis_OTB"  
-  setwd(paste(path,analysisName,sep="/"))
+  if (!file.exists(path)) dir.create(path)
+  setwd(path)
+  if (!file.exists(analysisName)) dir.create(analysisName)
+  setwd(file.path(path,analysisName))
 
   # Format
   eflalo=formatEflalo(eflalo)
