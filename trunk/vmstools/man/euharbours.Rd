@@ -19,7 +19,7 @@ the harbour spans
 EU Lot 2 project, Niels T. Hintzen (niels.hintzen@wur.nl)
 }
 \examples{
-data(euharbours)
+data(euharbours); euharbours <- harbours
 pointInHarbour(tacsat$SI_LONG,tacsat$SI_LATI,euharbours)
 }
 \keyword{datasets}

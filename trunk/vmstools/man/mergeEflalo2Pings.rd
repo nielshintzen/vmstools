@@ -93,7 +93,7 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
   \dontrun{
   data(eflalo)
   data(tacsat)
-  data(euharbours)
+  data(euharbours); euharbours <- harbours
 
   # format
   eflalo <- formatEflalo(eflalo)

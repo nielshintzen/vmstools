@@ -918,7 +918,7 @@ return()
   #\dontrun{
    data(eflalo)
   data(tacsat)
-  data(euharbours)
+  data(euharbours); euharbours <- harbours
 
   # format
   eflalo <- formatEflalo(eflalo)
