@@ -27,7 +27,7 @@ range (in km) from these midpoints.
 library(vmstools)
 data(eflalo)
 data(tacsat)
-data(euharbours)
+data(euharbours; euharbours <- harbours
 
 #-Remove duplicated records from tacsat
 myf       <- paste(tacsat$VE_REF,tacsat$SI_LATI,tacsat$SI_LONG,
