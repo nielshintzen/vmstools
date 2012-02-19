@@ -59,18 +59,34 @@ calculateCI <- function(intLon
 
   distan <- matrix(NA,nrow=dim(bbox)[1],ncol=dim(bbox)[2])
   coords <- coordinates(sPDF)[idx,]
-  for (x in 2:length(interpolation[[int]][,1])){
+  if(is.null(dim(coords))==T){
+    for (x in 2:length(interpolation[[int]][,1])){
     distan <- pmin(distan,
-                   matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
+                   matrix(distance(lon=coords[1],lat=coords[2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
                    nrow=dim(bbox)[1],ncol=dim(bbox)[2]),na.rm=T)
-  }
+    }
+  } else {
+      for (x in 2:length(interpolation[[int]][,1])){
+        distan <- pmin(distan,
+                       matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
+                       nrow=dim(bbox)[1],ncol=dim(bbox)[2]),na.rm=T)
+      }
+    }
   
     #Calculate the distance from begin or endpoint
-  begindistan <- matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
-                        nrow=dim(bbox)[1],ncol=dim(bbox)[2])
-  enddistan   <- matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][length(interpolation[[1]][,1]),1],
+  if(is.null(dim(coords))==T){
+    begindistan <- matrix(distance(lon=coords[1],lat=coords[2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
+                          nrow=dim(bbox)[1],ncol=dim(bbox)[2])
+    enddistan   <- matrix(distance(lon=coords[1],lat=coords[2],lonRef=interpolation[[int]][length(interpolation[[1]][,1]),1],
                                                                latRef=interpolation[[int]][length(interpolation[[1]][,2]),2]),
-                        nrow=dim(bbox)[1],ncol=dim(bbox)[2])
+                          nrow=dim(bbox)[1],ncol=dim(bbox)[2])
+  } else {
+      begindistan <- matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
+                            nrow=dim(bbox)[1],ncol=dim(bbox)[2])
+      enddistan   <- matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][length(interpolation[[1]][,1]),1],
+                                                                   latRef=interpolation[[int]][length(interpolation[[1]][,2]),2]),
+                            nrow=dim(bbox)[1],ncol=dim(bbox)[2])
+    }
   linepistan  <- pmin(begindistan, enddistan,na.rm=T)
     #Reset very small numbers to 0 to get highest values at begin and end point
   linepistan[which(linepistan < 1e-6)]  <- 0
