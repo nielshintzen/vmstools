@@ -16,7 +16,7 @@ formatEflalo <- function(x){
   x$FT_LTIME      <- ac(x$FT_LTIME)
   x$LE_ID         <- ac(x$LE_ID)
   x$LE_CDAT       <- ac(x$LE_CDAT)
-  x$LE_UNIT       <- ac(x$LE_UNIT)
+  if("LE_UNIT"  %in% colnames(x)) x$LE_UNIT       <- ac(x$LE_UNIT)
   if("LE_STIME" %in% colnames(x)) x$LE_STIME      <- ac(x$LE_STIME)
   if("LE_ETIME" %in% colnames(x)) x$LE_ETIME      <- ac(x$LE_ETIME)
   if("LE_SLAT"  %in% colnames(x)) x$LE_SLAT       <- an(ac(x$LE_SLAT))
@@ -27,7 +27,7 @@ formatEflalo <- function(x){
   x$LE_MSZ        <- an(ac(x$LE_MSZ))
   x$LE_RECT       <- ac(x$LE_RECT)
   x$LE_DIV        <- ac(x$LE_DIV)
-  if(length(grep("LE_MET",colnames(x)))>0) x[,grep("LE_MET",colnames(x))] <- ac(x[,grep("LE_MET",colnames(x))])
+  if("LE_MET" %in% colnames(x)) x$LE_MET          <- ac(x$LE_MET)
   for(i in c(grep("_KG_",colnames(x)),grep("_EURO_",colnames(x)))) x[,i] <- an(ac(x[,i]))
   return(x)
 }
