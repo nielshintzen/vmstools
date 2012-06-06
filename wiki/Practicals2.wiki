@@ -1,4 +1,4 @@
-= Cleaning and processing the VMS and logbook data =
+= Practical 2: Cleaning and processing the VMS and logbook data =
 
 == Introduction ==
 Most often VMS data contains a lot of errors, many of them have a technical origin. Some are easy to detect, others a bit more tricky. The problems associated with logbooks are present as well, but most often these problems are caused by the fishers filling them out rather than by the processing and storing the data. 
