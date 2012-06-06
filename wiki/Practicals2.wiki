@@ -109,7 +109,7 @@ How about removing those records where arrival date occurs before departure date
 </code>
 Because we carefully screened the example data before it was included in the package, you don't run into problems here.
 
-Due to human mistakes, some catch records in the eflalo data end up being extremely large. Do we trust these values or not? Perhaps, an easy check is to see if these large catches are really big compared to other catches of the same species. If the second highest catch is more than 10 times as small as the biggest catch you can start to question the results. Again, knowledge on the fishery and their landings is required!
+Due to human mistakes, some catch records in the eflalo data end up being extremely large. Do we trust these values or not? Perhaps, an easy check is to see if these large catches are really big compared to other catches of the same species. If the second highest catch is more than 10 times smaller than the biggest catch you can start to question the results. Again, knowledge on the fishery and their landings is required!
 As a rule of thumb, I normally use a factor 30 difference as a quick check. 
 <code>
 #First get the species names in your eflalo dataset
