@@ -99,6 +99,9 @@ This dataset contains a staggering amount of columns, 189! and only 4539 rows (o
 And therefore you might want to switch to
 <code>>head(eflalo[,1:20])</code>
 Again, a lot of information available. It starts with vessel 238, which apparently is a beamtrawler (VE_FLT = TBB), has a vessel length of 24 meters and 221kW engine. From column 32 onwards, the kilo's of fish caught and their associated price is given (LE_KG_spec and LE_EURO_spec). 
+<code>
+>head(eflalo[,32:52])
+</code>
 === Exercise 2 ===
   # Go through the different columns and try to understand what they mean.
   # Two other classes are given in the eflalo dataset, what are they and do they make sense?
