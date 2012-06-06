@@ -1,0 +1,13 @@
+#Practical 1: Getting the VMS and logbook data into R
+
+= Introduction =
+Welcome to the first practical of the ICES VMStools course. Within the series of practicals you will learn how to deal with VMS and logbook data to produce a variety of end results ranging from the calculation of indicators of seabed disturbance to linking your data with for example temperature datasets. 
+
+The practicals you will work on will consist of some guidance text, some code that can be copied directly into R and some examples to test your skills. In all instances, the R code necessary to do the job will be included and hence allows you, after the course, to immediately get started with your own data! 
+
+=== It is recommended to carefully read through the text that goes with each of the practicals ===
+
+= Getting started =
+Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are Tinn-R or R-studio. However, programs as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is R2.14.x or higher! (How can I check...)
+<code>R.Version()$version.string</code>
+
