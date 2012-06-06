@@ -1,0 +1,46 @@
+= Cleaning and processing the VMS and logbook data
+
+== Introduction ==
+Most often VMS data contains a lot of errors, many of them have a technical origin. Some are easy to detect, others a bit more tricky. The problems associated with logbooks are present as well, but most often these problems are caused by the fishers filling them out rather than by the processing and storing the data. 
+
+Here we will provide some guidance on how to clean the VMS and logbook data. It needs to be set that these guidelines are not strict rules and that other rules are most likely more appropriate for your own dataset!
+
+== Cleaning VMS data ===
+Again, we start with loading / reading in the VMS data
+<code>>data(tacsat)</code>
+In VMS we can distinguish roughly two types of errors, 1- those errors that are without doubt incorrect and 2- errors for which a bit of thinking is required and might be part of a discussion.
+
+Among the errors that are incorrect no matter what are VMS positions that are not associated with our globe, are true duplicates, have headings outside a compass range or are situated on land. Let's see if we can get rid of those first.
+<code>>idx <- which(abs(tacsat$SI_LATI) > 90 | abs(tacsat$SI_LONG) > 180) #points not on the globe
+>idx             <- unique(c(idx,which(tacsat$SI_HE < 0 | tacsat$SI_HE >  360))) #adding points with heading outside compass range
+>length(idx)
+</code>
+Luckily, no problems as yet. On to points on land and duplicate records, which needs a bit more code.
+<code>
+>tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M") #create one date-time stamp
+>uniqueTacsat    <- paste(tacsat$VE_REF,tacsat$SI_LATI,tacsat$SI_LONG,tacsat$SI_DATIM) #get records as a string to easily check for duplicates
+>print(nrow(tacsat))
+>tacsat          <- tacsat[!duplicated(uniqueTacsat),] #get rid of the duplicates
+>print(nrow(tacsat))
+</code>
+And again, no problems, no duplicates (the only time you will see this most likely!). On to the points on land.
+<code>
+>data(europa) #a dataset already build into the package with the coastlines embedded
+>head(europa)
+>pols    <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
+                function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,
+                                     SI_LATI=subset(europa,SID==x)$Y)}))
+>idx     <- pointOnLand(tacsat,pols);
+>table(idx)
+>pol     <- tacsat[which(idx==1),] #points on land
+>tacsat  <- tacsat[which(idx==0),] #tacsat not on land
+</code>
+Let's have a look where these points on land (according to our algorithm) are really located!
+<code>
+>library(maps);library(mapdata)
+>map("worldHires",res=0,fill=T,col="darkgreen",xlim=c(-4,10),ylim=c(48,62)); map.axes()
+>points(x=pol$SI_LONG,y=pol$SI_LATI,col="red",pch=19,cex=0.5)
+</code>
+As you can see, most of them are either on land, close to a harbour or on a river. Hence, it is important to use a detailed map to perform this calculation!
+
+
