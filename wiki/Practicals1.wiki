@@ -101,5 +101,31 @@ And therefore you might want to switch to
 Again, a lot of information available. It starts with vessel 238, which apparently is a beamtrawler (VE_FLT = TBB), has a vessel length of 24 meters and 221kW engine. From column 32 onwards, the kilo's of fish caught and their associated price is given (LE_KG_spec and LE_EURO_spec). 
 === Exercise 2 ===
   # Go through the different columns and try to understand what they mean.
-  # Two other classes are given in the eflalo dataset, what are they and to they make sense?
+  # Two other classes are given in the eflalo dataset, what are they and do they make sense?
   # How many kilo's of plaice (PLE) has been registered in this dataset?
+
+If you brought your own data, we can now try to get this into R, if not, we will just save the build-in datasets to disk and read them in.
+==== Your own data ====
+<code>>path2OwnData <- "C:/" #Fill out your own path here
+>dataName <- "tacsat2011.csv" #The tacsat file name, needs to be in csv format!
+>tacsat <- readTacsat(paste(path2OwnData,dataName,sep=""))
+</code>
+==== Example data ====
+<code>dir.create("C:/tmpTacsat")
+>write.table(tacsat, file = "C:/tmpTacsat/tacsat.csv", quote = TRUE, sep = ",",
+        eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
+
+#Read in tacsat file
+>tacsat <- readTacsat("C:/tmpTacsat/tacsat.csv")
+</code>
+
+Obviously the same thing works for eflalo. However, in most instances, the format of the data (i.e. the classes of each of the columns) is not correct. This will pose problem along the way and therefore they need to be put into the correct format. 
+<code>
+>tacsat <- formatTacsat(tacsat)
+>eflalo <- formatEflalo(eflalo)
+</code>
+
+=== Exercise 3 ===
+  # Read in your own tacsat and eflalo data (or use the example data), check the formats, are they all correct? 
+  # What happens if you run the formatTacsat and formatEflalo functions?
+  # Do the new formats make more sense?
