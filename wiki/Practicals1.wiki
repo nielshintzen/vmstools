@@ -1,13 +1,37 @@
-#Practical 1: Getting the VMS and logbook data into R
+=Practical 1: Getting the VMS and logbook data into R=
 
-= Introduction =
+== Introduction ==
 Welcome to the first practical of the ICES VMStools course. Within the series of practicals you will learn how to deal with VMS and logbook data to produce a variety of end results ranging from the calculation of indicators of seabed disturbance to linking your data with for example temperature datasets. 
 
 The practicals you will work on will consist of some guidance text, some code that can be copied directly into R and some examples to test your skills. In all instances, the R code necessary to do the job will be included and hence allows you, after the course, to immediately get started with your own data! 
 
 === It is recommended to carefully read through the text that goes with each of the practicals ===
 
-= Getting started =
+== Getting VMStools installed ==
 Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are Tinn-R or R-studio. However, programs as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is R2.14.x or higher! (How can I check...)
 <code>R.Version()$version.string</code>
+If this says anything below R2.14.x, please upgrade. VMStools is still in development and R is as well. Over the past months considerable changes have taken place which do no not allow backwards compatibility of VMStools with older R versions.
 
+Now start a version of your favorite editor and start R. VMStools is an add-on package to R and depends on several other packages. Hence, before we can run VMStools, we need to install these other packages too. This is how you do that:
+<code>vmstoolsPackages <- 
+   c("amap","cluster","doBy","data.table","FactoMineR","foreign",
+   "maptools","MASS","sp","SOAR","aspace","PBSmapping","raster",
+   "shapefiles","mda","maps","fields","spam","mapdata","RColorBrewer",
+   "classInt")
+ 
+for(i in vmstoolsPackages) try(install.packages(pkgs=i,repos=getOption("repos"))) 
+</code>
+It will prompt you a box to select a country and place to download the packages from, choose one nearby (e.g. Denmark). 
+
+Now it is time to install the VMStools package, you have to download it first however from this website: [http://code.google.com/p/vmstools/downloads/list VMStools google repository]. Take either the vmstools_0.59.zip version if you work under Windows or the vmstools_0.59.tar.gz version if you work under Linux or Apple. Download the file to your local disk. Next up is to install the VMStools package itself. Do this manually by clicking in R the 'Packages' tab and select the option 'Install packages from local zip files' and navigate to the file download or do it as follows from the R command line:
+<code>
+path2VMStoolsDownload <- "C:/downloads/" #this folder is an example folder
+install.packages(paste(path2VMStoolsDowload,"vmstools_0.59.zip",sep=""))
+</code>
+
+If all went well, you have now successfully installed VMStools. Note that you only need to go over this once and that all packages are available every time you start R. 
+
+== Getting started ==
+Once more, open your editor and R version (if it is still running, that is fine as well). To load the VMStools package, you need to type the following on the R command line:
+<code>library(vmstools)</code>
+All functions available in VMStools are loaded now and available to you. As well, 
