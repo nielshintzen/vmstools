@@ -57,3 +57,23 @@ Only few points are associated with speeds higher than 20 knots. Let's move to t
 >pih <- tacsat[which(idx==1),]
 >table(idx)
 >tacsat <- tacsat[which(idx==0),]
+</code>
+All in all, 14787 points are located in harbour (that is about 15% of the total dataset!). Let's see where they really are located and if our analyses made sense.
+<code>
+>library(maps);library(mapdata)
+>map("worldHires",res=0,fill=T,col="darkgreen",xlim=c(-4,10),ylim=c(48,62)); map.axes()
+>points(x=pih$SI_LONG,y=pih$SI_LATI,col="red",pch=19,cex=0.5)
+</code>
+=== Exercise 1 ===
+  # Note the dot-at-sea in the corner with the Netherlands, Germany and  Denmark. Have a look up Google Maps to which which harbour might be located there
+  # How many harbours are stored in the build-in harbour dataset?
+  # What does the 'range' mean in the harbour dataset?
+
+What is left in cleaning the VMS dataset are the pseudo duplicates. What might happen is a malfunctioning of the VMS transmitter on-board vessels. They might transmit not on a regular interval of e.g. 1 or 2 hours but also within a few seconds or few minutes additional points. If you view these are true errors, you might want to remove these.
+<code>
+>tacsat <- sortTacsat(tacsat) #sort the data by vessel and time
+>tacsatp<- intervalTacsat(tacsat,level="vessel",fill.na=T)
+>hist(tacsatp$INTV,breaks=1000000,xlim=c(0,150)) #apparently there is a large number of records with a very small interval rate (close to zero)
+>intThres <- 5 #I believe that interval rates lower than 5 minutes need to be removed
+>tacsat          <- tacsatp[which(tacsatp$INTV > intThres,-grep("INTV",colnames(tacsatp))]
+</code>
