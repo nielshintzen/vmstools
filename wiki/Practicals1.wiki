@@ -9,29 +9,54 @@ The practicals you will work on will consist of some guidance text, some code th
 
 == Getting VMStools installed ==
 Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are Tinn-R or R-studio. However, programs as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is R2.14.x or higher! (How can I check...)
-<code>R.Version()$version.string</code>
+<code>>R.Version()$version.string</code>
 If this says anything below R2.14.x, please upgrade. VMStools is still in development and R is as well. Over the past months considerable changes have taken place which do no not allow backwards compatibility of VMStools with older R versions.
 
-Now start a version of your favorite editor and start R. VMStools is an add-on package to R and depends on several other packages. Hence, before we can run VMStools, we need to install these other packages too. This is how you do that:
-<code>vmstoolsPackages <- 
+Now start a version of your favorite editor and start R. VMStools is an add-on package to R and depends on several other packages. Hence, before we can run VMStools, we need to install these other packages too. This is how you do that: 
+==== *Note that all code inside a grey box starting with '>' refers to R code that can be copied directly into R. If it has no '>' in front, it refers to results of R. Do not copy the '>' sign to R* ====
+<code>>vmstoolsPackages <- 
    c("amap","cluster","doBy","data.table","FactoMineR","foreign",
    "maptools","MASS","sp","SOAR","aspace","PBSmapping","raster",
    "shapefiles","mda","maps","fields","spam","mapdata","RColorBrewer",
    "classInt")
  
-for(i in vmstoolsPackages) try(install.packages(pkgs=i,repos=getOption("repos"))) 
+>for(i in vmstoolsPackages) try(install.packages(pkgs=i,repos=getOption("repos"))) 
 </code>
 It will prompt you a box to select a country and place to download the packages from, choose one nearby (e.g. Denmark). 
 
 Now it is time to install the VMStools package, you have to download it first however from this website: [http://code.google.com/p/vmstools/downloads/list VMStools google repository]. Take either the vmstools_0.59.zip version if you work under Windows or the vmstools_0.59.tar.gz version if you work under Linux or Apple. Download the file to your local disk. Next up is to install the VMStools package itself. Do this manually by clicking in R the 'Packages' tab and select the option 'Install packages from local zip files' and navigate to the file download or do it as follows from the R command line:
 <code>
-path2VMStoolsDownload <- "C:/downloads/" #this folder is an example folder
-install.packages(paste(path2VMStoolsDowload,"vmstools_0.59.zip",sep=""))
+>path2VMStoolsDownload <- "C:/downloads/" #this folder is an example folder
+>install.packages(paste(path2VMStoolsDowload,"vmstools_0.59.zip",sep=""))
 </code>
 
 If all went well, you have now successfully installed VMStools. Note that you only need to go over this once and that all packages are available every time you start R. 
 
 == Getting started ==
 Once more, open your editor and R version (if it is still running, that is fine as well). To load the VMStools package, you need to type the following on the R command line:
-<code>library(vmstools)</code>
-All functions available in VMStools are loaded now and available to you. As well, 
+<code>>library(vmstools)</code>
+All functions available in VMStools are loaded now and available to you. Note that a lot of messages are printed to R, make sure they do not contain errors, some warning messages are fine. 
+Getting your own data into R might be difficult right from the start, hence, we've attached some VMS and logbook data to the package itself which allows you to play with the package right away. You need to load these datasets first however. 
+<code>>data(tacsat); data(eflalo)</code>
+Let's have a look at what they look like
+<code>>str(tacsat)
+'data.frame':   97015 obs. of  8 variables:
+ $ VE_COU : chr  "Atlantis" "Atlantis" "Atlantis" "Atlantis" ...
+ $ VE_REF : chr  "10" "10" "10" "10" ...
+ $ SI_LATI: num  51.4 51.4 51.4 51.4 51.4 ...
+ $ SI_LONG: num  3.58 3.58 3.6 3.59 3.59 ...
+ $ SI_DATE: chr  "04/05/1800" "04/05/1800" "04/05/1800" "04/05/1800" ...
+ $ SI_TIME: chr  "13:32:00" "15:28:00" "17:22:00" "19:18:00" ...
+ $ SI_SP  : num  0 0 0 0 0 0 0 12 2 2 ...
+ $ SI_HE  : num  25 25 25 25 25 25 111 292 43 294 ...
+</code>
+Apparently, tacsat has class 'data.frame', has 97015 observations (rows) and 8 variables (columns). Each column name is given on a new row in the example above. The names might be a bit strange, but follow the agreed format as you can download from [http://code.google.com/p/vmstools/downloads/list Exchange_EFLALO2_v2-1.doc]. Have a quick look at the tacsat (VMS) data.
+<code>>head(tacsat)
+         VE_COU VE_REF  SI_LATI  SI_LONG    SI_DATE  SI_TIME SI_SP SI_HE
+658237 Atlantis     10 51.44772 3.583731 04/05/1800 13:32:00     0    25
+658238 Atlantis     10 51.44067 3.583847 04/05/1800 15:28:00     0    25
+662888 Atlantis     10 51.44074 3.595529 04/05/1800 17:22:00     0    25
+662889 Atlantis     10 51.44315 3.586862 04/05/1800 19:18:00     0    25
+662890 Atlantis     10 51.44351 3.586948 04/05/1800 21:12:00     0    25
+662891 Atlantis     10 51.44811 3.593958 04/05/1800 23:08:00     0    25
+</code>
