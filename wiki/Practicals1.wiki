@@ -132,3 +132,20 @@ Obviously the same thing works for eflalo. However, in most instances, the forma
   # Read in your own tacsat and eflalo data (or use the example data), check the formats, are they all correct? 
   # What happens if you run the formatTacsat and formatEflalo functions?
   # Do the new formats make more sense?
+
+== Lot's of data ==
+VMS and logbook data can be rather large in size (e.g. multiple years, lot's of vessels etc) and reading them all in at once might pose problems. It isn't a problem to do the whole job on for example a year-by-year basis and combine the datasets.
+<code>
+>years <- 2005:2010
+>path  <- "C:/tmpTacsat/"
+>totalTacsat <- numeric()
+>for(iYears in years){
+   tacsatYr <- readTacsat(paste(path,"tacsat_",iYears,sep=""))
+   totalTacsat <- rbindTacsat(totalTacsat,tacsatYr)
+ }
+</code>
+
+=== Exercise 4 ===
+  # Split the example dataset into a year 1800 and 1801 and save it to disk
+  # Read the seperate year files in and combine them into one 'totalTacsat' file.
+  # How many rows of data do you have, and how many columns? Does that match up with the number of rows and columns mentioned earlier in this practical?
