@@ -124,8 +124,15 @@ As a rule of thumb, I normally use a factor 30 difference as a quick check.
 #Get the index of each of the species
 >idx             <- unlist(lapply(as.list(specs),function(x){ idx   <- grep(x,colnames(eflalo))[grep("KG",colnames(eflalo)[grep(x,colnames(eflalo))])];
                                                         return(idx)}))
-#If landing > bound -> NA
+#If landing > threshold turn it into an 'NA'
 >for(iSpec in idx) eflalo[which(eflalo[,iSpec] > an(specBounds[(iSpec-idx[1]+1),2])),iSpec] <- NA
 
 #Turn all other NA's in the eflalo dataset in KG and EURO columns to zero
 >for(i in kgeur(colnames(eflalo))) eflalo[which(is.na(eflalo[,i]) == T),i] <- 0
+</code>
+
+You have now finished cleaning the eflalo dataset, time for an exercise.
+
+=== Exercise 3 ===
+  # Clean the eflalo dataset (remove these records) where meshsizes are larger than 150mm, how many do you come across?
+  # There are some very large vessels (> 100meters) in the eflalo dataset. What type of gear do they use and what do they primarily catch?
