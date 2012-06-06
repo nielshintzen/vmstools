@@ -133,7 +133,7 @@ Obviously the same thing works for eflalo. However, in most instances, the forma
   # What happens if you run the formatTacsat and formatEflalo functions?
   # Do the new formats make more sense?
 
-== Lot's of data ==
+== Lots of data ==
 VMS and logbook data can be rather large in size (e.g. multiple years, lot's of vessels etc) and reading them all in at once might pose problems. It isn't a problem to do the whole job on for example a year-by-year basis and combine the datasets.
 <code>
 >years <- 2005:2010
