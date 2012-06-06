@@ -43,4 +43,17 @@ Let's have a look where these points on land (according to our algorithm) are re
 </code>
 As you can see, most of them are either on land, close to a harbour or on a river. Hence, it is important to use a detailed map to perform this calculation!
 
-
+This means we are half-way cleaning the VMS dataset. The points left to do is to look into those 'errors' which are subject of discussion. They are VMS records associated with very high speeds, points in a harbour and 'pseudo-duplicates': points that are not exactly duplicates but can be considered as such. 
+<code>
+>hist(tacsat$SI_SP,breaks=100) #are there any outlying results?
+>spThres <- 20 #I decide that 20knots is the maximum speed allowed in the dataset
+>idx <- which(tacsat$SI_SP > spThres)
+>tacsat <- tacsat[-idx,]
+</code>
+Only few points are associated with speeds higher than 20 knots. Let's move to the points in harbour. Obviously, these points are not true errors. Vessels are in harbour for large amounts of time. However, when analysing VMS we are hardly ever interested in these points and for that reason, we'd like to get rid of these. There are a large number of ports in Europe already and checking for all of them isn't easy, but we will give it a try! Again, to make things easy, a large port dataset is already available. Note however that this list is NOT complete and that you might need to add additional ports if you want to accurately perform this cleaning part.
+<code>
+>data(euharbours)
+>idx <- pointInHarbour(tacsat$SI_LONG,tacsat$SI_LATI,harbours)
+>pih <- tacsat[which(idx==1),]
+>table(idx)
+>tacsat <- tacsat[which(idx==0),]
