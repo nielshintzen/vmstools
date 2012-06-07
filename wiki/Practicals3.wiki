@@ -61,10 +61,51 @@ Most often, fishery type is determined by the gear used when fishing. As we have
 
 #Let's see what speed profiles are associated with these fishery types
 >par(mfrow=c(2,1))
->hist(TBB$SI_SP,breaks=100,xlim=c(0,20),xlab="Knots",main="OTB")
+>hist(TBB$SI_SP,breaks=100,xlim=c(0,20),xlab="Knots",main="TBB")
 >hist(OTB$SI_SP,breaks=100,xlim=c(0,20),xlab="Knots",main="OTB")
 </code>
 Do not close this picture immediately, it comes in handy in the next example. 
 
 === Define activity ===
-In many cases, activity can be defined based on speed. We've just made a picture of the speed profiles. Can you distinguish different behavior looking at these plots already?
+In many cases, activity can be defined based on speed. We've just made a picture of the speed profiles. Can you distinguish different behavior looking at these plots already? In general, there are 3 types of behavior to be distinguished (but with more information on the fishery, you could potentially indicate even more behaviors). 
+  # Floating / being in harbour, associated with very low to zero speeds. 
+  # Fishing, associated with intermediate speeds. 
+  # Steaming, associated with high speeds. If we now look back at the figure we just made, in the OTB panel, we can observe 2 'hills', one with mean around 3knots ranging between 2 and 6/7 knots and one with a mean around 10knots ranging between 7 and 13knots. Everything below 1knot can be assigned to 'floating / being in harbour. All in all, this is a simple approach, but might be very time consuming. 
+
+Therefore, based on these ideas, different functionalities have been developed. 
+  # segmentTacsatSpeed, segmented regression on speed profile and automatic detection of fishing versus no-fishing
+  # activityTacsat, normal density curve fitting based on speed profile but informed by user decision
+
+I will present short examples of both methods.
+
+==== SegmentTacsatSpeed ====
+Note that you can only run this example with 1 year of data!
+<code>
+>tacsatp$idx       <- 1:nrow(tacsatp)
+>tacsatp$LE_GEAR   <- af(tacsatp$LE_GEAR) #this needs to be a factor for the calculation that follows
+>tmpPath          <- "D:/output/" #specify a temporary folder for output
+>tacsatSegment     <- segmentTacsatSpeed(tacsatp[which(is.na(tacsatp$LE_GEAR)==F),],general=list(output.path=tmpPath,visual.check=F, a.year=c(1800)))
+>tacsatp           <- merge(tacsatp,tacsatSegment[,c("idx","SI_STATE")],by=c("idx"),all.x=T)
+
+#Lets look at the results, left = no-fishing, right = fishing
+>spds <- table(tacsatp$SI_SP,tacsatp$SI_STATE)
+>barplot(spds,names.arg=rep(dimnames(spds)[[1]],2),beside=T)
+</code>
+==== activityTacsat ====
+This functionality works on more than 1 year and can be used to define activity of all similar gears or on a vessel level. In its most sophisticated form, it requires input from the user to determine peaks of fishing and no-fishing which will eventually result in better results. 
+<code>
+>tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==T)] <- "NO_GEAR"
+>tacsatp$LE_GEAR <- ac(tacsatp$LE_GEAR)
+>storeScheme   <- activityTacsatAnalyse(subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
+>require(mixtools)
+>res           <- activityTacsat(subset(tacsatp,LE_GEAR == "OTM" &
+                      year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",storeScheme)
+>tacsatSubset <- subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801 & is.na(SI_SP)==F)
+>tacsatSubset$SI_STATE <- res
+>spds <- table(tacsatSubset$SI_SP,tacsatSubset$SI_STATE)
+>plot(y=spds[,1],x=an(dimnames(spds)[[1]]),type="h",ylim=range(spds),xlab="knots",ylab="Frequency")
+>lines(y=spds[,2],x=(an(dimnames(spds)[[1]])+0.1),col=2,type="h")
+>lines(y=spds[,3],x=(an(dimnames(spds)[[1]])+0.2),col=3,type="h")
+>legend("topright",legend=c("No fishing","Fishing","Steaming"),col=1:3,box.lty=0,lwd=2,lty=1)
+</code>
+From both these examples you can tell already that it isn't easy to determine activity and it will most certainly take you a considerate amount of time to do this properly. However, it is very important as the results of this analyses are most often used as input to follow-up analyses!
