@@ -149,6 +149,6 @@ Similar to the analyses above, we can make a picture of for example plaice landi
 
 In this practical you've come across a lot of example code where each of the functions also has many options. Once you get to these analyses yourself back home it won't hurt to read the manuals that go with these functions. 
 
-=== Exercise 1 ===
+=== Exercise 2 ===
   # In the last example, how many kilo difference is there between all plaice landings in the tacsatEflalo set and in the eflalo dataset?
   # Where might this difference come from?
