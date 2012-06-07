@@ -8,7 +8,7 @@ The practicals you will work on will consist of some guidance text, some code th
 === It is recommended to carefully read through the text that goes with each of the practicals ===
 
 == Getting VMStools installed ==
-Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are Tinn-R or R-studio. However, programs as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is R2.14.x or higher! (How can I check...)
+Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are Tinn-R or R-studio. However, programs such as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is R2.14.x or higher! (How can I check...)
 <code>>R.Version()$version.string</code>
 If this says anything below R2.14.x, please upgrade. VMStools is still in development and R is as well. Over the past months considerable changes have taken place which do no not allow backwards compatibility of VMStools with older R versions.
 
@@ -94,11 +94,11 @@ Let's do the same thing for the eflalo (logbook) data.
  $ LE_ETIME: chr  NA NA NA NA ...
  $ LE_SLAT : num  NA NA NA NA NA NA NA NA NA NA ...
 </code>
-This dataset contains a staggering amount of columns, 189! and only 4539 rows (observations). The data is structured in such a way that each species caught get's its own column. Hence, it might be more difficult to get the right information on your screen by just typing 
+This dataset contains a staggering amount of columns, 189! and only 4539 rows (observations). The data are structured in such a way that each species caught get's its own column. Hence, it might be more difficult to get the right information on your screen by just typing 
 <code>>head(eflalo)</code>
 And therefore you might want to switch to
 <code>>head(eflalo[,1:20])</code>
-Again, a lot of information available. It starts with vessel 238, which apparently is a beamtrawler (VE_FLT = TBB), has a vessel length of 24 meters and 221kW engine. From column 32 onwards, the kilo's of fish caught and their associated price is given (LE_KG_spec and LE_EURO_spec). 
+Again, there is a lot of information available. It starts with vessel 238, which apparently is a beamtrawler (VE_FLT = TBB), has a vessel length of 24 meters and 221kW engine. From column 32 onwards, the kilo's of fish caught and their associated price is given (LE_KG_spec and LE_EURO_spec). 
 <code>
 >head(eflalo[,32:52])
 </code>
@@ -107,7 +107,7 @@ Again, a lot of information available. It starts with vessel 238, which apparent
   # Two other classes are given in the eflalo dataset, what are they and do they make sense?
   # How many kilo's of plaice (PLE) has been registered in this dataset?
 
-If you brought your own data, we can now try to get this into R, if not, we will just save the build-in datasets to disk and read them in.
+If you brought your own data, we can now try to get this into R, if not, we will just save the built-in datasets to disk and read them in.
 ==== Your own data ====
 <code>>path2OwnData <- "C:/" #Fill out your own path here
 >dataName <- "tacsat2011.csv" #The tacsat file name, needs to be in csv format!
@@ -134,7 +134,7 @@ Obviously the same thing works for eflalo. However, in most instances, the forma
   # Do the new formats make more sense?
 
 == Lots of data ==
-VMS and logbook data can be rather large in size (e.g. multiple years, lot's of vessels etc) and reading them all in at once might pose problems. It isn't a problem to do the whole job on for example a year-by-year basis and combine the datasets.
+VMS and logbook data can be rather large in size (e.g. multiple years, lot's of vessels etc) and reading them all in at once might pose problems. It isn't a problem to do the whole job on, for example, a year-by-year basis using a 'loop' and combine the datasets.
 <code>
 >years <- 2005:2010
 >path  <- "C:/tmpTacsat/"
@@ -147,5 +147,5 @@ VMS and logbook data can be rather large in size (e.g. multiple years, lot's of 
 
 === Exercise 4 ===
   # Split the example dataset into a year 1800 and 1801 and save it to disk
-  # Read the seperate year files in and combine them into one 'totalTacsat' file.
+  # Read the separate year files in and combine them into one 'totalTacsat' file.
   # How many rows of data do you have, and how many columns? Does that match up with the number of rows and columns mentioned earlier in this practical?
