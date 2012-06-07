@@ -78,7 +78,7 @@ Therefore, based on these ideas, different functionalities have been developed.
 
 I will present short examples of both methods.
 
-==== SegmentTacsatSpeed ====
+==== Segmented Tacsat Speed ====
 Note that you can only run this example with 1 year of data!
 <code>
 >tacsatp$idx       <- 1:nrow(tacsatp)
