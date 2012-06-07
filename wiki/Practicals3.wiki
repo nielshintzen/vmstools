@@ -96,12 +96,18 @@ This functionality works on more than 1 year and can be used to define activity 
 <code>
 >tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==T)] <- "NO_GEAR"
 >tacsatp$LE_GEAR <- ac(tacsatp$LE_GEAR)
+
+#Analyse a selection of the data, a window will pop-up!
 >storeScheme   <- activityTacsatAnalyse(subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
 >require(mixtools)
+#After analysing the peaks, time to let the magic fit normal density distributions to the data
 >res           <- activityTacsat(subset(tacsatp,LE_GEAR == "OTM" &
                       year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",storeScheme)
+#Make sure the same selection is used when writing the results to the original tacsat dataset
 >tacsatSubset <- subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801 & is.na(SI_SP)==F)
 >tacsatSubset$SI_STATE <- res
+
+#Lets look at the results
 >spds <- table(tacsatSubset$SI_SP,tacsatSubset$SI_STATE)
 >plot(y=spds[,1],x=an(dimnames(spds)[[1]]),type="h",ylim=range(spds),xlab="knots",ylab="Frequency")
 >lines(y=spds[,2],x=(an(dimnames(spds)[[1]])+0.1),col=2,type="h")
@@ -109,3 +115,33 @@ This functionality works on more than 1 year and can be used to define activity 
 >legend("topright",legend=c("No fishing","Fishing","Steaming"),col=1:3,box.lty=0,lwd=2,lty=1)
 </code>
 From both these examples you can tell already that it isn't easy to determine activity and it will most certainly take you a considerate amount of time to do this properly. However, it is very important as the results of this analyses are most often used as input to follow-up analyses!
+
+=== Fine scale effort patterns ===
+With the gear type available in tacsat, I can now compare the effort available in the VMS data and compare that with the effort data in the logbooks. Therefore however, I need to calculate the effort of the VMS data. 
+<code>
+>tacsatp <- sortTacsat(tacsatp) #Make sure it is ordered correctly
+>tacsatp <- effort(tacsatp, level = "trip", unit = "hours",fill.na=T)
+>eflalop <- effort(eflalo,level="trip",unit="hours",fill.na=T)
+>eflalop$LE_EFF_LOG <- an(eflalop$LE_EFF_LOG)
+
+#Let's quickly introduce a plotting routine, you'll hear more about that later on in the course
+>require(RColorBrewer)
+#First the tacsat effort
+>plotTools(subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm="LE_EFF_VMS"))
+#Now the eflalo effort
+>x11()
+>plotTools(subset(eflalop,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,color=NULL,control.eflalo=list(clm="LE_EFF_LOG"))
+</code>
+Quite a difference, not! Having VMS and logbook data available allows you to dispatch catches, values or effort at a much finer scale. If this is as good and believable as normal logbook data is up to you, the tools are there however.
+
+=== Distribution of catches / values ===
+Similar to the analyses above, we can make a picture of for example plaice landings on the spatial scale of VMS. Note here however that we are about to dispatch landings at a much finer spatial scale that is not stored in the data and is a complete interpretation of the data available. It is up to you to decide if this is a wise analyses to perform!
+<code>
+>tacsatEflalo      <- splitAmongPings(tacsat=subset(tacsatp,LE_GEAR == "TBB" & year(SI_DATIM)==1801),eflalo=subset(eflalo,LE_GEAR == "TBB"),
+                        variable="all",level="day",conserve=T)
+
+#Lets make some plots again
+>plotTools(tacsatEflalo,level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm="LE_KG_PLE"))
+>eflalo$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME),format="%d/%m/%Y %H:%M")
+>x11()
+>plotTools(subset(eflalo,LE_GEAR == "TBB" & year(FT_DDATIM) == 1801),level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,color=NULL,control.eflalo=list(clm="LE_KG_PLE"))
