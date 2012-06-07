@@ -145,3 +145,10 @@ Similar to the analyses above, we can make a picture of for example plaice landi
 >eflalo$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME),format="%d/%m/%Y %H:%M")
 >x11()
 >plotTools(subset(eflalo,LE_GEAR == "TBB" & year(FT_DDATIM) == 1801),level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,color=NULL,control.eflalo=list(clm="LE_KG_PLE"))
+</code>
+
+In this practical you've come across a lot of example code where each of the functions also has many options. Once you get to these analyses yourself back home it won't hurt to read the manuals that go with these functions. 
+
+=== Exercise 1 ===
+  # In the last example, how many kilo difference is there between all plaice landings in the tacsatEflalo set and in the eflalo dataset?
+  # Where might this difference come from?
