@@ -3,7 +3,7 @@
 == Introduction ==
 You have already come a long way by importing your VMS and logbook data, cleaning your datasets to ensure that whatever analyses you want to carry out, the basis is solid. We can't stress it enough, as with normal statistics, getting your data ready and in the right format is crucial for your results. 
 
-The potential of having these two datasets combined is large and discussed in the presentation already. Here we will show how it's done and how to make some first pictures out of it. You might be disappointed however when you see how much work it takes :-).
+The potential of having these two datasets combined is large and has been discussed during the lectures already. Here we will show how it's done in VMStools, and how to make some first pictures out of the results. You might be disappointed however when you see how much work it takes :-).
 
 == Getting the data ready ==
 If you still have an R version running with the results of the cleaning step, use those eflalo and tacsat results. If you had to start R anew, don't worry, we will show you how it works, and with your own data you can do it properly in one go (but note that you should only start to link VMS and logbook data after the cleaning process!).
@@ -22,7 +22,7 @@ If you still have an R version running with the results of the cleaning step, us
 
 >print(length(which(tacsatp$FT_REF == 0))) #number of records not able to link
 </code>
-What we can observe is that another column is added to the 'tacsatp' object, namely the 'FT_REF' column. What happened 'under the hood' is the linking of VMS and logbook based on vessel name+year and time stamps, such that each VMS record would fall within the time frame of departure and arrival of a logbook record of that same vessel. Now we know which VMS record can be associated with which eflalo record. This allows for some cool things to explore. Note that if no linking was possible, FT_REF will equal "0".
+What we can observe is that another column has been added to the 'tacsatp' object; namely the 'FT_REF' column. What happened 'under the hood' is the linking of VMS and logbook data, based on vessel name+year and time stamps, such that each VMS record would fall within the time frame of the departure and arrival of a logbook trip for that same vessel. Now we know which VMS record can be associated with which eflalo record. This now allows us to do some really cool things. Note that if no linking was possible, FT_REF equals "0" and this happens in many instances, e.g. when vessels are in harbour.
 <code>
 #Move the gear type from eflalo to tacsat
 >tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
@@ -54,7 +54,7 @@ Similar to the presentation, we will quickly look into four types of benefit
   # Distribution of catches / values
 
 === Distinguish fishery types ===
-Most often, fishery type is determined by the gear used when fishing. As we have already assigned gear type from eflalo to tacsat, splitting the tacsat data up into bits per gear type is not too difficult.
+Most often, fishery type is determined by the gear used (mesh size etc.) when fishing. As we have already assigned gear type from eflalo to tacsat, splitting the tacsat data up into bits per gear type is not too difficult.
 <code>
 >TBB <- subset(tacsatp,LE_GEAR == "TBB")
 >OTB <- subset(tacsatp,LE_GEAR == "OTB")
@@ -67,12 +67,12 @@ Most often, fishery type is determined by the gear used when fishing. As we have
 Do not close this picture immediately, it comes in handy in the next example. 
 
 === Define activity ===
-In many cases, activity can be defined based on speed. We've just made a picture of the speed profiles. Can you distinguish different behavior looking at these plots already? In general, there are 3 types of behavior to be distinguished (but with more information on the fishery, you could potentially indicate even more behaviors). 
+In many cases, activity can be defined based on speed. We've just made a picture of the speed profiles. Can you distinguish different behaviors by looking at these plots already? In general, there are 3 types of behavior to be distinguished (but with more information on the fishery, you could potentially indicate even more behaviors). 
   # Floating / being in harbour, associated with very low to zero speeds. 
   # Fishing, associated with intermediate speeds. 
-  # Steaming, associated with high speeds. If we now look back at the figure we just made, in the OTB panel, we can observe 2 'hills', one with mean around 3knots ranging between 2 and 6/7 knots and one with a mean around 10knots ranging between 7 and 13knots. Everything below 1knot can be assigned to 'floating / being in harbour. All in all, this is a simple approach, but might be very time consuming. 
+  # Steaming, associated with high speeds. If we now look back at the figure we just made, in the OTB panel, we can observe 2 'hills', one with mean around 3knots ranging between 2 and 6/7 knots and one with a mean around 10knots ranging between 7 and 13knots. Everything below 1 knot can be assigned to 'floating / being in harbour. All in all, this is a simple approach, but might be very time consuming. 
 
-Therefore, based on these ideas, different functionalities have been developed. 
+Therefore, based on these ideas, different functionalities have been developed in VMStools. 
   # segmentTacsatSpeed, segmented regression on speed profile and automatic detection of fishing versus no-fishing
   # activityTacsat, normal density curve fitting based on speed profile but informed by user decision
 
@@ -114,10 +114,10 @@ This functionality works on more than 1 year and can be used to define activity 
 >lines(y=spds[,3],x=(an(dimnames(spds)[[1]])+0.2),col=3,type="h")
 >legend("topright",legend=c("No fishing","Fishing","Steaming"),col=1:3,box.lty=0,lwd=2,lty=1)
 </code>
-From both these examples you can tell already that it isn't easy to determine activity and it will most certainly take you a considerate amount of time to do this properly. However, it is very important as the results of this analyses are most often used as input to follow-up analyses!
+From both these examples you can tell already that it isn't easy to determine activity and it will most certainly take you a considerable amount of time to do this properly. However, it is very important as the results of this analyses are most often used as input to follow-up analyses!
 
 === Fine scale effort patterns ===
-With the gear type available in tacsat, I can now compare the effort available in the VMS data and compare that with the effort data in the logbooks. Therefore however, I need to calculate the effort of the VMS data. 
+With the gear type available in tacsat, we can now compare the effort available in the VMS data and compare that with the effort data in the logbooks. Therefore however, we must first calculate the effort of the VMS data. 
 <code>
 >tacsatp <- sortTacsat(tacsatp) #Make sure it is ordered correctly
 >tacsatp <- effort(tacsatp, level = "trip", unit = "hours",fill.na=T)
@@ -132,10 +132,10 @@ With the gear type available in tacsat, I can now compare the effort available i
 >x11()
 >plotTools(subset(eflalop,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,color=NULL,control.eflalo=list(clm="LE_EFF_LOG"))
 </code>
-Quite a difference, not! Having VMS and logbook data available allows you to dispatch catches, values or effort at a much finer scale. If this is as good and believable as normal logbook data is up to you, the tools are there however.
+Quite a difference, not! Having VMS and logbook data available allows you to dispatch catches, values or effort at a much finer scale. Whether this is as good and believable as normal logbook data is up to you to decide; the tools are available however.
 
 === Distribution of catches / values ===
-Similar to the analyses above, we can make a picture of for example plaice landings on the spatial scale of VMS. Note here however that we are about to dispatch landings at a much finer spatial scale that is not stored in the data and is a complete interpretation of the data available. It is up to you to decide if this is a wise analyses to perform!
+Similar to the analyses above, we can make a picture of, for example, plaice landings on the spatial scale of VMS. Note here, however, that we are about to dispatch landings at a much finer spatial scale than at which the original data are stored (ie. the logbooks). We might hope that this is a sensible interpretation of the two data sources available, exploiting each to permit the finest possible spatial resolution. It is up to you, however, to decide if this is a wise analysis to perform!
 <code>
 >tacsatEflalo      <- splitAmongPings(tacsat=subset(tacsatp,LE_GEAR == "TBB" & year(SI_DATIM)==1801),eflalo=subset(eflalo,LE_GEAR == "TBB"),
                         variable="all",level="day",conserve=T)
@@ -147,7 +147,7 @@ Similar to the analyses above, we can make a picture of for example plaice landi
 >plotTools(subset(eflalo,LE_GEAR == "TBB" & year(FT_DDATIM) == 1801),level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,color=NULL,control.eflalo=list(clm="LE_KG_PLE"))
 </code>
 
-In this practical you've come across a lot of example code where each of the functions also has many options. Once you get to these analyses yourself back home it won't hurt to read the manuals that go with these functions. 
+In this practical you've come across a lot of example code where each of the functions also has many options. Once you get into these analyses yourselves back home, it won't hurt to read the manuals that go with these functions. 
 
 === Exercise 2 ===
   # In the last example, how many kilo difference is there between all plaice landings in the tacsatEflalo set and in the eflalo dataset?
