@@ -1,0 +1,18 @@
+= Practical 5: Interpolation methods for VMS tracks
+
+== Introduction ==
+Even scaling up from the 'poor' logbook spatial resolution to the more detailed VMS resolution is sometimes not enough for your type of analyses. 
+What you rather want to do is to interpolate the fishing tracks from your VMS data and create a number of 'intermediate' points, i.e. interpolated points. 
+
+Before you start to consider to do these type of analyses, you have to be aware of a number of issues. 
+  # You are now making up data points
+  # You might associate these interpolated points with catches, keep an eye on reality
+  # Most often you only want to interpolate between fishing pings, so your analyses of activity is very important!
+  # Is your computer up for the test, because you will expand your dataset even more (and requires more memory too)
+
+That should be enough warnings to convince you how cool these things actually are, and please, do try this at home, but be aware of the assumptions when you present something to e.g. stakeholders or a ministry.
+
+== Interpolate VMS data ==
+In VMStools we only distinguish between two types of interpolation:
+  # Linear interpolation
+  # Cubic Hermite Spline interpolation (according to Hintzen et al. 2010, Fisheries Research)
