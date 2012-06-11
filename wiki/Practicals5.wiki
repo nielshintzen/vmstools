@@ -29,7 +29,60 @@ Although the technicalities might be a bit too much for you, the practical way i
 >interpolationSL <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="SL",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
 #Interpolate according to the cubic-hermite spline interpolation
->interpolationcHs <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+>interpolationcHs <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
 #The returned interpolation is a list, let's look at the first interpolation
->plot(interpolationSL[[1]][-1,],type="l")
+>plot(interpolationSL[[1]][-1,],type="l",xlim=c(3.17,3.24))
+>points(interpolationSL[[1]][c(2,101),],pch=19,col="blue")
+>lines(interpolationcHs[[1]][-1,],col="red")
+</code>
+Ok, we've managed to interpolate some of our data. Not in all instances interpolations were possible, as we only got:
+<code>
+>length(interpolationSL)
+>nrow(tacsat)
+</code>
+216 interpolations while we had 414 tacsat points. In theory (if they are all of the same vessel) we could have had 413 interpolations. 
+
+The format of the interpolation allows some 'lapply' functions to be executed directly on the object, in other cases however, it might be easier to convert the interpolated data back to the default tacsat format.
+<code>
+>tacsatInt <- interpolation2Tacsat(interpolation,tacsat,npoints=10)
+#Each interpolation is splitted into 10 equally spaced points (including the start and the end point). In total 8 new points are added per interpolation.
+>nrow(tacsatInt)
+>nrow(tacsat)
+>(nrow(tacsatInt)-nrow(tacsat))/8 #I've seen that number before
+
+#What is the distance traveled within each of these interpolations?
+>sum(distanceInterpolation(interpolationSL))
+>sum(distanceInterpolation(interpolationcHs))
+</code>
+The only way to really test if either of these two interpolations is any better is test it against a much higher resolution dataset.
+<code>
+#Make use of a 6-minute interval dataset, and subset that every 120 minutes
+>data(VMShf)
+>colnames(VMShf) <- c("VE_REF","SI_LATI","SI_LONG","SI_SP","SI_HE","SI_DATIM")
+>VMShf$VE_COU <- "Atlantis"
+>VMShf$SI_DATE<- format(VMShf$SI_DATIM,format="%d/%m/%Y")
+>VMShf$SI_TIME<- format(VMShf$SI_DATIM,format="%H:%M")
+>VMShf <- formatTacsat(VMShf)
+>VMShf <- sortTacsat(VMShf)
+>VMShf <- filterTacsat(VMShf,st=c(2,6),hd=NULL,remDup=T)
+#cHs first
+>cHs <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+#Then straight line
+>SL <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="SL",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+
+
+#Visualize the results
+>plot(diffInter(cHs,VMShf)[,"mean"],pch=19,ylab="difference",ylim=c(0,10))
+>abline(h=1,col=2)
+>points(diffInter(SL,VMShf)[,"mean"],col="blue",pch=19)
+>length(which(diffInter(cHs,VMShf)[,"mean"] < diffInter(SL,VMShf)[,"mean"]))
+>sum(diffInter(cHs,VMShf)[,"mean"])
+>sum(diffInter(SL,VMShf)[,"mean"])
+
+</code>
+Obviously, we could do a bit of tuning here and there to make the performance of the interpolation even better, as this was just a quick and dirty example showing the benefits.
+
+== From here onwards == 
+
+We are back to the tacsat format and perform all types of analyses to it we've been doing before (e.g. splitAmongPings). 
