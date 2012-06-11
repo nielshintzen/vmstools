@@ -149,5 +149,47 @@ What you can see in the picture is the VMS point (the dot), the interpolated lin
 >distance(3.7,51.8,3.6,51.8) #what distance have I traveled?
 >destFromBearing(3.7,51.8,270.0393,6.876387) #starting from the same point, traveling with the bearing and distance calculated, do I end up at the same point?
 </code>
+It is recommended to be specific when calculating the area trawled using the 'addWidth' functionality as it requires a very large number of calculations which will most certainly slow down your analyses.
 
 === Calculating uncertainty of interpolation ===
+It is common to most scientists to be uncertain about assumptions and the results of an analyses. This uncertainty can however also provide interesting results  and be used in e.g. indicator calculations!
+
+Obviously, interpolation isn't without uncertainty either. Hence, tools have been developed to show this uncertainty and to allow us to calculate with it. It should be stressed however that we are talking about uncertainty in the track of the interpolation, not the VMS position itself while it is known that those 'pings' aren't without error either (but might be negligible on the scale of things). 
+
+From the interpolation and VMS points itself we can already distill a bit of guidance on how to construct the 'confidence interval'.   
+  # Confidence at the VMS pings equals 1
+  # The further away from either of these two points, the lower the certainty.
+  # The further away from the interpolation, the lower the certainty (as we assume that the interpolation is the best possible track between the two pings)
+
+We like to do these calculations on a grid again, as that allows us to plot the results too. 
+<code>
+>data(tacsat)
+
+#Sort the Tacsat data
+>tacsat     <- sortTacsat(tacsat)
+>tacsat     <- tacsat[1:1000,]
+
+#Filter the Tacsat data
+>tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
+
+#Interpolate the VMS data
+>interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
+                   res=100,method="cHs",params=list(fm=0.5,distscale=20,
+                   sigline=0.2,st=c(2,6)),headingAdjustment=0)
+
+#Create the final grid where all interpolations should fit on
+>xrange        <- c(2.1,2.6); yrange <- c(51.3,51.65)
+>grid          <- createGrid(xrange,yrange,resx=0.001,resy=0.0005)
+>sPDF          <- createGrid(xrange,yrange,resx=0.001,resy=0.0005,type="SpatialPixelsDataFrame")
+>sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
+
+>lon <- tacsat$SI_LONG[c(12,13)]
+>lat <- tacsat$SI_LATI[c(12,13)]
+
+>res <- calculateCI(intLon=lon,intLat=lat,vmsIdx1=12,vmsIdx2=13,VMS.=tacsat,
+            grid=grid,sPDF=sPDF,interpolation=interpolation,int=4,    
+            params=list(fm=0.45,distscale=3.1,sigline=0.42,st=c(2,6)))
+>res <- (res[[1]] - min(res[[1]])) / (max(res[[1]]) - min(res[[1]]))
+
+>levelplot(matrix(res,nrow=655,ncol=537))
+
