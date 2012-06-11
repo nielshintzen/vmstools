@@ -1,4 +1,4 @@
-= Practical 5: Interpolation methods for VMS tracks
+= Practical 5: Interpolation methods for VMS tracks = 
 
 == Introduction ==
 Even scaling up from the 'poor' logbook spatial resolution to the more detailed VMS resolution is sometimes not enough for your type of analyses. 
