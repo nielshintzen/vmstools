@@ -54,6 +54,8 @@ Obviously, we can do the same for the VMS data, but try that yourself! One other
 </code>
 The length of the CSquare notation becomes longer and longer the higher the resolution gets. 
 
+== Analyse on a defined spatial scale == 
+
 So far, we've only converted VMS and logbook data into different spatial notations. A next step would be to analyse the data based on the converted spatial scale.
 <code>
 #Let's calculate the catches of plaice in the total eflalo dataset at the ICES rectangle level
@@ -104,7 +106,10 @@ Grid <- createGrid(xrange,yrange,1,0.5,type="SpatialGrid") #just like an ICES re
 >Grid@coords #this doesn't show much...
 >coordinates(Grid) #Much better
 >plot(Grid); map.axes()
+</code>
+Now you've defined your own grid, but obviously you want to link e.g. your VMS data points to this grid. In other words, you want to know in which grid cell each of your VMS positions would fall. Why is this handy? Primarily because you can now calculate certain indicators based on a home defined grid (e.g. kg of cod in a certain area) and it allows you to combine different data sources within the same grid! But more on that later on. First, let's see in which grid cell all theVMS positions fall.
 
+<code>
 #Get some tacsat positions, and link them to the Grid
 somePos <- head(tacsat[,c("SI_LONG","SI_LATI")])
 >points(SpatialPoints(coordinates(somePos)),col="red",pch=19)
