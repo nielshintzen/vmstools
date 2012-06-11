@@ -1,3 +1,12 @@
 = Practical 6: Calculating indicators =
 
 == Introduction ==
+All of the main marine policy frameworks in Europe have adopted an ecosystem approach to  managing their anthropogenic activities and conserving their natural resources. For effective ecosystem-based management (EBM), indicators are required that describe the pressures affecting the ecosystem, the state of the ecosystem, and the response of managers. To implement EBM successfully it is also critical that we understand the links between these indicators so that the policy objectives on the state of the ecosystem can be achieved by managing human pressures through an appropriate response. 
+
+The EU Data Collection Framework (DCF) standardizes three indicators to analyse the fishing activity. They are summarised as follow:
+
+ * DCF Indicator 5: Distribution of fishing activities. The spatial extent of fishing activity based on the total area of grids within which VMS records were obtained, each month; 
+
+ * DCF Indicator 6: Aggregation of fishing activities. The extent to which fishing activity is aggregated based on the total area of grids within which 90% of VMS records were obtained, each month.
+
+ * DCF Indicator 7: Areas not impacted by mobile bottom gears. The area of seabed that has not been impacted by mobile bottom fishing gears in the last year. Could be reported annually and would state the total proportion of the area by depth strata in each marine region.
