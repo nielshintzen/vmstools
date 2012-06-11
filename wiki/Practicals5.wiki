@@ -16,3 +16,20 @@ That should be enough warnings to convince you how cool these things actually ar
 In VMStools we only distinguish between two types of interpolation:
   # Linear interpolation
   # Cubic Hermite Spline interpolation (according to Hintzen et al. 2010, Fisheries Research)
+
+Although the technicalities might be a bit too much for you, the practical way is somewhat simpler. And if you are OK not to watch underneath the hood, you're fine as well.
+<code>
+>data(tacsat)
+#Sort the data and make a subset
+>tacsat <- sortTacsat(tacsat)[1:1000,]
+>tacsat <- filterTacsat(tacsat,st=c(2,6),hd=NULL,remDup=T)
+
+#Do not mind the large number of arguments here
+#Interpolate according to a straight line interpolation
+>interpolationSL <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="SL",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+
+#Interpolate according to the cubic-hermite spline interpolation
+>interpolationcHs <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+
+#The returned interpolation is a list, let's look at the first interpolation
+>plot(interpolationSL[[1]][-1,],type="l")
