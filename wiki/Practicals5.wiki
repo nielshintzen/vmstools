@@ -208,13 +208,18 @@ That was the code to just calculate one confidence interval. But what if I want 
 >interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
                    res=100,method="cHs",params=list(fm=0.5,distscale=20,
                    sigline=0.2,st=c(2,6)),headingAdjustment=0)
+</code>
+Ok, data has been prepared and interpolated, now define the grid
+<code>
 >ranges <- do.call(rbind,lapply(interpolation,function(x){return(apply(x[-1,],2,range))}))
 >xrange        <- range(ranges[,1]); yrange <- range(ranges[,2])
 >grid          <- createGrid(xrange,yrange,resx=0.01,resy=0.005)
 >sPDF          <- createGrid(xrange,yrange,resx=0.01,resy=0.005,type="SpatialPixelsDataFrame")
 >sPDF@data     <- data.frame(rep(1,length(sPDF@grid.index)))
 >colnames(sPDF@data) <- "data" 
-
+</code>
+I've created a data frame where I can store the chance that an area is untrawled, which obviously ranges between 0 and 1. I call this the sPDF (spatial data frame). Hereafter I need to fill the spatial dataframe based on the calculations of the CI. The functions returns the index of the dataframe where data on the CI should be stored (not in every grid cell, but just a selection) and the value of the CI cells.
+<code>
 #Start the loop
 >for(iNt in 1:length(interpolation)){
 print(iNt)
@@ -233,7 +238,9 @@ CI                      <- (resCI[[1]] - min(resCI[[1]])) /
                            (max(resCI[[1]]) - min(resCI[[1]]))
 sPDF@data[idx,"data"]<- sPDF@data[idx,"data"] * (1-CI)
 }#end for loop
-
+</code>
+As I am only interested in those areas where I do have trawling, I just simply only use that part where the chance of no trawling is smaller than 1. Thereafter I associate the value of the data with a color, which makes it easier to plot afterwards.
+<code>
 >idxwithdata <- which(sPDF@data<1)
 >coords      <- data.frame(coordinates(sPDF[idxwithdata,]))
 >coords$data <- sPDF@data[idxwithdata,]
@@ -242,15 +249,23 @@ sPDF@data[idx,"data"]<- sPDF@data[idx,"data"] * (1-CI)
 >map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=c(yrange[1],54.6))
 >map.axes()
 >color <- rev(brewer.pal(9,"YlOrRd"))
+</code>
+Time to plot, a for loop with polygon is not the best way to do it, but it works for now.
+<code>
 >for(i in 1:nrow(coords)){
   polygon(x=c(coords[i,1],coords[i,1]+0.01,coords[i,1]+0.01,coords[i,1]),
         y=c(coords[i,2],coords[i,2], 
             coords[i,2]+0.005,coords[i,2]+0.005),
         col=color[coords[i,"color"]],lwd=1,border=NA)
 }
->map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange,add=T) 
+>map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange,add=T) </code>
+That gives us a nice picture, let's see where the original VMS datapoints were located!
+<code>
 #compare to VMS points
 >x11()
 >map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=c(yrange[1],54.6)) 
 >map.axes()
 >points(tacsat$SI_LONG,tacsat$SI_LATI,col=1,pch=19,cex=0.5)
+</code>
+
+That is pretty much all VMStools can help you with related to interpolations. Go ahead and have fun!
