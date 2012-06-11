@@ -1,0 +1,28 @@
+= Practical 4: How to link VMS and logbook data to 'spatial' grids
+
+== Introduction ==
+In general, logbook data is recorded a the ICES rectangle level. VMS data however, is not associated with any spatial scale (other than taking account of the uncertainty in the data itself which may be a limiting factor). In many instances however, the output of any analyses is required to be delivered at some spatial scale. If that spatial scale is ICES rectangle for logbook data, you're lucky, but most often it requires a bit more work. 
+
+Here we will provide some tools to help you out with these exercise.
+
+== Converting between spatial notations ==
+What if you are required to report VMS data analyses on the ICES rectangle. Will you go through some complicated procedure to find the closest ICES rectangle to your data, or just use the embedded functionality in VMStools! Let's see how that would work.
+<code>
+#Start fresh!
+>rm(list=ls())
+
+#load the data
+>data(tacsat); data(eflalo)
+
+>tacsat$LE_RECT <- ICESrectangle(tacsat)
+#That was easy, can we also convert back?
+>pos <- ICESrectangle2LonLat(tacsat$LE_RECT,midpoint=T)
+>tacsatCompare <- cbind(tacsat,pos)
+>head(tacsatCompare)
+    VE_COU VE_REF  SI_LATI  SI_LONG    SI_DATE  SI_TIME SI_SP SI_HE LE_RECT SI_LATI SI_LONG
+658237 Atlantis     10 51.44772 3.583731 04/05/1800 13:32:00     0    25    31F3   51.25     3.5
+658238 Atlantis     10 51.44067 3.583847 04/05/1800 15:28:00     0    25    31F3   51.25     3.5
+662888 Atlantis     10 51.44074 3.595529 04/05/1800 17:22:00     0    25    31F3   51.25     3.5
+662889 Atlantis     10 51.44315 3.586862 04/05/1800 19:18:00     0    25    31F3   51.25     3.5
+662890 Atlantis     10 51.44351 3.586948 04/05/1800 21:12:00     0    25    31F3   51.25     3.5
+662891 Atlantis     10 51.44811 3.593958 04/05/1800 23:08:00     0    25    31F3   51.25     3.5
