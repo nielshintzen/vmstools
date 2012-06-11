@@ -1,4 +1,4 @@
-= Practical 4: How to link VMS and logbook data to 'spatial' grids
+= Practical 4: How to link VMS and logbook data to 'spatial' grids =
 
 == Introduction ==
 In general, logbook data is recorded a the ICES rectangle level. VMS data however, is not associated with any spatial scale (other than taking account of the uncertainty in the data itself which may be a limiting factor). In many instances however, the output of any analyses is required to be delivered at some spatial scale. If that spatial scale is ICES rectangle for logbook data, you're lucky, but most often it requires a bit more work. 
@@ -76,3 +76,14 @@ So far, we've only converted VMS and logbook data into different spatial notatio
 #In a picture, it looks like this
 >x11()
 >plotTools(tacsatEflalo,level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.1),color=NULL,control.tacsat=list(clm="LE_KG_PLE"))
+</code>
+Observe the difference! That is quite a more detailed picture on plaice catch distribution. 
+
+=== Exercise 2 ===
+  # Aggregate COD catches on a CSquare notation of 0.5 degrees
+  # If you are handy with R, can you make your own plot? (else, use plotTools to do it for you)
+
+== Define your own grid ==
+Although the spatial grids just discussed might be suitable in a large number of occasions, there are still some instances where you need to define your own grid. Within the core developers group of VMStools, we have decided not to use any km or nm based grids but only longitude and lattitude based grids. As all calculations are based on the assumption that the earth is spherical, we wouldn't be able to use these tools anymore if we would move to km or nm notation. We would be critical but happy though to embed successful code to perform these analyses in the package.
+
+VMStools relies on a secondary package for spatial data storage and analyses, the sp package by Bivand et al. If you plan to do a lot of spatial analyses in R in combination with VMS (basically the type of analyses you'll see from here and onwards) I can recommend you read the first chapters of his book <i>[http://books.google.nl/books?hl=nl&lr=&id=4gg8yx_lcj0C&oi=fnd&pg=PR7&dq=bivand,+sp,+R&ots=yzdH3v5-7G&sig=cGG9UC3rlreQxzlVROJXTKbxmyE#v=onepage&q=bivand%2C%20sp%2C%20R&f=false Applied spatial analyses with R (2008)]</i>, especially chapter 2 on the different classes. It is not an easy read, but it will help you to understand how most of these analyses work together with polygons, shapefiles and data storage.
