@@ -26,3 +26,53 @@ What if you are required to report VMS data analyses on the ICES rectangle. Will
 662889 Atlantis     10 51.44315 3.586862 04/05/1800 19:18:00     0    25    31F3   51.25     3.5
 662890 Atlantis     10 51.44351 3.586948 04/05/1800 21:12:00     0    25    31F3   51.25     3.5
 662891 Atlantis     10 51.44811 3.593958 04/05/1800 23:08:00     0    25    31F3   51.25     3.5
+</code>
+=== Exercise 1 ===
+  # When executing the function 'ICESrectangle2LonLat' a warning was given. What does this warning mean?
+  # Can you find out what the location is of the points not converted back to longitude,latitude. Does this make sense?
+
+Similar things we can do with the logbook data
+<code>
+>pos <- ICESrectangle2LonLat(eflalo$LE_RECT,midpoint=T)
+>eflalop <- cbind(eflalo,pos)
+
+#Let's find the ICES area within of logbook records
+#We need the longitude, latitude position from the step before
+>eflalop$LE_AREA <- ICESarea(eflalop,roman=T)
+</code>
+Obviously, we can do the same for the VMS data, but try that yourself! One other type of conversion is one into the spatial <b>C-square</b> notation. This notation has been developed in Australia and is now implemented as the default FishFrame spatial scale. However, the C-square notation can take many different resolutions. Let's convert some VMS data into C-square notation.
+<code>
+#For this example, take the first six positions only
+>somePos <- head(tacsat[,c("SI_LONG","SI_LATI")])
+>CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=10)
+>CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=10)
+>CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=5)
+>CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.5)
+>CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.1)
+>CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.05)
+>CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.01)
+</code>
+The length of the CSquare notation becomes longer and longer the higher the resolution gets. 
+
+So far, we've only converted VMS and logbook data into different spatial notations. A next step would be to analyse the data based on the converted spatial scale.
+<code>
+#Let's calculate the catches of plaice in the total eflalo dataset at the ICES rectangle level
+>aggregate(eflalop$LE_KG_PLE,by=list(eflalop$LE_RECT),FUN=sum,na.rm=T)
+#This would be the picture associated with that catch distribution
+>plotTools(eflalop,level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=FALSE,color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=c("LE_KG_PLE")))
+
+#Now at a slightly higher scale, the VMS data
+>tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+>tacsatp$IDX       <- 1:nrow(tacsatp)
+#A quick and dirty rule which says that all speeds between 1 and 6 is fishing
+>tacsatFilter      <- filterTacsat(tacsatp,st=c(1,6),hd=NULL,remDup=T)
+>tacsatp$SI_STATE  <- 0
+>tacsatp$SI_STATE[tacsatFilter$IDX] <- 1
+>tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
+                        variable="all",level="day",conserve=T)
+>tacsatEflalo$LE_SPAT <- CSquare(tacsatEflalo$SI_LONG,tacsatEflalo$SI_LATI,degrees=0.1)
+>aggregate(tacsatEflalo$LE_KG_PLE,by=list(tacsatEflalo$LE_SPAT),FUN=sum,na.rm=T)
+
+#In a picture, it looks like this
+>x11()
+>plotTools(tacsatEflalo,level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.1),color=NULL,control.tacsat=list(clm="LE_KG_PLE"))
