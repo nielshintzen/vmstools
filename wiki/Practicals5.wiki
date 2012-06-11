@@ -67,9 +67,9 @@ The only way to really test if either of these two interpolations is any better 
 >VMShf <- sortTacsat(VMShf)
 >VMShf <- filterTacsat(VMShf,st=c(2,6),hd=NULL,remDup=T)
 #cHs first
->cHs <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+>cHs <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=1)
 #Then straight line
->SL <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="SL",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+>SL <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="SL",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=1)
 
 
 #Visualize the results
@@ -85,9 +85,69 @@ Obviously, we could do a bit of tuning here and there to make the performance of
 
 === Exercise 1 ===
   # Plot the second interpolation, why is the curve so different from the straight line?
-  # What is the difference in distance traveled between the two types of interpolation?
+  # What is the difference in distance traveled between the two types of interpolation? (try and use the 'distance' function to do it yourself)
   # What would be the associated speed of the vessel under the two different interpolation scenarios?
 
 == From here onwards == 
 
-We are back to the tacsat format and perform all types of analyses to it we've been doing before (e.g. splitAmongPings). 
+Once the tacsat data is interpolated some other possibilities remain. It is, for example, possible to add a certain width of a gear to the interpolation. This might be handy when you want to reconstruct trawling tracks as approximately the right scale. Or you could focus on the uncertainty associated with interpolated tracks to test if areas have remained unfished from some time. 
+
+=== Adding gear width to interpolation ===
+Especially when your study area is very small (e.g. only a few kilometers), it is worth to start considering the width of the gear in fishing track pictures. One feature tested before was Google Earth pictures where by zooming in, the actual with of the gear could be visualized. As we now move into rather sophisticated tools, I do show some of the underlying tools that are used, but wrapped, inside the functions. 
+
+First of all, select a vessel of which we know the gear width (e.g. a beam trawl has normally speaking twice 12 meter beams).
+<code>
+>unique(subset(eflalo,LE_GEAR == "TBB"))$VE_REF[1]
+>subTacsat <- subset(tacsatp,VE_REF == "238")
+
+#Interpolate the dataset
+>cHs <-interpolateTacsat(subTacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+
+#Make a picture of all interpolations first
+#Get the ranges of the total picture
+>ranges <- do.call(rbind,lapply(cHs,function(x){return(apply(x[-1,],2,range))}))
+>xrange <- range(ranges[,"x"])
+>yrange <- range(ranges[,"y"])
+
+>plot(subTacsat$SI_LONG,subTacsat$SI_LATI,xlim=xrange,ylim=yrange,pch=19,col="blue",xlab="Longitude",ylab="Latitude")
+>for(iInt in 1:length(cHs)){
+  lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2])}
+</code>
+What we now basically would like to do is something close to this:
+<code>
+>>for(iInt in 1:length(cHs)){
+  lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2],lwd=2)}
+</code>
+That did give it more wide gear tracks, but how wide are they really? The total distance from the left hand side of the picture to the right hand side equals aproximately:
+<code>
+>distance(3.6,51.8,4.5,51.8) #~62km
+</code>
+Nearly 62 km! So, using a thicker line to plot is not really accurate. Let's do it the 'right' way. 
+<code>
+>interWidth <- addWidth(cHs,gearWidth=0.024)
+>x11(); plot(interWidth); map.axes()
+>points(subTacsat$SI_LONG,subTacsat$SI_LATI,col="blue",pch=19)
+</code>
+Again, you can question how useful this really is if you look at a picture with dimension 60x70km... It would be better to zoom in a bit more and have another look and compare the results with a 'normal' line drawing of R.
+<code>
+#Let's look at 2km width, how many degrees is that?
+>distance(3.6,51.8,3.7,51.8) #0.1 degree longitude = 6.8km, so 1 km is 0.015 degree longitude. 
+>distance(3.6,51.8,3.615,51.8)
+#In latitude, approx half of that step size
+>distance(3.6,51.8,3.6,51.81)
+#Take a VMS point and take 100meter on each side of it
+>plot(interWidth,ylim=c(51.83098 - (0.0075),51.83098 + (0.0075 )),xlim=c(3.778870 - (0.015),3.778870 + (0.015)))
+>points(subTacsat$SI_LONG,subTacsat$SI_LATI,pch=19)
+>map.axes()
+>for(iInt in 1:length(cHs)){
+  lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2],col="red")} #The interpolated line only
+</code>
+What you can see in the picture is the VMS point (the dot), the interpolated line (without gear width, in red) and the interpolated line with gear width in black squares. What happens under the hood is that for each little step taken in the interpolation (each interpolation consists of e.g. 100 small steps i.e. new points), it's bearing is calculated towards the next small step. Having this knowledge, the width of the gear must extend in a perpendicular direction (90 and -90 degrees from the heading of the vessel). Keeping this bearing for a distance equal to the width of the gear gives us the outer points of the black boxes. All black boxes are thereafter combined to give a fishing track. So, the function bearing plays an important role here, you might want to use it for other purposes too.
+<code>
+>bearing(3.7,51.8,3.6,51.8) #heading into a 270 degree compass course
+#If you are interested where you will end up with a certain bearing and distance to travel, you can use this
+>distance(3.7,51.8,3.6,51.8) #what distance have I traveled?
+>destFromBearing(3.7,51.8,270.0393,6.876387) #starting from the same point, traveling with the bearing and distance calculated, do I end up at the same point?
+</code>
+
+=== Calculating uncertainty of interpolation ===
