@@ -192,4 +192,65 @@ We like to do these calculations on a grid again, as that allows us to plot the 
 >res <- (res[[1]] - min(res[[1]])) / (max(res[[1]]) - min(res[[1]]))
 
 >levelplot(matrix(res,nrow=655,ncol=537))
+</code>
 
+That was the code to just calculate one confidence interval. But what if I want the confidence interval of a whole trip. That requires a short loop! Let's see how far we get
+<code>
+>data(tacsat)
+
+#Sort the Tacsat data
+>tacsat     <- sortTacsat(tacsat)
+>tacsat     <- tacsat[1:1000,]
+
+#Filter the Tacsat data
+>tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
+#Interpolate the VMS data
+>interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
+                   res=100,method="cHs",params=list(fm=0.5,distscale=20,
+                   sigline=0.2,st=c(2,6)),headingAdjustment=0)
+>ranges <- do.call(rbind,lapply(interpolation,function(x){return(apply(x[-1,],2,range))}))
+>xrange        <- range(ranges[,1]); yrange <- range(ranges[,2])
+>grid          <- createGrid(xrange,yrange,resx=0.01,resy=0.005)
+>sPDF          <- createGrid(xrange,yrange,resx=0.01,resy=0.005,type="SpatialPixelsDataFrame")
+>sPDF@data     <- data.frame(rep(1,length(sPDF@grid.index)))
+>colnames(sPDF@data) <- "data" 
+
+#Start the loop
+>for(iNt in 1:length(interpolation)){
+print(iNt)
+resCI <- calculateCI(intLon=
+              interpolation[[iNt]][c(2,nrow(interpolation[[iNt]])),1],
+                      intLat=
+              interpolation[[iNt]][c(2,nrow(interpolation[[iNt]])),2],
+            vmsIdx1=interpolation[[iNt]][1,1],
+            vmsIdx2=interpolation[[iNt]][1,2],
+            VMS.=tacsat,
+            grid=grid,sPDF=sPDF,interpolation=interpolation,int=iNt,    
+            params=list(fm=0.5,distscale=3.1,sigline=0.42,st=c(2,6)))
+
+idx                     <- resCI[[2]]
+CI                      <- (resCI[[1]] - min(resCI[[1]])) /   
+                           (max(resCI[[1]]) - min(resCI[[1]]))
+sPDF@data[idx,"data"]<- sPDF@data[idx,"data"] * (1-CI)
+}#end for loop
+
+>idxwithdata <- which(sPDF@data<1)
+>coords      <- data.frame(coordinates(sPDF[idxwithdata,]))
+>coords$data <- sPDF@data[idxwithdata,]
+>coords$color<- apply(abs(outer(seq(0,1,length.out=9),coords$data,"-")),2,which.min)
+>xrange <- range(coords[,1]); yrange <- range(coords[,2])
+>map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange)
+>map.axes()
+>color <- rev(brewer.pal(9,"YlOrRd"))
+>for(i in 1:nrow(coords)){
+  polygon(x=c(coords[i,1],coords[i,1]+0.01,coords[i,1]+0.01,coords[i,1]),
+        y=c(coords[i,2],coords[i,2], 
+            coords[i,2]+0.005,coords[i,2]+0.005),
+        col=color[coords[i,"color"]],,lwd=1,border=NA)
+}
+>map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange,add=T) 
+#compare to VMS points
+>x11()
+>map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange) 
+>map.axes()
+>points(tacsat$SI_LONG,tacsat$SI_LATI,col=1,pch=19,cex=0.5)
