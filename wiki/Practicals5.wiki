@@ -83,6 +83,11 @@ The only way to really test if either of these two interpolations is any better 
 </code>
 Obviously, we could do a bit of tuning here and there to make the performance of the interpolation even better, as this was just a quick and dirty example showing the benefits.
 
+=== Exercise 1 ===
+  # Plot the second interpolation, why is the curve so different from the straight line?
+  # What is the difference in distance traveled between the two types of interpolation?
+  # What would be the associated speed of the vessel under the two different interpolation scenarios?
+
 == From here onwards == 
 
 We are back to the tacsat format and perform all types of analyses to it we've been doing before (e.g. splitAmongPings). 
