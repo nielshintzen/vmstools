@@ -239,18 +239,18 @@ sPDF@data[idx,"data"]<- sPDF@data[idx,"data"] * (1-CI)
 >coords$data <- sPDF@data[idxwithdata,]
 >coords$color<- apply(abs(outer(seq(0,1,length.out=9),coords$data,"-")),2,which.min)
 >xrange <- range(coords[,1]); yrange <- range(coords[,2])
->map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange)
+>map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=c(yrange[1],54.6))
 >map.axes()
 >color <- rev(brewer.pal(9,"YlOrRd"))
 >for(i in 1:nrow(coords)){
   polygon(x=c(coords[i,1],coords[i,1]+0.01,coords[i,1]+0.01,coords[i,1]),
         y=c(coords[i,2],coords[i,2], 
             coords[i,2]+0.005,coords[i,2]+0.005),
-        col=color[coords[i,"color"]],,lwd=1,border=NA)
+        col=color[coords[i,"color"]],lwd=1,border=NA)
 }
 >map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange,add=T) 
 #compare to VMS points
 >x11()
->map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange) 
+>map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=c(yrange[1],54.6)) 
 >map.axes()
 >points(tacsat$SI_LONG,tacsat$SI_LATI,col=1,pch=19,cex=0.5)
