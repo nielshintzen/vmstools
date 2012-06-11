@@ -10,3 +10,102 @@ The EU Data Collection Framework (DCF) standardizes three indicators to analyse 
  * DCF Indicator 6: Aggregation of fishing activities. The extent to which fishing activity is aggregated based on the total area of grids within which 90% of VMS records were obtained, each month.
 
  * DCF Indicator 7: Areas not impacted by mobile bottom gears. The area of seabed that has not been impacted by mobile bottom fishing gears in the last year. Could be reported annually and would state the total proportion of the area by depth strata in each marine region.
+
+Although the definition of these indicators has been around for some time already, and tools are even developed to calculate these indicators, there is still room for alternative approaches to calculate the indicators. 
+
+Within this practical we will guide you through the simplest ways to calculate the indicators and a home-made approach which allows for more flexibility.
+
+=== Some background on the indicators and their calculation === 
+These indicators aggregate the tacsat point data into a gridded data frame using the functions mapGrid and vmsGridCreate and therefore the resolution of the grid (cell size) must be defined.
+
+*DCF 5* calculates the total area of a grid of cells with fishing activity which is above a minimum threshold of number of pings or number of fishing hours (if the tacsat data contains a field with time interval between two points called SI_INTV, then the threshold will be a minimal number of hours, otherwise it will be a minimal number of points). The area of each cell is calculated with the function surface either via a fast and rough method using a trapezoid  approximation (option "Trapezoid"), either via a more precise but slow method using a Universal Transverse Mercator projection (option "UTM"). The first method is fine for big grids of small cell sizes, the second one is better for large cell sizes. This total fishing area is processed by month.
+
+*DCF 6* also calculates the total area of a grid with fishing activity but keeps only the 90% of the points by discarding the outer 10% points (or any other specified percentage). It uses the function tacsatMCP adapted from the aspace library. This function draws a minimum convex polygon around the central points to keep. Then these points are gridded and the total area of the cells is calculated with the surface function with the same optional methods as DCF 5. This total fishing area is processed by month.
+
+*DCF 7* calculates the total area of a specified polygon not impacted by mobile bottom gear. It therefore needs that the tacsat data has been merged with the logbooks in order to have a gear code (or others) for each vms point. The indicator needs a list of gear code to include as mobile bottom gears (if empty, all the points will be included). The specified area to be processed is a polygon shapefile. This polygon (or group of polygons) is then clipped with the Europe polygon to be sure that the indicator won't include land in its area calculation. If no shapefile is defined, the area of the bounding box containing all the vms points will be considered. The result is the area of the polygon less the area of the grid where fishing activity occurs. The vms pings are gridded with an optional threshold in either minimal of fishing hours or minimal number of points (see DCF 5). The area of each grid cell is calculated with the surface function (see DCF 5 or DCF 6).
+
+
+== Calculating indicators the easy way ==
+Again, we have to start with the tacsat and eflalo data, make sure they are free from the easy-to-spot errors and link them up. As we do this for example purposes only, we skip the cleaning steps and move to linking the tacsat and eflalo datasets immediately. 
+<code>
+>data(tacsat); data(eflalo)
+>tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+>tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+
+#In general, most of these indicators only make sense for bottom gear, so let's make a selection
+>gear <- c("OTB","PTB","TBB","OTM")
+>tacsatp <- subset(tacsatp,LE_GEAR %in% gear)
+#Again, quick and dirty filtering activity
+>tacsatp <- filterTacsat(tacsatp,st = c(2, 6), hd = NULL, remDup = T)
+>tacsatp <- sortTacsat(tacsatp)
+
+#Calculate the interval rate between pings
+>tacsatp <- intervalTacsat(tacsatp,level="trip",fill.na=TRUE)
+>tacsatp$SI_INTV <- tacsatp$INTV
+
+#Define an area of interest (prevent having an influence of VMS pings in a completely different area)
+>spatBound <- list(x=c(-5,10),y=c(48,62)) #Spatial boundaries of approx the North Sea
+>idxlon              <- which(tacsatp$SI_LONG >= spatBound$x[1] & tacsatp$SI_LONG <= spatBound$x[2])
+>idxlat              <- which(tacsatp$SI_LATI >= spatBound$y[1] & tacsatp$SI_LATI <= spatBound$y[2])
+>tacsatp             <- tacsatp[idxlon[which(idxlon %in% idxlat)],]
+
+#Let's make a quick graph
+plotTools(tacsatp,level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm="SI_INTV"))
+</code>
+Ok, all the data has been cleaned, the interval rate has been calculated (optional, otherwise VMS pings will be taken as a measure) and roughly the North Sea area has been selected. Now onto calculating the indicators!
+<code>
+#Set a working directory where the files will be written to disk
+>setwd("D:/")
+>ind5                <- indicators( indicatorNum=5,
+                                   tacsatp,
+                                   minThreshold=0, # percentage of points to be included in the Minimal Convex Polygon
+                                   cellresX=0.1,
+                                   cellresY=0.05,
+                                   calcAreaMethod="Trapezoid",
+                                   plotMapTF=T,
+                                   exportTableName="indicator5_01005",
+                                   exportGridName="indicator5_01005")
+>print(ind5)
+
+#Let's change the resolution of the calculated grid and see how the indicator values change
+>ind5_2                <- indicators( indicatorNum=5,
+                                   tacsatp,
+                                   minThreshold=0, # percentage of points to be included in the Minimal Convex Polygon
+                                   cellresX=0.05,
+                                   cellresY=0.025,
+                                   calcAreaMethod="Trapezoid",
+                                   plotMapTF=T,
+                                   exportTableName="",
+                                   exportGridName="")
+
+>cbind(ind5,ind5_2)
+</code>
+That was DCF indicator number 5, and changing the resolution made quite a change. Let's move on to indicator number 6 and 7.
+<code>
+>ind6 <- indicators(indicatorNum=6,
+           tacsatp,
+           pctThreshold=90,
+           cellresX=0.01,
+           cellresY=0.05,
+           calcAreaMethod="Trapezoid",
+           plotMapTF=TRUE,
+           exportTableName="",
+           exportGridName="")
+
+#And now indicator number 7
+>ind7 <- indicators(indicatorNum=7,
+           tacsatp, 
+           ltGear=c("TBB","OTB"),
+           inShapeArea="",
+           cellresX=0.01,
+           cellresY=0.05, 
+           calcAreaMethod="Trapezoid",
+           minThreshold=0,
+           plotMapTF=TRUE,
+           exportGridName="")
+</code>
+For most I assume, these calculations are like a black box. This doesn't mean you cannot use them, Read up carefully on the help files, perhaps even look at the code. And once you want to compare indicator values across nations, whereby the assumptions on how to calculate the indicators isn't clear yet, this might serve you well. 
+
+However, if you want or need full control, you might be better of by calculating these indicators all by yourself. Find below some instructions on how to get started!
+
+== Calculating indicators tailor-made == 
