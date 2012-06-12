@@ -145,4 +145,4 @@ We have the choice to interpolate the data or not, but to keep things simple, we
                    resx=0.1,resy=0.05) #Let's take a tenth of an ICES rectangle for a start
 </code>
 
-So far so good, you've all seen these preparation steps a number of times now, it's good to learn them by hart as you need to get over these time and time again (look at [Practical2])
+So far so good, you've all seen these preparation steps a number of times now, it's good to learn them by hart as you need to get over these time and time again (look at [Practicals2])
