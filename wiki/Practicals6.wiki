@@ -133,7 +133,7 @@ We have the choice to interpolate the data or not, but to keep things simple, we
 >table(tacsatp$LE_GEAR)
 >gears <- c("OTB","PTB","TBB")
 >tacsatp <- subset(tacsatp,LE_GEAR%in% gears)
->gearWidth <- list(OTB=87,PTB=2*87,TBB=24)
+>gearWidth <- data.frame(LE_GEAR=gears,LE_WIDTH=c(87,2*87,24))
 
 #Define the grid & subset the area
 >spatBound <- list(x=c(-5,10),y=c(48,62))
@@ -145,4 +145,11 @@ We have the choice to interpolate the data or not, but to keep things simple, we
                    resx=0.1,resy=0.05) #Let's take a tenth of an ICES rectangle for a start
 </code>
 
-So far so good, you've all seen these preparation steps a number of times now, it's good to learn them by hart as you need to get over these time and time again (look at [Practicals2])
+So far so good, you've all seen these preparation steps a number of times now, it's good to learn them by hart as you need to get over these time and time again (look at [Practicals2]). 
+
+The next step is to start calculating the area trawled for each VMS ping. It might be handy here to store the results by year in some sort of dataframe again, so you can access it later and also derive other results from it.
+
+Area trawled = duration of trawling * width of gear * speed of a vessel
+Let's work this equation out for each of the VMS pings in the dataset.
+<code>
+>
