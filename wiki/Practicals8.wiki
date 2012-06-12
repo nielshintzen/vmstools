@@ -27,13 +27,31 @@ The habitat map is a shapefile and we'll make some plots first to see what it is
 #We can simply plot it
 >plot(habitat) #But it doesn't make much sense...
 >names(habitat)
+>slotNames(habitat)
+#The way the file is constructed is that it has a large number of polygons (167). 
+#Each of these polygons can be associated with e.g. substrate or salinity. 
+#The same polygons are used for substrate and salinity but the polygons belonging to the same substrate is not necessarily the same polygons that belong to the same salinity value. 
 
 #Let's plot the substrate types around the North Sea
 >require(maps);require(mapdata)
->map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=T,col="darkgreen"); >map.axes()
+>map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=T,col="darkgreen"); 
 #What substrate levels do we have?
 >levels(habitat$substrate) #apparently 7 different substrates
 #Define 7 different colors
 >colrs <- c(
 "lightblue","brown","yellow","slategray","green","red",
 "blue")
+#Turn the polygons into spatial polygons
+>sp <- SpatialPolygons(habitat@polygons)
+#Look at the order of plotting
+>sp@plotOrder
+>plot(sp,col=colrs[an(habitat$substrate)],border=colrs[an(habitat$substrate)],add=T)
+>lcolrs <- length(colrs)+1
+>legend("bottomleft",legend=c("Land",levels(habitat$substrate)),
+        lwd=c(1,1,1,1),lty=rep(NA,10),pch=rep(22,lcolrs),ncol=2,
+        col=rep("black",lcolrs), pt.bg=c("darkgreen",colrs),pt.cex=rep(3,lcolrs),box.lty=1,box.lwd=2,
+        y.intersp=1.5,title="Substrate type",bg="white",cex=0.5)
+>map.axes()
+</code>
+You might get puzzled from such shapefiles but after a while you'll get a grip on how to handle those! Let's see if we can link VMS pings with substrate type. We must be careful now however. This particular shapefile contains polygons inside polygons. So, if we test if one VMS ping is inside any of the polygons, it might hit 'yes' more than once. So, which one is the right one? Luckily, the file also comes with a plotting order, we need to watch that!
+<code>
