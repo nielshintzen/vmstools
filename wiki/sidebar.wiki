@@ -9,7 +9,7 @@
     * [Practicals6 P6: Calculating indicators at different spatial scales]
     * [Practicals7 P7: Plotting, exporting to GIS and FishFrame]
     * [Practicals8 P8: How to link VMS data with other spatial datasets]
-  * [VMStools workflow example scripts]
+  * VMStools workflow example scripts
     * [examples_coupling Coupling VMS and Logbooks]
     * [MetiersLogbook Define metiers]
     * [DCFIndicators Calculate indicators]
