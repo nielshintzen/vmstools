@@ -109,3 +109,34 @@ For most I assume, these calculations are like a black box. This doesn't mean yo
 However, if you want or need full control, you might be better of by calculating these indicators all by yourself. Find below some instructions on how to get started!
 
 == Calculating indicators tailor-made == 
+For a start, let's take a simple indicator to calculate ourselves. Let's define: the total surface area trawled by year. What we need to do for this exercise is:
+  # clean the tacsat and eflalo data
+  # merge them together
+  # perform activity analyses and take fishing activity only
+  # select bottom trawling gear only
+  # define the width of the gear
+  # define the grid
+
+We have the choice to interpolate the data or not, but to keep things simple, we will not do that here. Obviously, the function to add a width to a gear, seen before, could be useful. However, we take less of a true spatial approach here (for most spatial analyses, your data structure is fine as vectors rather than a grid!), whereby the 'addWidth' function would simply take too long to run.
+
+<code>
+>data(tacsat);data(eflalo)
+
+#Now clean the tacsat and eflalo dataset...
+>tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+>tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+
+#Again, the quick and dirty fishing activity analyses
+>tacsatp <- filterTacsat(tacsatp,st=c(2,6),hd=NULL,remDup=T)
+
+#Select gears
+>table(tacsatp$LE_GEAR)
+>gears <- c("OTB","PTB","TBB")
+>tacsatp <- subset(tacsatp,LE_GEAR%in% gears)
+>gearWidth <- list(OTB=87,PTB=2*87,TBB=24)
+
+#Define the grid
+>spatBound <- list(x=c(-5,10),y=c(48,62))
+>idxlon    <- which(tacsatp$SI_LONG >= spatBound$x[1] & tacsatp$SI_LONG <= spatBound$x[2])
+>idxlat    <- which(tacsatp$SI_LATI >= spatBound$y[1] & tacsatp$SI_LATI <= spatBound$y[2])
+>tacsatp   <- 
