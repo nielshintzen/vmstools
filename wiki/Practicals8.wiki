@@ -1,0 +1,10 @@
+= How to link VMS data with other spatial datasets =
+
+== Introduction ==
+The number of VMS data requests and analyses have gone up tremendously over the past years. The number of papers written on VMS analyses have followed this increase too. Many of them deal with issues like: how should you clean your data, how should you link VMS and logbook data, what grid size is best to use and also how to calculate your indicators. This already shows that although most of the tools are available, at the advisory level, no consensus has been reached as yet on how exactly to tackle these issues.
+
+At the same time, VMS and logbook data are associated with confidentiality issues, which makes it much more difficult to combine datasets of different nations. Although VMStools presents a framework that can be applied by many different nations at exactly the same manner, also combined with the FishFrame database that might hold VMS data at some point, no such results have been reported yet. 
+
+Most of you are here however to do science, and contributing to the discussions outlined above might not be as satisfactory for you. Well, here is a challenge! So far, hardly any papers have discussed the relationship between VMS and covariates as temperature, seabed or wave hight. Why not? Potentially because it is difficult to line all these different datasets up and do the statistics. 
+
+Within this practical I'll show you how you can start exploring these interesting aspects, which was one of the core goals to develop VMStools: to quickly deal with the 'un-interesting stuff' of cleaning and linking and get to the explanatory relationships as soon as possible!
