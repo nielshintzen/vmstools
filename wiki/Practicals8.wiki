@@ -55,3 +55,5 @@ The habitat map is a shapefile and we'll make some plots first to see what it is
 </code>
 You might get puzzled from such shapefiles but after a while you'll get a grip on how to handle those! Let's see if we can link VMS pings with substrate type. We must be careful now however. This particular shapefile contains polygons inside polygons. So, if we test if one VMS ping is inside any of the polygons, it might hit 'yes' more than once. So, which one is the right one? Luckily, the file also comes with a plotting order, we need to watch that!
 <code>
+#Let's take an example point, e.g. lon,lat = 4.8,54.2. This must be located inside 'Mud to sandy mud'
+>
