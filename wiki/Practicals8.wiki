@@ -26,10 +26,14 @@ The habitat map is a shapefile and we'll make some plots first to see what it is
 
 #We can simply plot it
 >plot(habitat) #But it doesn't make much sense...
+>names(habitat)
 
 #Let's plot the substrate types around the North Sea
 >require(maps);require(mapdata)
 >map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=T,col="darkgreen"); >map.axes()
-
-
-
+#What substrate levels do we have?
+>levels(habitat$substrate) #apparently 7 different substrates
+#Define 7 different colors
+>colrs <- c(
+"lightblue","brown","yellow","slategray","green","red",
+"blue")
