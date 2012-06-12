@@ -182,6 +182,29 @@ spgDF@data[ac(aggregate(subTacsat$TR_AREA,          by=list(idx),FUN=sum,na.rm=T
 }
 #Have a look at some data (where Y1800 is not zero)
 >head(spgDF@data[which(spgDF@data$Y1800>0),])
+
+#And calculate the indicator value
+>colSums(spgDF@data[,c("Y1800","Y1801")])
 </code>
 
+However, we just set this system up to be a bit more flexible and use the data for other questions too. Can we now easily move from total area trawled to percentage of the area untrawled? Or could we even see which area has been trawled in 1800 but not in 1801?
 
+<code>
+#Add surface of each gridcell to the dataframe
+>spgDF@data$surface <- surface(spgDF)$cellArea
+
+#Percentage trawled
+>idxun <- which(spgDF@data[,"Y1800"] == 0)
+>sum(spgDF@data$surface[idxun]) / sum(spgDF@data$surface)
+
+#Area trawled in 1800 but not in 1801
+>idx <- which(spgDF@data[,"Y1800"] > 0 & spgDF@data[,"Y1801"] == 0)
+>sum(spgDF@data$surface[idx]) / sum(spgDF@data$surface)
+</code>
+
+All in all, a lot to play with in a rather flexible way.
+
+=== Exercise 1 ===
+  # Calculate the total area trawled by the TBB gears only (in 1800)
+  # Calculate the proportion of the total surface the TBB has trawled (in 1800)
+  # In how many grid cells was the trawling intensity > 1? (i.e. where has the area trawled exceeded the surface of the area)
