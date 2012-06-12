@@ -152,4 +152,36 @@ The next step is to start calculating the area trawled for each VMS ping. It mig
 Area trawled = duration of trawling * width of gear * speed of a vessel
 Let's work this equation out for each of the VMS pings in the dataset.
 <code>
->
+>tacsatp <- sortTacsat(tacsatp)
+#Calculate duration of trawling per ping
+>tacsatp <- intervalTacsat(tacsatp,level="trip",fill.na=TRUE)
+>tacsatp$SI_INTV <- tacsatp$INTV
+>tacsatp$LE_WIDTH <- merge(tacsatp,gearWidth,by="LE_GEAR")$LE_WIDTH
+>tacsatp$TR_AREA <- (tacsatp$SI_INTV / 60) * (tacsatp$LE_WIDTH / 1000) * (tacsatp$SI_SP *1.852)
+</code>
+For the full tacsat dataset we have now calculated the area trawled per ping, however, not yet per year. We could easily split up the tacsat dataset into the two years (1800 and 1801) and aggregate over the trawled area column. But, as indicated before, if we want a bit more flexibility, it might be good to store the data first and perform calculations later-on. 
+<code>
+#Turn the defined grid into a spatial dataframe
+>sg <- SpatialGrid(grid=grd)
+>spgDF <- as(sg,"SpatialGridDataFrame")
+>slotNames(spgDF)
+#We can simply add a dataframe to this object (but make sure it has the same size as all coordinates considered!
+>spgDF@data <- data.frame("Y1800"=rep(0,nrow(coordinates(spgDF))),
+                          "Y1801"=rep(0,nrow(coordinates(spgDF))),
+                          surface=rep(0,nrow(coordinates(spgDF))))
+>head(spgDF@data)
+
+#Now align the VMS pings to the grid
+#We have to turn the coordinates of the tacsat dataset into spatial points first
+>for(iYr in c(1800:1801)){
+subTacsat <- subset(tacsatp,year(SI_DATIM)==iYr) 
+sp <- SpatialPoints(coordinates(subTacsat[,c("SI_LONG","SI_LATI")]))
+#The spatial grid dataframe is a long list (nrow(spgDF@data)) and the idx tells me which row number (associated with a grid cell) the VMS ping is located in.
+idx <- overlay(sg,sp)
+spgDF@data[ac(aggregate(subTacsat$TR_AREA,          by=list(idx),FUN=sum,na.rm=T)[,1]), paste("Y",iYr,sep="")]    <- aggregate(subTacsat$TR_AREA,  by=list(idx),FUN=sum,na.rm=T)[,2] 
+}
+#Have a look at some data (where Y1800 is not zero)
+>head(spgDF@data[which(spgDF@data$Y1800>0),])
+</code>
+
+
