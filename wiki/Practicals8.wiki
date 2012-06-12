@@ -8,3 +8,11 @@ At the same time, VMS and logbook data are associated with confidentiality issue
 Most of you are here however to do science, and contributing to the discussions outlined above might not be as satisfactory for you. Well, here is a challenge! So far, hardly any papers have discussed the relationship between VMS and covariates as temperature, seabed or wave hight. Why not? Potentially because it is difficult to line all these different datasets up and do the statistics. 
 
 Within this practical I'll show you how you can start exploring these interesting aspects, which was one of the core goals to develop VMStools: to quickly deal with the 'un-interesting stuff' of cleaning and linking and get to the explanatory relationships as soon as possible!
+
+== Getting and preparing spatial data ==
+One requirement of spatial data is that it contains some sort of position identifier. This could be a shapefile / polygon or a longitude-latitude position(like the start or midpoint of a survey trawl). 
+
+In this practical I'll show how to link VMS data with such a shapefile (habitat) and with some phyto plankton data.
+
+=== Link VMS with habitat ===
+The good thing about habitat (as in substrate) is that is doesn't change much over time. Once somebody has created a map, you can use it for quite some time and there is no need to update your code.
