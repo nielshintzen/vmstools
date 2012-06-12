@@ -14,5 +14,22 @@ One requirement of spatial data is that it contains some sort of position identi
 
 In this practical I'll show how to link VMS data with such a shapefile (habitat) and with some phyto plankton data.
 
-=== Link VMS with habitat ===
-The good thing about habitat (as in substrate) is that is doesn't change much over time. Once somebody has created a map, you can use it for quite some time and there is no need to update your code.
+=== Link VMS with habitat map ===
+The good thing about habitat (as in substrate) is that is doesn't change much over time. Once somebody has created a map, you can use it for quite some time and there is no need to update your code. Please now download the [http://code.google.com/p/vmstools/downloads/list HabitatMaps.zip], store it somewhere on your harddrive (somewhere easy, because you need to link to at later on) and unzip it!
+
+The habitat map is a shapefile and we'll make some plots first to see what it is all about. Thereafter we'll link VMS points up with the habitats and show where most of e.g. the beam trawling has taken place.
+
+<code>
+#Find the path to your habitat map 
+>path <- "D:/HabitatMaps/"
+>habitat <- readShapePoly(paste(path,"ModelledSeabedHabitats.shp",sep=""))
+
+#We can simply plot it
+>plot(habitat) #But it doesn't make much sense...
+
+#Let's plot the substrate types around the North Sea
+>require(maps);require(mapdata)
+>map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=T,col="darkgreen"); >map.axes()
+
+
+
