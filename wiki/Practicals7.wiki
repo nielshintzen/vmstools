@@ -1,5 +1,3 @@
-#summary One-sentence summary of this page.
-
 = Practical 7: Output to Fishframe and GIS =
 
 == Output to FishFrame ==
