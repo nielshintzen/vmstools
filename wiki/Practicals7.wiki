@@ -97,44 +97,58 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 #    if(!match('LE_MET_level6',colnames(eflalo))>0){
 #      eflalo$LE_MET_level6 <- eflalo$LE_MET
 #    }
+</code>
 
+=== In this example we run the code for a given set (50 random ones) of vessels in the year 1800. Since detectFishing = TRUE (see below) then the code is also detectingfishing activity using the built-in function segmentTacsatSpeed(). Note that this will overwrite the existing SI_STATE. First we set up some variables we need,ie. a year variable and a vector for the unique boat names and the number of boats to run through the code ===
 
+<code>  
+ 
+>tacsat$year <- as.numeric(format(tacsat$SI_DATIM, format = "%Y")) 
+>how.many.boats.in.tacsat <- length(unique(tacsat$VE_REF     [tacsat$year==1800]))  #Take data for 1800 
+>no.of.boats              <- 50 # lets's do 50 boats
+>which.boats <- unique(tacsat$VE_REF)[seq(1,how.many.boats.in.tacsat,length=no.of.boats)]
 
-  # TEST FOR A GIVEN SET OF VESSELS
-  # (if detect.fishing is true then do also detection of fishing *<br/>* activity
-  # e.g. if speed='segment' the segmentTacsatSpeed() automatic *<br/>* detection of fishing states
-  # that will overwrite the existing SI_STATE)
-  
-  tacsat$year <- as.numeric(format(tacsat$SI_DATIM, format = "%Y")) 
+</code>
 
-  how.many.boats.in.tacsat <- length(unique(tacsat$VE_REF[tacsat$year==1800]))  #Take data for 1800 
-  no.of.boats              <- 50 # lets's do 50 boats
-  which.boats <- unique(tacsat$VE_REF)[seq(1,how.many.boats.in.tacsat,length=no.of.boats)]
-  
-  unlink("c:\\output\\*") #delete everything in c:\\output to avoid confusion.
-  
-  mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=which.boats,
+=== This code writes data to the c:\\ drive so it's safe to clean it out first to avoid confusion:===
+
+<code>
+ >unlink("c:\\output\\*") #delete everything in c:\\output to avoid confusion.
+</code>
+
+=== Now run the main program that does all the work. You will note pictures popping up etc. These can all be found in c:\\output and describe the matching of the VMS to logbook data and how fishing was identified for each vessel ===
+
+<code>  
+ >mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=which.boats,
                      general=list(output.path=file.path("C:","output"),
                      visual.check=TRUE, detectFishing=TRUE, speed="segment",
                      what.speed="calculated"))
-  # ...OR APPLY FOR ALL VESSELS IN eflalo
-  #mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
+
+</code>
+
+=== Another option might be to run the code for ALL the vessels you have available. The code to do this is described below should you want to try...  === 
+<code>
+#>mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
 #                     general=list(output.path=file.path("C:","output"),
 #                     visual.check=TRUE, detectFishing=TRUE, speed="segment",
 #                     what.speed="calculated"))
-  gc(reset=TRUE)
 
-  ## load the merged output table for one vessel
-#  load(file.path("C:","output","merged_10_1800.RData"))
-#  
-#  merged.10 <- merged
-#
-#  # check the conservation of landings
-#  sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
-#  sum(eflalo[eflalo$VE_REF=="10","LE_KG_PLE"], na.rm=TRUE)
-#
+===Tidy up the crap in your R directory===
+<code>
+>gc(reset=TRUE)
+</code>
 
-   # ...or bind all vessels (keeping only some given species here)
+
+=== Similarly you might want to load the merged output table for one vessel, say vessel "10" for the year 1800 and check whether all the landings in eflalo (logbook) have actually been allocated to VMS positions, which we do below :===
+<code>
+>load(file.path("C:","output","merged_10_1800.RData"))
+>merged.10 <- merged
+
+>sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
+>sum(eflalo[eflalo$VE_REF=="10","LE_KG_PLE"], na.rm=TRUE)
+</code>
+
+=== Alternatively we can bind up all 50 vessels (keeping only some given species here)
   
   bindAllMergedTables (vessels=which.boats, a.year = "1800",
                       species.to.keep=c("PLE","COD","SOL","DAB","TUR"),
