@@ -24,15 +24,15 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 <code>
 
-# install the library
+# Install the library
 
 >library(vmstools)   
 
-# increase memory to maximum
+# Increase memory to maximum
 
 >memory.size(4000)  
 
-# install the logbook, VMS and harbour data
+# Install the logbook, VMS and harbour data
                      
 >data(eflalo)                            
 
@@ -42,36 +42,39 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 # Re-name the harbour database
                      
-euharbours <- harbours                
+>euharbours <- harbours                
 
 # Format the data as usual
 
-  eflalo <- formatEflalo(eflalo)
-  tacsat <- formatTacsat(tacsat)
+>eflalo <- formatEflalo(eflalo)
+>tacsat <- formatTacsat(tacsat)
 
 # Order tacsat chronologically with sortTacsat
 
-  tacsat <- sortTacsat(tacsat)
+>tacsat <- sortTacsat(tacsat)
 
 # Test whether VMS positions are in harbour or not
-  tacsat$SI_HARB <- NA
-  euharbours$Description <- euharbours$harbour
-  tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG),
+  
+>tacsat$SI_HARB <- NA
+>euharbours$Description <- euharbours$harbour
+>tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG),
                                    lat=anf(tacsat$SI_LATI),
                                    harbours=harbours,
                                    rowSize=30, returnNames=TRUE)
-  inHarb <- tacsat$SI_HARB
-  inHarb <- replace(inHarb, !is.na(inHarb), 1)
-  inHarb <- replace(inHarb, is.na(inHarb), 0)
-  inHarb <- as.numeric(inHarb)
+  
+>inHarb <- tacsat$SI_HARB
+>inHarb <- replace(inHarb, !is.na(inHarb), 1)
+>inHarb <- replace(inHarb, is.na(inHarb), 0)
+>inHarb <- as.numeric(inHarb)
 
-  # assign a trip identifier
-  tacsat$SI_FT <- 1 # init
-  idx <- which(inHarb==0)
-  tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
+# Assign a trip identifier
 
-  # keep 'out of harbour' points only
-  # (but keep the departure point and the arrival point lying in the *<br/>*  harbour)
+>tacsat$SI_FT <- 1 # init
+>idx <- which(inHarb==0)
+>tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
+
+# Keep 'out of harbour' points but also the departure and the arrival <br/>points
+
   startTrip <- c(diff(tacsat[,"SI_FT"]), 0)
   endTrip   <- c(0, diff(tacsat[,"SI_FT"]))
   tacsat[which(startTrip>0),"SI_FT"]  <-  tacsat[which(startTrip>0)+1,"SI_FT"] 
@@ -190,7 +193,5 @@ euharbours <- harbours
 
 vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","noutput"),a.year=2009, a.country="NLD") )
   ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","noutput"),a.year=2009, a.country="NLD") )
-
-
 
 
