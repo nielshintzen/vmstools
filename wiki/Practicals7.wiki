@@ -25,39 +25,31 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 ===Install the library===
 
 <code>
-
 >library(vmstools)   
-
 </code>
 
 ===Increase memory to maximum===
 
 <code>
-
 >memory.size(4000)  
-
 </code>
 
 ===Install the logbook, VMS and harbour data===
-                     
+   
+<code>                  
 >data(eflalo)                            
-
 >data(tacsat)        
-                      
->data(euharbours)   
+>data(euharbours)                        
+>euharbours <- harbours   
+</code>             
 
-# Re-name the harbour database
-                     
->euharbours <- harbours                
+===Format the data as usual===
 
-# Format the data as usual
-
+<code>
 >eflalo <- formatEflalo(eflalo)
 >tacsat <- formatTacsat(tacsat)
-
-# Order tacsat chronologically with sortTacsat
-
 >tacsat <- sortTacsat(tacsat)
+</code>
 
 # Test whether VMS positions are in harbour or not
   
