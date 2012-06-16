@@ -22,17 +22,23 @@
 ==Getting started==
 As usual we have to add the inbuilt data sets to R's search path, install the vmstools library, 'clean' and process the data prior to any analysis.
 
-<code>
+===Install the library===
 
-# Install the library
+<code>
 
 >library(vmstools)   
 
-# Increase memory to maximum
+</code>
+
+===Increase memory to maximum===
+
+<code>
 
 >memory.size(4000)  
 
-# Install the logbook, VMS and harbour data
+</code>
+
+===Install the logbook, VMS and harbour data===
                      
 >data(eflalo)                            
 
@@ -73,19 +79,24 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 >idx <- which(inHarb==0)
 >tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
 
-# Keep 'out of harbour' points but also the departure and the arrival <br/>points
+# Keep 'out of harbour' points but also the departure and the arrival points.
 
-  startTrip <- c(diff(tacsat[,"SI_FT"]), 0)
-  endTrip   <- c(0, diff(tacsat[,"SI_FT"]))
-  tacsat[which(startTrip>0),"SI_FT"]  <-  tacsat[which(startTrip>0)+1,"SI_FT"] 
-  tacsat[which(endTrip<0),"SI_FT"]    <-  tacsat[which(endTrip<0)-1,"SI_FT"] 
-  tacsat <- tacsat[which(inHarb==0 |  startTrip>0 |  endTrip<0),]
+>startTrip <- c(diff(tacsat[,"SI_FT"]), 0)
+>endTrip   <- c(0, diff(tacsat[,"SI_FT"]))
+>tacsat[which(startTrip>0),"SI_FT"]  <-  tacsat[which(startTrip>0)+1,"SI_FT"] 
+>tacsat[which(endTrip<0),"SI_FT"]    <-  tacsat[which(endTrip<0)-1,"SI_FT"] 
+ >tacsat <- tacsat[which(inHarb==0 |  startTrip>0 |  endTrip<0),]
 
 
-  # assign a state to each ping (here, useless if detectFishing at TRUE)*<br/>* 
-  tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
-  # fake speed rule for fishing state
-  tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
+# Assign activity state (e.g. fishing v steaming) to each ping. Note that this is optional.
+#If detectFishing = TRUE in mergeEflalo2Pings the function/code will do this part ) 
+
+>tacsat$SI_STATE <- 2 # init (1 = fishing; 2 = steaming)
+
+  
+# Rule for fishing state based on speed.
+  
+tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
 
 
   # reduce the size of the eflalo data by merging species
@@ -193,5 +204,3 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","noutput"),a.year=2009, a.country="NLD") )
   ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","noutput"),a.year=2009, a.country="NLD") )
-
-
