@@ -209,14 +209,59 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 == Output to more formal GIS: ==
 
-=== Run the same code as described above but add in the argument
+=== Run similar code as described above but add in the argument: ===
+<code>
+
+# Set up desired grid size and range
+>grid.size <- 0.06
+>we <- -3
+>ea <- 10
+>so <- 49
+>no <- 59
+
+#Directory to put output file in and name of file
+
+>setwd('c://output')
+>outfile <- 'fishlandings.asc'
+
+#Run the function vmsGridGreate which has an option to output an ASCII grid that is in ArcView format but can be read by other GIS programs
+
+>output.mat<-vmsGridCreate(df2, we=we,ea=ea,so=so,no=no,nameLon = "SI_LONG", nameLat = "SI_LATI",plotMap=F,
+nameVarToSum="LE_KG_PLE",cellsizeX = grid.size, cellsizeY = grid.size,
+legendx="bottomright",numCats=9,plotPoints=F,legendncol=2,legendtitle="kgs",outGridFile=outfile)
+
+</code>
+
+== Now go get and install QGIS (http://www.qgis.org/). Find the file fishlandings.asc in c:\\output and load into QGIS as a raster layer. Other options are to produce the output in Google Earth see below: ===
+
+<code>
+
+===Another free and very good GIS system is Google Earth which you can use easily with our vmstools library: ===
+<code>
+# Create an output file
+
+fn<-'landings'
+
+# Run the function Grid2KML:
+
+Grid2KML(output.mat=output.mat,what.quantity = 'kgs',kmlfile=paste(fn,'.kml',sep=''),imagefile=paste(fn,'.png',sep=''))
+
+# Go to c":\\output and click on the kml file to examine your data in GE.
+</code>
 
 
 
-vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", we = 3, ea = 6, so = 50, no = 54,
-                nameVarToSum = what.species.to.map,cellsizeX =0.05,
-                cellsizeY =0.05,  legendtitle = paste(substr(what.species.to.map,7,9)," landings (kg)")
-                , plotPoints =TRUE, breaks0=c(1,4,8,16,32,64,100000))
+
+
+
+
+
+
+
+
+
+
+
 
 
  
