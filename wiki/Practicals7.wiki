@@ -2,7 +2,7 @@
 
 = Practical 7: Output to Fishframe and GIS =
 
-== Introduction ==
+== Output to FishFrame ==
 
   * Here we describe a method due to Bastardie et at. (2010) for simultaneously coupling VMS and logbook data and then distributing the landings or their cash values between among VMS positions estimated to be actively fishing.
 
@@ -99,10 +99,9 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 #    }
 </code>
 
-=== In this example we run the code for a given set (50 random ones) of vessels in the year 1800. Since detectFishing = TRUE (see below) then the code is also detectingfishing activity using the built-in function segmentTacsatSpeed(). Note that this will overwrite the existing SI_STATE. First we set up some variables we need,ie. a year variable and a vector for the unique boat names and the number of boats to run through the code ===
+=== In this example we run the code for a given set (50 random ones) of vessels in the year 1800. Since detectFishing = TRUE (see below) then the code is also detecting fishing activity using the built-in function segmentTacsatSpeed(). [Note that this will overwrite the existing SI_STATE]. First we set up some variables we need,ie. a year variable, and a vector for the unique boat names and also the total number of boats that we intend to output data for ===
 
 <code>  
- 
 >tacsat$year <- as.numeric(format(tacsat$SI_DATIM, format = "%Y")) 
 >how.many.boats.in.tacsat <- length(unique(tacsat$VE_REF     [tacsat$year==1800]))  #Take data for 1800 
 >no.of.boats              <- 50 # lets's do 50 boats
@@ -206,6 +205,11 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 </code>
 
-=== Note that the file of interest is in c:\\output and is called for this run of the script, NLD1800_VD.csv. Open it in Wordpad or similar and have a look at it ===
+=== Note that the file of interest (FishFrame format) will be in c:\\output and is called for this run of the script, NLD1800_VD.csv. Open it in Wordpad or similar and have a look at it ===
+
+== Output to more formal GIS ==
+
+
+
 
  
