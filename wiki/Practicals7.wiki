@@ -2,7 +2,27 @@
 
 = Practical 7: Output to Fishframe and GIS =
 
-Add your content here.
+== Introduction ==
+
+# Here we describe a method due to Bastardie et at. (2010) for simultaneously coupling VMS and logbook data and then distributing the landings or their cash values between among VMS positions estimated to be actively fishing.
+
+The first step is to work out the proximity of each VMS data point to each fishing port.  Linking of each VMS trip to each logbook trip is done by assigning a common identifier by searching for the nearest trip among all logbook trips based on the temporal mid-point of trips.  Note: that the method described here differs from that due to Hintzen and described in Practical ?????
+
+After linking gear types can be assigned to each VMS position thus enabling fishing activity or otherwise to be identified using segmented regression describer earlier. 
+
+The next step of the process is to evaluate the consistency between each data sources (VMS vs logbook) which is described by Bastardie et al. (2010). 
+
+In a final step, the landings (in both weight and cash value) declared in the logbooks (byICES rectangle) scale from logbooks are further allocated to each VMS position. 
+
+The data can then be reshaped and aggregated into any other format. R-scripts like the one described below for our 'Atlantis' data can be run on VMS and logbook data for different countries to produce aggregated datasets in common formats that can be combined and exchanged without violoting data protection laws. The scripting method ensures that each dataset is processed in an identical way and is repeatable.
+
+
+
+
+
+
+
+
 
 
 = Details =
