@@ -24,28 +24,36 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 <code>
 
-library(vmstools)                       # install the library
+# install the library
 
+>library(vmstools)   
 
-memory.size(4000)                       # increase memory to maximum
+# increase memory to maximum
 
-data(eflalo)                            # install the logbook data from Atlantis
+>memory.size(4000)  
 
-data(tacsat)                            # install the VMS data from Atlantis
-  
-data(euharbours)                        # install the fishing habour database
+# install the logbook, VMS and harbour data
+                     
+>data(eflalo)                            
 
-euharbours <- harbours                  # re-name the harbour database
+>data(tacsat)        
+                      
+>data(euharbours)   
 
+# Re-name the harbour database
+                     
+euharbours <- harbours                
 
-# format
+# Format the data as usual
+
   eflalo <- formatEflalo(eflalo)
   tacsat <- formatTacsat(tacsat)
 
-  # order tacsat chronologically with sortTacsat
+# Order tacsat chronologically with sortTacsat
+
   tacsat <- sortTacsat(tacsat)
 
-  # test each ping if in harbour or not
+# Test whether VMS positions are in harbour or not
   tacsat$SI_HARB <- NA
   euharbours$Description <- euharbours$harbour
   tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG),
@@ -63,7 +71,7 @@ euharbours <- harbours                  # re-name the harbour database
   tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
 
   # keep 'out of harbour' points only
-  # (but keep the departure point and the arrival point lying in the harbour)
+  # (but keep the departure point and the arrival point lying in the *<br/>*  harbour)
   startTrip <- c(diff(tacsat[,"SI_FT"]), 0)
   endTrip   <- c(0, diff(tacsat[,"SI_FT"]))
   tacsat[which(startTrip>0),"SI_FT"]  <-  tacsat[which(startTrip>0)+1,"SI_FT"] 
@@ -71,7 +79,7 @@ euharbours <- harbours                  # re-name the harbour database
   tacsat <- tacsat[which(inHarb==0 |  startTrip>0 |  endTrip<0),]
 
 
-  # assign a state to each ping (here, useless if detectFishing at TRUE)
+  # assign a state to each ping (here, useless if detectFishing at TRUE)*<br/>* 
   tacsat$SI_STATE <- 2 # init (1: fishing; 2: steaming)
   # fake speed rule for fishing state
   tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
@@ -97,8 +105,8 @@ euharbours <- harbours                  # re-name the harbour database
 #
 
   # TEST FOR A GIVEN SET OF VESSELS
-  # (if detect.fishing is true then do also detection of fishing activity
-  # e.g. if speed='segment' the segmentTacsatSpeed() automatic detection of fishing states
+  # (if detect.fishing is true then do also detection of fishing *<br/>* activity
+  # e.g. if speed='segment' the segmentTacsatSpeed() automatic *<br/>* detection of fishing states
   # that will overwrite the existing SI_STATE)
   
   tacsat$year <- as.numeric(format(tacsat$SI_DATIM, format = "%Y")) 
@@ -182,8 +190,6 @@ euharbours <- harbours                  # re-name the harbour database
 
 vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","noutput"),a.year=2009, a.country="NLD") )
   ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","noutput"),a.year=2009, a.country="NLD") )
-
-
 
 
 
