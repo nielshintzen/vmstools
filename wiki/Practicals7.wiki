@@ -132,6 +132,7 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 #                     general=list(output.path=file.path("C:","output"),
 #                     visual.check=TRUE, detectFishing=TRUE, speed="segment",
 #                     what.speed="calculated"))
+</code>
 
 ===Tidy up the crap in your R directory===
 <code>
@@ -148,55 +149,63 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 >sum(eflalo[eflalo$VE_REF=="10","LE_KG_PLE"], na.rm=TRUE)
 </code>
 
-=== Alternatively we can bind up all 50 vessels (keeping only some given species here)
-  
-  bindAllMergedTables (vessels=which.boats, a.year = "1800",
+=== Alternatively we can bind up all 50 vessels keeping the file sizes manageable by selecting just a few species :===
+<code>  
+>bindAllMergedTables (vessels=which.boats, a.year = "1800",
                       species.to.keep=c("PLE","COD","SOL","DAB","TUR"),
                       folder = file.path("C:","output"),
                       all.in.one.table=TRUE)
+</code>
 
-    # ...and load the merged output table for all vessels
-  
+=== We then load up the merged output table for all 50 vessels: ===
+<code> 
   load(file.path("C:","output","all_merged__1800.RData"))
+</code>
 
-  # map landing of cod from all studied vessels
-  # ( with debugging if tacsat has not been cleaned earlier)
-  graphics.off()
+=== Switch graphics off ===
+<code>
+>graphics.off()
+</code>
+
+===Map the data:===
+<code>
+# Select columns of interest
+>df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD","LE_KG_PLE","LE_KG_SOL","LE_KG_DAB","LE_KG_TUR")]
+>df1$SI_LONG <- anf(df1$SI_LONG)
+>df1$SI_LATI <- anf(df1$SI_LATI)
+>df1 <-   df1[ !is.na(df1$SI_LATI),]
+>df1 <-   df1[ !is.na(df1$SI_LONG),]
+
+#Chose species to look at
+  
+>what.species.to.map <- "LE_KG_PLE" 
+  
+#Remove steaming points before plotting:
  
-  df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD","LE_KG_PLE","LE_KG_SOL","LE_KG_DAB","LE_KG_TUR")]
+>df2<-df1[-which(is.na(df1[,what.species.to.map])),]
   
-  
-  df1$SI_LONG <- anf(df1$SI_LONG)
-  df1$SI_LATI <- anf(df1$SI_LATI)
-  df1 <-   df1[ !is.na(df1$SI_LATI),]
-  df1 <-   df1[ !is.na(df1$SI_LONG),]
-  
-  what.species.to.map <- "LE_KG_PLE"
-  
- 
- # but you need to remove steaming points before gridding!
- 
-  df2<-df1[-which(is.na(df1[,what.species.to.map])),]
-  
-  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", we = 3, ea = 6, so = 50, no = 54,
+>vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", we = 3, ea = 6, so = 50, no = 54,
                 nameVarToSum = what.species.to.map,cellsizeX =0.05,
                 cellsizeY =0.05,  legendtitle = paste(substr(what.species.to.map,7,9)," landings (kg)")
                 , plotPoints =TRUE, breaks0=c(1,4,8,16,32,64,100000))
 
+</code>
 
+=== Now convert to FishFrame format which might take some time running. By default this function will keep all the species in the output table===
+<code>
+# First bind up all the tables in c:\\output
 
-  # CONVERT TO FISHFRAME FORMAT (might take some time running)
-  # (by default, this will keep all the species in the output table)
-  tmp <- bindAllMergedTables (vessels=which.boats,
+>tmp <- bindAllMergedTables (vessels=which.boats,
                               species.to.keep=character(),
                               folder = file.path("C:","output"),
                               all.in.one.table=FALSE)
+#Now create FishFrame data
 
-  ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
+>ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
                           a.year=1800, a.country="NLD") )
 
-  
-## End(Not run)
+</code>
 
-vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","noutput"),a.year=2009, a.country="NLD") )
-  ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","noutput"),a.year=2009, a.country="NLD") )
+=== Note that the file of interest is in c:\\output and is called for this run of the script, NLD1800_VD.csv. Open it in Wordpad or similar and have a look at it ===
+
+ 
