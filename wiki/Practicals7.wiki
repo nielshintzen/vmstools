@@ -6,7 +6,7 @@
 
   * Here we describe a method due to Bastardie et at. (2010) for simultaneously coupling VMS and logbook data and then distributing the landings or their cash values among VMS positions estimated to be actively fishing.
 
-  * The first step is to work out the proximity of each VMS data point to each fishing port.  Linking each VMS trip to each logbook trip is done by searching for the nearest trip among all logbook trips based on the temporal mid-point of trips.  Note: that the method described here differs from that due to Hintzen and described in Practical ?????
+  * The first step is to work out the proximity of each VMS data point to each fishing port.  Linking each VMS trip to each logbook trip is done by searching for the nearest trip among all logbook trips based on the temporal mid-point of trips.  Note: that the method described here differs from that due to Hintzen and described in Practical 3.
 
   * After linking VMS and logbook data, gear types can be assigned to each VMS position enabling fishing activity, or otherwise, to be identified using the segmented regression approach described earlier. 
 
@@ -22,19 +22,13 @@
 ==Getting started==
 As usual we have to add the inbuilt data sets to R's search path, install the vmstools library, and 'clean' the data prior to any analysis.
 
-===Install the library:===
+Loading the library, a usual start to every analyses.
 
 <code>
 >library(vmstools)   
 </code>
 
-===Increase memory to maximum:===
-
-<code>
->memory.size(4000)  
-</code>
-
-===Install the logbook, VMS and harbour data:===
+Hereafter, as we've seen before, we need to load the logbook, VMS and harbour data to have access to these data sources.
    
 <code>                  
 >data(eflalo)                            
@@ -43,7 +37,7 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 >euharbours <- harbours   
 </code>             
 
-===Format the data as usual:===
+As usual, and especially necessary for your own data, format the data.
 
 <code>
 >eflalo <- formatEflalo(eflalo)
@@ -51,7 +45,7 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 >tacsat <- sortTacsat(tacsat)
 </code>
 
-===Test whether VMS positions are in harbour or not:===
+The code that turns the data into FishFrame data has a slightly different setup than the other function's you've seen so far. Especially the way logbook and VMS data are linked is different and it requires a pre-definition of point ins harbour. Here we test whether VMS positions are in harbour or not.
 
 <code>  
 >tacsat$SI_HARB <- NA
@@ -67,7 +61,7 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 >inHarb <- as.numeric(inHarb)
 </code>
 
-===Assign a trip identifier:===
+Once we've defined which points are in harbour, the functionality requires some sort of trip identifier.
 
 <code>
 >tacsat$SI_FT <- 1 # init
@@ -76,7 +70,7 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 </code>
 
-===Keep 'out of harbour' points but also the departure and the arrival points:===
+Linking logbooks and VMS is defined based on mid-points of trips and therefore requires points outside of a harbour but also the departure and arrival dates.
 
 <code>
 >startTrip <- c(diff(tacsat[,"SI_FT"]), 0)
@@ -86,20 +80,20 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
  >tacsat <- tacsat[which(inHarb==0 |  startTrip>0 |  endTrip<0),]
 </code>
 
-===Assign activity state (e.g. fishing v steaming) to each ping. Note that this is optional. If detectFishing = TRUE in mergeEflalo2Pings then the function/code will do this part automatically. You might want, for example, to apply your own rules to identify fishing. You can do it here setting detectFishing = FALSE ===
+Now assign activity state (e.g. fishing v steaming) to each ping. Note that this is optional. If detectFishing = TRUE in mergeEflalo2Pings then the function/code will do this part automatically. You might want, for example, to apply your own rules to identify fishing. You can do it here setting detectFishing = FALSE
 <code>
 >tacsat$SI_STATE <- 2 # init (1 = fishing; 2 = steaming)
 >tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
 </code>
 
- === Sometimes you get naming mistakes and below is some example code that might be useful to deal with these: ===
+Sometimes you get naming mistakes and below is some example code that might be useful to deal with these:
 <code>
 #    if(!match('LE_MET_level6',colnames(eflalo))>0){
 #      eflalo$LE_MET_level6 <- eflalo$LE_MET
 #    }
 </code>
 
-=== In this example we run the code for a given set (50 random ones) of vessels in the year 1800. Since detectFishing = TRUE (see below) then the code is also detecting fishing activity using the built-in function segmentTacsatSpeed(). [Note that this will overwrite the existing SI_STATE]. First we set up some variables we need,ie. a year variable, and a vector for the unique boat names and also the total number of boats that we intend to output data for. ===
+In this example we run the code for a given set (50 random ones) of vessels in the year 1800. Since detectFishing = TRUE (see below) then the code is also detecting fishing activity using the built-in function segmentTacsatSpeed(). [Note that this will overwrite the existing SI_STATE]. First we set up some variables we need,ie. a year variable, and a vector for the unique boat names and also the total number of boats that we intend to output data for.
 
 <code>  
 >tacsat$year <- as.numeric(format(tacsat$SI_DATIM, format = "%Y")) 
@@ -109,13 +103,13 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 </code>
 
-=== This code writes data to the c:\\ drive so it's safe to clean it out first to avoid confusion:===
+This code writes data to the c:\\ drive so it's safe to clean it out first to avoid confusion:
 
 <code>
  >unlink("c:\\output\\*") #delete everything in c:\\output to avoid confusion.
 </code>
 
-=== Now run the main program that does all the work. You will note pictures popping up etc. These can all be found in c:\\output and describe the matching of the VMS to logbook data and how fishing was identified for each vessel. ===
+Now run the main program that does all the work. You will note pictures popping up etc. These can all be found in c:\\output and describe the matching of the VMS to logbook data and how fishing was identified for each vessel.
 
 <code>  
  >mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=which.boats,
@@ -125,7 +119,7 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 </code>
 
-=== Another option might be to run the code for ALL the vessels you have available. The code to do this is described below should you want to try...  === 
+Another option might be to run the code for ALL the vessels you have available. The code to do this is described below should you want to try...
 <code>
 #>mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat,
 #                     general=list(output.path=file.path("C:","output"),
@@ -133,13 +127,13 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 #                     what.speed="calculated"))
 </code>
 
-===Tidy up the crap in your R directory===
+Tidy up the results in your R directory
 <code>
 >gc(reset=TRUE)
 </code>
 
 
-=== Similarly you might want to load the merged output table for one vessel, say vessel "10" for the year 1800 and check whether all the landings in eflalo (logbook) have actually been allocated to VMS positions, which we do below:===
+Similarly you might want to load the merged output table for one vessel, say vessel "10" for the year 1800 and check whether all the landings in eflalo (logbook) have actually been allocated to VMS positions, which we do below:
 <code>
 >load(file.path("C:","output","merged_10_1800.RData"))
 >merged.10 <- merged
@@ -148,7 +142,7 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 >sum(eflalo[eflalo$VE_REF=="10","LE_KG_PLE"], na.rm=TRUE)
 </code>
 
-=== Alternatively we can bind up all 50 vessels keeping the file sizes manageable by selecting just a few species:===
+Alternatively we can bind up all 50 vessels keeping the file sizes manageable by selecting just a few species:
 <code>  
 >bindAllMergedTables (vessels=which.boats, a.year = "1800",
                       species.to.keep=c("PLE","COD","SOL","DAB","TUR"),
@@ -156,17 +150,17 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
                       all.in.one.table=TRUE)
 </code>
 
-=== We then load up the merged output table for all 50 vessels: ===
+We then load up the merged output table for all 50 vessels:
 <code> 
   load(file.path("C:","output","all_merged__1800.RData"))
 </code>
 
-=== Switch graphics off ===
+Switch graphics off
 <code>
 >graphics.off()
 </code>
 
-===Map the data:===
+Time to map the data!
 <code>
 # Select columns of interest
 >df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD","LE_KG_PLE","LE_KG_SOL","LE_KG_DAB","LE_KG_TUR")]
@@ -190,7 +184,7 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 </code>
 
-=== Now convert to FishFrame format which might take some time running. By default this function will keep all the species in the output table===
+Now convert to FishFrame format which might take some time running. By default this function will keep all the species in the output table
 <code>
 # First bind up all the tables in c:\\output
 
@@ -205,11 +199,11 @@ As usual we have to add the inbuilt data sets to R's search path, install the vm
 
 </code>
 
-=== Note that the file of interest (FishFrame format) will be in c:\\output and is called for this run of the script, NLD1800_VD.csv. Open it in Wordpad or similar and have a look at it ===
+Note that the file of interest (FishFrame format) will be in c:\\output and is called for this run of the script, NLD1800_VD.csv. Open it in Wordpad or similar and have a look at it
 
-== Output to more formal GIS: ==
+==Output to more formal GIS:==
 
-=== Run similar code as described above but add in the argument: ===
+Run similar code as described above but add in the argument.
 <code>
 
 # Set up desired grid size and range
@@ -232,11 +226,11 @@ legendx="bottomright",numCats=9,plotPoints=F,legendncol=2,legendtitle="kgs",outG
 
 </code>
 
-== Now go get and install QGIS (http://www.qgis.org/). Find the file fishlandings.asc in c:\\output and load into QGIS as a raster layer. Other options are to produce the output in Google Earth see below: ===
+Now go get and install QGIS (http://www.qgis.org/). Find the file fishlandings.asc in c:\\output and load into QGIS as a raster layer. Other options are to produce the output in Google Earth see below:
 
 <code>
 
-===Another free and very good GIS system is Google Earth which you can use easily with our vmstools library: ===
+Another free and very good GIS system is Google Earth which you can use easily with our vmstools library:
 <code>
 # Create an output file
 
