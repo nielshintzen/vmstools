@@ -66,7 +66,7 @@ You might get puzzled from such shapefiles but after a while you'll get a grip o
 >idx <- overlay(spo,sp); print(idx)
 >habitat$substrate[idx]
 </code>
-That wasn't too difficult, and you didn't notice the polygon inside polygon issue at all. That is how nice these things could work. However, if you want / need to do these calculations yourself (because you not only want to perform these analyses, but also want to fully understand what is going on), here is some Do It Yourself code!
+That wasn't too difficult, and you didn't notice the polygon inside polygon issue at all. That is how nice these things could work. Note that you can have multiple points inside the SpatialPoints. However, if you want / need to do these calculations yourself (because you not only want to perform these analyses, but also want to fully understand what is going on), here is some Do It Yourself code!
 <code>
 #Create a vector with zeros representing each of the polygons
 # Note that for our point can be inside more than one polygon, therefore we have one value (zero or one) for each polygon.
@@ -82,3 +82,24 @@ That wasn't too difficult, and you didn't notice the polygon inside polygon issu
 >print(habitat$substrate[idx])
 #This is tricky, we need to define in which substrate the point lies but keep track of the plot order!
 >habitat$substrate[idx][which.max(order(habitat@plotOrder)[idx])]
+</code>
+The main 'engine' of most of these calculations is the point.in.polygon function which is very powerful, but the way it's code above is very inefficient for just one point!
+
+Time to find some relationships. Let's take some beamtrawl fishers only and see what type of substrate they normally trawl. Do you have a gut-feeling already?
+<code>
+>data(tacsat);data(eflalo)
+>tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+>tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+>tacsat  <- subset(tacsatp,LE_GEAR == "TBB")
+>tacsat  <- sortTacsat(tacsat)
+>tacsat  <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
+
+#All the preparation is done now, let's overlay these VMS points with the habitat map (I am interested in substrate)
+>spo     <- SpatialPoints(coordinates(tacsat[,c("SI_LONG","SI_LATI")]))
+>sp      <- SpatialPolygons(habitat@polygons)
+>idx     <- overlay(spo,sp) #Get a cup of coffee, this might take a while...!
+>tacsat$SUBSTRATE <- habitat$substrate[idx]
+>table(tacsat$SUBSTRATE)
+
+</code>
+=== Link VMS with phyto plantkon map ===
