@@ -55,5 +55,30 @@ The habitat map is a shapefile and we'll make some plots first to see what it is
 </code>
 You might get puzzled from such shapefiles but after a while you'll get a grip on how to handle those! Let's see if we can link VMS pings with substrate type. We must be careful now however. This particular shapefile contains polygons inside polygons. So, if we test if one VMS ping is inside any of the polygons, it might hit 'yes' more than once. So, which one is the right one? Luckily, the file also comes with a plotting order, we need to watch that!
 <code>
-#Let's take an example point, e.g. lon,lat = 4.8,54.2. This must be located inside 'Mud to sandy mud'
->
+#Let's take an example point, e.g. lon,lat = 4.8,54.2. This must be located inside 'Mud to sandy mud'. However, we must be careful here, as the point will be inside more than 1 polygon of the dataset!
+<code>
+#First the easy and automated way
+>pnt <- c(4.8,54.2)
+#Turn the point into a spatial point
+>spo <- SpatialPoints(coordinates(data.frame(SI_LONG=pnt[1],
+                                            SI_LATI=pnt[2])))
+#Use the magic 'overlay' function to see in which polygon it is located
+>idx <- overlay(spo,sp); print(idx)
+>habitat$substrate[idx]
+</code>
+That wasn't too difficult, and you didn't notice the polygon inside polygon issue at all. That is how nice these things could work. However, if you want / need to do these calculations yourself (because you not only want to perform these analyses, but also want to fully understand what is going on), here is some Do It Yourself code!
+<code>
+#Create a vector with zeros representing each of the polygons
+# Note that for our point can be inside more than one polygon, therefore we have one value (zero or one) for each polygon.
+>insidePols <- rep(0,length(habitat@polygons))
+>for(i in 1:length(habitat@polygons)){
+  for(j in 1:length(habitat@polygons[[i]]@Polygons)){
+    pol <- coordinates(habitat@polygons[[i]]@Polygons[[j]])
+    insidePols[i] <- max(insidePols[i],point.in.polygon(pnt[1],pnt[2],pol[,1],pol[,2]))
+  }
+}
+#Check inside which polygon our point is situated
+>idx <- which(insidePols == 1)
+>print(habitat$substrate[idx])
+#This is tricky, we need to define in which substrate the point lies but keep track of the plot order!
+>habitat$substrate[idx][which.max(order(habitat@plotOrder)[idx])]
