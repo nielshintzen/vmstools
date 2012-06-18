@@ -102,7 +102,7 @@ Time to find some relationships. Let's take some beamtrawl fishers only and see 
 >table(tacsat$SUBSTRATE)
 </code>
 
-=== Link VMS with phyto plantkon map ===
+=== Link VMS with phyto plankton map ===
 Some datasets however, we'd like to link to VMS, change considerably over time. Think for example about seabirds following fishing vessels, the benthic community composition during a year or phytoplankton abundance in the North Sea. This requires us to 'overlay' the VMS and other datasets in both time and space. This is obviously different from the exercise above where we were only overlaying space.
 
 As an example, we will use the phytoplankton distribution data that can be downloaded as [http://code.google.com/p/vmstools/downloads/list a34phy040616.txt]. Again, download it to a place from where you can easily read it in. This dataset only represents 2 weeks of data, and can therefore only be associated with 2 weeks of VMS pings too! Let's get started!
@@ -154,4 +154,3 @@ That was just linking the two datasets, however, we would like do some sort of a
 === Exercise 1 ===
   # There is an option to change from grid to a 'distance' based calculation in the 'clipObs2Tacsat' function. Perform the same analyses as above, but now with method="euclidean" and threshold = 10km. 
   # How many records are returned in the first analyses and how many in the second, can you explain the difference
-
