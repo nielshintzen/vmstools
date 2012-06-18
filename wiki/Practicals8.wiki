@@ -100,6 +100,58 @@ Time to find some relationships. Let's take some beamtrawl fishers only and see 
 >idx     <- overlay(spo,sp) #Get a cup of coffee, this might take a while...!
 >tacsat$SUBSTRATE <- habitat$substrate[idx]
 >table(tacsat$SUBSTRATE)
-
 </code>
+
 === Link VMS with phyto plantkon map ===
+Some datasets however, we'd like to link to VMS, change considerably over time. Think for example about seabirds following fishing vessels, the benthic community composition during a year or phytoplankton abundance in the North Sea. This requires us to 'overlay' the VMS and other datasets in both time and space. This is obviously different from the exercise above where we were only overlaying space.
+
+As an example, we will use the phytoplankton distribution data that can be downloaded as [http://code.google.com/p/vmstools/downloads/list a34phy040616.txt]. Again, download it to a place from where you can easily read it in. This dataset only represents 2 weeks of data, and can therefore only be associated with 2 weeks of VMS pings too! Let's get started!
+<code>
+#Only use the VMS data in this instance
+>data(tacsat)
+>tacsat <- sortTacsat(tacsat)
+
+#Read in the phytoplankton data
+>path2phyto <- "D:/"
+>phyto <- read.table(paste(path2phyto,"a34phy040616.txt",sep=""))
+>phyto <- as.matrix(phyto)
+>phyto[which(phyto == -99)][] <- NA
+>phyto <- t(phyto)[,dim(phyto)[1]:1]
+>image(phyto)
+#You can see the contours of the UK and the Netherlands & Denmark and even the southern part of Norway in there. Right the area most of our VMS pings are situated as well.
+
+#Although missing from the phyto file, we know what grid cell resolution is associated with this data. 
+>dimnames(phyto) <- rev(list(lat=seq(48.3833,65.9833,1/10)+1/20,lon=seq(-4.1667,13.1667,1/6)[1:83]+1/12))
+
+#The phyto file is currently a matrix, but it would be easier to handle if it would be a data.frame with longitude and latitude columns.
+>df <- expand.grid(SI_LONG=dimnames(phyto)[[1]],SI_LATI=dimnames(phyto)[[2]])
+>df$SI_LONG <- anf(df$SI_LONG); df$SI_LATI <- anf(df$SI_LATI)
+>df$PHYTO <- c(phyto)
+#Let's only save those records with data
+>df <- subset(df,is.na(df$PHYTO)==F)
+</code>
+
+The data needs to get a time stamp too, because it only represents 2 weeks (and allows you to add more weeks of data below the current data in the same dataframe). In that way, you can link your VMS with e.g. a whole year of phytoplankton data at once.
+
+<code>
+>df$SI_DATIM <- as.POSIXct("25-06-1800 14:00",format="%d-%m-%Y %H:%M")
+
+#Now link the phytoplankton data to the VMS pings
+res <- clipObs2Tacsat(tacsat,df,method="grid",control.grid=list(resx=0.1,resy=0.05,gridBbox="obs"),temporalRange=c(-(7*24*60),(7*24*60)),all.t=F)
+</code>
+That was just linking the two datasets, however, we would like do some sort of analyses with it. Perhaps associate each VMS ping with a phytoplankton value!
+<code>
+>head(res[[1]]) #The total observation dataset, now gridded with grid index value
+>head(res[[2]]) #All the linked VMS points, also with grid index value
+>tacsatLinked <- res[[2]] 
+>tacsatLinked$PHYTO <- res[[1]]$PHYTO[match(res[[2]]$GR_ID,tacsatLinked$GR_ID)]
+
+#A completely arbitrary picture of the results
+# Do they fish harder when there is more phytoplankton?
+>plot(tacsatLinked$SI_SP~tacsatLinked$PHYTO,xlab="Phytoplankton abundance",ylab="Speed (knots)",pch=19)
+</code>
+
+=== Exercise 1 ===
+  # There is an option to change from grid to a 'distance' based calculation in the 'clipObs2Tacsat' function. Perform the same analyses as above, but now with method="euclidean" and threshold = 10km. 
+  # How many records are returned in the first analyses and how many in the second, can you explain the difference
+
