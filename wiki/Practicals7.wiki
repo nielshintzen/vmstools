@@ -245,7 +245,9 @@ Grid2KML(output.mat=output.mat,what.quantity = 'kgs',kmlfile=paste(fn,'.kml',sep
   # Go and install QGIS (http://www.qgis.org/) which is free and useful GIS system. 
   # Find an .asc file in c:\\output output by vmsGridCreate and load into QGIS as a raster layer. 
   # In QGIS apply a color scale to the monochrome grid that you should be able to see.
-  # In QGIS convert this 'raster' file to a 'vector' file format (e.g. shapefile), save it to disk and then import into R and plot. The idea here is just to show that vmstools need not be used in isolation from more formal GIS, and that many spatial file formats can be handled in R, in and out which they can be readily exchanged. 
+  # In QGIS convert this 'raster' file to a 'vector' file format (e.g. shapefile), save it to disk and then import into R and plot. 
+
+Note that the idea here is just to show that vmstools need not be used in isolation from more formal GIS, and that many spatial file formats can be handled in R. Furthermore you don't have to pay for good GIS systems either! Udig is another good option by the way http://udig.refractions.net/.
 
   
 
