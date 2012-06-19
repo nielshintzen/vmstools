@@ -224,10 +224,10 @@ legendx="bottomright",numCats=9,plotPoints=F,legendncol=2,legendtitle="kgs",outG
 
 </code>
 
-Now go get and install QGIS (http://www.qgis.org/). Find the file fishlandings.asc in c:\\output and load into QGIS as a raster layer.  Another free and very good GIS system is Google Earth which you can also use easily with our vmstools library:
+ A free and actually very good GIS system is Google Earth which you can also use easily with our vmstools library (note that GE avoids the problems of 'projections' because it is all actually done on the surface of a sphere):
 
 <code>
-# Create an output file
+# Create an output filename
 
 fn<-'landings'
 
@@ -235,12 +235,13 @@ fn<-'landings'
 
 Grid2KML(output.mat=output.mat,what.quantity = 'kgs',kmlfile=paste(fn,'.kml',sep=''),imagefile=paste(fn,'.png',sep=''))
 
-# Go to c":\\output and click on the kml file to examine your data in GE.
+# If Google Earth is not already installed on your machine, do so and then go to the directory, c:\\output, click on the kml file there and examine your data!
 </code>
 
-=== Exercise 1 ===
-  # Create raster files/grids/matrices for the weight and value of sole and plot them in R.
-  # Import one of these raster (.asc) files created above into QGIS, and apply a color scale to the grid.
+=== Exercises ===
+  # Go and install QGIS (http://www.qgis.org/) which is free and useful GIS system. 
+  # Find an .asc file in c:\\output output by vmsGridCreate and load into QGIS as a raster layer. 
+  # In QGIS apply a color scale to the grid you will see.
   # In QGIS convert this 'raster' file to a 'vector' file format (e.g. shapefile), save it to disk and then import into R and plot.
 
   
