@@ -240,8 +240,8 @@ Grid2KML(output.mat=output.mat,what.quantity = 'kgs',kmlfile=paste(fn,'.kml',sep
 
 === Exercise 1 ===
   # Create raster files/grids/matrices for the weight and value of sole and plot them in R.
-  # Import one of these raster (.asc) files created above into QGIS, and apply a color scale to the map.
-  # In QGIS convert the raster file to a vector file format (e.g. shapefile), save it to disk and then import into R.
+  # Import one of these raster (.asc) files created above into QGIS, and apply a color scale to the grid.
+  # In QGIS convert this 'raster' file to a 'vector' file format (e.g. shapefile), save it to disk and then import into R and plot.
 
   
 
