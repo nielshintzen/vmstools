@@ -224,7 +224,8 @@ legendx="bottomright",numCats=9,plotPoints=F,legendncol=2,legendtitle="kgs",outG
 
 </code>
 
- A free and actually very good GIS system is Google Earth which you can also use easily with our vmstools library (note that GE avoids the problems of 'projections' because it is all actually done on the surface of a sphere):
+ A free and actually very good GIS system is Google Earth which you can also use easily with our vmstools library (note that GE avoids the problems of 'projections' because it is all actually done on the surface of a sphere). If Google Earth is not already installed on your machine, do so now! 
+
 
 <code>
 # Create an output filename
@@ -235,14 +236,16 @@ fn<-'landings'
 
 Grid2KML(output.mat=output.mat,what.quantity = 'kgs',kmlfile=paste(fn,'.kml',sep=''),imagefile=paste(fn,'.png',sep=''))
 
-# If Google Earth is not already installed on your machine, do so and then go to the directory, c:\\output, click on the kml file there and examine your data!
+#  Now if you go to the directory, c:\\output, and doubleclick on the kml file there Google Earth will open automatically upon which your data will be superimposed!
+
+
 </code>
 
 === Exercises ===
   # Go and install QGIS (http://www.qgis.org/) which is free and useful GIS system. 
   # Find an .asc file in c:\\output output by vmsGridCreate and load into QGIS as a raster layer. 
-  # In QGIS apply a color scale to the grid you will see.
-  # In QGIS convert this 'raster' file to a 'vector' file format (e.g. shapefile), save it to disk and then import into R and plot.
+  # In QGIS apply a color scale to the monochrome grid that you should be able to see.
+  # In QGIS convert this 'raster' file to a 'vector' file format (e.g. shapefile), save it to disk and then import into R and plot. The idea here is just to show that vmstools need not be used in isolation from more formal GIS, and that many spatial file formats can be handled in R, in and out which they can be readily exchanged. 
 
   
 
