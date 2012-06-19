@@ -224,11 +224,8 @@ legendx="bottomright",numCats=9,plotPoints=F,legendncol=2,legendtitle="kgs",outG
 
 </code>
 
-Now go get and install QGIS (http://www.qgis.org/). Find the file fishlandings.asc in c:\\output and load into QGIS as a raster layer. Other options are to produce the output in Google Earth see below:
+Now go get and install QGIS (http://www.qgis.org/). Find the file fishlandings.asc in c:\\output and load into QGIS as a raster layer.  Another free and very good GIS system is Google Earth which you can also use easily with our vmstools library:
 
-<code>
-
-Another free and very good GIS system is Google Earth which you can use easily with our vmstools library:
 <code>
 # Create an output file
 
