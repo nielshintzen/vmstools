@@ -8,7 +8,7 @@ Return the interval time between pings of one vessel or at the trip level. Inter
 is calculated based on ping x and ping x-1 or ping x and ping x+1.
 }
 \usage{
-intervalTacsat(tacsat, level,weight,fill.NA)
+intervalTacsat(tacsat, level,weight,fill.na)
 }
 \arguments{
   \item{tacsat}{tacsat dataset}

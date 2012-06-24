@@ -39,8 +39,10 @@ tacsatTrip              <- subset(tacsat,FT_REF != 0)
 remainTacsat            <- sort(unique(tacsatTrip$ID))
 
   #- Subset eflalo file
-eflaloTrip              <- subset(eflalo,       FT_REF %in% sort(unique(tacsatTrip$FT_REF)))
-eflaloNoTrip            <- subset(eflalo,      !FT_REF %in% sort(unique(tacsatTrip$FT_REF)))
+eflalo$ID               <- 1:nrow(eflalo)
+eflaloTrip              <- subset(eflalo,       FT_REF %in% sort(unique(tacsatTrip$FT_REF)) & VE_REF %in% sort(unique(tacsatTrip$VE_REF)))
+#eflaloNoTrip            <- subset(eflalo,      !FT_REF %in% sort(unique(tacsatTrip$FT_REF)))
+eflaloNoTrip            <- eflalo[which(!eflalo$ID %in% eflaloTrip$ID),]
 #eflaloVessel            <- subset(eflaloNoTrip, VE_REF %in% sort(unique(tacsatTrip$VE_REF)))
 #eflaloNoVessel          <- subset(eflaloNoTrip,!VE_REF %in% sort(unique(tacsatTrip$VE_REF)))
 eflaloVessel            <- eflaloNoTrip[which(paste(eflaloNoTrip$VE_REF,year(eflaloNoTrip$LE_CDATIM)) %in% unique(paste(tacsatTrip$VE_REF,year(tacsatTrip$SI_DATIM)))),]
@@ -101,7 +103,7 @@ if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
   #-------------------------------------------------------------------------------
 
   if(length(remainTacsat) > 0) warning("Not all tacsat records with tripnumber have been merged!!")
-
+  if(nrow(eflaloTrip) > 0) warning("Not all eflalo records with matching VMS tripnumber have been merged!!")
   if("day" %in% level){ tacsatFTREF <- rbind(byDayTacsat,byRectTacsat,byTripTacsat)
   } else {
       if("ICESrectangle" %in% level){ tacsatFTREF <- rbind(byRectTacsat,byTripTacsat)

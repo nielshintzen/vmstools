@@ -18,10 +18,16 @@ activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NUL
   \item{analyse.by}{Analyse tacsat by gear ("LE_GEAR") or vessel ("VE_REF").}
   \item{storeScheme}{If \code{\link{activityTacsatAnalyse}} is used, supply
         output here.}
+  \item{plot}{Logical. Whether the results of the fit of the normal distributions should be
+              plotted}
+  \item{level}{If analyse.by="LE_GEAR" is selected, there is an option to analyse
+               at vessel level too, but taking the gear parameter estimates as
+               starting values. level = "vessel" turns this option on.}
 }
 \details{
 The analyses assumes that the speed profile close to 0 can be mirrored to create
 a good normal distribution.
+Success of fit might depend on the initial guess in peaks or mean peak values.
 }
 \value{
 Returnes SI_STATE column. 1=In harbour. 2=Fishing. 3=Steaming.
@@ -46,15 +52,20 @@ tacsat          <- tacsatp
 #- Visual analyses of activity, and define number of peaks / kernels that can be
 #  observed (either 3 or 5)
 storeScheme   <- activityTacsatAnalyse(subset(tacsat,LE_GEAR == "OTM" &
-                      year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
+                      year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",identify="means")
 res           <- activityTacsat(subset(tacsat,LE_GEAR == "OTM" &
                       year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",
-                      storeScheme)
+                      storeScheme,plot=T)
+res           <- activityTacsat(subset(tacsat,LE_GEAR == "OTM" &
+                      year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",
+                      storeScheme,plot=T,level="vessel")
 
 #--------- VE_REF -----------
-tacsat        <- subset(tacsat,VE_REF == names(rev(sort(table(tacsat$VE_REF)))[1]))
-storeScheme   <- activityTacsatAnalyse(tacsat,units="year",analyse.by="VE_REF")
+tacsat        <- subset(tacsat,VE_REF == "801")
+storeScheme   <- activityTacsatAnalyse(tacsat,units="year",analyse.by="VE_REF",
+                                       identify="means")
 
 #- Run activityTacsat
-res           <- activityTacsat(tacsat,units="year",analyse.by="VE_REF",storeScheme)
+res           <- activityTacsat(tacsat,units="year",analyse.by="VE_REF",storeScheme,
+                                plot=T)
 }
