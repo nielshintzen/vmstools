@@ -14,7 +14,9 @@ R.Version()$version.string</code>
 If this says anything below R2.14.x, please upgrade. VMStools is still in development and R is as well. Over the past months considerable changes have taken place which do no not allow backwards compatibility of VMStools with older R versions.
 
 Now start a version of your favorite editor and start R. VMStools is an add-on package to R and depends on several other packages. Hence, before we can run VMStools, we need to install these other packages too. This is how you do that: 
-==== *Note that all code inside a grey box starting with '>' refers to output of R. If it has no '>' in front, it refers to code of R that can directly be copied into R (but preference is given to go through the code line by line, to look at intermediate results etc). ====
+
+*Note that all code inside a grey box starting with '>' refers to output of R. If it has no '>' in front, it refers to code of R that can directly be copied into R (but preference is given to go through the code line by line, to look at intermediate results etc).*
+
 <code>
 vmstoolsPackages <-
    c("amap","cluster","doBy","data.table","FactoMineR","foreign",
@@ -46,7 +48,7 @@ All functions available in VMStools are loaded now and available to you. Note th
 Getting your own data into R might be difficult right from the start, hence, we've attached some VMS and logbook data to the package itself which allows you to play with the package right away. You need to load these datasets first however. 
 
 <code>
-data(tacsat); data(eflalo)</code>
+data(tacsat); data(eflalo)
 
 #Let's have a look at what they look like
 str(tacsat)
