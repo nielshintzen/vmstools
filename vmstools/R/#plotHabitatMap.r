@@ -1,5 +1,8 @@
 plotHabitatMap <- function(read.in.shapefile=TRUE,what.habitat.grouping="Grouped",min.lon=-5, max.lon=10, min.lat=48, max.lat=62,OS='Windoze')
 {
+
+require(maps)
+require(mapdata)
 #what.habitat.grouping = "substrate"
 #what.habitat.grouping = "SubsGroups"
 #what.habitat.grouping ="EUSMRegion"
@@ -69,4 +72,45 @@ legend("bottomleft",legend=c("Land",ac(unique(habitat[[what.habitat.grouping]]))
 
 
 #OS <- 'Linux'
-#plot.habitat.map(read.in.shapefile=TRUE,what.habitat.grouping="SubsGrpPlu",min.lon= -5,max.lon=10, min.lat=45,max.lat=65)
+#plotHabitatMap(read.in.shapefile=TRUE,what.habitat.grouping="SubsGrpPlu",min.lon= -5,max.lon=10, min.lat=45,max.lat=65)
+
+
+map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=T,col="darkgreen");
+map.axes()
+
+sp <- SpatialPolygons(habitat@polygons)
+plot(sp,col=colrs[an(habitat$substrate)],
+     border=colrs[an(habitat$substrate)],add=T)
+     
+legend("bottomleft",legend=c("Land",levels(habitat$substrate)),
+        lwd=c(1,1,1,1),lty=rep(NA,10),pch=rep(22,lcolrs),ncol=2,
+        col=rep("black",lcolrs), pt.bg=c("darkgreen",colrs),pt.cex=rep(3,lcolrs),box.lty=1,box.lwd=2,
+        y.intersp=1.5,title="Substrate type",bg="white",cex=0.5)
+
+for(i in levels(habitat$substrate)){
+x11()
+        
+idx <- which(habitat$substrate == i)
+sp2 <- SpatialPolygons(habitat@polygons[idx])
+map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=T,col="darkgreen");
+title(i)
+map.axes()
+plot(sp2,col=colrs[an(habitat$substrate[idx])[order(sp2@plotOrder)]],
+     border=colrs[an(habitat$substrate[idx])[order(sp2@plotOrder)]],add=T)
+}
+
+
+pnt <- c(4.8,54.2) #Mud to sandy mut
+pnt <- c(0.7,58.72) #Mixed sediment
+pnt <- c(4.5,59.3) #Till
+pnt <- c(2,56) #Sand to muddy sand
+insidePols <- rep(0,length(habitat@polygons))
+for(i in 1:length(habitat@polygons)){
+  for(j in 1:length(habitat@polygons[[i]]@Polygons)){
+    pol <- coordinates(habitat@polygons[[i]]@Polygons[[j]])
+    insidePols[i] <- max(insidePols[i],point.in.polygon(pnt[1],pnt[2],pol[,1],pol[,2]))
+  }
+}
+idx <- which(insidePols == 1)
+habitat$substrate[idx]
+habitat$substrate[idx][which.max(order(habitat@plotOrder)[idx])]
