@@ -291,7 +291,6 @@ for(i in 1:nrow(coords)){
         col=color[coords[i,"color"]],lwd=1,border=NA)
 }
 map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange,add=T) </code>
-</code>
 
 That gives us a nice picture, let's see where the original VMS datapoints were located!
 
