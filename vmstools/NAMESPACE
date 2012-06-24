@@ -99,6 +99,7 @@ export(
 "tacsatMCP",                      
 "tacsatMinimumConvexPolygon",
 "targetspecies",
+"tclWindows.r",
 "test.values",
 "transformation_proportion",
 "vmsGridCreate",
