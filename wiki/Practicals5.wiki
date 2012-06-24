@@ -18,69 +18,78 @@ In VMStools we only distinguish between two types of interpolation:
   # Cubic Hermite Spline interpolation (according to Hintzen et al. 2010, Fisheries Research)
 
 Although the technicalities might be a bit too much for you, the practical way is somewhat simpler. And if you are OK not to watch underneath the hood, you're fine as well.
+
 <code>
->data(tacsat)
+data(tacsat)
 #Sort the data and make a subset
->tacsat <- sortTacsat(tacsat)[1:1000,]
->tacsat <- filterTacsat(tacsat,st=c(2,6),hd=NULL,remDup=T)
+tacsat <- sortTacsat(tacsat)[1:1000,]
+tacsat <- filterTacsat(tacsat,st=c(2,6),hd=NULL,remDup=T)
 
 #Do not mind the large number of arguments here
 #Interpolate according to a straight line interpolation
->interpolationSL <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="SL",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolationSL <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="SL",params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
 #Interpolate according to the cubic-hermite spline interpolation
->interpolationcHs <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+interpolationcHs <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
 #The returned interpolation is a list, let's look at the first interpolation
->plot(interpolationSL[[1]][-1,],type="l",xlim=c(3.17,3.24))
->points(interpolationSL[[1]][c(2,101),],pch=19,col="blue")
->lines(interpolationcHs[[1]][-1,],col="red")
+plot(interpolationSL[[1]][-1,],type="l",xlim=c(3.17,3.24))
+points(interpolationSL[[1]][c(2,101),],pch=19,col="blue")
+lines(interpolationcHs[[1]][-1,],col="red")
 </code>
+
 Ok, we've managed to interpolate some of our data. Not in all instances interpolations were possible, as we only got:
+
 <code>
->length(interpolationSL)
->nrow(tacsat)
+length(interpolationSL)
+nrow(tacsat)
 </code>
+
 216 interpolations while we had 414 tacsat points. In theory (if they are all of the same vessel) we could have had 413 interpolations. 
 
 The format of the interpolation allows some 'lapply' functions to be executed directly on the object, in other cases however, it might be easier to convert the interpolated data back to the default tacsat format.
+
 <code>
->tacsatInt <- interpolation2Tacsat(interpolation,tacsat,npoints=10)
+tacsatInt <- interpolation2Tacsat(interpolation,tacsat,npoints=10)
+
 #Each interpolation is splitted into 10 equally spaced points (including the start and the end point). In total 8 new points are added per interpolation.
->nrow(tacsatInt)
->nrow(tacsat)
->(nrow(tacsatInt)-nrow(tacsat))/8 #I've seen that number before
+nrow(tacsatInt)
+nrow(tacsat)
+(nrow(tacsatInt)-nrow(tacsat))/8 #I've seen that number before
 
 #What is the distance traveled within each of these interpolations?
->sum(distanceInterpolation(interpolationSL))
->sum(distanceInterpolation(interpolationcHs))
+sum(distanceInterpolation(interpolationSL))
+sum(distanceInterpolation(interpolationcHs))
 </code>
+
 The only way to really test if either of these two interpolations is any better is test it against a much higher resolution dataset.
+
 <code>
 #Make use of a 6-minute interval dataset, and subset that every 120 minutes
->data(VMShf)
->colnames(VMShf) <- c("VE_REF","SI_LATI","SI_LONG","SI_SP","SI_HE","SI_DATIM")
->VMShf$VE_COU <- "Atlantis"
->VMShf$SI_DATE<- format(VMShf$SI_DATIM,format="%d/%m/%Y")
->VMShf$SI_TIME<- format(VMShf$SI_DATIM,format="%H:%M")
->VMShf <- formatTacsat(VMShf)
->VMShf <- sortTacsat(VMShf)
->VMShf <- filterTacsat(VMShf,st=c(2,6),hd=NULL,remDup=T)
-#cHs first
->cHs <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=1)
-#Then straight line
->SL <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="SL",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=1)
+data(VMShf)
+colnames(VMShf) <- c("VE_REF","SI_LATI","SI_LONG","SI_SP","SI_HE","SI_DATIM")
+VMShf$VE_COU <- "Atlantis"
+VMShf$SI_DATE<- format(VMShf$SI_DATIM,format="%d/%m/%Y")
+VMShf$SI_TIME<- format(VMShf$SI_DATIM,format="%H:%M")
+VMShf <- formatTacsat(VMShf)
+VMShf <- sortTacsat(VMShf)
+VMShf <- filterTacsat(VMShf,st=c(2,6),hd=NULL,remDup=T)
 
+#cHs first
+cHs <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=1)
+
+#Then straight line
+SL <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="SL",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=1)
 
 #Visualize the results
->plot(diffInter(cHs,VMShf)[,"mean"],pch=19,ylab="difference",ylim=c(0,10))
->abline(h=1,col=2)
->points(diffInter(SL,VMShf)[,"mean"],col="blue",pch=19)
->length(which(diffInter(cHs,VMShf)[,"mean"] < diffInter(SL,VMShf)[,"mean"]))
->sum(diffInter(cHs,VMShf)[,"mean"])
->sum(diffInter(SL,VMShf)[,"mean"])
-
+plot(diffInter(cHs,VMShf)[,"mean"],pch=19,ylab="difference",ylim=c(0,10))
+abline(h=1,col=2)
+points(diffInter(SL,VMShf)[,"mean"],col="blue",pch=19)
+length(which(diffInter(cHs,VMShf)[,"mean"] < diffInter(SL,VMShf)[,"mean"]))
+sum(diffInter(cHs,VMShf)[,"mean"])
+sum(diffInter(SL,VMShf)[,"mean"])
 </code>
+
 Obviously, we could do a bit of tuning here and there to make the performance of the interpolation even better, as this was just a quick and dirty example showing the benefits.
 
 === Exercise 1 ===
@@ -97,58 +106,72 @@ Especially when your study area is very small (e.g. only a few kilometers), it i
 
 First of all, select a vessel of which we know the gear width (e.g. a beam trawl has normally speaking twice 12 meter beams).
 <code>
->unique(subset(eflalo,LE_GEAR == "TBB"))$VE_REF[1]
->subTacsat <- subset(tacsatp,VE_REF == "238")
+unique(subset(eflalo,LE_GEAR == "TBB"))$VE_REF[1]
+subTacsat <- subset(tacsatp,VE_REF == "238")
 
 #Interpolate the dataset
->cHs <-interpolateTacsat(subTacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
+cHs <-interpolateTacsat(subTacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
 #Make a picture of all interpolations first
 #Get the ranges of the total picture
->ranges <- do.call(rbind,lapply(cHs,function(x){return(apply(x[-1,],2,range))}))
->xrange <- range(ranges[,"x"])
->yrange <- range(ranges[,"y"])
+ranges <- do.call(rbind,lapply(cHs,function(x){return(apply(x[-1,],2,range))}))
+xrange <- range(ranges[,"x"])
+yrange <- range(ranges[,"y"])
 
->plot(subTacsat$SI_LONG,subTacsat$SI_LATI,xlim=xrange,ylim=yrange,pch=19,col="blue",xlab="Longitude",ylab="Latitude")
->for(iInt in 1:length(cHs)){
+plot(subTacsat$SI_LONG,subTacsat$SI_LATI,xlim=xrange,ylim=yrange,pch=19,col="blue",xlab="Longitude",ylab="Latitude")
+for(iInt in 1:length(cHs)){
   lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2])}
 </code>
+
 What we now basically would like to do is something close to this:
+
 <code>
->>for(iInt in 1:length(cHs)){
+for(iInt in 1:length(cHs)){
   lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2],lwd=2)}
 </code>
+
 That did give it more wide gear tracks, but how wide are they really? The total distance from the left hand side of the picture to the right hand side equals aproximately:
+
 <code>
->distance(3.6,51.8,4.5,51.8) #~62km
+distance(3.6,51.8,4.5,51.8) #~62km
 </code>
+
 Nearly 62 km! So, using a thicker line to plot is not really accurate. Let's do it the 'right' way. 
+
 <code>
->interWidth <- addWidth(cHs,gearWidth=0.024)
->x11(); plot(interWidth); map.axes()
->points(subTacsat$SI_LONG,subTacsat$SI_LATI,col="blue",pch=19)
+interWidth <- addWidth(cHs,gearWidth=0.024)
+x11(); plot(interWidth); map.axes()
+points(subTacsat$SI_LONG,subTacsat$SI_LATI,col="blue",pch=19)
 </code>
+
 Again, you can question how useful this really is if you look at a picture with dimension 60x70km... It would be better to zoom in a bit more and have another look and compare the results with a 'normal' line drawing of R.
+
 <code>
 #Let's look at 2km width, how many degrees is that?
->distance(3.6,51.8,3.7,51.8) #0.1 degree longitude = 6.8km, so 1 km is 0.015 degree longitude. 
->distance(3.6,51.8,3.615,51.8)
+distance(3.6,51.8,3.7,51.8) #0.1 degree longitude = 6.8km, so 1 km is 0.015 degree longitude.
+distance(3.6,51.8,3.615,51.8)
+
 #In latitude, approx half of that step size
->distance(3.6,51.8,3.6,51.81)
+distance(3.6,51.8,3.6,51.81)
+
 #Take a VMS point and take 100meter on each side of it
->plot(interWidth,ylim=c(51.83098 - (0.0075),51.83098 + (0.0075 )),xlim=c(3.778870 - (0.015),3.778870 + (0.015)))
->points(subTacsat$SI_LONG,subTacsat$SI_LATI,pch=19)
->map.axes()
->for(iInt in 1:length(cHs)){
+plot(interWidth,ylim=c(51.83098 - (0.0075),51.83098 + (0.0075 )),xlim=c(3.778870 - (0.015),3.778870 + (0.015)))
+points(subTacsat$SI_LONG,subTacsat$SI_LATI,pch=19)
+map.axes()
+for(iInt in 1:length(cHs)){
   lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2],col="red")} #The interpolated line only
 </code>
+
 What you can see in the picture is the VMS point (the dot), the interpolated line (without gear width, in red) and the interpolated line with gear width in black squares. What happens under the hood is that for each little step taken in the interpolation (each interpolation consists of e.g. 100 small steps i.e. new points), it's bearing is calculated towards the next small step. Having this knowledge, the width of the gear must extend in a perpendicular direction (90 and -90 degrees from the heading of the vessel). Keeping this bearing for a distance equal to the width of the gear gives us the outer points of the black boxes. All black boxes are thereafter combined to give a fishing track. So, the function bearing plays an important role here, you might want to use it for other purposes too.
+
 <code>
->bearing(3.7,51.8,3.6,51.8) #heading into a 270 degree compass course
+bearing(3.7,51.8,3.6,51.8) #heading into a 270 degree compass course
+
 #If you are interested where you will end up with a certain bearing and distance to travel, you can use this
->distance(3.7,51.8,3.6,51.8) #what distance have I traveled?
->destFromBearing(3.7,51.8,270.0393,6.876387) #starting from the same point, traveling with the bearing and distance calculated, do I end up at the same point?
+distance(3.7,51.8,3.6,51.8) #what distance have I traveled?
+destFromBearing(3.7,51.8,270.0393,6.876387) #starting from the same point, traveling with the bearing and distance calculated, do I end up at the same point?
 </code>
+
 It is recommended to be specific when calculating the area trawled using the 'addWidth' functionality as it requires a very large number of calculations which will most certainly slow down your analyses.
 
 === Calculating uncertainty of interpolation ===
@@ -163,65 +186,70 @@ From the interpolation and VMS points itself we can already distill a bit of gui
 
 We like to do these calculations on a grid again, as that allows us to plot the results too. 
 <code>
->data(tacsat)
+data(tacsat)
 
 #Sort the Tacsat data
->tacsat     <- sortTacsat(tacsat)
->tacsat     <- tacsat[1:1000,]
+tacsat     <- sortTacsat(tacsat)
+tacsat     <- tacsat[1:1000,]
 
 #Filter the Tacsat data
->tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
+tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
 
 #Interpolate the VMS data
->interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
+interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
                    res=100,method="cHs",params=list(fm=0.5,distscale=20,
                    sigline=0.2,st=c(2,6)),headingAdjustment=0)
 
 #Create the final grid where all interpolations should fit on
->xrange        <- c(2.1,2.6); yrange <- c(51.3,51.65)
->grid          <- createGrid(xrange,yrange,resx=0.001,resy=0.0005)
->sPDF          <- createGrid(xrange,yrange,resx=0.001,resy=0.0005,type="SpatialPixelsDataFrame")
->sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
+xrange        <- c(2.1,2.6); yrange <- c(51.3,51.65)
+grid          <- createGrid(xrange,yrange,resx=0.001,resy=0.0005)
+sPDF          <- createGrid(xrange,yrange,resx=0.001,resy=0.0005,type="SpatialPixelsDataFrame")
+sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
 
->lon <- tacsat$SI_LONG[c(12,13)]
->lat <- tacsat$SI_LATI[c(12,13)]
+lon <- tacsat$SI_LONG[c(12,13)]
+lat <- tacsat$SI_LATI[c(12,13)]
 
->res <- calculateCI(intLon=lon,intLat=lat,vmsIdx1=12,vmsIdx2=13,VMS.=tacsat,
+res <- calculateCI(intLon=lon,intLat=lat,vmsIdx1=12,vmsIdx2=13,VMS.=tacsat,
             grid=grid,sPDF=sPDF,interpolation=interpolation,int=4,    
             params=list(fm=0.45,distscale=3.1,sigline=0.42,st=c(2,6)))
->res <- (res[[1]] - min(res[[1]])) / (max(res[[1]]) - min(res[[1]]))
+res <- (res[[1]] - min(res[[1]])) / (max(res[[1]]) - min(res[[1]]))
 
->levelplot(matrix(res,nrow=655,ncol=537))
+levelplot(matrix(res,nrow=655,ncol=537))
 </code>
 
 That was the code to just calculate one confidence interval. But what if I want the confidence interval of a whole trip. That requires a short loop! Let's see how far we get
+
 <code>
->data(tacsat)
+data(tacsat)
 
 #Sort the Tacsat data
->tacsat     <- sortTacsat(tacsat)
->tacsat     <- tacsat[1:1000,]
+tacsat     <- sortTacsat(tacsat)
+tacsat     <- tacsat[1:1000,]
 
 #Filter the Tacsat data
->tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
+tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
 #Interpolate the VMS data
->interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
+interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
                    res=100,method="cHs",params=list(fm=0.5,distscale=20,
                    sigline=0.2,st=c(2,6)),headingAdjustment=0)
 </code>
+
 Ok, data has been prepared and interpolated, now define the grid
+
 <code>
->ranges <- do.call(rbind,lapply(interpolation,function(x){return(apply(x[-1,],2,range))}))
->xrange        <- range(ranges[,1]); yrange <- range(ranges[,2])
->grid          <- createGrid(xrange,yrange,resx=0.01,resy=0.005)
->sPDF          <- createGrid(xrange,yrange,resx=0.01,resy=0.005,type="SpatialPixelsDataFrame")
->sPDF@data     <- data.frame(rep(1,length(sPDF@grid.index)))
->colnames(sPDF@data) <- "data" 
+ranges <- do.call(rbind,lapply(interpolation,function(x){return(apply(x[-1,],2,range))}))
+xrange        <- range(ranges[,1]); yrange <- range(ranges[,2])
+grid          <- createGrid(xrange,yrange,resx=0.01,resy=0.005)
+sPDF          <- createGrid(xrange,yrange,resx=0.01,resy=0.005,type="SpatialPixelsDataFrame")
+sPDF@data     <- data.frame(rep(1,length(sPDF@grid.index)))
+colnames(sPDF@data) <- "data"
 </code>
+
 I've created a data frame where I can store the chance that an area is untrawled, which obviously ranges between 0 and 1. I call this the sPDF (spatial data frame). Hereafter I need to fill the spatial dataframe based on the calculations of the CI. The functions returns the index of the dataframe where data on the CI should be stored (not in every grid cell, but just a selection) and the value of the CI cells.
+
 <code>
 #Start the loop
->for(iNt in 1:length(interpolation)){
+for(iNt in 1:length(interpolation)){
 print(iNt)
 resCI <- calculateCI(intLon=
               interpolation[[iNt]][c(2,nrow(interpolation[[iNt]])),1],
@@ -239,33 +267,40 @@ CI                      <- (resCI[[1]] - min(resCI[[1]])) /
 sPDF@data[idx,"data"]<- sPDF@data[idx,"data"] * (1-CI)
 }#end for loop
 </code>
+
 As I am only interested in those areas where I do have trawling, I just simply only use that part where the chance of no trawling is smaller than 1. Thereafter I associate the value of the data with a color, which makes it easier to plot afterwards.
+
 <code>
->idxwithdata <- which(sPDF@data<1)
->coords      <- data.frame(coordinates(sPDF[idxwithdata,]))
->coords$data <- sPDF@data[idxwithdata,]
->coords$color<- apply(abs(outer(seq(0,1,length.out=9),coords$data,"-")),2,which.min)
->xrange <- range(coords[,1]); yrange <- range(coords[,2])
->map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=c(yrange[1],54.6))
->map.axes()
->color <- rev(brewer.pal(9,"YlOrRd"))
+idxwithdata <- which(sPDF@data<1)
+coords      <- data.frame(coordinates(sPDF[idxwithdata,]))
+coords$data <- sPDF@data[idxwithdata,]
+coords$color<- apply(abs(outer(seq(0,1,length.out=9),coords$data,"-")),2,which.min)
+xrange <- range(coords[,1]); yrange <- range(coords[,2])
+map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=c(yrange[1],54.6))
+map.axes()
+color <- rev(brewer.pal(9,"YlOrRd"))
 </code>
+
 Time to plot, a for loop with polygon is not the best way to do it, but it works for now.
+
 <code>
->for(i in 1:nrow(coords)){
+for(i in 1:nrow(coords)){
   polygon(x=c(coords[i,1],coords[i,1]+0.01,coords[i,1]+0.01,coords[i,1]),
         y=c(coords[i,2],coords[i,2], 
             coords[i,2]+0.005,coords[i,2]+0.005),
         col=color[coords[i,"color"]],lwd=1,border=NA)
 }
->map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange,add=T) </code>
+map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange,add=T) </code>
+</code>
+
 That gives us a nice picture, let's see where the original VMS datapoints were located!
+
 <code>
 #compare to VMS points
->x11()
->map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=c(yrange[1],54.6)) 
->map.axes()
->points(tacsat$SI_LONG,tacsat$SI_LATI,col=1,pch=19,cex=0.5)
+x11()
+map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=c(yrange[1],54.6))
+map.axes()
+points(tacsat$SI_LONG,tacsat$SI_LATI,col=1,pch=19,cex=0.5)
 </code>
 
 That is pretty much all VMStools can help you with related to interpolations. Go ahead and have fun!

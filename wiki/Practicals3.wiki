@@ -10,9 +10,9 @@ If you still have an R version running with the results of the cleaning step, us
 
 == Linking VMS and logbook data ==
 <code>
->tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
->head(tacsatp)
-         VE_COU VE_REF  SI_LATI  SI_LONG    SI_DATE  SI_TIME SI_SP SI_HE            SI_DATIM INTV FT_REF
+tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+head(tacsatp)
+>         VE_COU VE_REF  SI_LATI  SI_LONG    SI_DATE  SI_TIME SI_SP SI_HE            SI_DATIM INTV FT_REF
 662894 Atlantis     10 51.67319 3.176576 05/05/1800  4:54:00     2    43 1800-05-05 04:54:00  116 272058
 662895 Atlantis     10 51.69432 3.229084 05/05/1800  6:48:00     2   294 1800-05-05 06:48:00  114 272058
 662896 Atlantis     10 51.65607 3.160989 05/05/1800  8:44:00     6   144 1800-05-05 08:44:00  116 272058
@@ -20,16 +20,18 @@ If you still have an R version running with the results of the cleaning step, us
 662898 Atlantis     10 51.57692 2.987796 05/05/1800 14:30:00     6   228 1800-05-05 14:30:00  230 272058
 662899 Atlantis     10 51.54655 2.876395 05/05/1800 16:24:00     7    50 1800-05-05 16:24:00  114 272058
 
->print(length(which(tacsatp$FT_REF == 0))) #number of records not able to link
+print(length(which(tacsatp$FT_REF == 0))) #number of records not able to link
 </code>
+
 What we can observe is that another column has been added to the 'tacsatp' object; namely the 'FT_REF' column. What happened 'under the hood' is the linking of VMS and logbook data, based on vessel name+year and time stamps, such that each VMS record would fall within the time frame of the departure and arrival of a logbook trip for that same vessel. Now we know which VMS record can be associated with which eflalo record. This now allows us to do some really cool things. Note that if no linking was possible, FT_REF equals "0" and this happens in many instances, e.g. when vessels are in harbour.
+
 <code>
 #Move the gear type from eflalo to tacsat
->tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
 
 #Let's see if it worked correctly
->subset(tacsatp,FT_REF == "326494")
-         VE_COU VE_REF  SI_LATI  SI_LONG    SI_DATE  SI_TIME SI_SP SI_HE            SI_DATIM INTV FT_REF LE_GEAR
+subset(tacsatp,FT_REF == "326494")
+>         VE_COU VE_REF  SI_LATI  SI_LONG    SI_DATE  SI_TIME SI_SP SI_HE            SI_DATIM INTV FT_REF LE_GEAR
 1019702 Atlantis    102 51.63328 3.480378 20/12/1801  7:16:00   0.6   354 1801-12-20 07:16:00  114 326494     DRB
 1019703 Atlantis    102 51.64547 3.462132 20/12/1801  9:12:00   0.0   258 1801-12-20 09:12:00  116 326494     DRB
 1019704 Atlantis    102 51.63715 3.447098 20/12/1801 11:06:00   0.0   280 1801-12-20 11:06:00  114 326494     DRB
@@ -37,8 +39,8 @@ What we can observe is that another column has been added to the 'tacsatp' objec
 1019706 Atlantis    102 51.63760 3.458493 20/12/1801 14:58:00   0.6   132 1801-12-20 14:58:00  116 326494     DRB
 1019707 Atlantis    102 51.64877 3.528120 20/12/1801 16:52:00   6.8    72 1801-12-20 16:52:00  114 326494     DRB
 
->subset(eflalo,FT_REF == "326494")
-      VE_REF VE_FLT   VE_COU VE_LEN VE_KW VE_TON FT_REF FT_DCOU FT_DHAR    FT_DDAT FT_DTIME FT_LCOU FT_LHAR    FT_LDAT FT_LTIME
+subset(eflalo,FT_REF == "326494")
+>      VE_REF VE_FLT   VE_COU VE_LEN VE_KW VE_TON FT_REF FT_DCOU FT_DHAR    FT_DDAT FT_DTIME FT_LCOU FT_LHAR    FT_LDAT FT_LTIME
 48267    102    DRB Atlantis     29   127     NA 326494     nld      NL 20/12/1801 06:00:00     nld      NL 20/12/1801 18:00:00
 </code>
 
@@ -56,14 +58,15 @@ Similar to the presentation, we will quickly look into four types of benefit
 === Distinguish fishery types ===
 Most often, fishery type is determined by the gear used (mesh size etc.) when fishing. As we have already assigned gear type from eflalo to tacsat, splitting the tacsat data up into bits per gear type is not too difficult.
 <code>
->TBB <- subset(tacsatp,LE_GEAR == "TBB")
->OTB <- subset(tacsatp,LE_GEAR == "OTB")
+TBB <- subset(tacsatp,LE_GEAR == "TBB")
+OTB <- subset(tacsatp,LE_GEAR == "OTB")
 
 #Let's see what speed profiles are associated with these fishery types
->par(mfrow=c(2,1))
->hist(TBB$SI_SP,breaks=100,xlim=c(0,20),xlab="Knots",main="TBB")
->hist(OTB$SI_SP,breaks=100,xlim=c(0,20),xlab="Knots",main="OTB")
+par(mfrow=c(2,1))
+hist(TBB$SI_SP,breaks=100,xlim=c(0,20),xlab="Knots",main="TBB")
+hist(OTB$SI_SP,breaks=100,xlim=c(0,20),xlab="Knots",main="OTB")
 </code>
+
 Do not close this picture immediately, it comes in handy in the next example. 
 
 === Define activity ===
@@ -81,70 +84,81 @@ I will present short examples of both methods.
 ==== Segmented Tacsat Speed ====
 Note that you can only run this example with 1 year of data!
 <code>
->tacsatp$idx       <- 1:nrow(tacsatp)
->tacsatp$LE_GEAR   <- af(tacsatp$LE_GEAR) #this needs to be a factor for the calculation that follows
->tmpPath          <- "D:/output/" #specify a temporary folder for output
->tacsatSegment     <- segmentTacsatSpeed(tacsatp[which(is.na(tacsatp$LE_GEAR)==F),],general=list(output.path=tmpPath,visual.check=F, a.year=c(1800)))
->tacsatp           <- merge(tacsatp,tacsatSegment[,c("idx","SI_STATE")],by=c("idx"),all.x=T)
+tacsatp$idx       <- 1:nrow(tacsatp)
+tacsatp$LE_GEAR   <- af(tacsatp$LE_GEAR) #this needs to be a factor for the calculation that follows
+tmpPath           <- "D:/output/" #specify a temporary folder for output
+tacsatSegment     <- segmentTacsatSpeed(tacsatp[which(is.na(tacsatp$LE_GEAR)==F),],general=list(output.path=tmpPath,visual.check=F, a.year=c(1800)))
+tacsatp           <- merge(tacsatp,tacsatSegment[,c("idx","SI_STATE")],by=c("idx"),all.x=T)
 
 #Lets look at the results, left = no-fishing, right = fishing
->spds <- table(tacsatp$SI_SP,tacsatp$SI_STATE)
->barplot(spds,names.arg=rep(dimnames(spds)[[1]],2),beside=T)
+spds <- table(tacsatp$SI_SP,tacsatp$SI_STATE)
+barplot(spds,names.arg=rep(dimnames(spds)[[1]],2),beside=T)
 </code>
+
 ==== activityTacsat ====
 This functionality works on more than 1 year and can be used to define activity of all similar gears or on a vessel level. In its most sophisticated form, it requires input from the user to determine peaks of fishing and no-fishing which will eventually result in better results. 
+
 <code>
->tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==T)] <- "NO_GEAR"
->tacsatp$LE_GEAR <- ac(tacsatp$LE_GEAR)
+tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==T)] <- "NO_GEAR"
+tacsatp$LE_GEAR <- ac(tacsatp$LE_GEAR)
 
 #Analyse a selection of the data, a window will pop-up!
->storeScheme   <- activityTacsatAnalyse(subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
->require(mixtools)
+storeScheme   <- activityTacsatAnalyse(subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
+require(mixtools)
+
 #After analysing the peaks, time to let the magic fit normal density distributions to the data
->res           <- activityTacsat(subset(tacsatp,LE_GEAR == "OTM" &
+res           <- activityTacsat(subset(tacsatp,LE_GEAR == "OTM" &
                       year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",storeScheme)
+
 #Make sure the same selection is used when writing the results to the original tacsat dataset
->tacsatSubset <- subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801 & is.na(SI_SP)==F)
->tacsatSubset$SI_STATE <- res
+tacsatSubset <- subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801 & is.na(SI_SP)==F)
+tacsatSubset$SI_STATE <- res
 
 #Lets look at the results
->spds <- table(tacsatSubset$SI_SP,tacsatSubset$SI_STATE)
->plot(y=spds[,1],x=an(dimnames(spds)[[1]]),type="h",ylim=range(spds),xlab="knots",ylab="Frequency")
->lines(y=spds[,2],x=(an(dimnames(spds)[[1]])+0.1),col=2,type="h")
->lines(y=spds[,3],x=(an(dimnames(spds)[[1]])+0.2),col=3,type="h")
->legend("topright",legend=c("No fishing","Fishing","Steaming"),col=1:3,box.lty=0,lwd=2,lty=1)
+spds <- table(tacsatSubset$SI_SP,tacsatSubset$SI_STATE)
+plot(y=spds[,1],x=an(dimnames(spds)[[1]]),type="h",ylim=range(spds),xlab="knots",ylab="Frequency")
+lines(y=spds[,2],x=(an(dimnames(spds)[[1]])+0.1),col=2,type="h")
+lines(y=spds[,3],x=(an(dimnames(spds)[[1]])+0.2),col=3,type="h")
+legend("topright",legend=c("No fishing","Fishing","Steaming"),col=1:3,box.lty=0,lwd=2,lty=1)
 </code>
+
 From both these examples you can tell already that it isn't easy to determine activity and it will most certainly take you a considerable amount of time to do this properly. However, it is very important as the results of this analyses are most often used as input to follow-up analyses!
 
 === Fine scale effort patterns ===
 With the gear type available in tacsat, we can now compare the effort available in the VMS data and compare that with the effort data in the logbooks. Therefore however, we must first calculate the effort of the VMS data. 
+
 <code>
->tacsatp <- sortTacsat(tacsatp) #Make sure it is ordered correctly
->tacsatp <- effort(tacsatp, level = "trip", unit = "hours",fill.na=T)
->eflalop <- effort(eflalo,level="trip",unit="hours",fill.na=T)
->eflalop$LE_EFF_LOG <- an(eflalop$LE_EFF_LOG)
+tacsatp <- sortTacsat(tacsatp) #Make sure it is ordered correctly
+tacsatp <- effort(tacsatp, level = "trip", unit = "hours",fill.na=T)
+eflalop <- effort(eflalo,level="trip",unit="hours",fill.na=T)
+eflalop$LE_EFF_LOG <- an(eflalop$LE_EFF_LOG)
 
 #Let's quickly introduce a plotting routine, you'll hear more about that later on in the course
->require(RColorBrewer)
+require(RColorBrewer)
+
 #First the tacsat effort
->plotTools(subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm="LE_EFF_VMS"))
+plotTools(subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm="LE_EFF_VMS"))
+
 #Now the eflalo effort
->x11()
->plotTools(subset(eflalop,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,color=NULL,control.eflalo=list(clm="LE_EFF_LOG"))
+x11()
+plotTools(subset(eflalop,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,color=NULL,control.eflalo=list(clm="LE_EFF_LOG"))
 </code>
+
 Quite a difference, not! Having VMS and logbook data available allows you to dispatch catches, values or effort at a much finer scale. Whether this is as good and believable as normal logbook data is up to you to decide; the tools are available however.
 
 === Distribution of catches / values ===
 Similar to the analyses above, we can make a picture of, for example, plaice landings on the spatial scale of VMS. Note here, however, that we are about to dispatch landings at a much finer spatial scale than at which the original data are stored (ie. the logbooks). We might hope that this is a sensible interpretation of the two data sources available, exploiting each to permit the finest possible spatial resolution. It is up to you, however, to decide if this is a wise analysis to perform!
+
 <code>
->tacsatEflalo      <- splitAmongPings(tacsat=subset(tacsatp,LE_GEAR == "TBB" & year(SI_DATIM)==1801),eflalo=subset(eflalo,LE_GEAR == "TBB"),
+tacsatEflalo      <- splitAmongPings(tacsat=subset(tacsatp,LE_GEAR == "TBB" & year(SI_DATIM)==1801),eflalo=subset(eflalo,LE_GEAR == "TBB"),
                         variable="all",level="day",conserve=T)
 
 #Lets make some plots again
->plotTools(tacsatEflalo,level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm="LE_KG_PLE"))
->eflalo$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME),format="%d/%m/%Y %H:%M")
->x11()
->plotTools(subset(eflalo,LE_GEAR == "TBB" & year(FT_DDATIM) == 1801),level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,color=NULL,control.eflalo=list(clm="LE_KG_PLE"))
+plotTools(tacsatEflalo,level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm="LE_KG_PLE"))
+eflalo$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME),format="%d/%m/%Y %H:%M")
+
+x11()
+plotTools(subset(eflalo,LE_GEAR == "TBB" & year(FT_DDATIM) == 1801),level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,color=NULL,control.eflalo=list(clm="LE_KG_PLE"))
 </code>
 
 In this practical you've come across a lot of example code where each of the functions also has many options. Once you get into these analyses yourselves back home, it won't hurt to read the manuals that go with these functions. 

@@ -7,19 +7,21 @@ Here we will provide some tools to help you out with these exercise.
 
 == Converting between spatial notations ==
 What if you are required to report VMS data analyses on the ICES rectangle. Will you go through some complicated procedure to find the closest ICES rectangle to your data, or just use the embedded functionality in VMStools! Let's see how that would work.
+
 <code>
 #Start fresh!
->rm(list=ls())
+rm(list=ls())
 
 #load the data
->data(tacsat); data(eflalo)
+data(tacsat); data(eflalo)
 
->tacsat$LE_RECT <- ICESrectangle(tacsat)
+tacsat$LE_RECT <- ICESrectangle(tacsat)
 #That was easy, can we also convert back?
->pos <- ICESrectangle2LonLat(tacsat$LE_RECT,midpoint=T)
->tacsatCompare <- cbind(tacsat,pos)
->head(tacsatCompare)
-    VE_COU VE_REF  SI_LATI  SI_LONG    SI_DATE  SI_TIME SI_SP SI_HE LE_RECT SI_LATI SI_LONG
+pos <- ICESrectangle2LonLat(tacsat$LE_RECT,midpoint=T)
+
+tacsatCompare <- cbind(tacsat,pos)
+head(tacsatCompare)
+>    VE_COU VE_REF  SI_LATI  SI_LONG    SI_DATE  SI_TIME SI_SP SI_HE LE_RECT SI_LATI SI_LONG
 658237 Atlantis     10 51.44772 3.583731 04/05/1800 13:32:00     0    25    31F3   51.25     3.5
 658238 Atlantis     10 51.44067 3.583847 04/05/1800 15:28:00     0    25    31F3   51.25     3.5
 662888 Atlantis     10 51.44074 3.595529 04/05/1800 17:22:00     0    25    31F3   51.25     3.5
@@ -27,58 +29,67 @@ What if you are required to report VMS data analyses on the ICES rectangle. Will
 662890 Atlantis     10 51.44351 3.586948 04/05/1800 21:12:00     0    25    31F3   51.25     3.5
 662891 Atlantis     10 51.44811 3.593958 04/05/1800 23:08:00     0    25    31F3   51.25     3.5
 </code>
+
 === Exercise 1 ===
   # When executing the function 'ICESrectangle2LonLat' a warning was given. What does this warning mean?
   # Can you find out what the location is of the points not converted back to longitude,latitude. Does this make sense?
 
 Similar things we can do with the logbook data
+
 <code>
->pos <- ICESrectangle2LonLat(eflalo$LE_RECT,midpoint=T)
->eflalop <- cbind(eflalo,pos)
+pos <- ICESrectangle2LonLat(eflalo$LE_RECT,midpoint=T)
+eflalop <- cbind(eflalo,pos)
 
 #Let's find the ICES area within of logbook records
 #We need the longitude, latitude position from the step before
->eflalop$LE_AREA <- ICESarea(eflalop,roman=T)
+eflalop$LE_AREA <- ICESarea(eflalop,roman=T)
 </code>
+
 Obviously, we can do the same for the VMS data, but try that yourself! One other type of conversion is one into the spatial <b>C-square</b> notation. This notation has been developed in Australia and is now implemented as the default FishFrame spatial scale. However, the C-square notation can take many different resolutions. Let's convert some VMS data into C-square notation.
+
 <code>
 #For this example, take the first six positions only
->somePos <- head(tacsat[,c("SI_LONG","SI_LATI")])
->CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=10)
->CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=10)
->CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=5)
->CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.5)
->CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.1)
->CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.05)
->CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.01)
+somePos <- head(tacsat[,c("SI_LONG","SI_LATI")])
+CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=10)
+CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=10)
+CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=5)
+CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.5)
+CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.1)
+CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.05)
+CSquare(somePos$SI_LONG,somePos$SI_LATI,degrees=0.01)
 </code>
+
 The length of the CSquare notation becomes longer and longer the higher the resolution gets. 
 
 == Analyse on a defined spatial scale == 
 
 So far, we've only converted VMS and logbook data into different spatial notations. A next step would be to analyse the data based on the converted spatial scale.
+
 <code>
 #Let's calculate the catches of plaice in the total eflalo dataset at the ICES rectangle level
->aggregate(eflalop$LE_KG_PLE,by=list(eflalop$LE_RECT),FUN=sum,na.rm=T)
+aggregate(eflalop$LE_KG_PLE,by=list(eflalop$LE_RECT),FUN=sum,na.rm=T)
+
 #This would be the picture associated with that catch distribution
->plotTools(eflalop,level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=FALSE,color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=c("LE_KG_PLE")))
+plotTools(eflalop,level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=FALSE,color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=c("LE_KG_PLE")))
 
 #Now at a slightly higher scale, the VMS data
->tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
->tacsatp$IDX       <- 1:nrow(tacsatp)
+tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+tacsatp$IDX       <- 1:nrow(tacsatp)
+
 #A quick and dirty rule which says that all speeds between 1 and 6 is fishing
->tacsatFilter      <- filterTacsat(tacsatp,st=c(1,6),hd=NULL,remDup=T)
->tacsatp$SI_STATE  <- 0
->tacsatp$SI_STATE[tacsatFilter$IDX] <- 1
->tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
+tacsatFilter      <- filterTacsat(tacsatp,st=c(1,6),hd=NULL,remDup=T)
+tacsatp$SI_STATE  <- 0
+tacsatp$SI_STATE[tacsatFilter$IDX] <- 1
+tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
                         variable="all",level="day",conserve=T)
->tacsatEflalo$LE_SPAT <- CSquare(tacsatEflalo$SI_LONG,tacsatEflalo$SI_LATI,degrees=0.1)
->aggregate(tacsatEflalo$LE_KG_PLE,by=list(tacsatEflalo$LE_SPAT),FUN=sum,na.rm=T)
+tacsatEflalo$LE_SPAT <- CSquare(tacsatEflalo$SI_LONG,tacsatEflalo$SI_LATI,degrees=0.1)
+aggregate(tacsatEflalo$LE_KG_PLE,by=list(tacsatEflalo$LE_SPAT),FUN=sum,na.rm=T)
 
 #In a picture, it looks like this
->x11()
->plotTools(tacsatEflalo,level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.1),color=NULL,control.tacsat=list(clm="LE_KG_PLE"))
+x11()
+plotTools(tacsatEflalo,level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.1),color=NULL,control.tacsat=list(clm="LE_KG_PLE"))
 </code>
+
 Observe the difference! That is quite a more detailed picture on plaice catch distribution. 
 
 === Exercise 2 ===
@@ -91,46 +102,53 @@ Although the spatial grids just discussed might be suitable in a large number of
 VMStools relies on a secondary package for spatial data storage and analyses, the sp package by Bivand et al. If you plan to do a lot of spatial analyses in R in combination with VMS (basically the type of analyses you'll see from here and onwards) I can recommend you read the first chapters of his book <i>[http://books.google.nl/books?hl=nl&lr=&id=4gg8yx_lcj0C&oi=fnd&pg=PR7&dq=bivand,+sp,+R&ots=yzdH3v5-7G&sig=cGG9UC3rlreQxzlVROJXTKbxmyE#v=onepage&q=bivand%2C%20sp%2C%20R&f=false Applied spatial analyses with R (2008)]</i>, especially chapter 2 on the different classes. It is not an easy read, but it will help you to understand how most of these analyses work together with polygons, shapefiles and data storage.
 
 Let's define our first own grid
+
 <code>
->x <- seq(-5,5,length.out=10)
->y <- seq(50,55,length.out=10)
->xrange <- range(x,na.rm=T)
->yrange <- range(y,na.rm=T)
+x <- seq(-5,5,length.out=10)
+y <- seq(50,55,length.out=10)
+xrange <- range(x,na.rm=T)
+yrange <- range(y,na.rm=T)
 
 #returns a grid with 11 cells in the x-direction and 11 in the y-direction
 Grid <- createGrid(xrange,yrange,1,0.5,type="SpatialGrid") #just like an ICES rectangle grid
 
 #Let's see what is stored in the 'Grid' object
->slotNames(Grid)
-[1] "coords"      "grid"        "grid.index"  "bbox"        "proj4string"
->Grid@coords #this doesn't show much...
->coordinates(Grid) #Much better
->plot(Grid); map.axes()
+slotNames(Grid)
+>[1] "coords"      "grid"        "grid.index"  "bbox"        "proj4string"
+Grid@coords #this doesn't show much...
+coordinates(Grid) #Much better
+
+plot(Grid); map.axes()
 </code>
+
 Now you've defined your own grid, but obviously you want to link e.g. your VMS data points to this grid. In other words, you want to know in which grid cell each of your VMS positions would fall. Why is this handy? Primarily because you can now calculate certain indicators based on a home defined grid (e.g. kg of cod in a certain area) and it allows you to combine different data sources within the same grid! But more on that later on. First, let's see in which grid cell all theVMS positions fall.
 
 <code>
 #Get some tacsat positions, and link them to the Grid
 somePos <- head(tacsat[,c("SI_LONG","SI_LATI")])
->points(SpatialPoints(coordinates(somePos)),col="red",pch=19)
->overlay(Grid,SpatialPoints(coordinates(somePos)))
-[1] 87 87 87 87 87 87
+points(SpatialPoints(coordinates(somePos)),col="red",pch=19)
+overlay(Grid,SpatialPoints(coordinates(somePos)))
+>[1] 87 87 87 87 87 87
+
 #This output really means that all 6 positions in 'somePos' are located in grid cell 87 of coordinates(Grid)
->coordinates(Grid)[87,]
+coordinates(Grid)[87,]
 
 #Now for the full tacsat dataset, and summary the result immediately
->table(overlay(Grid,SpatialPoints(coordinates(tacsat[,c("SI_LONG","SI_LATI")]))))
+table(overlay(Grid,SpatialPoints(coordinates(tacsat[,c("SI_LONG","SI_LATI")]))))
 </code>
+
 === Exercise 3 ===
   # Which grid cell (in coordinate notation) is associated with the highest number of VMS records?
   # Plot it onto the grid as in the example above
 
 All you actually need to aggregate again over a certain grid is the 'overlay' function and the definition of your own grid. Once you get the results of the overlay back, you can use this to summarize your results. An example:
+
 <code>
->coordTacsat <- coordinates(tacsat[,c("SI_LONG","SI_LATI")])
->SPtacsat <- SpatialPoints(coordTacsat)
->index <- overlay(Grid,SPtacsat)
->tacsat$INDEX <- index
+coordTacsat <- coordinates(tacsat[,c("SI_LONG","SI_LATI")])
+SPtacsat <- SpatialPoints(coordTacsat)
+index <- overlay(Grid,SPtacsat)
+tacsat$INDEX <- index
+
 #Do something strange for a change, and take the mean heading in a grid cell
->aggregate(tacsat$SI_HE,by=list(tacsat$INDEX),FUN=mean,na.rm=T)
+aggregate(tacsat$SI_HE,by=list(tacsat$INDEX),FUN=mean,na.rm=T)
 </code>

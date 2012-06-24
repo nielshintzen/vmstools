@@ -11,7 +11,7 @@ The EU Data Collection Framework (DCF) standardizes three indicators to analyse 
 
  * DCF Indicator 7: Areas not impacted by mobile bottom gears. The area of seabed that has not been impacted by mobile bottom fishing gears in the last year. Could be reported annually and would state the total proportion of the area by depth strata in each marine region.
 
-Although the definition of these indicators has been around for some time already, and tools are even developed to calculate these indicators, there is still room for alternative approaches to calculate the indicators. 
+Although the definition of these indicators has been around for some time already, and tools are even developed to calculate these indicators, there is still room for alternative approaches to calculate the indicators.
 
 Within this practical we will guide you through the simplest ways to calculate the indicators and a home-made approach which allows for more flexibility.
 
@@ -27,36 +27,40 @@ These indicators aggregate the tacsat point data into a gridded data frame using
 
 == Calculating indicators the easy way ==
 Again, we have to start with the tacsat and eflalo data, make sure they are free from the easy-to-spot errors and link them up. As we do this for example purposes only, we skip the cleaning steps and move to linking the tacsat and eflalo datasets immediately. 
+
 <code>
->data(tacsat); data(eflalo)
->tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
->tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+data(tacsat); data(eflalo)
+tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
 
 #In general, most of these indicators only make sense for bottom gear, so let's make a selection
->gear <- c("OTB","PTB","TBB","OTM")
->tacsatp <- subset(tacsatp,LE_GEAR %in% gear)
+gear <- c("OTB","PTB","TBB","OTM")
+tacsatp <- subset(tacsatp,LE_GEAR %in% gear)
+
 #Again, quick and dirty filtering activity
->tacsatp <- filterTacsat(tacsatp,st = c(2, 6), hd = NULL, remDup = T)
->tacsatp <- sortTacsat(tacsatp)
+tacsatp <- filterTacsat(tacsatp,st = c(2, 6), hd = NULL, remDup = T)
+tacsatp <- sortTacsat(tacsatp)
 
 #Calculate the interval rate between pings
->tacsatp <- intervalTacsat(tacsatp,level="trip",fill.na=TRUE)
->tacsatp$SI_INTV <- tacsatp$INTV
+tacsatp <- intervalTacsat(tacsatp,level="trip",fill.na=TRUE)
+tacsatp$SI_INTV <- tacsatp$INTV
 
 #Define an area of interest (prevent having an influence of VMS pings in a completely different area)
->spatBound <- list(x=c(-5,10),y=c(48,62)) #Spatial boundaries of approx the North Sea
->idxlon              <- which(tacsatp$SI_LONG >= spatBound$x[1] & tacsatp$SI_LONG <= spatBound$x[2])
->idxlat              <- which(tacsatp$SI_LATI >= spatBound$y[1] & tacsatp$SI_LATI <= spatBound$y[2])
->tacsatp             <- tacsatp[idxlon[which(idxlon %in% idxlat)],]
+spatBound <- list(x=c(-5,10),y=c(48,62)) #Spatial boundaries of approx the North Sea
+idxlon              <- which(tacsatp$SI_LONG >= spatBound$x[1] & tacsatp$SI_LONG <= spatBound$x[2])
+idxlat              <- which(tacsatp$SI_LATI >= spatBound$y[1] & tacsatp$SI_LATI <= spatBound$y[2])
+tacsatp             <- tacsatp[idxlon[which(idxlon %in% idxlat)],]
 
 #Let's make a quick graph
 plotTools(tacsatp,level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm="SI_INTV"))
 </code>
+
 Ok, all the data has been cleaned, the interval rate has been calculated (optional, otherwise VMS pings will be taken as a measure) and roughly the North Sea area has been selected. Now onto calculating the indicators!
+
 <code>
 #Set a working directory where the files will be written to disk
->setwd("D:/")
->ind5                <- indicators( indicatorNum=5,
+setwd("D:/")
+ind5                <- indicators( indicatorNum=5,
                                    tacsatp,
                                    minThreshold=0, # percentage of points to be included in the Minimal Convex Polygon
                                    cellresX=0.1,
@@ -65,10 +69,10 @@ Ok, all the data has been cleaned, the interval rate has been calculated (option
                                    plotMapTF=T,
                                    exportTableName="indicator5_01005",
                                    exportGridName="indicator5_01005")
->print(ind5)
+print(ind5)
 
 #Let's change the resolution of the calculated grid and see how the indicator values change
->ind5_2                <- indicators( indicatorNum=5,
+ind5_2                <- indicators( indicatorNum=5,
                                    tacsatp,
                                    minThreshold=0, # percentage of points to be included in the Minimal Convex Polygon
                                    cellresX=0.05,
@@ -78,11 +82,13 @@ Ok, all the data has been cleaned, the interval rate has been calculated (option
                                    exportTableName="",
                                    exportGridName="")
 
->cbind(ind5,ind5_2)
+cbind(ind5,ind5_2)
 </code>
+
 That was DCF indicator number 5, and changing the resolution made quite a change. Let's move on to indicator number 6 and 7.
+
 <code>
->ind6 <- indicators(indicatorNum=6,
+ind6 <- indicators(indicatorNum=6,
            tacsatp,
            pctThreshold=90,
            cellresX=0.01,
@@ -93,7 +99,7 @@ That was DCF indicator number 5, and changing the resolution made quite a change
            exportGridName="")
 
 #And now indicator number 7
->ind7 <- indicators(indicatorNum=7,
+ind7 <- indicators(indicatorNum=7,
            tacsatp, 
            ltGear=c("TBB","OTB"),
            inShapeArea="",
@@ -104,6 +110,7 @@ That was DCF indicator number 5, and changing the resolution made quite a change
            plotMapTF=TRUE,
            exportGridName="")
 </code>
+
 For most I assume, these calculations are like a black box. This doesn't mean you cannot use them, Read up carefully on the help files, perhaps even look at the code. And once you want to compare indicator values across nations, whereby the assumptions on how to calculate the indicators isn't clear yet, this might serve you well. 
 
 However, if you want or need full control, you might be better of by calculating these indicators all by yourself. Find below some instructions on how to get started!
@@ -120,27 +127,27 @@ For a start, let's take a simple indicator to calculate ourselves. Let's define:
 We have the choice to interpolate the data or not, but to keep things simple, we will not do that here. Obviously, the function to add a width to a gear, seen before, could be useful. However, we take less of a true spatial approach here (for most spatial analyses, your data structure is fine as vectors rather than a grid!), whereby the 'addWidth' function would simply take too long to run.
 
 <code>
->data(tacsat);data(eflalo)
+data(tacsat);data(eflalo)
 
 #Now clean the tacsat and eflalo dataset...
->tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
->tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
 
 #Again, the quick and dirty fishing activity analyses
->tacsatp <- filterTacsat(tacsatp,st=c(2,6),hd=NULL,remDup=T)
+tacsatp <- filterTacsat(tacsatp,st=c(2,6),hd=NULL,remDup=T)
 
 #Select gears
->table(tacsatp$LE_GEAR)
->gears <- c("OTB","PTB","TBB")
->tacsatp <- subset(tacsatp,LE_GEAR%in% gears)
->gearWidth <- data.frame(LE_GEAR=gears,LE_WIDTH=c(87,2*87,24))
+table(tacsatp$LE_GEAR)
+gears <- c("OTB","PTB","TBB")
+tacsatp <- subset(tacsatp,LE_GEAR%in% gears)
+gearWidth <- data.frame(LE_GEAR=gears,LE_WIDTH=c(87,2*87,24))
 
 #Define the grid & subset the area
->spatBound <- list(x=c(-5,10),y=c(48,62))
->idxlon    <- which(tacsatp$SI_LONG >= spatBound$x[1] & tacsatp$SI_LONG <= spatBound$x[2])
->idxlat    <- which(tacsatp$SI_LATI >= spatBound$y[1] & tacsatp$SI_LATI <= spatBound$y[2])
->tacsatp   <- tacsatp[idxlon[which(idxlon %in% idxlat)],]
->grd <- createGrid(xrange=c(unlist(spatBound$x)),
+spatBound <- list(x=c(-5,10),y=c(48,62))
+idxlon    <- which(tacsatp$SI_LONG >= spatBound$x[1] & tacsatp$SI_LONG <= spatBound$x[2])
+idxlat    <- which(tacsatp$SI_LATI >= spatBound$y[1] & tacsatp$SI_LATI <= spatBound$y[2])
+tacsatp   <- tacsatp[idxlon[which(idxlon %in% idxlat)],]
+grd <- createGrid(xrange=c(unlist(spatBound$x)),
                    yrange=c(unlist(spatBound$y)),
                    resx=0.1,resy=0.05) #Let's take a tenth of an ICES rectangle for a start
 </code>
@@ -151,55 +158,62 @@ The next step is to start calculating the area trawled for each VMS ping. It mig
 
 Area trawled = duration of trawling * width of gear * speed of a vessel
 Let's work this equation out for each of the VMS pings in the dataset.
+
 <code>
->tacsatp <- sortTacsat(tacsatp)
+tacsatp <- sortTacsat(tacsatp)
+
 #Calculate duration of trawling per ping
->tacsatp <- intervalTacsat(tacsatp,level="trip",fill.na=TRUE)
->tacsatp$SI_INTV <- tacsatp$INTV
->tacsatp$LE_WIDTH <- merge(tacsatp,gearWidth,by="LE_GEAR")$LE_WIDTH
->tacsatp$TR_AREA <- (tacsatp$SI_INTV / 60) * (tacsatp$LE_WIDTH / 1000) * (tacsatp$SI_SP *1.852)
+tacsatp <- intervalTacsat(tacsatp,level="trip",fill.na=TRUE)
+tacsatp$SI_INTV <- tacsatp$INTV
+tacsatp$LE_WIDTH <- merge(tacsatp,gearWidth,by="LE_GEAR")$LE_WIDTH
+tacsatp$TR_AREA <- (tacsatp$SI_INTV / 60) * (tacsatp$LE_WIDTH / 1000) * (tacsatp$SI_SP *1.852)
 </code>
+
 For the full tacsat dataset we have now calculated the area trawled per ping, however, not yet per year. We could easily split up the tacsat dataset into the two years (1800 and 1801) and aggregate over the trawled area column. But, as indicated before, if we want a bit more flexibility, it might be good to store the data first and perform calculations later-on. 
+
 <code>
 #Turn the defined grid into a spatial dataframe
->sg <- SpatialGrid(grid=grd)
->spgDF <- as(sg,"SpatialGridDataFrame")
->slotNames(spgDF)
+sg <- SpatialGrid(grid=grd)
+spgDF <- as(sg,"SpatialGridDataFrame")
+slotNames(spgDF)
+
 #We can simply add a dataframe to this object (but make sure it has the same size as all coordinates considered!
->spgDF@data <- data.frame("Y1800"=rep(0,nrow(coordinates(spgDF))),
+spgDF@data <- data.frame("Y1800"=rep(0,nrow(coordinates(spgDF))),
                           "Y1801"=rep(0,nrow(coordinates(spgDF))),
                           surface=rep(0,nrow(coordinates(spgDF))))
->head(spgDF@data)
+head(spgDF@data)
 
 #Now align the VMS pings to the grid
 #We have to turn the coordinates of the tacsat dataset into spatial points first
->for(iYr in c(1800:1801)){
+for(iYr in c(1800:1801)){
 subTacsat <- subset(tacsatp,year(SI_DATIM)==iYr) 
 sp <- SpatialPoints(coordinates(subTacsat[,c("SI_LONG","SI_LATI")]))
+
 #The spatial grid dataframe is a long list (nrow(spgDF@data)) and the idx tells me which row number (associated with a grid cell) the VMS ping is located in.
 idx <- overlay(sg,sp)
 spgDF@data[ac(aggregate(subTacsat$TR_AREA,          by=list(idx),FUN=sum,na.rm=T)[,1]), paste("Y",iYr,sep="")]    <- aggregate(subTacsat$TR_AREA,  by=list(idx),FUN=sum,na.rm=T)[,2] 
 }
+
 #Have a look at some data (where Y1800 is not zero)
->head(spgDF@data[which(spgDF@data$Y1800>0),])
+head(spgDF@data[which(spgDF@data$Y1800>0),])
 
 #And calculate the indicator value
->colSums(spgDF@data[,c("Y1800","Y1801")])
+colSums(spgDF@data[,c("Y1800","Y1801")])
 </code>
 
 However, we just set this system up to be a bit more flexible and use the data for other questions too. Can we now easily move from total area trawled to percentage of the area untrawled? Or could we even see which area has been trawled in 1800 but not in 1801?
 
 <code>
 #Add surface of each gridcell to the dataframe
->spgDF@data$surface <- surface(spgDF)$cellArea
+spgDF@data$surface <- surface(spgDF)$cellArea
 
 #Percentage trawled
->idxun <- which(spgDF@data[,"Y1800"] == 0)
->sum(spgDF@data$surface[idxun]) / sum(spgDF@data$surface)
+idxun <- which(spgDF@data[,"Y1800"] == 0)
+sum(spgDF@data$surface[idxun]) / sum(spgDF@data$surface)
 
 #Area trawled in 1800 but not in 1801
->idx <- which(spgDF@data[,"Y1800"] > 0 & spgDF@data[,"Y1801"] == 0)
->sum(spgDF@data$surface[idx]) / sum(spgDF@data$surface)
+idx <- which(spgDF@data[,"Y1800"] > 0 & spgDF@data[,"Y1801"] == 0)
+sum(spgDF@data$surface[idx]) / sum(spgDF@data$surface)
 </code>
 
 All in all, a lot to play with in a rather flexible way.
