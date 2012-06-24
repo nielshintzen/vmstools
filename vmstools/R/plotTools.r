@@ -1,4 +1,4 @@
-plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),returnRange=F,...){
+plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),returnRange=F){
   library(RColorBrewer)
   library(maps)
   library(mapdata)
@@ -85,7 +85,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
     byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",control.eflalo$clm)
     byRect                <- byRect[which(is.na(byRect$SI_LONG)==F & is.na(byRect$SI_LATI) == F),]
     if(length(control.eflalo$clm)>1)  rangeRect             <- range(apply(byRect[,control.eflalo$clm],1,sum,na.rm=T))
-    if(length(control.eflalo$clm)==1) rangeRect             <- range(byRect[,kgeur(colnames(byRect))],na.rm=T)
+    if(length(control.eflalo$clm)==1) rangeRect             <- range(byRect[,control.eflalo$clm],na.rm=T)
     rangeRect             <- c(0,rangeRect[2])
     ctrl                  <- control.eflalo
   }

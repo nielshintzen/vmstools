@@ -133,24 +133,27 @@ if(method == "euclidean"){
                                       distObsTac  <- distance(ox[x],oy[x],tx[y],ty[y])
                                    return(distObsTac)})
                                 
-       idx              <- apply(res,1,function(x){return(x <= control.euclidean$threshold)})
+       idx              <- apply(res,2,function(x){return(x <= control.euclidean$threshold)})
        idx              <- which(idx == T,arr.ind=T)
        restime          <- difftime(obs$SI_DATIM[obsRows[idx[,1]]],tacsat$SI_DATIM[tacRows[idx[,2]]],unit="mins")
 
        if(is.null(temporalRange)==F){ retrn       <- which(restime <= temporalRange[2] & restime >= temporalRange[1])
        } else { retrn <- 1:length(restime) }
-       res              <- cbind(tacRows[idx[retrn,2]],obs$GR_ID[obsRows[idx[,1]]])
-       totRes           <- rbind(totRes,na.omit(res))
+       if(length(retrn)>0){
+         res              <- cbind(tacRows[idx[retrn,2]],obs$GR_ID[obsRows[idx[retrn,1]]])
+         totRes           <- rbind(totRes,na.omit(res))
+       }
       }
       
       
     }#End iNT loop
   }#End iNO loop
-  tacsat$GR_ID <- NA
-  tacsat$GR_ID[totRes[,1]] <-totRes[,2]
+  tacsat$GR_ID    <- NA
+  dubTacsat       <- tacsat[totRes[,1],]
+  dubTacsat$GR_ID <- totRes[,2]
 
 
-  retrn   <- list(obs,tacsat[totRes[,1],])
+  retrn   <- list(obs,dubTacsat)
 }#End method euclidean
 
 if(all.t) retrn[[2]] <- merge(retrn[[2]],tacsatOrig,by=colnames(tacsatOrig),all=T)

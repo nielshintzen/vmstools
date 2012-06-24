@@ -24,7 +24,7 @@ clipObs2Tacsat(tacsat, obs, method, control.grid, control.euclidean,
 }
   \item{control.grid}{
    If method = "grid", control.grid is a list with specification of the spatialGrid
-   (spatGrid, of class "SpatialGrid") or the resolution in x and y values hwere the
+   (spatGrid, of class "SpatialGrid") or the resolution in x and y values where
    the outermargins can be given by the tacsat dataset (gridBox="tacsat") or the
    observation dataset (gridBox="obs").
 
@@ -42,7 +42,7 @@ clipObs2Tacsat(tacsat, obs, method, control.grid, control.euclidean,
   element = observation set, second = matching tacsat), else F second = all tacsat
 }
   \item{rowSize}{
-  To speed of calculations, define maximum rowSize (default = 1000)
+  To speed up calculations, define maximum rowSize (default = 1000)
 }
 }
 \details{

@@ -7,17 +7,23 @@ Analyse speed profiles to define number of peaks.
 Analyse histrogram of speed profiles by gear or vessel to define number of peaks
 }
 \usage{
-activityTacsatAnalyse(tacsat, units = "year", analyse.by = "LE_GEAR")
+activityTacsatAnalyse(tacsat, units = "year", analyse.by = "LE_GEAR",identify="peaks")
 }
 \arguments{
   \item{tacsat}{tacsat dataset}
   \item{units}{Analyse by: "year", "month" and "week". "month" and "week" cannot
                be used at same time}
   \item{analyse.by}{Analyse tacsat by gear ("LE_GEAR") or vessel ("VE_REF")}
+  \item{identify}{Identify either the number of peaks ("peaks", rough approach)
+                  or mean speed associated with peaks ("means", detailed approach)}
 }
 \details{
 The analyses assumes that the speed profile close to 0 can be mirrored to create
-a good normal distribution.
+a good normal distribution. The left-hand side of the histogram is identical to the
+right-hand side and therefore potential identified peaks should be mirrored as well.
+The detailed 'means' approach does take more time to identify but is more succesful
+in fitting distributions to the speed profile. It pays off to specify mean values
+of the peaks by 0.5knots precision.
 }
 \value{
 Returns a \code{\link{data.frame}} with a run scheme that can be used as input
@@ -43,5 +49,10 @@ tacsat          <- tacsatp
 #- Visual analyses of activity, and define number of peaks / kernels that can
 #  be observed (either 3 or 5)
 storeScheme   <- activityTacsatAnalyse(subset(tacsat,LE_GEAR == "OTM" &
-                      year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
+                      year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",
+                      identify="peaks")
+storeScheme   <- activityTacsatAnalyse(subset(tacsat,LE_GEAR == "OTM" &
+                      year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",
+                      identify="means")
+
 }
