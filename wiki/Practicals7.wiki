@@ -29,6 +29,7 @@ library(vmstools)
 Hereafter, as we've seen before, we need to load the logbook, VMS and harbour data to have access to these data sources.
    
 <code>
+#Load the data
 data(eflalo)
 data(tacsat)
 data(euharbours)
@@ -38,6 +39,7 @@ euharbours <- harbours
 As usual, and especially necessary for your own data, format the data.
 
 <code>
+#Format and sort the data
 eflalo <- formatEflalo(eflalo)
 tacsat <- formatTacsat(tacsat)
 tacsat <- sortTacsat(tacsat)
@@ -46,17 +48,20 @@ tacsat <- sortTacsat(tacsat)
 The code that turns the data into FishFrame data has a slightly different setup than the other function's you've seen so far. Especially the way logbook and VMS data are linked is different and it requires a pre-definition of point ins harbour. Here we test whether VMS positions are in harbour or not.
 
 <code>  
+#Find out in which harbour they are located
 tacsat$SI_HARB <- NA
 euharbours$Description <- euharbours$harbour
 tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG),
                                    lat=anf(tacsat$SI_LATI),
                                    harbours=harbours,
-                                   rowSize=30, returnNames=TRUE)
+                                   rowSize=30, returnNames=TRUE,saveHarbourList=F)
   
+#Create a separate object with just the harbour information
 inHarb <- tacsat$SI_HARB
 inHarb <- replace(inHarb, !is.na(inHarb), 1)
 inHarb <- replace(inHarb, is.na(inHarb), 0)
 inHarb <- as.numeric(inHarb)
+head(inHarb) #What did just happen?
 </code>
 
 Once we've defined which points are in harbour, the functionality requires some sort of trip identifier.
@@ -70,6 +75,7 @@ tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
 Linking logbooks and VMS is defined based on mid-points of trips and therefore requires points outside of a harbour but also the departure and arrival dates.
 
 <code>
+#A way to get a trip identifier to the tacsat dataset, some clever coding, but perhaps a bit more difficult to understand. Have a look at what the 'diff' function really does
 startTrip <- c(diff(tacsat[,"SI_FT"]), 0)
 endTrip   <- c(0, diff(tacsat[,"SI_FT"]))
 tacsat[which(startTrip>0),"SI_FT"]  <-  tacsat[which(startTrip>0)+1,"SI_FT"]
@@ -80,6 +86,7 @@ tacsat <- tacsat[which(inHarb==0 |  startTrip>0 |  endTrip<0),]
 Now assign activity state (e.g. fishing v steaming) to each ping. Note that this is optional. If detectFishing = TRUE in mergeEflalo2Pings then the function/code will do this part automatically. You might want, for example, to apply your own rules to identify fishing. You can do it here setting detectFishing = FALSE
 
 <code>
+#Add activity to the dataset
 tacsat$SI_STATE <- 2 # init (1 = fishing; 2 = steaming)
 tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
 </code>
@@ -95,7 +102,10 @@ Sometimes you get naming mistakes and below is some example code that might be u
 In this example we run the code for a given set (50 random ones) of vessels in the year 1800. Since detectFishing = TRUE (see below) then the code is also detecting fishing activity using the built-in function segmentTacsatSpeed(). [Note that this will overwrite the existing SI_STATE]. First we set up some variables we need,ie. a year variable, and a vector for the unique boat names and also the total number of boats that we intend to output data for.
 
 <code>  
+#get a year column in the data
 tacsat$year <- as.numeric(format(tacsat$SI_DATIM, format = "%Y"))
+
+#Making a selection of boats
 how.many.boats.in.tacsat <- length(unique(tacsat$VE_REF     [tacsat$year==1800]))  #Take data for 1800
 no.of.boats              <- 50 # lets's do 50 boats
 which.boats <- unique(tacsat$VE_REF)[seq(1,how.many.boats.in.tacsat,length=no.of.boats)]
@@ -136,9 +146,11 @@ gc(reset=TRUE)
 Similarly you might want to load the merged output table for one vessel, say vessel "10" for the year 1800 and check whether all the landings in eflalo (logbook) have actually been allocated to VMS positions, which we do below:
 
 <code>
+#Load some of the results we got above
 load(file.path("C:","output","merged_10_1800.RData"))
 merged.10 <- merged
 
+#Sum over the plaice landings
 sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
 sum(eflalo[eflalo$VE_REF=="10","LE_KG_PLE"], na.rm=TRUE)
 </code>
@@ -169,6 +181,8 @@ Time to map the data!
 <code>
 # Select columns of interest
 df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD","LE_KG_PLE","LE_KG_SOL","LE_KG_DAB","LE_KG_TUR")]
+
+#Need to turn my longitude and latitude into factors here, this is tricky, and we do it for a very specific reason (another function that needs it, so don't try this at home (unless you want to copy what we do here :-))
 df1$SI_LONG <- anf(df1$SI_LONG)
 df1$SI_LATI <- anf(df1$SI_LATI)
 df1 <-   df1[ !is.na(df1$SI_LATI),]
@@ -176,8 +190,6 @@ df1 <-   df1[ !is.na(df1$SI_LONG),]
 
 #Chose species to look at
 what.species.to.map <- "LE_KG_PLE"
-  
-#Remove steaming points before plotting:
 df2<-df1[-which(is.na(df1[,what.species.to.map])),]
   
 vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", we = 3, ea = 6, so = 50, no = 54,
