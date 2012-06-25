@@ -10,7 +10,9 @@ If you still have an R version running with the results of the cleaning step, us
 
 == Linking VMS and logbook data ==
 <code>
+#We assume you still have got a good cleaned set of eflalo and tacsat available, if not, reload the data (data(tacsat);data(eflalo)), and continue without prior cleaning for example purposes
 tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+
 head(tacsatp)
 >         VE_COU VE_REF  SI_LATI  SI_LONG    SI_DATE  SI_TIME SI_SP SI_HE            SI_DATIM INTV FT_REF
 662894 Atlantis     10 51.67319 3.176576 05/05/1800  4:54:00     2    43 1800-05-05 04:54:00  116 272058
@@ -58,6 +60,7 @@ Similar to the presentation, we will quickly look into four types of benefit
 === Distinguish fishery types ===
 Most often, fishery type is determined by the gear used (mesh size etc.) when fishing. As we have already assigned gear type from eflalo to tacsat, splitting the tacsat data up into bits per gear type is not too difficult.
 <code>
+#Splitting the tacsatp dataset into smaller chuncks, a TBB and an OTB part
 TBB <- subset(tacsatp,LE_GEAR == "TBB")
 OTB <- subset(tacsatp,LE_GEAR == "OTB")
 
@@ -84,10 +87,14 @@ I will present short examples of both methods.
 ==== Segmented Tacsat Speed ====
 Note that you can only run this example with 1 year of data!
 <code>
+#I want to keep track of the number of rows, so I add a unique number to each row
 tacsatp$idx       <- 1:nrow(tacsatp)
 tacsatp$LE_GEAR   <- af(tacsatp$LE_GEAR) #this needs to be a factor for the calculation that follows
-tmpPath           <- "D:/output/" #specify a temporary folder for output
+
+tmpPath           <- "C:/tmpTacsat/" #specify a temporary folder for output
 tacsatSegment     <- segmentTacsatSpeed(tacsatp[which(is.na(tacsatp$LE_GEAR)==F),],general=list(output.path=tmpPath,visual.check=F, a.year=c(1800)))
+
+#Merge the results of segmentTacsatSpeed with the original tacsatp dataset
 tacsatp           <- merge(tacsatp,tacsatSegment[,c("idx","SI_STATE")],by=c("idx"),all.x=T)
 
 #Lets look at the results, left = no-fishing, right = fishing
@@ -99,12 +106,15 @@ barplot(spds,names.arg=rep(dimnames(spds)[[1]],2),beside=T)
 This functionality works on more than 1 year and can be used to define activity of all similar gears or on a vessel level. In its most sophisticated form, it requires input from the user to determine peaks of fishing and no-fishing which will eventually result in better results. 
 
 <code>
+#In order to get this working, I cannot have NA's as gear type, to assign them 'NO_GEAR'
 tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==T)] <- "NO_GEAR"
 tacsatp$LE_GEAR <- ac(tacsatp$LE_GEAR)
 
 #Analyse a selection of the data, a window will pop-up!
 storeScheme   <- activityTacsatAnalyse(subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
-require(mixtools)
+
+#If this gives an error, you need to install the package first, go to R -> packages -> install packages
+require(mixtools) 
 
 #After analysing the peaks, time to let the magic fit normal density distributions to the data
 res           <- activityTacsat(subset(tacsatp,LE_GEAR == "OTM" &
@@ -150,6 +160,7 @@ Quite a difference, not! Having VMS and logbook data available allows you to dis
 Similar to the analyses above, we can make a picture of, for example, plaice landings on the spatial scale of VMS. Note here, however, that we are about to dispatch landings at a much finer spatial scale than at which the original data are stored (ie. the logbooks). We might hope that this is a sensible interpretation of the two data sources available, exploiting each to permit the finest possible spatial resolution. It is up to you, however, to decide if this is a wise analysis to perform!
 
 <code>
+#This code will dispatch KG and EURO on the ping scale to VMS
 tacsatEflalo      <- splitAmongPings(tacsat=subset(tacsatp,LE_GEAR == "TBB" & year(SI_DATIM)==1801),eflalo=subset(eflalo,LE_GEAR == "TBB"),
                         variable="all",level="day",conserve=T)
 
