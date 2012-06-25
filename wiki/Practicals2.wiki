@@ -38,7 +38,7 @@ And again, no problems, no duplicates (the only time you will see this most like
 data(europa) #a dataset already build into the package with the coastlines embedded
 head(europa)
 
-#Convert the europa dataset into a polygon
+#Convert the europa dataset into a polygon, takes rather long so be patient!
 pols    <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
                 function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,
                                      SI_LATI=subset(europa,SID==x)$Y)}))
@@ -46,6 +46,7 @@ idx     <- pointOnLand(tacsat,pols);
 table(idx)
 
 pol     <- tacsat[which(idx==1),] #points on land
+#Overwrite the original tacsat dataset with only those points on land
 tacsat  <- tacsat[which(idx==0),] #tacsat not on land
 </code>
 
@@ -72,9 +73,10 @@ Only few points are associated with speeds higher than 20 knots. Let's move to t
 
 <code>
 data(euharbours)
-idx <- pointInHarbour(tacsat$SI_LONG,tacsat$SI_LATI,harbours)
+idx <- pointInHarbour(tacsat$SI_LONG,tacsat$SI_LATI,harbours,saveHarbourList=F)
 pih <- tacsat[which(idx==1),]
 table(idx)
+#Overwrite the tacsat file with only those records which are not in harbour
 tacsat <- tacsat[which(idx==0),]
 </code>
 
@@ -128,12 +130,19 @@ How about removing those records where arrival date occurs before departure date
 
 <code>
 eflalop           <- eflalo
+
+#Create a date-time stamp for the departure date
 eflalop$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,  eflalo$FT_DTIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M") #turn date and time into one date-time stamp
+
+#Create a date-time stamp for the landing date
 eflalop$FT_LDATIM <- as.POSIXct(paste(eflalo$FT_LDAT,  eflalo$FT_LTIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M") #turn date and time into one date-time stamp
+
+#Now see where the landing date happens before departure
 idx               <- which(eflalop$FT_LDATIM >= eflalop$FT_DDATIM)
 print(nrow(eflalo))
 
-eflalo            <- eflalo[idx,] #only keep the records we want
+#only keep the records we want
+eflalo            <- eflalo[idx,] 
 print(nrow(eflalo))
 </code>
 
@@ -146,16 +155,30 @@ As a rule of thumb, I normally use a factor 30 difference as a quick check.
 #First get the species names in your eflalo dataset
 specs  <- substr(colnames(eflalo[grep("KG",colnames(eflalo))]),7,9)
 lanThres <- 1.5 #this is approx 30x difference on a log10 scale)
-specBounds      <- lapply(as.list(specs),function(x){ idx   <- grep(x,colnames(eflalo))[grep("KG",colnames(eflalo)[grep(x,colnames(eflalo))])];
-                                                        wgh   <- sort(unique(eflalo[which(eflalo[,idx]>0),idx]));
-                                                        difw  <- diff(log10(wgh));
-                                                        return(ifelse(any(difw > lanThres),wgh[rev(which(difw <= lanThres))],ifelse(length(wgh)==0,0,max(wgh,na.rm=T))))})
-specBounds      <- cbind(specs,unlist(specBounds)); >specBounds[which(is.na(specBounds[,2])==T),2] <- "0"
 
-#Get the index of each of the species
-idx             <- unlist(lapply(as.list(specs),function(x){ idx   <- grep(x,colnames(eflalo))[grep("KG",colnames(eflalo)[grep(x,colnames(eflalo))])];
-                                                        return(idx)}))
-#If landing > threshold turn it into an 'NA'
+#Define per species what the maximum allowed catch is (larger than that value you expect it to be an error / outlier
+specBounds      <- lapply(as.list(specs),function(x){ 
+                     idx   <- grep(x,colnames(eflalo))         
+                              [grep("KG",colnames(eflalo)
+                              [grep(x,colnames(eflalo))])];
+                     wgh   <- 
+                      sort(unique(eflalo[which(eflalo[,idx]>0),idx]));
+                     difw  <- diff(log10(wgh));                                                         
+                   return(ifelse(any(difw > lanThres),wgh[rev(which(difw <= lanThres))],ifelse(length(wgh)==0,0,max(wgh,na.rm=T))))})
+
+#Make a list of the species names and the cut-off points / error / outlier point
+specBounds      <- cbind(specs,unlist(specBounds)); 
+
+#Put these values to zero
+specBounds[which(is.na(specBounds[,2])==T),2] <- "0"
+
+#Get the index (column number) of each of the species
+idx             <- unlist(lapply(as.list(specs),function(x){ 
+                 idx   <- grep(x,colnames(eflalo)) 
+                [grep("KG",colnames(eflalo)[grep(x,colnames(eflalo))])];
+                return(idx)}))
+
+#If landing > cut-off turn it into an 'NA'
 for(iSpec in idx) eflalo[which(eflalo[,iSpec] > an(specBounds[(iSpec-idx[1]+1),2])),iSpec] <- NA
 
 #Turn all other NA's in the eflalo dataset in KG and EURO columns to zero
