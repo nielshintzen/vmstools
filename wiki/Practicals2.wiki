@@ -144,7 +144,7 @@ As a rule of thumb, I normally use a factor 30 difference as a quick check.
 
 <code>
 #First get the species names in your eflalo dataset
-specs  <- substr(colnames(eflalo[grep("KG",colnames(eflalo))],7,9)
+specs  <- substr(colnames(eflalo[grep("KG",colnames(eflalo))]),7,9)
 lanThres <- 1.5 #this is approx 30x difference on a log10 scale)
 specBounds      <- lapply(as.list(specs),function(x){ idx   <- grep(x,colnames(eflalo))[grep("KG",colnames(eflalo)[grep(x,colnames(eflalo))])];
                                                         wgh   <- sort(unique(eflalo[which(eflalo[,idx]>0),idx]));
