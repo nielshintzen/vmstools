@@ -48,7 +48,7 @@ colrs <- c(
 #Turn the polygons into spatial polygons
 sp <- SpatialPolygons(habitat@polygons)
 
-#Look at the order of plotting
+#Look at the order of plotting (do I need it: ... not now, but later on yes!)
 sp@plotOrder
 plot(sp,col=colrs[an(habitat$substrate)],border=colrs[an(habitat$substrate)],add=T)
 lcolrs <- length(colrs)+1
@@ -99,6 +99,7 @@ The main 'engine' of most of these calculations is the point.in.polygon function
 Time to find some relationships. Let's take some beamtrawl fishers only and see what type of substrate they normally trawl. Do you have a gut-feeling already?
 
 <code>
+#Load the data, merge it, sort and filter and make a subset
 data(tacsat);data(eflalo)
 tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
 tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
@@ -127,9 +128,17 @@ tacsat <- sortTacsat(tacsat)
 #Read in the phytoplankton data
 path2phyto <- "D:/"
 phyto <- read.table(paste(path2phyto,"a34phy040616.txt",sep=""))
+
+#Convert the class to matrix
 phyto <- as.matrix(phyto)
+
+#The data is organised in such a way that 'on land' cells get value -99, R prefers NAs
 phyto[which(phyto == -99)][] <- NA
+
+#The orientation is a bit off, so transpose the data and change mirror over latitude (normally you have to look at your data to see how its organised)
 phyto <- t(phyto)[,dim(phyto)[1]:1]
+
+#Make a little picture
 image(phyto)
 #You can see the contours of the UK and the Netherlands & Denmark and even the southern part of Norway in there. Right the area most of our VMS pings are situated as well.
 
@@ -148,6 +157,7 @@ df <- subset(df,is.na(df$PHYTO)==F)
 The data needs to get a time stamp too, because it only represents 2 weeks (and allows you to add more weeks of data below the current data in the same dataframe). In that way, you can link your VMS with e.g. a whole year of phytoplankton data at once.
 
 <code>
+#Adding at date-time stamp to the phytoplankton data
 df$SI_DATIM <- as.POSIXct("25-06-1800 14:00",format="%d-%m-%Y %H:%M")
 
 #Now link the phytoplankton data to the VMS pings
