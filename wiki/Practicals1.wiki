@@ -33,7 +33,7 @@ Now it is time to install the VMStools package, you have to download it first ho
 
 <code>
 path2VMStoolsDownload <- "C:/downloads/" #this folder is an example folder
-install.packages(paste(path2VMStoolsDowload,"vmstools_0.60.zip",sep=""))
+install.packages(paste(path2VMStoolsDownload,"vmstools_0.60.zip",sep=""))
 </code>
 
 If all went well, you have now successfully installed VMStools. Note that you only need to go over this once and that all packages are available every time you start R. 
