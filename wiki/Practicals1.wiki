@@ -169,13 +169,35 @@ eflalo <- formatEflalo(eflalo)
 VMS and logbook data can be rather large in size (e.g. multiple years, lot's of vessels etc) and reading them all in at once might pose problems. It isn't a problem to do the whole job on, for example, a year-by-year basis using a 'loop' and combine the datasets.
 
 <code>
-years <- 2005:2010
+#First split the tacsat data into a 1800 and 1801 dataset
+# To get a simple tacsat date timestap, use the sortTacsat function
+tacsat <- sortTacsat(tacsat)
+tacsat$YEAR <- year(tacsat$SI_DATIM)
+
+#Split the data
+tacsat1800 <- subset(tacsat,YEAR == 1800)
+tacsat1801 <- subset(tacsat,YEAR == 1801)
+
+#Check if both datasets together hold the same number of records as the original tacsat dataset
+nrow(tacsat1800) + nrow(tacsat1801) #96882
+nrow(tacsat) #97051!!! So apparently, some date + time's are not converted properly, up to you to fix this!
+
+#Write files to disk
+write.table(tacsat1800, file = "C:/tmpTacsat/tacsat1800.csv", quote = TRUE, sep = ",",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
+
+write.table(tacsat1801, file = "C:/tmpTacsat/tacsat1801.csv", quote = TRUE, sep = ",",eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
+
+#Read it in again
+years <- 1800:1801
 path  <- "C:/tmpTacsat/"
 totalTacsat <- numeric()
 for(iYears in years){
-   tacsatYr <- readTacsat(paste(path,"tacsat_",iYears,sep=""))
+   tacsatYr <- readTacsat(paste(path,"tacsat",iYears,".csv",sep=""))
    totalTacsat <- rbindTacsat(totalTacsat,tacsatYr)
 }
+head(totalTacsat) #Note the first rows of NA's, needs to be removed
+totalTacsat <- totalTacsat[-1,]
+nrow(totalTacsat) #96882 again!
 </code>
 
 === Exercise 4 ===
