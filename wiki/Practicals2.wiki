@@ -78,7 +78,7 @@ table(idx)
 tacsat <- tacsat[which(idx==0),]
 </code>
 
-All in all, 14787 points are located in harbour (that is about 15% of the total dataset!). Let's see where they really are located and if our analyses made sense.
+All in all, 14787 points are located in harbour (that is about 15% of the total dataset!, but using the raw dataset, if you've used the 'on land' cleaned dataset, you will end up with a different value). Let's see where they really are located and if our analyses made sense.
 
 <code>
 library(maps);library(mapdata)
