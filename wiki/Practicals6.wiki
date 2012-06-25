@@ -29,6 +29,7 @@ These indicators aggregate the tacsat point data into a gridded data frame using
 Again, we have to start with the tacsat and eflalo data, make sure they are free from the easy-to-spot errors and link them up. As we do this for example purposes only, we skip the cleaning steps and move to linking the tacsat and eflalo datasets immediately. 
 
 <code>
+#Load the data, merge the datasets together and assign gear to tacsatp
 data(tacsat); data(eflalo)
 tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
 tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
@@ -47,6 +48,8 @@ tacsatp$SI_INTV <- tacsatp$INTV
 
 #Define an area of interest (prevent having an influence of VMS pings in a completely different area)
 spatBound <- list(x=c(-5,10),y=c(48,62)) #Spatial boundaries of approx the North Sea
+
+#Just some code to select only those tacsat records which are within these boundaries
 idxlon              <- which(tacsatp$SI_LONG >= spatBound$x[1] & tacsatp$SI_LONG <= spatBound$x[2])
 idxlat              <- which(tacsatp$SI_LATI >= spatBound$y[1] & tacsatp$SI_LATI <= spatBound$y[2])
 tacsatp             <- tacsatp[idxlon[which(idxlon %in% idxlat)],]
@@ -59,7 +62,7 @@ Ok, all the data has been cleaned, the interval rate has been calculated (option
 
 <code>
 #Set a working directory where the files will be written to disk
-setwd("D:/")
+setwd("C:/tmpTacsat/")
 ind5                <- indicators( indicatorNum=5,
                                    tacsatp,
                                    minThreshold=0, # percentage of points to be included in the Minimal Convex Polygon
