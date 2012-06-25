@@ -21,6 +21,7 @@ Although the technicalities might be a bit too much for you, the practical way i
 
 <code>
 data(tacsat)
+
 #Sort the data and make a subset
 tacsat <- sortTacsat(tacsat)[1:1000,]
 tacsat <- filterTacsat(tacsat,st=c(2,6),hd=NULL,remDup=T)
@@ -41,7 +42,9 @@ lines(interpolationcHs[[1]][-1,],col="red")
 Ok, we've managed to interpolate some of our data. Not in all instances interpolations were possible, as we only got:
 
 <code>
+#How many interpolations do I have?
 length(interpolationSL)
+#How many tacsat entries do I have?
 nrow(tacsat)
 </code>
 
@@ -50,6 +53,7 @@ nrow(tacsat)
 The format of the interpolation allows some 'lapply' functions to be executed directly on the object, in other cases however, it might be easier to convert the interpolated data back to the default tacsat format.
 
 <code>
+#Convert the interpolation to tacsat style data
 tacsatInt <- interpolation2Tacsat(interpolation,tacsat,npoints=10)
 
 #Each interpolation is splitted into 10 equally spaced points (including the start and the end point). In total 8 new points are added per interpolation.
@@ -66,7 +70,10 @@ The only way to really test if either of these two interpolations is any better 
 
 <code>
 #Make use of a 6-minute interval dataset, and subset that every 120 minutes
+#Load some high frequency VMS data
 data(VMShf)
+
+#And go through some formatting issues and very basic cleaning...
 colnames(VMShf) <- c("VE_REF","SI_LATI","SI_LONG","SI_SP","SI_HE","SI_DATIM")
 VMShf$VE_COU <- "Atlantis"
 VMShf$SI_DATE<- format(VMShf$SI_DATIM,format="%d/%m/%Y")
@@ -81,7 +88,7 @@ cHs <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="cHs",params
 #Then straight line
 SL <-interpolateTacsat(VMShf,interval=120,margin=10,res=100,method="SL",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=1)
 
-#Visualize the results
+#Visualize the results, note the diffInter function, what does it do?
 plot(diffInter(cHs,VMShf)[,"mean"],pch=19,ylab="difference",ylim=c(0,10))
 abline(h=1,col=2)
 points(diffInter(SL,VMShf)[,"mean"],col="blue",pch=19)
@@ -106,6 +113,7 @@ Especially when your study area is very small (e.g. only a few kilometers), it i
 
 First of all, select a vessel of which we know the gear width (e.g. a beam trawl has normally speaking twice 12 meter beams).
 <code>
+#Select one vessel
 unique(subset(eflalo,LE_GEAR == "TBB"))$VE_REF[1]
 subTacsat <- subset(tacsatp,VE_REF == "238")
 
@@ -118,6 +126,7 @@ ranges <- do.call(rbind,lapply(cHs,function(x){return(apply(x[-1,],2,range))}))
 xrange <- range(ranges[,"x"])
 yrange <- range(ranges[,"y"])
 
+#Plot the results
 plot(subTacsat$SI_LONG,subTacsat$SI_LATI,xlim=xrange,ylim=yrange,pch=19,col="blue",xlab="Longitude",ylab="Latitude")
 for(iInt in 1:length(cHs)){
   lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2])}
@@ -126,11 +135,12 @@ for(iInt in 1:length(cHs)){
 What we now basically would like to do is something close to this:
 
 <code>
+#Change width of the line to 2 instead of 1
 for(iInt in 1:length(cHs)){
   lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2],lwd=2)}
 </code>
 
-That did give it more wide gear tracks, but how wide are they really? The total distance from the left hand side of the picture to the right hand side equals aproximately:
+That did give it more wide gear tracks, but how wide are they really? The total distance from the left hand side of the picture to the right hand side equals approximately:
 
 <code>
 distance(3.6,51.8,4.5,51.8) #~62km
@@ -204,14 +214,19 @@ interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
 xrange        <- c(2.1,2.6); yrange <- c(51.3,51.65)
 grid          <- createGrid(xrange,yrange,resx=0.001,resy=0.0005)
 sPDF          <- createGrid(xrange,yrange,resx=0.001,resy=0.0005,type="SpatialPixelsDataFrame")
+
+#Add a column of data to the data.frame with only zeros
 sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
 
 lon <- tacsat$SI_LONG[c(12,13)]
 lat <- tacsat$SI_LATI[c(12,13)]
 
+#Do some fancy stuff and calculate the Confidence Interval (a lot of arguments to this function follow, just 'accept' that for the moment
 res <- calculateCI(intLon=lon,intLat=lat,vmsIdx1=12,vmsIdx2=13,VMS.=tacsat,
             grid=grid,sPDF=sPDF,interpolation=interpolation,int=4,    
             params=list(fm=0.45,distscale=3.1,sigline=0.42,st=c(2,6)))
+
+#Scale all values between 0 and 1
 res <- (res[[1]] - min(res[[1]])) / (max(res[[1]]) - min(res[[1]]))
 
 levelplot(matrix(res,nrow=655,ncol=537))
@@ -241,6 +256,8 @@ ranges <- do.call(rbind,lapply(interpolation,function(x){return(apply(x[-1,],2,r
 xrange        <- range(ranges[,1]); yrange <- range(ranges[,2])
 grid          <- createGrid(xrange,yrange,resx=0.01,resy=0.005)
 sPDF          <- createGrid(xrange,yrange,resx=0.01,resy=0.005,type="SpatialPixelsDataFrame")
+
+#Now I don't add zeros, but ones instead, because it's about the chance of NOT being trawled which declines with the values of the CI
 sPDF@data     <- data.frame(rep(1,length(sPDF@grid.index)))
 colnames(sPDF@data) <- "data"
 </code>
@@ -271,10 +288,17 @@ sPDF@data[idx,"data"]<- sPDF@data[idx,"data"] * (1-CI)
 As I am only interested in those areas where I do have trawling, I just simply only use that part where the chance of no trawling is smaller than 1. Thereafter I associate the value of the data with a color, which makes it easier to plot afterwards.
 
 <code>
+#Select those areas where trawling intensity is smaller than 1
 idxwithdata <- which(sPDF@data<1)
+
+#Get the coordinates of these areas
 coords      <- data.frame(coordinates(sPDF[idxwithdata,]))
 coords$data <- sPDF@data[idxwithdata,]
+
+#some nasty code here just to determine in which category (in total 9) the data belongs. This category automatically becomes the number of the color to use
 coords$color<- apply(abs(outer(seq(0,1,length.out=9),coords$data,"-")),2,which.min)
+
+#Define the ranges in longitude and lattitude
 xrange <- range(coords[,1]); yrange <- range(coords[,2])
 map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=c(yrange[1],54.6))
 map.axes()
@@ -290,6 +314,7 @@ for(i in 1:nrow(coords)){
             coords[i,2]+0.005,coords[i,2]+0.005),
         col=color[coords[i,"color"]],lwd=1,border=NA)
 }
+#Some plotting occurred on top of the map, so let's add the map again (but do not overwrite, hence the 'add=T' argument
 map("worldHires",fill=T,col="darkgreen",xlim=xrange,ylim=yrange,add=T) </code>
 
 That gives us a nice picture, let's see where the original VMS datapoints were located!
