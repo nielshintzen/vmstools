@@ -141,6 +141,11 @@ From both these examples you can tell already that it isn't easy to determine ac
 With the gear type available in tacsat, we can now compare the effort available in the VMS data and compare that with the effort data in the logbooks. Therefore however, we must first calculate the effort of the VMS data. 
 
 <code>
+#Start fresh
+data(tacsat); data(eflalo)
+tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+
+#Sort the data and calculate the effort
 tacsatp <- sortTacsat(tacsatp) #Make sure it is ordered correctly
 tacsatp <- effort(tacsatp, level = "trip", unit = "hours",fill.na=T)
 eflalop <- effort(eflalo,level="trip",unit="hours",fill.na=T)
