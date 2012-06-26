@@ -171,8 +171,7 @@ specBounds[which(is.na(specBounds[,2])==T),2] <- "0"
 
 #Get the index (column number) of each of the species
 idx             <- unlist(lapply(as.list(specs),function(x){ 
-                 idx   <- grep(x,colnames(eflalo)) 
-                [grep("KG",colnames(eflalo)[grep(x,colnames(eflalo))])];
+                 idx   <- grep(x,colnames(eflalo))               [grep("KG",colnames(eflalo)[grep(x,colnames(eflalo))])];
                 return(idx)}))
 
 #If landing > cut-off turn it into an 'NA'
