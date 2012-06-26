@@ -3,7 +3,7 @@
   * VMStools ICES course (25-29th June 2012)
     * [Practicals1 P1: Getting the VMS and logbook data into R]
     * [Practicals2 P2: Cleaning and processing the VMS and logbook data, and accounting for potential problems]
-    * [Practicals2i: Metier identification]
+    * [Practicals2i P2i: Metier identification]
     * [Practicals3 P3: Linking VMS and logbook data and exploring the benefits]
     * [Practicals4 P4: How to link VMS, logbook data to ‘spatial’ grids]
     * [Practicals5 P5: Interpolation methods for VMS tracks]
