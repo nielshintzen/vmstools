@@ -1,9 +1,9 @@
 = Practical 4: How to link VMS and logbook data to 'spatial' grids =
 
 == Introduction ==
-In general, logbook data is recorded a the ICES rectangle level. VMS data however, is not associated with any spatial scale (other than taking account of the uncertainty in the data itself which may be a limiting factor). In many instances however, the output of any analyses is required to be delivered at some spatial scale. If that spatial scale is ICES rectangle for logbook data, you're lucky, but most often it requires a bit more work. 
+In general, logbook data are recorded at the ICES rectangle level. VMS data, however, are not associated with any spatial scale (other than taking account of the uncertainty in the data themselves which may be a limiting factor). In many instances however, the output of any analysis is required to be delivered at some spatial scale. If that spatial scale is ICES rectangle for logbook data, you're lucky, but most often it requires a bit more work. 
 
-Here we will provide some tools to help you out with these exercise.
+Here we will provide some tools to help you out with such jobs.
 
 == Converting between spatial notations ==
 What if you are required to report VMS data analyses on the ICES rectangle. Will you go through some complicated procedure to find the closest ICES rectangle to your data, or just use the embedded functionality in VMStools! Let's see how that would work.
@@ -36,9 +36,9 @@ head(tacsatCompare)
 
 === Exercise 1 ===
   # When executing the function 'ICESrectangle2LonLat' a warning was given. What does this warning mean?
-  # Can you find out what the location is of the points not converted back to longitude,latitude. Does this make sense?
+  # Can you find out the locations of the points not converted back to longitude,latitude? Does this make sense?
 
-Similar things we can do with the logbook data
+We can of course do similar things with the logbook data
 
 <code>
 pos <- ICESrectangle2LonLat(eflalo$LE_RECT,midpoint=T)
@@ -49,7 +49,7 @@ eflalop <- cbind(eflalo,pos)
 eflalop$LE_AREA <- ICESarea(eflalop,roman=T)
 </code>
 
-Obviously, we can do the same for the VMS data, but try that yourself! One other type of conversion is one into the spatial <b>C-square</b> notation. This notation has been developed in Australia and is now implemented as the default FishFrame spatial scale. However, the C-square notation can take many different resolutions. Let's convert some VMS data into C-square notation.
+Obviously, we can do the same for the VMS data, but try that yourself! One other type of conversion available is into the spatial <b>C-square</b> notation. This notation was developed in Australia and has many handy features, ie it can be used for the entire globe.  It is now implemented as the default FishFrame spatial scale. The C-square notation is flexible since, although it is a standard 'naming convention', it can also take many different resolutions. Let's convert some VMS data into C-square notation.
 
 <code>
 #For this example, take the first six positions only
@@ -76,7 +76,7 @@ aggregate(eflalop$LE_KG_PLE,by=list(eflalop$LE_RECT),FUN=sum,na.rm=T)
 #This would be the picture associated with that catch distribution
 plotTools(eflalop,level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=FALSE,color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=c("LE_KG_PLE")))
 
-#Now at a slightly higher scale, the VMS data
+#Now at a slightly finer scale, the VMS data
 tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
 tacsatp$IDX       <- 1:nrow(tacsatp)
 
@@ -89,7 +89,7 @@ tacsatp$SI_STATE[tacsatFilter$IDX] <- 1
 tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
                         variable="all",level="day",conserve=T)
 
-#Lets count the number of rows in tacsatEflalo and compare with the original tacsatp file
+#Let's count the number of rows in tacsatEflalo and compare with the original tacsatp file
 nrow(tacsatp)
 nrow(tacsatEflalo)
 table(tacsatp$SI_STATE) #does this make sense?
@@ -103,7 +103,7 @@ x11()
 plotTools(tacsatEflalo,level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,log=F,gridcell=c(0.1,0.1),color=NULL,control.tacsat=list(clm="LE_KG_PLE"))
 </code>
 
-Observe the difference! That is quite a more detailed picture on plaice catch distribution. 
+Observe the difference! This is a much more detailed picture on plaice catch distribution. Note the definition of the Plaice Box which was gradually closed to large beamers between 1989 and 1994.
 
 === Exercise 2 ===
   # Aggregate COD catches on a CSquare notation of 0.5 degrees
@@ -135,7 +135,7 @@ coordinates(Grid) #Much better
 plot(Grid); map.axes()
 </code>
 
-Now you've defined your own grid, but obviously you want to link e.g. your VMS data points to this grid. In other words, you want to know in which grid cell each of your VMS positions would fall. Why is this handy? Primarily because you can now calculate certain indicators based on a home defined grid (e.g. kg of cod in a certain area) and it allows you to combine different data sources within the same grid! But more on that later on. First, let's see in which grid cell all theVMS positions fall.
+Now you've defined your own grid, but obviously you want to link, e.g. your VMS data points to this grid. In other words, you want to know in which grid cell each of your VMS positions would fall. Why is this handy? Primarily because you can now calculate certain indicators based on a home defined grid (e.g. kg of cod in a certain area) and it allows you to combine different data sources within the same grid! But more on that later on. First, let's see in which grid cell all theVMS positions fall.
 
 <code>
 #Get some tacsat positions, and link them to the Grid
