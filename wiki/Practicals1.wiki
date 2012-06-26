@@ -151,6 +151,15 @@ write.table(tacsat, file = "C:/tmpTacsat/tacsat.csv", quote = TRUE, sep = ",",
 
 #Read in tacsat file
 tacsat <- readTacsat("C:/tmpTacsat/tacsat.csv")
+str(tacsat) #How does that look?
+
+#Or we can use the build-in read.csv function from R
+tacsat <- read.csv("C:/tmpTacsat/tacsat.csv")
+str(tacsat) #How does that look?
+
+tacsat <- formatTacsat(tacsat)
+str(tacsat) #How about now?
+
 </code>
 
 Obviously the same thing works for eflalo. However, in most instances, the format of the data (i.e. the classes of each of the columns) is not correct. This will pose problem along the way and therefore they need to be put into the correct format. 
