@@ -125,7 +125,7 @@ res           <- activityTacsat(subset(tacsatp,LE_GEAR == "OTM" &
 
 #Make sure the same selection is used when writing the results to the original tacsat dataset
 tacsatSubset <- subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801 & is.na(SI_SP)==F)
-tacsatSubset$SI_STATE <- res
+tacsatSubset$SI_STATE <- na.omit(res)
 
 #Lets look at the results
 spds <- table(tacsatSubset$SI_SP,tacsatSubset$SI_STATE)
