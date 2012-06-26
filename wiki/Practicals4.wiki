@@ -124,12 +124,12 @@ xrange <- range(x,na.rm=T)
 yrange <- range(y,na.rm=T)
 
 #returns a grid with 11 cells in the x-direction and 11 in the y-direction
-Grid <- createGrid(xrange,yrange,1,0.5,type="SpatialGrid") #just like an ICES rectangle grid
+Grid <- createGrid(xrange,yrange,1,0.5,type="SpatialPixels") #just like an ICES rectangle grid
 
 #Let's see what is stored in the 'Grid' object
 slotNames(Grid)
 >[1] "coords"      "grid"        "grid.index"  "bbox"        "proj4string"
-Grid@coords #this doesn't show much...
+Grid@coords #is the same as...
 coordinates(Grid) #Much better
 
 plot(Grid); map.axes()
