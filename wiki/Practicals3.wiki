@@ -168,7 +168,11 @@ Quite a difference, not! Having VMS and logbook data available allows you to dis
 Similar to the analyses above, we can make a picture of, for example, plaice landings on the spatial scale of VMS. Note here, however, that we are about to dispatch landings at a much finer spatial scale than at which the original data are stored (ie. the logbooks). We might hope that this is a sensible interpretation of the two data sources available, exploiting each to permit the finest possible spatial resolution. It is up to you, however, to decide if this is a wise analysis to perform!
 
 <code>
-#This code will dispatch KG and EURO on the ping scale to VMS
+#This code will dispatch KG and EURO on the ping scale to VMS, we need to add activity to tacsatp however (we did this before, but let's take a quick and dirty approach here)
+idx <- which(tacsatp$SI_SP >=2 & tacsatp$SI_SP <= 8)
+tacsatp$SI_STATE <- 0
+tacsatp$SI_STATE[idx] <- 1
+
 tacsatEflalo      <- splitAmongPings(tacsat=subset(tacsatp,LE_GEAR == "TBB" & year(SI_DATIM)==1801),eflalo=subset(eflalo,LE_GEAR == "TBB"),
                         variable="all",level="day",conserve=T)
 
