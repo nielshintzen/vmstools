@@ -130,7 +130,7 @@ Grid <- createGrid(xrange,yrange,1,0.5,type="SpatialPixels") #just like an ICES 
 slotNames(Grid)
 >[1] "coords"      "grid"        "grid.index"  "bbox"        "proj4string"
 Grid@coords #is the same as...
-coordinates(Grid) #Much better
+coordinates(Grid) #I prefer this way, works more often too!
 
 plot(Grid); map.axes()
 </code>
