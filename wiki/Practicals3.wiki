@@ -100,6 +100,9 @@ tacsatp           <- merge(tacsatp,tacsatSegment[,c("idx","SI_STATE")],by=c("idx
 #Lets look at the results, left = no-fishing, right = fishing
 spds <- table(tacsatp$SI_SP,tacsatp$SI_STATE)
 barplot(spds,names.arg=rep(dimnames(spds)[[1]],2),beside=T)
+
+#Don't forget to turn your LE_GEAR column back to 'character'
+tacsatp$LE_GEAR <- ac(tacsatp$LE_GEAR)
 </code>
 
 ==== activityTacsat ====
