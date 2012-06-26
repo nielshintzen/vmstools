@@ -52,12 +52,8 @@ outPath   <- "C:/output/"
 Various parameters which you can set such as the maximum mesh size
 
 <code>
-spThres   <- 20   #Maximum speed threshold in analyses in nm
 msThres   <- 150  #Maximum meshsize threshold in mm
-intThres  <- 5    #Minimum difference in time interval in minutes to prevent pseudo duplicates
 lanThres  <- 1.5  #Maximum difference in log10-transformed sorted weights
-relSpThres<- 0.3  #Maximum deviance from median fishing speed to be included as 'fishing'
-spatBound <- list(xrange = c(-4,10),yrange = c(50,62))
 </code>
 
 Make sure the eflalo data are clean
