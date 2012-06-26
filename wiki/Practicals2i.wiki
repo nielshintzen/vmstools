@@ -157,10 +157,11 @@ STEP 1 - Identifying main species
 
 Exploration:
 <code>
-explo               <- selectMainSpecies(eflalo,analysisName,RunHAC=TRUE,DiagFlag=FALSE)
+explo <-selectMainSpecies(eflalo,analysisName,RunHAC=TRUE,DiagFlag=FALSE)
 </code>
 STEP 1- Selection of main species
-<code>             <- extractTableMainSpecies(eflalo,explo$namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
+<code>
+Step1<- extractTableMainSpecies(eflalo,explo$namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
 </code>
 
 Optional save of the Explo Step 1 output
