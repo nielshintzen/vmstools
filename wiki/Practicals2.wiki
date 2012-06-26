@@ -213,5 +213,5 @@ head(eflalo[idx,])
 columnIndex <- kgeur(colnames(eflalo))
 
 #Sum catches of this selection by species ('colSums'), and sort the catches ('sort'), look at the last ones in the row, these are the ones with the highest catches
-sort(colSums(eflalo[,columnIndex]))
+sort(colSums(eflalo[idx,columnIndex]))
 </code>
