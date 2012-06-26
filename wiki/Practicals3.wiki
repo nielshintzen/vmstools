@@ -144,6 +144,7 @@ With the gear type available in tacsat, we can now compare the effort available 
 #Start fresh
 data(tacsat); data(eflalo)
 tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
 
 #Sort the data and calculate the effort
 tacsatp <- sortTacsat(tacsatp) #Make sure it is ordered correctly
