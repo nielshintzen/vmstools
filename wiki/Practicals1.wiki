@@ -210,6 +210,6 @@ nrow(totalTacsat) #96882 again!
 </code>
 
 === Exercise 4 ===
-  # Split the example dataset into a year 1800 and 1801 and save it to disk
-  # Read the separate year files in and combine them into one 'totalTacsat' file.
+  # Split the example dataset into a set with vessel names smaller than 1000 and bigger than thousand and save these to disk.
+  # Read the separate files in and combine them into one 'totalTacsat' file.
   # How many rows of data do you have, and how many columns? Does that match up with the number of rows and columns mentioned earlier in this practical?
