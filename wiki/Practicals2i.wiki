@@ -1,6 +1,6 @@
 #summary One-sentence summary of this page.
 
-= Practical 2i. Metier Identification =
+= Practical 2i. Metier Identification in vmstools=
 ==Introduction==
 The European Common Fisheries Policy (CFP) calls for the implementation of an ecosystem-based approach to fisheries management (EBFM), to achieve good environmental status as required by the Marine Strategy Framework Directive. This has led in the last years to the enforcement of an area-based management scheme and includes measures to control and limit the fishing impact on the ecosystem. As part of the process, the CFP recognizes the importance of accounting for heterogeneity in fishing practices and there is a desire to move toward a fleet-based management. To make this approach operational, detailed information is needed on the various fishing activities of the fleets, as well as on their spatial and temporal distribution.  The overall aim is to pigeonhole fishing activity into fewer and more easy-to-manage categories. However, no single and fully unified approach has emerged, as there are so many criteria and scales that can be used. The European Community’s Data Collection Framework (DCF; EC, 2008), has been an important milestone and suggests a common framework for all European Member states, defining the needs and requirement for fisheries data collection. The DCF has adopted the following definitions which will be used throughout the subsequent analyses: 
 
@@ -21,48 +21,49 @@ The simplest approach consists of selecting the fishing trips where a certain ca
 
 Included in vmstools is an operational tool that: i) does sensitivity analyses of métier definition (at the level 7) to a variety of previously used classification methods; ii) predicts the métier of a new dataset; and iii) links the results obtained at level 7 to the DCF level 5.
 
-==Metier identification in vmstools==
 
-Make sure there is no crap lying around in R
+==Preparation and cleaning==
+
+Make sure there is no crap lying around in R:
 
 <code>
 rm(list=ls())
 </code>
 
-Make sure libraries are attached
+Make sure libraries are attached:
 <code>
 library(vmstools)
 library(maps)
 library(mapdata)
 </code>
 
-Increase memory size to maximum
+Increase memory size to maximum:
 <code>
 memory.size(4000)
 </code>
 
 
-Set up directories where the code will leave the output
+Set up directories where the code will leave the output:
 <code>
 codePath <- "C:/R/"
 dataPath <- "C:/data/"
 outPath  <- "C:/output/"
 </code>
 
-Various parameters which you can set such as the maximum mesh size
+Set various parameters such as the maximum mesh size:
 
 <code>
 msThres  <- 150  #Maximum meshsize threshold in mm
 lanThres <- 1.5  #Maximum difference in log10-transformed sorted weights
 </code>
 
-Make sure the eflalo data are clean
+Make sure the eflalo data are clean:
 <code>  
 idx <- which(eflalo$LE_MSZ >= msThres)
 eflalo <- eflalo[-idx,]
 </code>
 
-Remove outlying catch records
+Remove outlying catch records:
 <code>
 specs <- substr(colnames(eflalo)[grep("KG",colnames(eflalo))],7,9)
   #- Calculate the landing boundaries
@@ -78,19 +79,19 @@ idx <- unlist(lapply(as.list(specs),function(x){ idx   <- grep(x,colnames(eflalo
                                                         return(idx)}))
 </code>  
 
-If landing is greater than threshold boundary then it gets to be NA
+If landing is greater than threshold boundary then it gets to be NA:
 
 <code>
 for(iSpec in idx) eflalo[which(eflalo[,iSpec] > an(specBounds[(iSpec-idx[1]+1),2])),iSpec] <- 0
 for(i in kgeur(colnames(eflalo))) eflalo[which(is.na(eflalo[,i]) == T),i] <- 0
 </code>
 
- Remove non-unique trip numbers
+Remove non-unique trip numbers:
 <code>
 eflalo <- eflalo[!duplicated(eflalo$LE_ID),]
 </code>
 
-Remove records with arrival date before departure date
+Remove records with arrival date before departure date:
 <code>
 eflalop <- eflalo
 eflalop$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,  eflalo$FT_DTIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M:%S")
@@ -100,32 +101,29 @@ eflalo <- eflalo[idx,]
 </code>
 
 
-Perform the métier analyses. Start by attaching inbuilt datasets to R search path.
+==Perform the métier analyses==
+
+Start by attaching inbuilt datasets to R search path:
 <code>
 data(correspLevel7to5)
-data(correspMixedMetier)
-</code>
-Have a look at them to see if you can work out what they do.
-
+data(correspMixedMetier)</code>
+Note: Have a look at these data to see if you can work out what they might do.
 
 <code>
-eflaloOrig <- eflalo # Good idea to 'save' the original data in case some mistake.
-</code>
+eflaloOrig <- eflalo # Good idea to 'save' the original data in case some mistake.</code>
 
 Give the analysis a name and create a directory for the output:
 
 <code>
 analysisName="Atlantis"
-dir.create(paste(outPath,analysisName,sep="")); setwd(paste(outPath,analysisName,sep="/"))
-</code>
+dir.create(paste(outPath,analysisName,sep="")); setwd(paste(outPath,analysisName,sep="/"))</code>
 
-Keeping only L_ID and the value columns for tidiness
+Keep only L_ID and the value columns for economy & tidiness:
 
 <code>
-
 eflalo <- eflalo[,c("LE_ID",grep("EURO",names(eflalo),value=T))]
-eflalo[is.na(eflalo)]=0
-</code>
+eflalo[is.na(eflalo)]=0</code>
+
 Removing any negative and null values:
 <code>
 null.value <- vector()
@@ -138,38 +136,32 @@ if(length(null.value)!=0) {
   Store(LogEvent.removed)
 }
 names(eflalo)[-1]=unlist(lapply(strsplit(names(eflalo[,-1]),"_"),function(x) x[[3]]))
-
- 
 </code>
 
 Removing 'miscellaneous' species:
 <code>
-eflalo  <- eflalo[,!names(eflalo)=="MZZ"]
-</code>
+eflalo  <- eflalo[,!names(eflalo)=="MZZ"]</code>
 
-Optional save cleaned eflalo data to disk if you don't want to keep doing the above!
+Optional save of the cleaned eflalo data to disk if you don't want to keep doing the above!
 <code>
-#save(eflalo,file=paste(outPath,"cleanEflalo.RData",sep=""))
-</code>
+save(eflalo,file=paste(outPath,"cleanEflalo.RData",sep=""))</code>
 
 
 STEP 1 - Identifying main species
 
 Exploration:
 <code>
-explo <-selectMainSpecies(eflalo,analysisName,RunHAC=TRUE,DiagFlag=FALSE)
+explo <-selectMainSpecies(eflalo,analysisName,RunHAC=TRUE,DiagFlag=FALSE
 </code>
 STEP 1- Selection of main species
 <code>
-Step1<- extractTableMainSpecies(eflalo,explo$namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
-</code>
+Step1<- extractTableMainSpecies(eflalo,explo$namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)</code>
 
 Optional save of the Explo Step 1 output
 <code>
-save(explo,Step1,file="Explo_Step1.Rdata")
-</code>
+save(explo,Step1,file="Explo_Step1.Rdata")</code>
 
-Step 2 - Principal Components Analysis (PCA) or Not PCA
+STEP 2 - Principal Components Analysis (PCA) or Not PCA
 
 <code>
 option_step2 <- "PCA_70"
@@ -180,25 +172,24 @@ if (option_step2=="PCA_70") Step2 <- getTableAfterPCA(Step1,analysisName,pcaYesN
 if (option_step2=="PCA_SC") Step2 <- getTableAfterPCA(Step1,analysisName,pcaYesNo="pca",criterion="screetest") else    # criterion="screetest"
 if (option_step2=="NO_PCA") Step2 <- getTableAfterPCA(Step1,analysisName,pcaYesNo="nopca",criterion=NULL)
 </code>
-Optional save of step 2 output
+Optional save of step 2 output:
 <code>
-#save(Step2,file="Step2.Rdata")
+save(Step2,file="Step2.Rdata")
 </code>
 
-STEP 3- Clustering methods: HAC, CLARA or KMEANS (step 3)
+STEP 3 - Clustering methods: HAC, CLARA or KMEANS (step 3)
 
-Set option
+Chose which clustering method to play with:
 <code>  
 option_step3="CLARA"
 </code>
-Create directory to store output
+Create directory to store output:
 <code>
-
 if (!file.exists(option_step3)) dir.create(option_step3)
 setwd(paste(outPath,analysisName,option_step2,option_step3,sep="/"))
 </code>
 
-Do the cluster analyses
+Do the cluster analyses:
 <code>
 if (option_step3=="HAC")    Step3 <- getMetierClusters(Step1,Step2,analysisName,methMetier="hac",param1="euclidean",param2="ward") else
 if (option_step3=="CLARA")  Step3 <- getMetierClusters(Step1,Step2,analysisName=analysisName,methMetier="clara",param1="euclidean",param2=NULL) else
@@ -211,19 +202,8 @@ save(Step3,file="Step3.Rdata")
 
 Restore the data
 <code>
-
-eflalo <- eflaloOrig
-</code>
+eflalo <- eflaloOrig </code>
 
 ==Exercises==
+
 Explore and interpret the output of the 3 steps.
-
-
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
