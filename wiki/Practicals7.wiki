@@ -20,7 +20,7 @@
 ==Getting started==
 As usual we have to add the inbuilt data sets to R's search path, install the vmstools library, and 'clean' the data prior to any analysis.
 
-Loading the library, a usual start to every analyses.
+Loading the library, a usual start to every analysis.
 
 <code>
 library(vmstools)
@@ -36,7 +36,7 @@ data(euharbours)
 euharbours <- harbours
 </code>             
 
-As usual, and especially necessary for your own data, format the data.
+As usual, and especially necessary for your own data, format the data:
 
 <code>
 #Format and sort the data
@@ -45,7 +45,7 @@ tacsat <- formatTacsat(tacsat)
 tacsat <- sortTacsat(tacsat)
 </code>
 
-The code that turns the data into FishFrame data has a slightly different setup than the other function's you've seen so far. Especially the way logbook and VMS data are linked is different and it requires a pre-definition of point ins harbour. Here we test whether VMS positions are in harbour or not.
+The code that turns the data into FishFrame data has a slightly different setup than the other functions you've seen so far. Especially the way logbook and VMS data are linked is different and it requires a pre-definition of points in harbour. Here we test whether VMS positions are in harbour or not.
 
 <code>  
 #Find out in which harbour they are located
@@ -72,7 +72,7 @@ idx <- which(inHarb==0)
 tacsat[idx,"SI_FT"] <- cumsum(inHarb) [idx] # add a SI_FT index
 </code>
 
-Linking logbooks and VMS is defined based on mid-points of trips and therefore requires points outside of a harbour but also the departure and arrival dates.
+Linking logbooks and VMS is defined here based on mid-points of trips and therefore requires points outside of a harbour but also the departure and arrival dates.
 
 <code>
 #A way to get a trip identifier to the tacsat dataset, some clever coding, but perhaps a bit more difficult to understand. Have a look at what the 'diff' function really does
@@ -83,7 +83,7 @@ tacsat[which(endTrip<0),"SI_FT"]    <-  tacsat[which(endTrip<0)-1,"SI_FT"]
 tacsat <- tacsat[which(inHarb==0 |  startTrip>0 |  endTrip<0),]
 </code>
 
-Now assign activity state (e.g. fishing v steaming) to each ping. Note that this is optional. If detectFishing = TRUE in mergeEflalo2Pings then the function/code will do this part automatically. You might want, for example, to apply your own rules to identify fishing. You can do it here setting detectFishing = FALSE
+Now assign activity state (e.g. fishing v steaming) to each ping. Note that this is optional. If detectFishing = TRUE in mergeEflalo2Pings then the function/code will do this part automatically. You might want, for example, to apply your own rules to identify fishing. You can do it here by setting detectFishing = FALSE
 
 <code>
 #Add activity to the dataset
@@ -91,7 +91,7 @@ tacsat$SI_STATE <- 2 # init (1 = fishing; 2 = steaming)
 tacsat$SI_STATE [(tacsat$SI_SP>4 & tacsat$SI_SP<8)] <-1
 </code>
 
-Sometimes you get naming mistakes and below is some example code that might be useful to deal with these:
+Sometimes you get naming mistakes in eflalo and below is some example code that might be useful to deal with these:
 
 <code>
 #    if(!match('LE_MET_level6',colnames(eflalo))>0){
@@ -111,7 +111,7 @@ no.of.boats              <- 50 # lets's do 50 boats
 which.boats <- unique(tacsat$VE_REF)[seq(1,how.many.boats.in.tacsat,length=no.of.boats)]
 </code>
 
-This code writes data to the c:\\ drive so it's safe to clean it out first to avoid confusion:
+This code writes data to the c:\\ drive so it's a good idea to clean it out first to avoid confusion:
 
 <code>
 unlink("c:\\output\\*") #delete everything in c:\\output to avoid confusion.
@@ -136,7 +136,7 @@ Another option might be to run the code for ALL the vessels you have available. 
 #                     what.speed="calculated"))
 </code>
 
-Tidy up the results in your R directory
+Tidy up the results in your R directory:
 
 <code>
 gc(reset=TRUE)
@@ -216,7 +216,7 @@ Note that the file of interest (FishFrame format) will be in c:\\output and is c
 
 ==Output to more formal GIS:==
 
-Run similar code as described above but add in the argument.
+Add in the arguments for a grid below:
 
 <code>
 # Set up desired grid size and range
@@ -226,11 +226,11 @@ ea <- 10
 so <- 49
 no <- 59
 
-#Directory to put output file in and name of file
+#Directory to put output file in and the name of the file
 setwd('c://output')
 outfile <- 'fishlandings.asc'
 
-#Run the function vmsGridGreate which has an option to output an ASCII grid that is in ArcView format but can be read by other GIS programs
+#Run the function vmsGridGreate which has an option to output an ASCII grid that is in ArcView format but can also be read by other GIS programs
 output.mat<-vmsGridCreate(df2, we=we,ea=ea,so=so,no=no,nameLon = "SI_LONG", nameLat = "SI_LATI",plotMap=F,
 nameVarToSum="LE_KG_PLE",cellsizeX = grid.size, cellsizeY = grid.size,
 legendx="bottomright",numCats=9,plotPoints=F,legendncol=2,legendtitle="kgs",outGridFile=outfile)
