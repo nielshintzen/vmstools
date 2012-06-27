@@ -91,6 +91,11 @@ cbind(ind5,ind5_2)
 That was DCF indicator number 5, and changing the resolution made quite a change. Let's move on to indicator number 6 and 7.
 
 <code>
+library(adehabitat); library(gpclib)
+#If it doesn't work:
+# install.packages("adehabitat",repos=getOption("repos"))
+# install.packages("gpclib",repos=getOption("repos"))
+
 ind6 <- indicators(indicatorNum=6,
            tacsatp,
            pctThreshold=90,
