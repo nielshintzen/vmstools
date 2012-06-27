@@ -174,7 +174,7 @@ tacsatp <- sortTacsat(tacsatp)
 tacsatp <- intervalTacsat(tacsatp,level="trip",fill.na=TRUE)
 tacsatp$SI_INTV <- tacsatp$INTV
 gearWidth$LE_GEAR <- ac(gearWidth$LE_GEAR)
-tacsatp$LE_WIDTH <- merge(tacsatp,gearWidth,by="LE_GEAR")$LE_WIDTH
+tacsatp <- merge(tacsatp,gearWidth,by="LE_GEAR")
 tacsatp$TR_AREA <- (tacsatp$SI_INTV / 60) * (tacsatp$LE_WIDTH / 1000) * (tacsatp$SI_SP *1.852)
 </code>
 
