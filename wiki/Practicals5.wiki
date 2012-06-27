@@ -54,7 +54,7 @@ The format of the interpolation allows some 'lapply' functions to be executed di
 
 <code>
 #Convert the interpolation to tacsat style data
-tacsatInt <- interpolation2Tacsat(interpolation,tacsat,npoints=10)
+tacsatInt <- interpolation2Tacsat(interpolationcHs,tacsat,npoints=10)
 
 #Each interpolation is splitted into 10 equally spaced points (including the start and the end point). In total 8 new points are added per interpolation.
 nrow(tacsatInt)
