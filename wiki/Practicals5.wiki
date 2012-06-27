@@ -113,10 +113,11 @@ Especially when your study area is very small (e.g. only a few kilometers), it i
 
 First of all, select a vessel of which we know the gear width (e.g. a beam trawl has normally speaking twice 12 meter beams).
 <code>
+data(eflalo); data(tacsat)
 #Select one vessel
 unique(subset(eflalo,LE_GEAR == "TBB"))$VE_REF[1]
 
-subTacsat <- subset(tacsatp,VE_REF == "238")
+subTacsat <- subset(tacsat,VE_REF == "238")
 
 #Interpolate the dataset
 cHs <-interpolateTacsat(subTacsat,interval=120,margin=10,res=100,method="cHs",params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),headingAdjustment=0)
@@ -266,6 +267,7 @@ colnames(sPDF@data) <- "data"
 I've created a data frame where I can store the chance that an area is untrawled, which obviously ranges between 0 and 1. I call this the sPDF (spatial data frame). Hereafter I need to fill the spatial dataframe based on the calculations of the CI. The functions returns the index of the dataframe where data on the CI should be stored (not in every grid cell, but just a selection) and the value of the CI cells.
 
 <code>
+library(maps); library(mapdata); library(RColorBrewer)
 #Start the loop
 for(iNt in 1:length(interpolation)){
 print(iNt)
