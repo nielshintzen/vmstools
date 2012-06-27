@@ -115,6 +115,7 @@ First of all, select a vessel of which we know the gear width (e.g. a beam trawl
 <code>
 #Select one vessel
 unique(subset(eflalo,LE_GEAR == "TBB"))$VE_REF[1]
+
 subTacsat <- subset(tacsatp,VE_REF == "238")
 
 #Interpolate the dataset
