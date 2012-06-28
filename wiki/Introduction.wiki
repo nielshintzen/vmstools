@@ -35,7 +35,7 @@ Alternatively, you can check out the code from https://vmstools.googlecode.com/s
 Finally, there is a wee trap for beginners when logging in for the first time - make sure that you use the password for the project that googlecode supplies you - not your login password to google itself (slightly counter-intuitive, I know)! 
 
 == Installing the VMStools package ==
-Download the VMStools zip or rar file from the repository under the download tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in /trunk of the repository. Once you've installed all secondary packages install VMStools using <code>install.packages("yourPath/vmstools.zip")</code>
+Download the VMStools zip or rar file from the repository under the download tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in /trunk of the repository. 
 The packages VMStools depends on can easily be installed through:
 <code>vmstoolsPackages <- 
   c("amap","cluster","doBy","data.table","FactoMineR","foreign",
@@ -44,3 +44,5 @@ The packages VMStools depends on can easily be installed through:
   "classInt")
 
 for(i in vmstoolsPackages) try(install.packages(pkgs=i,repos=getOption("repos"))) </code>
+
+Once you've installed all secondary packages install VMStools using <code>install.packages("yourPath/vmstools.zip")</code>
