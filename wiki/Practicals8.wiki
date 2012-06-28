@@ -168,7 +168,7 @@ df$SI_DATIM <- as.POSIXct("25-06-1800 14:00",format="%d-%m-%Y %H:%M")
 res <- clipObs2Tacsat(tacsat,df,method="grid",control.grid=list(resx=0.1,resy=0.05,gridBbox="obs"),temporalRange=c(-(7*24*60),(7*24*60)),all.t=F)
 </code>
 
-That was just linking the two datasets, however, we would like do some sort of analyses with it. Perhaps associate each VMS ping with a phytoplankton value!
+That was just linking the two datasets, however, we would like do some sort of analyses with it. Perhaps associate each VMS ping with a phytoplankton value! Keep well in mind however that we do not link phytoplankton to VMS but VMS to phytoplankton! So only those VMS records that are within the 2 weeks of our phytoplankton data, and appear at the right spot will be linked to our phytoplankton data. In statistics, a model will look like this: phytoplankton ~ VMS + .... and not VMS ~ phytoplankton!
 
 <code>
 head(res[[1]]) #The total observation dataset, now gridded with grid index value
