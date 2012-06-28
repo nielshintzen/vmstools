@@ -112,6 +112,7 @@ spo     <- SpatialPoints(coordinates(tacsat[,c("SI_LONG","SI_LATI")]))
 sp      <- SpatialPolygons(habitat@polygons)
 idx     <- overlay(spo,sp) #Get a cup of coffee, this might take a while...!
 tacsat$SUBSTRATE <- habitat$substrate[idx]
+
 table(tacsat$SUBSTRATE)
 </code>
 
