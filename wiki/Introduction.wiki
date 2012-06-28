@@ -23,7 +23,7 @@ You will need the following software to use the VMStools software and repository
   * For very enthusiastic users / developers: An SVN (subversion) client. For Windows users, we recommend TortoiseSVN. Linux users will typically have access to such a client through their package distribution system.
   * Some way to write and edit R code. For Windows, try RStudio or Tinn-R. For Linux, you almost certaintly already have Vi
 
-== Getting the Code ==
+== Getting the Code for enthusiastic users / developers ==
 Once you've got all the necessary bits and pieces, the next step is to fetch a "working copy" of the VMStools repository from the server. The SVN client that you have installed takes care of this. The general process is client specific, but generally involves two steps 
   # Create a directory for your working copy (e.g. Desktop/VMStools) and 
   # "Checking out" the repository.
