@@ -142,6 +142,7 @@ EEZ <- as(EEZ,"SpatialPolygons")
 
 #Now select EEZ polygon 165
 EEZNLD <- EEZ[165]
+
 plot(EEZNLD)
 
 #Overlay the EEZ with the tacsat points, I first need to convert my tacsat points to SpatialPoints however.
