@@ -179,6 +179,9 @@ tacsatLinked$PHYTO <- res[[1]]$PHYTO[match(res[[2]]$GR_ID,tacsatLinked$GR_ID)]
 #A completely arbitrary picture of the results
 # Do they fish harder when there is more phytoplankton?
 plot(tacsatLinked$SI_SP~tacsatLinked$PHYTO,xlab="Phytoplankton abundance",ylab="Speed (knots)",pch=19)
+
+#And which phytoplankton datapoints got linked up in the end:
+plotTools(tacsatLinked,level="gridcell",xlim=c(-4,9),ylim=c(51,60),gridcell=c(0.1,0.05),control.tacsat=list(clm="PHYTO"),col=heat.colors(9))
 </code>
 
 === Exercise 1 ===
