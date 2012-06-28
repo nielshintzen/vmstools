@@ -119,6 +119,46 @@ tacsat$SUBSTRATE <- habitat$substrate[idx]
 table(tacsat$SUBSTRATE)
 </code>
 
+=== Link VMS with EEZ map ===
+Because the habitat map is so big, and might cause memory problems, we also do very similar things with an EEZ shapefile which is much smaller in size.
+
+Download the EEZ shapefile [http://code.google.com/p/vmstools/downloads EEZ.shp] and place it in a folder you can find easily and unzip the file. We will read the file in, make some simple plots of the total shapefile and extract the Dutch EEZ out of it. Thereafter we will see and plot which tacsat points are located inside the EEZ and which ones outside. A practical example could be that I am interested to study which fraction of the total Dutch fleet effort is allocated inside and outside the EEZ.
+
+<code>
+#Set path to EEZ file
+path <- "C:/tmpTacsat/"
+
+#Read all EEZ of the world
+EEZ         <- readShapePoly(paste(path,"World_EEZ_v2_20081031.shp",sep=""));
+
+#Plot the EEZ's
+plot(EEZ)
+
+#Take the EEZ of the Netherlands
+which(EEZ$Country == "Netherlands") #165
+
+#To substract the Dutch EEZ out of the full file, I first need to turn the EEZ into a SpatialPolygons
+EEZ <- as(EEZ,"SpatialPolygons")
+
+#Now select EEZ polygon 165
+EEZNLD <- EEZ[165]
+plot(EEZNLD)
+
+#Overlay the EEZ with the tacsat points, I first need to convert my tacsat points to SpatialPoints however.
+data(tacsat)
+
+sptacsat <- SpatialPoints(coordinates(tacsat[,c("SI_LONG","SI_LATI")]))
+
+idx      <- overlay(sptacsat,EEZNLD)
+
+#Plot the Dutch EEZ once more, and add the points inside the EEZ in blue and outside in red.
+plot(EEZNLD)
+points(tacsat$SI_LONG[which(idx==1)],tacsat$SI_LATI[which(idx==1)],col="blue")
+points(tacsat$SI_LONG[which(is.na(idx)==T)],tacsat$SI_LATI[which(is.na(idx)==T)],col="red")
+
+map.axes()
+</code>
+
 === Link VMS with phyto plankton map ===
 Some datasets however, we'd like to link to VMS, change considerably over time. Think for example about seabirds following fishing vessels, the benthic community composition during a year or phytoplankton abundance in the North Sea. This requires us to 'overlay' the VMS and other datasets in both time and space. This is obviously different from the exercise above where we were only overlaying space.
 
