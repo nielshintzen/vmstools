@@ -71,6 +71,8 @@ spo <- SpatialPoints(coordinates(data.frame(SI_LONG=pnt[1],
 #Use the magic 'overlay' function to see in which polygon it is located
 idx <- overlay(spo,sp); print(idx)
 habitat$substrate[idx]
+
+#Have a look at the map and plot the point, is it really in Mud to sandy mud?
 points(pnt[1],pnt[2],pch=19)
 </code>
 
