@@ -71,6 +71,7 @@ spo <- SpatialPoints(coordinates(data.frame(SI_LONG=pnt[1],
 #Use the magic 'overlay' function to see in which polygon it is located
 idx <- overlay(spo,sp); print(idx)
 habitat$substrate[idx]
+points(pnt[1],pnt[2],pch=19)
 </code>
 
 That wasn't too difficult, and you didn't notice the polygon inside polygon issue at all. That is how nice these things could work. Note that you can have multiple points inside the SpatialPoints. However, if you want / need to do these calculations yourself (because you not only want to perform these analyses, but also want to fully understand what is going on), here is some Do It Yourself code!
