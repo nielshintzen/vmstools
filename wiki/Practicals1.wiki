@@ -29,7 +29,7 @@ for(i in vmstoolsPackages) try(install.packages(pkgs=i,repos=getOption("repos"))
 
 It will prompt you a box to select a country and place to download the packages from, choose one nearby (e.g. Denmark). 
 
-Now it is time to install the VMStools package, you have to download it first however from this website: [http://code.google.com/p/vmstools/downloads/list VMStools google repository]. Take either the vmstools_0.60.zip version if you work under Windows or the vmstools_0.60.tar.gz version if you work under Linux or Apple. Download the file to your local disk. Next up is to install the VMStools package itself. Do this manually by clicking in R the 'Packages' tab and select the option 'Install packages from local zip files' and navigate to the file download or do it as follows from the R command line:
+Now it is time to install the VMStools package, you have to download it first however from this website: [http://code.google.com/p/vmstools/downloads/list VMStools google repository]. Take either the vmstools_0.60.zip version if you work under Windows or Mac and the vmstools_0.60.tar.gz version if you work under Linux. Download the file to your local disk. Next up is to install the VMStools package itself. Do this manually by clicking in R the 'Packages' tab and select the option 'Install packages from local zip files' and navigate to the file download or do it as follows from the R command line:
 
 <code>
 path2VMStoolsDownload <- "C:/downloads/" #this folder is an example folder
