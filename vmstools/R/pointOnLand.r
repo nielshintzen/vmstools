@@ -1,9 +1,7 @@
 pointOnLand <- function(tacsat,lands,proj4string=NULL){
       if(class(lands) != "SpatialPolygons") stop("'lands' must be specified as class 'SpatialPolygons'")
 
-      lon         <- tacsat$SI_LONG
-      lat         <- tacsat$SI_LATI
-      totres      <- rep(0,length(lon))
+      totres      <- rep(0,length(tacsat$SI_LONG))
 
       if(is.null(proj4string)==T){
         #No projection string used
