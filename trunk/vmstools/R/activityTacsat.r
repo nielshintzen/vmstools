@@ -158,7 +158,7 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
             probs               <- dnorm(x=tyg$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
             for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=tyg$SI_SP,mean=mu[i],sd=sds[i]))
             SI_STATE            <- apply(probs,1,which.max)
-            tacsat$SI_STATE[which(tacsat$ID %in% tyg$ID)] <- SI_STATE[1:(length(SI_STATE)/2)]
+            tacsat$SI_STATE[which(tacsat$ID %in% tyg$ID)] <- SI_STATE
           }
         }
         #-------------------------------------------------------------------------
