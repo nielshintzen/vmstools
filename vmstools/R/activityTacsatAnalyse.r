@@ -44,5 +44,5 @@ activityTacsatAnalyse <- function(tacsat,units="year",analyse.by="LE_GEAR",ident
         }
       }
     }
-  }
+  } else { stop("analyse.by statement not found as a column in the specified tacsat dataset")}
 return(storeScheme)}
