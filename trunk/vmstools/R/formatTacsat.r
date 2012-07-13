@@ -1,4 +1,5 @@
 formatTacsat <- function(x){
+  if("VE_COU" %in% colnames(x)) x$VE_COU <- ac(x$VE_COU)
   x$VE_REF    <- ac(x$VE_REF)
   x$SI_LATI   <- anf(x$SI_LATI)
   x$SI_LONG   <- anf(x$SI_LONG)
