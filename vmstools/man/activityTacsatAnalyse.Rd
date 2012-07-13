@@ -32,7 +32,7 @@ to \code{\link{activityTacsat}}
 \references{}
 \author{Niels T. Hintzen}
 \seealso{
-\code{\link{activityTacsat}}, \code{\link{segmentTacsatSpeed}}
+\code{\link{activityTacsat}}, \code{\link{segmentedTacsatSpeed}}
 }
 \examples{
 data(tacsat)
