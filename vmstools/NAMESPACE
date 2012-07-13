@@ -91,6 +91,7 @@ export(
 "readTacsat",
 "scree",
 "segmentTacsatSpeed",             
+"segmentedTacsatSpeed",  
 "selectMainSpecies",
 "select_species",
 "shortenEflalo",
