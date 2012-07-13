@@ -8,7 +8,7 @@ fitting normal distributions through these speed profiles, fishing and other
 activities.
 }
 \usage{
-activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NULL)
+activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NULL,level="all",saveDir=tempdir())
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -23,6 +23,7 @@ activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NUL
   \item{level}{If analyse.by="LE_GEAR" is selected, there is an option to analyse
                at vessel level too, but taking the gear parameter estimates as
                starting values. level = "vessel" turns this option on.}
+  \item{saveDir}{Save output in specified directory. Defaults to tempdir().}
 }
 \details{
 The analyses assumes that the speed profile close to 0 can be mirrored to create
@@ -35,7 +36,7 @@ Returnes SI_STATE column. 1=In harbour. 2=Fishing. 3=Steaming.
 \references{}
 \author{Niels T. Hintzen}
 \seealso{
-\code{\link{activityTacsatAnalyse}}, \code{\link{segmentTacsatSpeed}}
+\code{\link{activityTacsatAnalyse}}, \code{\link{segmentedTacsatSpeed}}
 }
 \examples{
 data(tacsat)
@@ -67,5 +68,5 @@ storeScheme   <- activityTacsatAnalyse(tacsat,units="year",analyse.by="VE_REF",
 
 #- Run activityTacsat
 res           <- activityTacsat(tacsat,units="year",analyse.by="VE_REF",storeScheme,
-                                plot=T)
+                                plot=T,level="all",saveDir=tempdir())
 }

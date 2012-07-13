@@ -7,7 +7,7 @@ Find the points that are on land given a set of coordinates and polygons that
 determine the part that is land
 }
 \usage{
-pointOnLand(tacsat, lands)
+pointOnLand(tacsat, lands,proj4string=NULL)
 }
 \arguments{
   \item{tacsat}{
@@ -16,9 +16,10 @@ Tacsat file
   \item{lands}{
 Polygon of area that is considered to be land
 }
+  \item{proj4string}{Projection string, default to NULL.}
 }
 \details{
-With many coordinates, the checking
+With many coordinates, the checking might take longer.
 
 }
 \value{
