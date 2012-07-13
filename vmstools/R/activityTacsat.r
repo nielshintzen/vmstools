@@ -286,4 +286,5 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
 leftOverTacsat  <- tacsatOrig[which(!tacsatOrig$ID %in% tacsat$ID),]
 tacsat          <- rbind(tacsat,leftOverTacsat)
 tacsat          <- orderBy(~ID,tacsat)
+cat("Note: no fishing = 0, fishing = 1, steaming / no fishing = 2\n")
 return(tacsat$SI_STATE)}

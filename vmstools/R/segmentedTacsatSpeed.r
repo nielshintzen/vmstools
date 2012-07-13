@@ -1,4 +1,4 @@
-segmentTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=F,CI=0.95){
+segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=F,CI=0.95,saveDir=tempdir()){
 
   require(segmented)
   tacsat$idx <- 1:nrow(tacsat)
@@ -55,7 +55,7 @@ segmentTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="ca
           } else {                             sTacsat$SI_SP <- calculateSpeed(sTacsat,level="vessel", weight=c(0.5,0.5), fill.na=T)$SI_SPCA}
         }
         #Remove records where SI_SP is NA
-        sTacsat <- sTacsat[is.na(sTacsat$SI_SP)==F,]
+        sTacsat <- sTacsat[which(is.na(sTacsat$SI_SP)==F & sTacsat$SI_SP > 0 & sTacsat$SI_SP <= 10),]
 
 
         minRows <- 20 #Based on a scan of sub tacsat datasets, 5% percentile was approx 20
@@ -70,7 +70,6 @@ segmentTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="ca
         if(nrow(sTacsat) > minRows){
 
           #Define starting values for segmented regression
-          sTacsat <- subset(sTacsat,SI_SP >0 & SI_SP <=10)
           hi  <- hist(sTacsat$SI_SP,breaks=diff(c(floor(  range(sTacsat$SI_SP[is.finite(sTacsat$SI_SP)],na.rm=T)[1]),
                                                   ceiling(range(sTacsat$SI_SP[is.finite(sTacsat$SI_SP)],na.rm=T)[2]))),plot=F)
           acc <- diff(diff(cumsum(hi$counts)))
@@ -93,13 +92,13 @@ segmentTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="ca
                      segmented(lm(y~x, data=dat) , seg.Z=~x , psi=psi, control= seg.control(display = FALSE, it.max=50, h=1)), # with 2 starting guesses
                      silent=TRUE) # the second breakpoint is quite uncertain and could lead to failure so...
             if(!"try-error" %in% class(o)) break else psi <- list(x=c(sort(runif(2,min=range(sTacsat$SI_SP,na.rm=T)[1],max=range(sTacsat$SI_SP,na.rm=T)[2])))) # searching decreasing by 1 each time
-            if(count>20) {bound1 <- psiOrig$x[1]; bound2 <- psiOrig$x[2] ; cat("failure of the segmented regression for",paste(c("year","month","week","analyse.by"),storeScheme[iRun,1:4]),"\n..."); break}
+            if(count>20) {bound1 <- psiOrig$x[1]; bound2 <- psiOrig$x[2] ; cat("failure of the segmented regression for",paste(c("year","month","week","analyse.by"),storeScheme[iRun,1:4]),"\n"); break}
           }
           #Calculate the bounds and whether the fit has been successful or not
           if(is.null(bound1)==T & is.null(bound2)==T){
             bound1 <- max(range(sTacsat$SI_SP)[1],min(confint(o,level=CI)$x))
             bound2 <- min(range(sTacsat$SI_SP)[2],max(confint(o,level=CI)$x))
-            storeScheme[iRun,"success"] <- 1
+            if(class(o)[1] != "try-error") storeScheme[iRun,"success"] <- 1
           }
 
           #Save the bounds
@@ -111,8 +110,15 @@ segmentTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="ca
         }
       }
     }
+  #Write the results to file and display the success rates
+  write.csv(storeScheme,file=file.path(saveDir,"storeScheme.csv"))
+  cat("Successful segmented regression fits",length(which(storeScheme$success==1)),"\n",
+      "versus unsuccessful fits",length(which(storeScheme$success == 0)),"\n\n",
+      "Check ",file.path(saveDir,"storeScheme.csv"),"for details \n\n")
+      
+  cat("Note: fishing = 1, no fishing = 0\n")
 return(tacsatOrig[,-grep("idx",colnames(tacsatOrig))])}
     
-#segmentTacsatSpeed(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=FALSE,CI=0.95)
+#res <- segmentedTacsatSpeed(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=FALSE,CI=0.95)
     
 
