@@ -19,7 +19,6 @@ pointOnLand <- function(tacsat,lands,proj4string=NULL){
           totres[which(is.na(idx)==F)] <- 1
           totres[which(is.na(idx)==T)] <- 0
         }
-      }
 return(totres)}
 
 
