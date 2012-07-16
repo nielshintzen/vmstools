@@ -5,7 +5,7 @@ pointOnLand <- function(tacsat,lands,proj4string=NULL){
 
       if(is.null(proj4string)==T){
         #No projection string used
-        if(is.na(proj4string(lands)==F)) stop("Projection defined for lands, use proj4string argument in function")
+        if(is.na(proj4string(lands))==F) stop("Projection defined for lands, use proj4string argument in function")
         spPoint           <- SpatialPoints(data.frame(x=tacsat$SI_LONG,y=tacsat$SI_LATI))
         idx               <- over(spPoint,lands)
         totres[which(is.na(idx)==F)] <- 1
