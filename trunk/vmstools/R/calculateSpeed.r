@@ -41,8 +41,9 @@ calculateSpeed <- function(tacsat,level="vessel",weight=c(1,1),fill.na=F){
                                                                    (distance_xplus1[idx]  * weight[2]) / (difftime_xplus1[idx]/60))
                           }
                         #- Use of 0.5 if ifelse = NA, as counter to 2*...
-                        SI_SPCA[idx]                      <- 2*(2* ifelse(is.na(speeds[,1])==T,0.5,speeds[,1]) * ifelse(is.na(speeds[,2])==T,0.5,speeds[,2]) /
-                                                                  (ifelse(is.na(speeds[,1])==T,0,speeds[,1])   + ifelse(is.na(speeds[,2])==T,0,speeds[,2])))
+                        SI_SPCA[idx]                      <- apply(speeds,1,na.omit)
+                        #SI_SPCA[idx]                      <- 2*(2* ifelse(is.na(speeds[,1])==T,0.5,speeds[,1]) * ifelse(is.na(speeds[,2])==T,0.5,speeds[,2]) /
+                        #                                          (ifelse(is.na(speeds[,1])==T,0,speeds[,1])   + ifelse(is.na(speeds[,2])==T,0,speeds[,2])))
                         SI_SPCA[idx][which(SI_SPCA[idx]==0)]<- NA
                       }
 
@@ -62,8 +63,8 @@ calculateSpeed <- function(tacsat,level="vessel",weight=c(1,1),fill.na=F){
                                                          tacsatp$SI_LONG[1:(nrow(tacsatp)-1)], tacsatp$SI_LATI[1:(nrow(tacsatp)-1)]))
     distance_xplus1                     <- c(distance_xmin1[-1],NA)
     #- Recalculate the interval rate for either outer averages
-    difftime_xmin1                      <- intervalTacsat(tacsatp,level="fleet",weight=c(1,0),fill.na=fill.na)$INTV
-    difftime_xplus1                     <- intervalTacsat(tacsatp,level="fleet",weight=c(0,1),fill.na=fill.na)$INTV
+    difftime_xmin1                      <- intervalTacsat(tacsatp,level="vessel",weight=c(1,0),fill.na=fill.na)$INTV
+    difftime_xplus1                     <- intervalTacsat(tacsatp,level="vessel",weight=c(0,1),fill.na=fill.na)$INTV
     if(any(weight == 0)){
       if(weight[1] == 0) SI_SPCA        <- distance_xplus1 / (interval/60)
       if(weight[2] == 0) SI_SPCA        <- distance_xmin1 / (interval/60)
@@ -83,8 +84,9 @@ calculateSpeed <- function(tacsat,level="vessel",weight=c(1,1),fill.na=F){
                                                  (distance_xplus1[idx]  * weight[2]) / (difftime_xplus1[idx]/60))
         }
       #- Use of 0.5 if ifelse = NA, as counter to 2*...
-      SI_SPCA[idx]                      <- 2*(2* ifelse(is.na(speeds[,1])==T,0.5,speeds[,1]) * ifelse(is.na(speeds[,2])==T,0.5,speeds[,2]) /
-                                                (ifelse(is.na(speeds[,1])==T,0,speeds[,1])   + ifelse(is.na(speeds[,2])==T,0,speeds[,2])))
+      SI_SPCA[idx]                      <- apply(speeds,1,na.omit)
+      #SI_SPCA[idx]                      <- 2*(2* ifelse(is.na(speeds[,1])==T,0.5,speeds[,1]) * ifelse(is.na(speeds[,2])==T,0.5,speeds[,2]) /
+      #                                          (ifelse(is.na(speeds[,1])==T,0,speeds[,1])   + ifelse(is.na(speeds[,2])==T,0,speeds[,2]))))
       SI_SPCA[idx][which(SI_SPCA[idx]==0)]<- NA
     }
     tacsatp$SI_SPCA                 <- SI_SPCA
