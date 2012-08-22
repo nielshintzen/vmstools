@@ -3,7 +3,7 @@
 # compatible area code when uploading to fishframe 
 
 
-# ICESarea <- function(tacsat,roman=F){
+ ICESarea <- function(tacsat,roman=F){ stop("This function contains mistakes and will be updated soon, please contact the maintainer for more info")}
 #
 #    library(sp)
 #
