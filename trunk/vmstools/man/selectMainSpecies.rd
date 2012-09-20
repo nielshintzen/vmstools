@@ -109,5 +109,5 @@ dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))]
 names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 
 explo <- selectMainSpecies(dat, analysisName, RunHAC=TRUE, DiagFlag=FALSE)
-  #=> send the LE_ID and LE_KG_SP columns only
+  #=> send the LE_ID and LE_EURO_SP columns only
 }
