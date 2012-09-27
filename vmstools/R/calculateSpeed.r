@@ -41,10 +41,10 @@ calculateSpeed <- function(tacsat,level="vessel",weight=c(1,1),fill.na=F){
                                                                    (distance_xplus1[idx]  * weight[2]) / (difftime_xplus1[idx]/60))
                           }
                         #- Use of 0.5 if ifelse = NA, as counter to 2*...
-                        SI_SPCA[idx]                      <- apply(speeds,1,na.omit)
+                        SI_SPCA[idx]                      <- apply(speeds,1,function(x){isfin <- is.finite(x); return(ifelse(all(isfin),mean(x),ifelse(any(isfin),x[isfin],NA)))})
                         #SI_SPCA[idx]                      <- 2*(2* ifelse(is.na(speeds[,1])==T,0.5,speeds[,1]) * ifelse(is.na(speeds[,2])==T,0.5,speeds[,2]) /
                         #                                          (ifelse(is.na(speeds[,1])==T,0,speeds[,1])   + ifelse(is.na(speeds[,2])==T,0,speeds[,2])))
-                        SI_SPCA[idx][which(SI_SPCA[idx]==0)]<- NA
+                        if(length(which(SI_SPCA[idx]==0))>0) SI_SPCA[idx][which(SI_SPCA[idx]==0)]<- NA
                       }
 
                       return(SI_SPCA)
@@ -84,10 +84,10 @@ calculateSpeed <- function(tacsat,level="vessel",weight=c(1,1),fill.na=F){
                                                  (distance_xplus1[idx]  * weight[2]) / (difftime_xplus1[idx]/60))
         }
       #- Use of 0.5 if ifelse = NA, as counter to 2*...
-      SI_SPCA[idx]                      <- apply(speeds,1,na.omit)
+      SI_SPCA[idx]                      <- apply(speeds,1,function(x){isfin <- is.finite(x); return(ifelse(all(isfin),mean(x),ifelse(any(isfin),x[isfin],NA)))})
       #SI_SPCA[idx]                      <- 2*(2* ifelse(is.na(speeds[,1])==T,0.5,speeds[,1]) * ifelse(is.na(speeds[,2])==T,0.5,speeds[,2]) /
       #                                          (ifelse(is.na(speeds[,1])==T,0,speeds[,1])   + ifelse(is.na(speeds[,2])==T,0,speeds[,2]))))
-      SI_SPCA[idx][which(SI_SPCA[idx]==0)]<- NA
+      if(length(which(SI_SPCA[idx]==0))>0) SI_SPCA[idx][which(SI_SPCA[idx]==0)]<- NA
     }
     tacsatp$SI_SPCA                 <- SI_SPCA
 
