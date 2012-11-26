@@ -66,4 +66,3 @@ maxRangeCI <- function(lon,lat,time.,speed){
                       y[k] <- mid.y + a[2] * sin(o) * cos(u) + b[2] * cos(o) * sin(u)
                     }
                 return(list(matrix(c(x,y),ncol=2),dmax,warn))}
-
