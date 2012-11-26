@@ -7,7 +7,11 @@ function(xrange
                              ){
                 
                 library(sp)             
-                roundDigit  <- max(getndp(resx),getndp(resy),na.rm=T)-1
+                if(((xrange[2]-xrange[1])%%resx)==0 && ((yrange[2]-yrange[1])%%resy)==0){
+                  roundDigit  <- max(getndp(resx),getndp(resy),na.rm=T)+1  
+                }else {
+                  roundDigit  <- max(getndp(resx),getndp(resy),na.rm=T)-1
+                }
                 xborder     <- round(seq(floor(sort(xrange)[1]*(10^roundDigit))/(10^roundDigit),ceiling(sort(xrange)[2]*(10^roundDigit))/(10^roundDigit),resx),roundDigit)
                 yborder     <- round(seq(floor(sort(yrange)[1]*(10^roundDigit))/(10^roundDigit),ceiling(sort(yrange)[2]*(10^roundDigit))/(10^roundDigit),resy),roundDigit)
                 
