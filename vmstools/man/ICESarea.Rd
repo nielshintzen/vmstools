@@ -15,7 +15,7 @@ ICESarea(x,areas,proj4string=NULL)
   \item{x}{
 dataframe given that they have 'SI_LONG' and 'SI_LATI' columns
 }
-  \item{x}{
+  \item{areas}{
 ICES areas as SpatialPolygons}
 \item{proj4string}{Projection string, default to NULL.}
 }

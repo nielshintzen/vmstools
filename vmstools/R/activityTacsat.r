@@ -153,12 +153,14 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
         }
         } else {
           for(iGr in unique(tyg$LE_GEAR)){
-            mu                  <- sort.int(res[[iGr]]$mu,index.return=T)
-            sds                 <- res[[iGr]]$sigma[mu$ix]; mu <- mu$x
-            probs               <- dnorm(x=tyg$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
-            for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=tyg$SI_SP,mean=mu[i],sd=sds[i]))
-            SI_STATE            <- apply(probs,1,which.max)
-            tacsat$SI_STATE[which(tacsat$ID %in% tyg$ID)] <- SI_STATE
+            if(!class(res[[iGr]]) == "try-error"){
+              mu                  <- sort.int(res[[iGr]]$mu,index.return=T)
+              sds                 <- res[[iGr]]$sigma[mu$ix]; mu <- mu$x
+              probs               <- dnorm(x=tyg$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
+              for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=tyg$SI_SP,mean=mu[i],sd=sds[i]))
+              SI_STATE            <- apply(probs,1,which.max)
+              tacsat$SI_STATE[which(tacsat$ID %in% tyg$ID)] <- SI_STATE
+            }
           }
         }
         #-------------------------------------------------------------------------
@@ -181,8 +183,10 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
             } else { idx <- -1:-nrow(subset(tngmr,VE_REF==iShip))}
 
             shipTacsat          <- subset(tngmr,VE_REF == iShip)
-            if(iShip %in% names(shipFit)) nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=length(shipFit[[iShip]]$mu),maxit=2000))
-            if(!iShip%in% names(shipFit)) nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=5,maxit=2000))
+            if(exists("shipFit")){
+              if(iShip %in% names(shipFit)) nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=length(shipFit[[iShip]]$mu),maxit=2000))
+            } else {
+                nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=5,maxit=2000))}
 
             mu                  <- sort.int(nonshipFit[[iShip]]$mu,index.return=T)
             sds                 <- nonshipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x

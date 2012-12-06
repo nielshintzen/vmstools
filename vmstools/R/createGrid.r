@@ -4,18 +4,24 @@ function(xrange
                              ,resx
                              ,resy
                              ,type="GridTopology"
+                             ,exactBorder=F
                              ){
                 
-                library(sp)             
-                if(((xrange[2]-xrange[1])%%resx)==0 && ((yrange[2]-yrange[1])%%resy)==0){
-                  roundDigit  <- max(getndp(resx),getndp(resy),na.rm=T)+1  
-                }else {
-                  roundDigit  <- max(getndp(resx),getndp(resy),na.rm=T)-1
+                require(sp)
+                if(exactBorder){
+                  roundDigit    <- max(getndp(resx),getndp(resy),na.rm=T)+1
+                  xborder       <- round(seq(xrange[1]+resx/2,xrange[2]-resx/2,resx),roundDigit)
+                  yborder       <- round(seq(yrange[1]+resy/2,yrange[2]-resy/2,resy),roundDigit)
+                } else {
+                    roundDigit  <- max(getndp(resx),getndp(resy),na.rm=T)
+                    xborder     <- round(seq(floor(sort(xrange)[1]*(10^roundDigit))/(10^roundDigit),ceiling(sort(xrange)[2]/resx)*resx,resx),roundDigit)
+                    yborder     <- round(seq(floor(sort(yrange)[1]*(10^roundDigit))/(10^roundDigit),ceiling(sort(yrange)[2]/resy)*resy,resy),roundDigit)
+                 }
+
+                if(!exactBorder){
+                  if(round(xrange[1],roundDigit)<xborder[1] | round(xrange[2],roundDigit)>rev(xborder)[1] |
+                     round(yrange[1],roundDigit)<yborder[1] | round(yrange[2],roundDigit)>rev(yborder)[1]) stop("Grid range smaller than specified bounds (bug!)")
                 }
-                xborder     <- round(seq(floor(sort(xrange)[1]*(10^roundDigit))/(10^roundDigit),ceiling(sort(xrange)[2]*(10^roundDigit))/(10^roundDigit),resx),roundDigit)
-                yborder     <- round(seq(floor(sort(yrange)[1]*(10^roundDigit))/(10^roundDigit),ceiling(sort(yrange)[2]*(10^roundDigit))/(10^roundDigit),resy),roundDigit)
-                
-                if(xrange[1]<xborder[1] | xrange[2]>rev(xborder)[1] | yrange[1]<yborder[1] | yrange[2]>rev(yborder)[1]) stop("Grid range smaller than specified bounds (bug!)")
                 grid        <- GridTopology(c(xborder[1],yborder[1]),c(resx,resy),c(length(xborder),length(yborder)))
                 if(type=="SpatialGrid"){
                   grid      <- SpatialGrid(grid=grid);
