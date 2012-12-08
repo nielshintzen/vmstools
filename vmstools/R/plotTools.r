@@ -42,7 +42,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
     #---------------------------------------------------------------------------
     if(level == "gridcell"){
       grids                 <- createGrid(xlim,ylim,gridcell[1],gridcell[2],type="SpatialPixelsDataFrame")
-      coords                <- SpatialPointsDataFrame(cbind(x=an(ac(x$SI_LONG)),y=an(ac(x$SI_LATI))),data=x)
+      coords                <- SpatialPointsDataFrame(cbind(x=an(ac(x$SI_LONG))-gridcell[1]/2,y=an(ac(x$SI_LATI)))-gridcell[2]/2,data=x)
       coords$dens           <- overlay( grids, coords)
       
         #- Sum by gridcell
