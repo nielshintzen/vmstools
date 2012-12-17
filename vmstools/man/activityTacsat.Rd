@@ -23,7 +23,8 @@ activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NUL
   \item{level}{If analyse.by="LE_GEAR" is selected, there is an option to analyse
                at vessel level too, but taking the gear parameter estimates as
                starting values. level = "vessel" turns this option on.}
-  \item{saveDir}{Save output in specified directory. Defaults to tempdir().}
+  \item{sigma}{Fixed sigma value for distribution around zero. NULL if parameter
+               needs to be estimated.}
 }
 \details{
 The analyses assumes that the speed profile close to 0 can be mirrored to create
@@ -68,5 +69,5 @@ storeScheme   <- activityTacsatAnalyse(tacsat,units="year",analyse.by="VE_REF",
 
 #- Run activityTacsat
 res           <- activityTacsat(tacsat,units="year",analyse.by="VE_REF",storeScheme,
-                                plot=T,level="all",saveDir=tempdir())
+                                plot=T,level="all")
 }
