@@ -49,5 +49,5 @@ maxRangeCI <- function(x,y,time.,speed){
   u         <- 0:360*pi180
   xres      <- mid.x + a[1] * cos(o) * cos(u) - b[1] * sin(o) * sin(u)
   yres      <- mid.y + a[2] * sin(o) * cos(u) + b[2] * cos(o) * sin(u)
-  }
+
   return(list(matrix(c(xres,yres),ncol=2),dmax,warn))}
