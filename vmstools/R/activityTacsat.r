@@ -1,4 +1,4 @@
-activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=NULL,plot=F,level="all"){
+activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=NULL,plot=F,level="all",sigma=0.911){
 
   require("mixtools")
   if (!"SI_DATIM" %in% colnames(tacsat))
@@ -12,6 +12,9 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
   tacsatOrig  <- tacsat
   idx         <- which(is.na(tacsat$SI_SP)==F)
   tacsat      <- tacsat[idx,]
+  
+  #- If sigma is NULL it needs to be estimated and gets a variable name
+  if(is.null(sigma)) sigma <- "d"
 
   if(units == "all"){   yrs <- 0;                                   mths  <- 0;                                    wks  <- 0}
   if(units == "year"){  yrs <- sort(unique(year(tacsat$SI_DATIM))); mths  <- 0;                                    wks  <- 0}
@@ -93,24 +96,24 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
           } else { idx <- -1:-nrow(subset(tygmr,LE_GEAR==iGr))}
 
         if(is.null(storeScheme)==T){
-          res[[iGr]]    <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5,maxrestarts=10,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b")))
+          res[[iGr]]    <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5,maxrestarts=10,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b")))
         } else {
             if("means" %in% colnames(storeScheme)){
               ss          <- storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
                                                storeScheme$weeks == wk & storeScheme$analyse.by == iGr),"means"]
               if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintmn <- c("-a",0,"a") } else { constraintmn <- c("-b","-a",0,"a","b")}
-              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")} else { constraintsd <- c("b","a",0.911,"a","b")}
+              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")} else { constraintsd <- c("b","a",sigma,"a","b")}
               res[[iGr]]   <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,mu=c(na.omit(as.numeric(strsplit(ss," ")[[1]]))), maxrestarts=10,
                                               mean.constr=constraintmn,sd.constr=constraintsd))
             } else {
               ss          <- storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
                                                storeScheme$weeks == wk & storeScheme$analyse.by == iGr),"peaks"]
               if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintmn <- c("-a",0,"a") } else { constraintmn <- c("-b","-a",0,"a","b")}
-              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")} else { constraintsd <- c("b","a",0.911,"a","b")}
+              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")} else { constraintsd <- c("b","a",sigma,"a","b")}
               if(length(ss)>0){
-                if(is.na(ss)==T)  res[[iGr]]   <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5, maxrestarts=10,  mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b")))
+                if(is.na(ss)==T)  res[[iGr]]   <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5, maxrestarts=10,  mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b")))
                 if(is.na(ss)==F)  res[[iGr]]   <- try(normalmixEM(x=subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=ss,maxrestarts=10,mean.constr=constraintmn,sd.constr=constraintsd))
-              } else {            res[[iGr]]   <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5, maxrestarts=10,  mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b")))}
+              } else {            res[[iGr]]   <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5, maxrestarts=10,  mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b")))}
             }
           }
         if(plot==T) plot(res[[iGr]],2,breaks=100,xlim=c(-20,20))
@@ -144,7 +147,7 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
             } else { idx <- -1:-nrow(subset(tygmr,VE_REF==iShip))}
 
             if(length(res[[names(which.max(table(shipTacsat$LE_GEAR)))]])==3){ constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
-            if(length(res[[names(which.max(table(shipTacsat$LE_GEAR)))]])==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",0.911,"a","b")}
+            if(length(res[[names(which.max(table(shipTacsat$LE_GEAR)))]])==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
 
             shipTacsat        <- subset(tygmr,VE_REF == iShip)
             shipFit[[iShip]]  <- try(normalmixEM(shipTacsat$SI_SP[-idx],mu=res[[names(which.max(table(shipTacsat$LE_GEAR)))]],maxit=2000,mean.constr=constraintmn,sd.constr=constraintsd))
@@ -195,10 +198,10 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
             if(exists("shipFit")){
               if(iShip %in% names(shipFit)){
                 if(length(shipFit[[iShip]]$mu)==3){constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
-                if(length(shipFit[[iShip]]$mu)==3){constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",0.911,"a","b")}
+                if(length(shipFit[[iShip]]$mu)==3){constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
                 nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=length(shipFit[[iShip]]$mu),maxit=2000,mean.constr=constraintmn,sd.constr=constraintsd))
             } else {
-                nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=5,maxit=2000,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b")))}
+                nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=5,maxit=2000,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b")))}
 
             if(!class(nonshipFit[[iShip]]) == "try-error"){
               mu                  <- sort.int(nonshipFit[[iShip]]$mu,index.return=T)
@@ -243,13 +246,13 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
           shipTacsat        <- subset(tyvmr,VE_REF == iShip)
 
           if(is.null(storeScheme)==T){
-            shipFit[[iShip]]    <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b"))$mu)
+            shipFit[[iShip]]    <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"))$mu)
           } else {
               if("means" %in% colnames(storeScheme)){
                 ss          <- storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
                                                  storeScheme$weeks == wk & storeScheme$analyse.by == iShip),"means"]
                 if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
-                if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",0.911,"a","b")}
+                if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
 
                 shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],mu=c(na.omit(as.numeric(strsplit(ss," ")[[1]]))), maxit=2000,
                                            mean.constr=constraintmn,
@@ -258,11 +261,11 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
                 ss          <- storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
                                                  storeScheme$weeks == wk & storeScheme$analyse.by == iShip),"peaks"]
                 if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
-                if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",0.911,"a","b")}
+                if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
                 if(length(ss)>0){
-                  if(is.na(ss)==T) shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b")))
+                  if(is.na(ss)==T) shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b")))
                   if(is.na(ss)==F) shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=ss,mean.constr=constraintmn,sd.constr=constraintsd))
-                } else {           shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b")))}
+                } else {           shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b")))}
               }
             }
           if(plot==T) plot(shipFit[[iShip]],2,breaks=100,xlim=c(-20,20))
@@ -298,7 +301,7 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
 
           shipTacsat          <- subset(tnvmr,VE_REF == iShip)
           if(length(shipFit[[iShip]]$mu)==3){constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
-          if(length(shipFit[[iShip]]$mu)==3){constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",0.911,"a","b")}
+          if(length(shipFit[[iShip]]$mu)==3){constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
           nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=length(shipFit[[iShip]]$mu),maxit=2000,mean.constr=constraintmn,sd.constr=constraintsd))
 
           if(!class(nonshipFit[[iShip]]) == "try-error"){
