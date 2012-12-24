@@ -14,8 +14,8 @@ summarizeTacsat <- function(tacsat){
   }
   return(as.data.frame(
           cbind(desc= c("nrCountries","nrVessels","minLon","maxLon","minLat","maxLat","minTime","maxTime","minHeading","maxHeading","minSpeed","maxSpeed","effort(hr)"),
-                value=c(nrCountries,nrVessels,range(tacsat$SI_LONG,na.rm=T),range(tacsat$SI_LATI,na.rm=T),
-                        ac(range(tacsat$SI_DATIM)[1]),ac(range(tacsat$SI_DATIM)[2]),
+                value=c(nrCountries,nrVessels,round(range(tacsat$SI_LONG,na.rm=T),3),round(range(tacsat$SI_LATI,na.rm=T),3),
+                        ac(range(tacsat$SI_DATIM,na.rm=T)[1]),ac(range(tacsat$SI_DATIM,na.rm=T)[2]),
                         range(tacsat$SI_HE,na.rm=T),range(tacsat$SI_SP,na.rm=T),round(totalEffort,1))),stringsAsFactors=F))}
   
 summarizeEflalo <- function(eflalo){

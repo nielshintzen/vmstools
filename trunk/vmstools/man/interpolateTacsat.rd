@@ -9,7 +9,7 @@ an interpolation of a straight line (on a x-y plane, not a sphere)
 \usage{
 interpolateTacsat(tacsat, interval = 120, margin = 12, res = 100,
                   method = "cHs", params = list(fm=0.2,distscale=20,
-                  sigline=0.2,st=c(2,6)),headingAdjustment=0)
+                  sigline=0.2,st=c(2,6)),headingAdjustment=0,fast=F)
 }
 \arguments{
   \item{tacsat}{Tacsat dataset with GPS points that need to be interpolated}
@@ -19,6 +19,8 @@ interpolateTacsat(tacsat, interval = 120, margin = 12, res = 100,
   \item{method}{"cHs" for cubic Hermite spline or "SL" for Straight Line interpolation, default = 0.2,20,0.2}
   \item{params}{Params needed for cHs method, including the speed thresholds used}
   \item{headingAdjustment}{Parameter to adjust the choice of heading depending on its own or previous point}
+  \itme{fast}{If your machine holds enough RAM (4gig or more) than the fast version
+              runs 7x faster}
 }
 \details{
 Interval: In most Tacsat datasets the succeeding datapoint can be found 1 or 2 hours appart. This interval time

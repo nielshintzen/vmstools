@@ -1,13 +1,29 @@
-surface <- function(vmsGrid,method="Trapezoid",includeNA=T){  #Methods can be "Trapezoid" and "UTM"
-        if(class(vmsGrid) != 'SpatialGridDataFrame') stop("class of vmsGrid should be SpatialGridDataFrame")
+surface <- function(obj,method="Trapezoid",includeNA=T,zone=NULL){  #Methods can be "Trapezoid" and "UTM"
+        require(sp)
+        require(PBSmapping)
+        if(!class(obj) %in% c('SpatialGridDataFrame','SpatialPolygons'))
+          stop("class of obj should be SpatialGridDataFrame or SpatialPolygons")
+        
+        if(class(obj) == 'SpatialPolygons')
+          {
+            for(iPol1 in 1:length(obj@polygons)){
+              for(iPol2 in 1:length(obj@polygons[[iPol1]])){
+                sourcePoly <- data.frame(cbind(1,1:nrow(obj@polygons[[iPol1]]@Polygons[[iPol2]]@coords),
+                                         obj@polygons[[iPol1]]@Polygons[[iPol2]]@coords[,1],obj@polygons[[iPol1]]@Polygons[[iPol2]]@coords[,2]))
+                rownames(sourcePoly)<-1:nrow(sourcePoly)
+                colnames(sourcePoly)<-c("PID","POS","X","Y")
+                obj@polygons[[iPol1]]@Polygons[[iPol2]]@area <- calcArea(as.PolySet(sourcePoly, projection="LL",zone=zone))$area
+              }
+            }
+          }
         if(!method %in% c("Trapezoid","UTM")) stop("method not available")
-        if (class(vmsGrid)=='SpatialGridDataFrame') # not empty...
+        if (class(obj) %in% c('SpatialGridDataFrame')) # not empty...
           {
              if(method == "Trapezoid"){
-               res <- max(vmsGrid@grid@cellsize,na.rm=T)/0.1 * 10  #automatic scaling
+               res <- max(obj@grid@cellsize,na.rm=T)/0.1 * 10  #automatic scaling
                if(res < 3) res <- 3
-               griddims <- summary(vmsGrid)$grid
-               bboxdims <- bbox(vmsGrid)
+               griddims <- summary(obj)$grid
+               bboxdims <- bbox(obj)
                stlon    <- bboxdims[1,1]
                stlat    <- bboxdims[2,1]
                enlon    <- bboxdims[1,2]
@@ -32,18 +48,18 @@ surface <- function(vmsGrid,method="Trapezoid",includeNA=T){  #Methods can be "T
                   surface <- rep(apply(heights * (base1 + base2) / 2,1,sum),each=length(seq(stlon,enlon-sizelon,sizelon)))
                 }
 
-               vmsGrid@data$cellArea <- rev(surface)
+               obj@data$cellArea <- rev(surface)
             }
           if(method == "UTM"){
             require(PBSmapping)
-            griddims <- summary(vmsGrid)$grid
+            griddims <- summary(obj)$grid
             sizelon  <- griddims[1,2]
             sizelat  <- griddims[2,2]
 
-            ltCentreCell<-coordinates(vmsGrid)
+            ltCentreCell<-coordinates(obj)
 
             for (x in 1:(length(ltCentreCell)/2)){
-              if (!is.na(vmsGrid@data[x,2]) | includeNA) {        # speed up the calculation by dropping cells with fishing=NA  /!| only work for DCF5 and DCF6!
+              if (includeNA) {        # speed up the calculation by dropping cells with fishing=NA  /!| only work for DCF5 and DCF6!
                 minX<-ltCentreCell[x,1]-sizelon/2
                 maxX<-ltCentreCell[x,1]+sizelon/2
                 minY<-ltCentreCell[x,2]-sizelat/2
@@ -54,13 +70,13 @@ surface <- function(vmsGrid,method="Trapezoid",includeNA=T){  #Methods can be "T
                 rownames(sourcePoly)<-seq(1,4)
                 colnames(sourcePoly)<-c("PID","POS","X","Y")
 
-                polyArea<-calcArea(as.PolySet(sourcePoly, projection="LL"))
+                polyArea<-calcArea(as.PolySet(sourcePoly, projection="LL",zone=zone))
                 singleCellArea<-polyArea$area
               } else {singleCellArea<-NA}
-              vmsGrid@data$cellArea[x]<-singleCellArea
+              obj@data$cellArea[x]<-singleCellArea
             }
           }
         }
-        return(vmsGrid)}
+        return(obj)}
          
          

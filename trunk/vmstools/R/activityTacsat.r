@@ -321,5 +321,6 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
 leftOverTacsat  <- tacsatOrig[which(!tacsatOrig$ID %in% tacsat$ID),]
 tacsat          <- rbind(tacsat,leftOverTacsat)
 tacsat          <- orderBy(~ID,tacsat)
-cat("Note: no fishing = 0, fishing = 1, steaming / no fishing = 2\n")
+cat("Note that in case of 5 peaks: no fishing = 1, fishing = 2, steaming / no fishing = 3\n")
+cat("Note that in case of 3 peaks: fishing = 2, steaming / no fishing = 3\n")
 return(tacsat$SI_STATE)}
