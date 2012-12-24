@@ -9,25 +9,20 @@ function calculates this proportion, as well as the maximum value representing t
 CI values.
 }
 \usage{
-outsideMaxRange(intLon, intLat, vmsIdx1, vmsIdx2, VMS, grid,
-                sPDF, interpolation, int, params)
+outsideMaxRange(int,tacint,params,grid)
 }
 \arguments{
-  \item{intLon}{Longitudes of single interpolation start and endpoint}
-  \item{intLat}{Latitudes of single interpolation start and endpoint}
-  \item{vmsIdx1}{Start point of interpolation expressed in row number of VMS dataset}
-  \item{vmsIdx2}{End point of interpolation expressed in row number of VMS dataset}
-  \item{VMS}{VMS dataset}
-  \item{grid}{Grid object inhereted from the 'sp' library: gridTopology}
-  \item{sPDF}{Spatial Pixels Data Frame object, used to store the CI data in}
-  \item{interpolation}{List of interpolations}
-  \item{int}{Identifier of interpolation}
-  \item{params}{parameters list(fm,distscale,sigline}
+  \item{int}{interpolation, as data.frame from 'interpolateTacsat'}
+  \item{tacint}{tacsat records (two rows) corresponding with the interpolation}
+  \item{params}{list of parameters used to perform interpolation}
+  \item{grid}{object of class 'GridTopology' specifying the grid dimensions}
 }
-\details{
-The spatial pixels data frame object is created from the grid object as is explained in the spatial library 'sp'.
+\value{
+Returnes a list with three objects:
+1) Fraction of CI located outside maximum range
+2) Franction of CI located inside maximum range
+3) Maximum value of CI (top, at VMS points)
 
-The interpolation is the list of interpolations returned by the 'interpolateVMS' function. 
 }
 \references{Hintzen et al. 2010 Improved estimation of trawling tracks using cubic Hermite spline interpolation of position registration data,
 EU lot 2 project}
@@ -51,18 +46,11 @@ interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
   #Create the final grid where all interpolations should fit on
 xrange        <- c(2,3); yrange <- c(51,52)
 grid          <- createGrid(xrange,yrange,resx=0.01,resy=0.005)
-sPDF          <- createGrid(xrange,yrange,resx=0.01,resy=0.005,type="SpatialPixelsDataFrame")
-sPDF@data     <- data.frame(rep(0,length(sPDF@grid.index)))
 
-
-lon <- tacsat$SI_LONG[c(12,13)]
-lat <- tacsat$SI_LATI[c(12,13)]
-
-result <- outsideMaxRange(intLon=lon,intLat=lat,vmsIdx1=12,vmsIdx2=13,
-            tacsat,grid,sPDF,interpolation,4,params=
-            list(fm=0.45,distscale=3.1,sigline=0.42,st=c(2,6)))
-
-#3.7\% of the total value of the CI is located outside the maximum range
-print(result[[2]]/result[[1]])
+res           <- outsideMaxRange(interpolation[[4]],
+                                 tacsat[interpolation[[4]][1,],],
+                                 params=list(fm=0.25,distscale=3.1,
+                                             sigline=0.4,st=c(2,6)),
+                                 grid=grid)
 
 }

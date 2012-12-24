@@ -42,7 +42,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
     #---------------------------------------------------------------------------
     if(level == "gridcell"){
       grids                 <- createGrid(xlim,ylim,gridcell[1],gridcell[2],type="SpatialPixelsDataFrame")
-      coords                <- SpatialPointsDataFrame(cbind(x=an(ac(x$SI_LONG))-gridcell[1]/2,y=an(ac(x$SI_LATI)))-gridcell[2]/2,data=x)
+      coords                <- SpatialPointsDataFrame(cbind(x=an(ac(x$SI_LONG)),y=an(ac(x$SI_LATI))),data=x)
       coords$dens           <- overlay( grids, coords)
       
         #- Sum by gridcell
@@ -109,8 +109,8 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
       }
     if(level == "ICESrectangle") polygon(x=c(an(ac(byRect[iRect,"SI_LONG"])),an(ac(byRect[iRect,"SI_LONG"]))+1,an(ac(byRect[iRect,"SI_LONG"]))+1,an(ac(byRect[iRect,"SI_LONG"]))),
                                          y=c(rep(an(ac(byRect[iRect,"SI_LATI"])),2),rep(an(ac(byRect[iRect,"SI_LATI"]))+0.5,2)),col=color[i],lwd=1,border=NA)
-    if(level == "gridcell")      polygon(x=c(an(ac(byRect[iRect,"SI_LONG"])),an(ac(byRect[iRect,"SI_LONG"]))+gridcell[1],an(ac(byRect[iRect,"SI_LONG"]))+gridcell[1],an(ac(byRect[iRect,"SI_LONG"]))),
-                                         y=c(rep(an(ac(byRect[iRect,"SI_LATI"])),2),rep(an(ac(byRect[iRect,"SI_LATI"]))+gridcell[2],2)),col=color[i],lwd=1,border=NA)                                          
+    if(level == "gridcell")      polygon(x=c(an(ac(byRect[iRect,"SI_LONG"]))-gridcell[1]/2,an(ac(byRect[iRect,"SI_LONG"]))+gridcell[1]/2,an(ac(byRect[iRect,"SI_LONG"]))+gridcell[1]/2,an(ac(byRect[iRect,"SI_LONG"]))-gridcell[1]/2),
+                                         y=c(rep(an(ac(byRect[iRect,"SI_LATI"])),2)-gridcell[2]/2,rep(an(ac(byRect[iRect,"SI_LATI"]))+gridcell[2]/2,2)),col=color[i],lwd=1,border=NA)
   }
   map("worldHires",res=1,xlim=xlim,ylim=ylim,fill=T,col="darkgreen",plt=F,add=T);box()
   if(returnRange) return(rangeRect)

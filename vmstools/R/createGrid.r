@@ -9,29 +9,31 @@ function(xrange
                 
                 require(sp)
                 if(exactBorder){
-                  roundDigit    <- max(getndp(resx),getndp(resy),na.rm=T)+1
-                  xborder       <- round(seq(xrange[1]+resx/2,xrange[2]-resx/2,resx),roundDigit)
-                  yborder       <- round(seq(yrange[1]+resy/2,yrange[2]-resy/2,resy),roundDigit)
-                } else {
-                    roundDigit  <- max(getndp(resx),getndp(resy),na.rm=T)
-                    xborder     <- round(seq(floor(sort(xrange)[1]*(10^roundDigit))/(10^roundDigit),ceiling(sort(xrange)[2]/resx)*resx,resx),roundDigit)
-                    yborder     <- round(seq(floor(sort(yrange)[1]*(10^roundDigit))/(10^roundDigit),ceiling(sort(yrange)[2]/resy)*resy,resy),roundDigit)
-                 }
+                  xs            <- seq(xrange[1]+resx/2,xrange[2]+resx,resx)
+                  xborder       <- range(xs)
+                  ys            <- seq(yrange[1]+resy/2,yrange[2]+resy,resy)
+                  yborder       <- range(ys)
+                  } else {
+                    roundDigitx <- getndp(resx)
+                    roundDigity <- getndp(resy)
+                    xs          <- seq(xrange[1],xrange[2] +resx,resx)
+                    xborder     <- c((min(floor(xs*10^roundDigitx))/10^roundDigitx)+resx/2,(max(ceiling(xs*10^roundDigitx)) / 10^roundDigitx)-resx/2)
+                    ys          <- seq(yrange[1],yrange[2] +resy,resy)
+                    yborder     <- c((min(floor(ys*10^roundDigity))/10^roundDigity)+resy/2,(max(ceiling(ys*10^roundDigity)) / 10^roundDigity)-resy/2)
+                   }
 
-                if(!exactBorder){
-                  if(round(xrange[1],roundDigit)<xborder[1] | round(xrange[2],roundDigit)>rev(xborder)[1] |
-                     round(yrange[1],roundDigit)<yborder[1] | round(yrange[2],roundDigit)>rev(yborder)[1]) stop("Grid range smaller than specified bounds (bug!)")
-                }
-                grid        <- GridTopology(c(xborder[1],yborder[1]),c(resx,resy),c(length(xborder),length(yborder)))
+                grid        <- GridTopology(c(xborder[1],yborder[1]),c(resx,resy),c(length(seq(xborder[1],xborder[2],resx)),length(seq(yborder[1],yborder[2],resy))))
                 if(type=="SpatialGrid"){
                   grid      <- SpatialGrid(grid=grid);
                 }
                 if(type=="SpatialPixels"){
+                  grid      <- GridTopology(c(xborder[1]-resx/2,yborder[1]-resy/2),c(resx,resy),c(length(seq(xborder[1]-resx/2,xborder[2]+resx/2,resx)),length(seq(yborder[1]-resy/2,yborder[2]+resy/2,resy))))
                   grid      <- SpatialGrid(grid=grid);
                   gridded(grid) = TRUE
                   grid      <- as(grid,"SpatialPixels");
                 }
                 if(type=="SpatialPixelsDataFrame"){
+                  grid      <- GridTopology(c(xborder[1]-resx/2,yborder[1]-resy/2),c(resx,resy),c(length(seq(xborder[1]-resx/2,xborder[2]+resx/2,resx)),length(seq(yborder[1]-resy/2,yborder[2]+resy/2,resy))))
                   grid      <- SpatialGrid(grid=grid);
                   gridded(grid) = TRUE
                   grid      <- as(grid,"SpatialPixels");
@@ -47,6 +49,12 @@ function(xrange
                   colnames(sPDF@data) <- "data"
                   grid          <- sPDF
                 }
+                
+               if(!class(grid)=="GridTopology"){
+                 bb <- bbox(grid)
+                 if(bb[1,1] > min(xrange) | max(xrange) > bb[1,2] | bb[2,1] > min(yrange) | max(yrange) > bb[2,2])
+                  stop("Dimensions of grid not large enough to span xranges and yranges (bug)")
+               }
                 
               return(grid)}
 

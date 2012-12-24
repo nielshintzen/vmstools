@@ -1,6 +1,6 @@
 \name{activityTacsat}
 \alias{activityTacsat}
-\title{Define activity of fishing vessel based on speed.
+\title{Define activity of fishing vessel based on speed profile analyses.
 }
 \description{
 Analyse tacsat data by gear of vessel and define, based on speed profile and
@@ -8,7 +8,7 @@ fitting normal distributions through these speed profiles, fishing and other
 activities.
 }
 \usage{
-activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NULL,level="all",saveDir=tempdir())
+activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NULL,level="all",sigma=0.911)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -32,7 +32,7 @@ a good normal distribution.
 Success of fit might depend on the initial guess in peaks or mean peak values.
 }
 \value{
-Returnes SI_STATE column. 1=In harbour. 2=Fishing. 3=Steaming.
+In general, a 5-peak analyses results in 1=no fishing / in harbour, 2=fishing, 3=steaming.
 }
 \references{}
 \author{Niels T. Hintzen}

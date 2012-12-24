@@ -1,103 +1,55 @@
-calculateCI <- function(intLon
-                               ,intLat
-                               ,vmsIdx1
-                               ,vmsIdx2
-                               ,VMS.
+calculateCI <- function(    int
+                               ,tacint
+                               ,params
                                ,grid
-                               ,sPDF
-                               ,interpolation
-                               ,int
-                               ,params){
+                               ,plot=F){
 
-  if(!"SI_DATIM" %in% colnames(VMS.)) VMS.$SI_DATIM <- as.POSIXct(paste(VMS.$SI_DATE,  VMS.$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-  #res1          <- maxRangeCI(intLon,intLat,an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="mins")),
-  #                            c(VMS.$SI_SP[vmsIdx1],VMS.$SI_SP[vmsIdx2]))
-  res1          <- maxRangeCI(intLon,intLat,an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="mins")),
-                              rep((distanceInterpolation(list(interpolation[[int]]))/1.852)/an(difftime(VMS.$SI_DATIM[vmsIdx2],VMS.$SI_DATIM[vmsIdx1],units="hours")),2))
-  if(res1[[2]] > distance(intLon[1],intLat[1],intLon[2],intLat[2])) res1[[2]] <- 2* distance(intLon[1],intLat[1],intLon[2],intLat[2])
-  if(any(point.in.polygon(interpolation[[int]][2:nrow(interpolation[[int]]),1],interpolation[[int]][2:nrow(interpolation[[int]]),1],res1[[1]][,1],res1[[1]][,2]))>0) stop("interpolation not inside maximum range" )
-    #First find the boundaries of the mills ellipse, thereafter, add a 10% extra margin, based on the minimum or
-    # maximum value. In the longitude direction, take the minimum value, and find the according latitude to go from km to degrees
-  res2          <- range(res1[[1]][,1],na.rm=T); boundx <- c(min(res2) - res1[[2]]*0.2*km2Degree(min(res2),
-                                                             res1[[1]][which(min(res2)==res1[[1]][,1]),2],1),
-                                                             max(res2) + res1[[2]]*0.2*km2Degree(max(res2),
-                                                             res1[[1]][which(max(res2)==res1[[1]][,1]),2],1))
-  res3          <- range(res1[[1]][,2],na.rm=T); boundy <- c(min(res3) - res1[[2]]*0.2*1/111.2,
-                                                             max(res3) + res1[[2]]*0.2*1/111.2)
-  if(res1[[3]] == 1){
-    boundx <- c(min(intLon) - res1[[2]]*0.2*km2Degree(min(intLon),
-              intLat[which(min(intLon)==intLon)],1),
-                max(intLon) + res1[[2]]*0.2*km2Degree(max(intLon),
-                intLat[which(max(intLon)==intLon)],1))
-    boundy <- c(min(intLat) - res1[[2]]*0.2*1/111.2,
-                max(intLat) + res1[[2]]*0.2*1/111.2)
+  if (!"SI_DATIM" %in% colnames(tacint))
+        tacint$SI_DATIMIM <- as.POSIXct(paste(tacint$SI_DATE, tacint$SI_TIME,
+            sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M")
+  mxr     <-  maxRangeCI(x  =c(int[-1,1][1],rev(int[-1,1])[1]),
+                         y  =c(int[-1,2][1],rev(int[-1,2])[1]),
+                         time.=c(difftime(tacint$SI_DATIM[2],tacint$SI_DATIM[1],units="mins")),
+                         speed=pmax(tacint$SI_SP,rep(distanceInterpolation(list(int)) / 1.852 /
+                                                     c(difftime(tacint$SI_DATIM[2],tacint$SI_DATIM[1],units="hours")),2)))
+                                                     
+  if(plot){
+    par(mfrow=c(2,2))
+    plot(mxr[[1]][,1],mxr[[1]][,2],type="l",xlab="Longitude",ylab="Latitude",asp=1/lonLatRatio(mxr[[1]][1,1],mxr[[1]][1,2]),main=paste(int[1,]))
+    lines(int[-1,1],int[-1,2],col=2)
   }
+  
+  xrange <- range(mxr[[1]][,1]); yrange <- range(mxr[[1]][,2])
+  xrg    <- range(int[-1,1]); yrg <- range(int[-1,2])
+  if(xrange[1] > xrg[1]) xrange[1] <- xrg[1] - diff(xrg)*0.1
+  if(xrange[2] < xrg[2]) xrange[2] <- xrg[2] + diff(xrg)*0.1
+  if(yrange[1] > yrg[1]) yrange[1] <- yrg[1] - diff(yrg)*0.1
+  if(yrange[2] < yrg[2]) yrange[2] <- yrg[2] - diff(yrg)*0.1
 
-    #Take the upper right and lower left values as setting the boundings of the smaller matrix
-  cc2           <- cbind(boundx,boundy)
-  idx           <- getGridIndex(cc2,grid,all.inside=F)
-    #If grid is too small, then extend grid to fit
-  if(any(is.na(idx))){
-    grid                  <- createGrid(xrange=cc2[,"boundx"],yrange=cc2[,"boundy"],resx=grid@cellsize[1],grid@cellsize[2])
-    spatialGrid           <- SpatialGrid(grid=grid)
-    gridded(spatialGrid) = TRUE
-    sPDF                  <- as(spatialGrid,"SpatialGridDataFrame")
-    sPDF@data             <- data.frame(rep(0,sPDF@grid@cells.dim[1]*sPDF@grid@cells.dim[2]))
-    sPDF@data[,2]         <- 0
-    colnames(sPDF@data)   <- c("data","tmpdata")
-    idx                   <- getGridIndex(cc2,grid,all.inside=T)
-  }
+  grid      <- createGrid(c((xrange[1] - grid@cellcentre.offset[1])                   %/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1],
+                            (xrange[2] - grid@cellcentre.offset[1] + grid@cellsize[1])%/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1]),
+                          c((yrange[1] - grid@cellcentre.offset[2])                   %/%grid@cellsize[2] * grid@cellsize[2] + grid@cellcentre.offset[2],
+                            (yrange[2] - grid@cellcentre.offset[2] + grid@cellsize[2])%/%grid@cellsize[2] * grid@cellsize[2] + grid@cellcentre.offset[2]),
+                          grid@cellsize[1],grid@cellsize[2],type="SpatialGridDataFrame")
+  coords    <- coordinates(grid)
+
+  # Distance to begin or end point
+  bpDistan  <- distance(tacint$SI_LONG[1],tacint$SI_LATI[1],coords[,1],coords[,2])
+  epDistan  <- distance(tacint$SI_LONG[2],tacint$SI_LATI[2],coords[,1],coords[,2])
+  pdistan   <- pmin(bpDistan,epDistan)
+  
+  if(plot){ image(t(matrix(pdistan,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=T)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
+
+  # Distance to interpolation
+  intDistan <- do.call(pmin,lapply(as.list(2:nrow(int)),function(x){distance(int[x,1],int[x,2],coords[,1],coords[,2])}))
     
+  if(plot){ image(t(matrix(intDistan,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=T)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
 
-    #Work out the other elements of the matrix
-  row1          <- min(idx)%/%grid@cells.dim[1]+1;            col1          <- min(idx) - (grid@cells.dim[1]*(row1-1))
-  row2          <- max(idx)%/%grid@cells.dim[1]+1;            col2          <- max(idx) - (grid@cells.dim[1]*(row2-1))
-  pxheigth      <- abs(row2-row1);                            pxwidth       <- abs(col2-col1)
-  bbox          <- matrix(NA,nrow=pxheigth+1,ncol=pxwidth+1); bbox[1,]      <- sort(min(idx) - seq(0,pxwidth,1))
-  if(pxheigth > 0) for(i in 1:(pxheigth)) bbox[i+1,] <- bbox[1,] + grid@cells.dim[1]*i
-  idx           <- c(bbox)
+  CI        <- N1p0(intDistan*params$distscale,0,pdistan^params$sigline,0)
+  if(max(CI,na.rm=T) < 0.1) warning("Prediction max(CI) is very small")
 
-  distan <- matrix(NA,nrow=dim(bbox)[1],ncol=dim(bbox)[2])
-  coords <- coordinates(sPDF)[idx,]
-  if(is.null(dim(coords))==T){
-    for (x in 2:length(interpolation[[int]][,1])){
-    distan <- pmin(distan,
-                   matrix(distance(lon=coords[1],lat=coords[2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
-                   nrow=dim(bbox)[1],ncol=dim(bbox)[2]),na.rm=T)
-    }
-  } else {
-      for (x in 2:length(interpolation[[int]][,1])){
-        distan <- pmin(distan,
-                       matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][x,1],latRef=interpolation[[int]][x,2]),
-                       nrow=dim(bbox)[1],ncol=dim(bbox)[2]),na.rm=T)
-      }
-    }
-  
-    #Calculate the distance from begin or endpoint
-  if(is.null(dim(coords))==T){
-    begindistan <- matrix(distance(lon=coords[1],lat=coords[2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
-                          nrow=dim(bbox)[1],ncol=dim(bbox)[2])
-    enddistan   <- matrix(distance(lon=coords[1],lat=coords[2],lonRef=interpolation[[int]][length(interpolation[[1]][,1]),1],
-                                                               latRef=interpolation[[int]][length(interpolation[[1]][,2]),2]),
-                          nrow=dim(bbox)[1],ncol=dim(bbox)[2])
-  } else {
-      begindistan <- matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][2,1],latRef=interpolation[[int]][2,2]),
-                            nrow=dim(bbox)[1],ncol=dim(bbox)[2])
-      enddistan   <- matrix(distance(lon=coords[,1],lat=coords[,2],lonRef=interpolation[[int]][length(interpolation[[1]][,1]),1],
-                                                                   latRef=interpolation[[int]][length(interpolation[[1]][,2]),2]),
-                            nrow=dim(bbox)[1],ncol=dim(bbox)[2])
-    }
-  linepistan  <- pmin(begindistan, enddistan,na.rm=T)
-    #Reset very small numbers to 0 to get highest values at begin and end point
-  linepistan[which(linepistan < 1e-6)]  <- 0
-  distan[which(distan < 1e-6)]          <- 0; zeroDistan <- which(distan==0)
+  if(plot){ image(t(matrix(CI,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=T)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
 
-  CI                              <- c(matrix(N1p0(distan*params$distscale,0,linepistan^params$sigline,0),ncol=dim(distan)[2],nrow=dim(distan)[1]))
-  if(max(CI,na.rm=T) < 0.1) warning("Prediction max(tmpnew) is very small")
-  if(length(zeroDistan)>0)  CI[zeroDistan]  <- pmax(CI[zeroDistan],1,na.rm=T)
-  
-  if(exists("spatialGrid")){ returns <- list(CI,idx,res1,grid,sPDF,spatialGrid,distan,linepistan)
-  } else { returns <- list(CI,idx,res1,grid,0,0,distan,linepistan)}
-  
-  
-  return(returns)}
+  grid@data$data <- CI
+return(grid)}
+                               
