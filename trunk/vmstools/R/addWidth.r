@@ -9,7 +9,7 @@ for(i in 1:length(interpolation)){
   xs <- interpolation[[i]][-1,1]
   ys <- interpolation[[i]][-1,2]
 
-  if(all(is.na(xs))==F & all(is.na(ys))==F){
+  if(all(is.na(xs))==F & all(is.na(ys))==FALSE){
     counter <- counter + 1
       #Calculate the bearing towards and away from each point
     bear1 <- bearing(xs[1:(length(xs)-2)],ys[1:(length(xs)-2)],xs[2:(length(xs)-1)],ys[2:(length(xs)-1)])

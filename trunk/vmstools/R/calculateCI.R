@@ -2,7 +2,7 @@ calculateCI <- function(    int
                                ,tacint
                                ,params
                                ,grid
-                               ,plot=F){
+                               ,plot=FALSE){
 
   if (!"SI_DATIM" %in% colnames(tacint))
         tacint$SI_DATIMIM <- as.POSIXct(paste(tacint$SI_DATE, tacint$SI_TIME,
@@ -38,17 +38,17 @@ calculateCI <- function(    int
   epDistan  <- distance(tacint$SI_LONG[2],tacint$SI_LATI[2],coords[,1],coords[,2])
   pdistan   <- pmin(bpDistan,epDistan)
   
-  if(plot){ image(t(matrix(pdistan,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=T)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
+  if(plot){ image(t(matrix(pdistan,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=TRUE)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
 
   # Distance to interpolation
   intDistan <- do.call(pmin,lapply(as.list(2:nrow(int)),function(x){distance(int[x,1],int[x,2],coords[,1],coords[,2])}))
     
-  if(plot){ image(t(matrix(intDistan,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=T)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
+  if(plot){ image(t(matrix(intDistan,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=TRUE)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
 
   CI        <- N1p0(intDistan*params$distscale,0,pdistan^params$sigline,0)
-  if(max(CI,na.rm=T) < 0.1) warning("Prediction max(CI) is very small")
+  if(max(CI,na.rm=TRUE) < 0.1) warning("Prediction max(CI) is very small")
 
-  if(plot){ image(t(matrix(CI,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=T)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
+  if(plot){ image(t(matrix(CI,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=TRUE)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
 
   grid@data$data <- CI
 return(grid)}

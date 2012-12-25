@@ -1,5 +1,5 @@
 ICESrectangle2LonLat <-
-function (statsq,midpoint=F)
+function (statsq,midpoint=FALSE)
 {
     part1 <- substr(statsq, 1, 2)
     part2 <- substr(statsq, 3, 4)

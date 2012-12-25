@@ -16,10 +16,6 @@ generate some effort maps (jpeg files) from the merged table per year, per metie
 using some arguments informing mapGrid(). Performing automatic creation of a hierarchy of output folders. 
 see also pings2LandingsMaps(). 
 }
-\source{
-}
-\references{
-}
 \author{
 Francois Bastardie
 }

@@ -2,14 +2,14 @@ ICESarea <- function(tacsat,areas,proj4string=NULL){
       if(class(areas) != "SpatialPolygons") stop("'areas' must be specified as class 'SpatialPolygons'")
 
       #filter NA values
-      NAS         <- which(is.na(tacsat$SI_LONG)==F & is.na(tacsat$SI_LATI)==F)
+      NAS         <- which(is.na(tacsat$SI_LONG)==F & is.na(tacsat$SI_LATI)==FALSE)
 
       totres      <- rep(NA,length(tacsat$SI_LONG))
       nms         <- unlist(lapply(areas@polygons,function(x){return(x@ID)}))
 
-      if(is.null(proj4string)==T){
+      if(is.null(proj4string)==TRUE){
         #No projection string used
-        if(is.na(proj4string(areas))==F) stop("Projection defined for areas, use proj4string argument in function")
+        if(is.na(proj4string(areas))==FALSE) stop("Projection defined for areas, use proj4string argument in function")
         spPoint           <- SpatialPoints(data.frame(x=tacsat$SI_LONG[NAS],y=tacsat$SI_LATI[NAS]))
         idx               <- over(spPoint,areas)
         totres[NAS]       <- nms[idx]

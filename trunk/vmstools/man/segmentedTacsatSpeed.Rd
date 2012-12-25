@@ -9,7 +9,7 @@ located. The segmented regression takes place on the cummulative speed profile.
 }
 \usage{
 segmentedTacsatSpeed(tacsat, units = "year", analyse.by = "VE_REF",
-                     speed = "calculated", logfit = F, CI = 0.95,
+                     speed = "calculated", logfit = FALSE, CI = 0.95,
                      saveDir = tempdir())
 }
 %- maybe also 'usage' for other objects documented here.

@@ -25,6 +25,7 @@ A clipped resulting polyset is returned.
 \author{Fabrizio Manco}
 \seealso{\code{indicators()}}
 \examples{
+\dontrun{
 # Load the shapefile containing the set of polygons to be clipped
 # Name of the shapefile without the .shp extension
 inShapeArea<-"testClosedAreaMultiple"
@@ -38,4 +39,5 @@ clipShapeFromLand<-clipPolygons (shapeAll, europa)
 
 # Plot the resulting clipped polygons to check
 plotPolys(clipShapeFromLand)
+}
 }

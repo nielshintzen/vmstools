@@ -289,7 +289,7 @@ segmentTacsatSpeed <- function(tacsat,
         dati   <- data.frame(x=x,y=y)
         dati$x <- as.integer(dati$x) # integer needed
         psi    <- list(x= quantile(dati$x,probs=c(0.05,0.5))  )
-        assign('dati', dati, env=.GlobalEnv) # DEBUG segmented()...this function looks in the global env to get dati!!
+        assign('dati', dati, envir=.GlobalEnv) # DEBUG segmented()...this function looks in the global env to get dati!!
         # get good start guesses
         hi$counts <- hi$counts[-1]
         idx       <- which(hi$counts==max(hi$counts))[1]

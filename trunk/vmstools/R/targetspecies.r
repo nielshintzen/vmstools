@@ -12,7 +12,7 @@ targetspecies=function(resval){
   for(i in 1:nbgp){
     # qnorm(0.975,mean=0,sd=1)=1.96     (P(resval>1.96)=0.025)
     numespcib=which(resval[,i]>1.96)
-    numespcibdec=numespcib[order(resval[numespcib,i],decreasing=T)]
+    numespcibdec=numespcib[order(resval[numespcib,i],decreasing=TRUE)]
     nomespcib=names(numespcibdec)
 
     nbespgpcib=length(numespcib)

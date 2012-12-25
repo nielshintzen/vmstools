@@ -1,4 +1,4 @@
-segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=F,CI=0.95,saveDir=tempdir()){
+segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=FALSE,CI=0.95,saveDir=tempdir()){
 
   require(segmented)
   tacsat$idx <- 1:nrow(tacsat)
@@ -12,9 +12,9 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
   tacsatOrig <- tacsat
   if(analyse.by %in% colnames(tacsat)){
     if(units == "all"){   yrs <- 0; mths <- 0; wks <- 0}
-    if(units == "year"){  yrs <- sort(unique(year(tacsat$SI_DATIM))); mths  <- 0;                                    wks  <- 0}
-    if(units == "month"){ yrs <- sort(unique(year(tacsat$SI_DATIM))); mths  <- sort(unique(month(tacsat$SI_DATIM))); wks  <- 0}
-    if(units == "week"){  yrs <- sort(unique(year(tacsat$SI_DATIM))); wks   <- sort(unique(week(tacsat$SI_DATIM)));  mths <- 0}
+    if(units == "year"){  yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); mths  <- 0;                                    wks  <- 0}
+    if(units == "month"){ yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); mths  <- sort(unique(month(tacsat$SI_DATIM))); wks  <- 0}
+    if(units == "week"){  yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); wks   <- sort(unique(week(tacsat$SI_DATIM)));  mths <- 0}
   } else { stop("analyse.by statement not found as a column in the specified tacsat dataset")}
     storeScheme               <- expand.grid(years=yrs,months=mths,weeks=wks,analyse.by=unique(tacsat[,analyse.by]))
     # Add upper and lower boundaries to storeScheme
@@ -30,17 +30,17 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
       if(analyse.by == "VE_REF"){
         if(nrow(storeScheme)==1){ sTacsat <- tacsat
         } else {
-            if(mth == 0 & wk == 0) sTacsat <- subset(tacsat,year(tacsat$SI_DATIM) == yr & VE_REF == aby)
-            if(mth == 0 & wk != 0) sTacsat <- subset(tacsat,year(tacsat$SI_DATIM) == yr & week( tacsat$SI_DATIM) == wk & VE_REF == aby)
-            if(mth != 0 & wk == 0) sTacsat <- subset(tacsat,year(tacsat$SI_DATIM) == yr & month(tacsat$SI_DATIM) == mth & VE_REF == aby)
+            if(mth == 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & VE_REF == aby)
+            if(mth == 0 & wk != 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & week( tacsat$SI_DATIM) == wk & VE_REF == aby)
+            if(mth != 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & month(tacsat$SI_DATIM) == mth & VE_REF == aby)
           }
       }
       if(analyse.by == "LE_GEAR"){
         if(nrow(storeScheme)==1){ sTacsat <- tacsat
         } else {
-            if(mth == 0 & wk == 0) sTacsat <- subset(tacsat,year(tacsat$SI_DATIM) == yr & LE_GEAR == aby)
-            if(mth == 0 & wk != 0) sTacsat <- subset(tacsat,year(tacsat$SI_DATIM) == yr & week( tacsat$SI_DATIM) == wk & LE_GEAR == aby)
-            if(mth != 0 & wk == 0) sTacsat <- subset(tacsat,year(tacsat$SI_DATIM) == yr & month(tacsat$SI_DATIM) == mth & LE_GEAR == aby)
+            if(mth == 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & LE_GEAR == aby)
+            if(mth == 0 & wk != 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & week( tacsat$SI_DATIM) == wk & LE_GEAR == aby)
+            if(mth != 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & month(tacsat$SI_DATIM) == mth & LE_GEAR == aby)
           }
       }
       
@@ -51,8 +51,8 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
         if(speed == "calculated"){
           sTacsat             <- sortTacsat(sTacsat)
           sTacsat$SI_SP_ORIG  <- sTacsat$SI_SP
-          if("FT_REF" %in% colnames(tacsat)){ sTacsat$SI_SP <- calculateSpeed(sTacsat,level="trip",   weight=c(0.5,0.5), fill.na=T)$SI_SPCA
-          } else {                             sTacsat$SI_SP <- calculateSpeed(sTacsat,level="vessel", weight=c(0.5,0.5), fill.na=T)$SI_SPCA}
+          if("FT_REF" %in% colnames(tacsat)){ sTacsat$SI_SP <- calculateSpeed(sTacsat,level="trip",   weight=c(0.5,0.5), fill.na=TRUE)$SI_SPCA
+          } else {                             sTacsat$SI_SP <- calculateSpeed(sTacsat,level="vessel", weight=c(0.5,0.5), fill.na=TRUE)$SI_SPCA}
         }
         #Remove records where SI_SP is NA
         sTacsat <- sTacsat[which(is.na(sTacsat$SI_SP)==F & sTacsat$SI_SP > 0 & sTacsat$SI_SP <= 10),]
@@ -70,8 +70,8 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
         if(nrow(sTacsat) > minRows){
 
           #Define starting values for segmented regression
-          hi  <- hist(sTacsat$SI_SP,breaks=diff(c(floor(  range(sTacsat$SI_SP[is.finite(sTacsat$SI_SP)],na.rm=T)[1]),
-                                                  ceiling(range(sTacsat$SI_SP[is.finite(sTacsat$SI_SP)],na.rm=T)[2]))),plot=F)
+          hi  <- hist(sTacsat$SI_SP,breaks=diff(c(floor(  range(sTacsat$SI_SP[is.finite(sTacsat$SI_SP)],na.rm=TRUE)[1]),
+                                                  ceiling(range(sTacsat$SI_SP[is.finite(sTacsat$SI_SP)],na.rm=TRUE)[2]))),plot=FALSE)
           acc <- diff(diff(cumsum(hi$counts)))
           idx <- rev(sort(abs(diff(diff(cumsum(hi$counts))))))[1:2]
           cnts<- which(abs(acc) %in% idx)+2 #Taking twice diff, so add 2 to get back to counts
@@ -79,7 +79,7 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
           psiOrig <- psi
           dat <- data.frame(x=sort(sTacsat$SI_SP[sTacsat$SI_SP>0]),
                             y=1:length(sTacsat$SI_SP[sTacsat$SI_SP>0]))
-          if(logfit==T) dat <- data.frame(x=      an(rep(names(table(sTacsat$SI_SP[sTacsat$SI_SP>0])),
+          if(logfit==TRUE) dat <- data.frame(x=      an(rep(names(table(sTacsat$SI_SP[sTacsat$SI_SP>0])),
                                                          ceiling(log(table(sTacsat$SI_SP[sTacsat$SI_SP>0]))))),
                                           y=1:length(rep(names(table(sTacsat$SI_SP[sTacsat$SI_SP>0])),
                                                          ceiling(log(table(sTacsat$SI_SP[sTacsat$SI_SP>0]))))))
@@ -91,11 +91,11 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
             o <- try(
                      segmented(lm(y~x, data=dat) , seg.Z=~x , psi=psi, control= seg.control(display = FALSE, it.max=50, h=1)), # with 2 starting guesses
                      silent=TRUE) # the second breakpoint is quite uncertain and could lead to failure so...
-            if(!"try-error" %in% class(o)) break else psi <- list(x=c(sort(runif(2,min=range(sTacsat$SI_SP,na.rm=T)[1],max=range(sTacsat$SI_SP,na.rm=T)[2])))) # searching decreasing by 1 each time
+            if(!"try-error" %in% class(o)) break else psi <- list(x=c(sort(runif(2,min=range(sTacsat$SI_SP,na.rm=TRUE)[1],max=range(sTacsat$SI_SP,na.rm=TRUE)[2])))) # searching decreasing by 1 each time
             if(count>20) {bound1 <- psiOrig$x[1]; bound2 <- psiOrig$x[2] ; cat("failure of the segmented regression for",paste(c("year","month","week","analyse.by"),storeScheme[iRun,1:4]),"\n"); break}
           }
           #Calculate the bounds and whether the fit has been successful or not
-          if(is.null(bound1)==T & is.null(bound2)==T){
+          if(is.null(bound1)==T & is.null(bound2)==TRUE){
             bound1 <- max(range(sTacsat$SI_SP)[1],min(confint(o,level=CI)$x))
             bound2 <- min(range(sTacsat$SI_SP)[2],max(confint(o,level=CI)$x))
             if(class(o)[1] != "try-error") storeScheme[iRun,"success"] <- 1

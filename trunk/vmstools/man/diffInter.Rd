@@ -28,11 +28,13 @@ EU lot 2 project}
 \author{Niels T. Hintzen}
 \seealso{\code{\link{distance}}, \code{\link{distanceInterpolation}}, \code{\link{distanceVMS}}}
 \examples{
+\dontrun{
 data(VMShf)
 
 #-Put the data in the right format
-VMShf$SI_DATE <- format(as.Date(VMShf$date),"\%d/\%m/\%Y")
-VMShf$SI_TIME <- format(VMShf$date, "\%H:\%M:\%S")
+VMShf$SI_DATE <- format(as.Date(VMShf$date),"%d/%m/%Y")
+VMShf$SI_TIME <- format(VMShf$date, "%H:%M")
+
 colnames(VMShf) <- c("VE_REF","SI_LATI","SI_LONG","SI_SP",
                      "SI_HE","SI_DATIM","SI_DATE","SI_TIME")
 
@@ -47,4 +49,5 @@ interpolation <- interpolateTacsat(VMShf,interval=120,margin=10,res=100,
 #Returns a matrix with 21 rows (each row represents 1 interpolation)
 # and 5 measures
 cHs <- diffInter(interpolation,VMShf)
+}
 }

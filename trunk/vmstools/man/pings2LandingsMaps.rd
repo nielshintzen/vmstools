@@ -15,10 +15,6 @@ generate landings maps from the merged table per year, per metier (level6), per 
 \details{
 using some arguments informing mapGrid(). Performing automatic creation of a hierarchy of output folders. 
 }
-\source{
-}
-\references{
-}
 \author{
 Francois Bastardie
 }

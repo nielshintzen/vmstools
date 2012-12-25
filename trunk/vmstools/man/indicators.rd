@@ -109,6 +109,7 @@ indicators(indicatorNum=6,
            exportGridName="")
 
 # DCF Indicator 7
+\dontrun{
 indicators(indicatorNum=7,
            tacsat, 
            ltGear=c("TBB","OTB","PTB","DRB","DRH"),
@@ -119,4 +120,5 @@ indicators(indicatorNum=7,
            minThreshold=0,
            plotMapTF=TRUE,
            exportGridName="")
+}
 }

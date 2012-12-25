@@ -29,7 +29,7 @@ polygons per interpolation, where each interpolation consists of several polygon
 \code{\link{interpolateTacsat}}, \code{\link{destFromBearing}}
 }
 \examples{
-library(vmstools)
+require(sp)
 
 data(tacsat)
 
@@ -38,7 +38,7 @@ tacsat     <- sortTacsat(tacsat)
 tacsat     <- tacsat[1:1000,]
 
   #Filter the Tacsat data
-tacsat     <- filterTacsat(tacsat,c(4,8),hd=NULL,remDup=T)
+tacsat     <- filterTacsat(tacsat,c(4,8),hd=NULL,remDup=TRUE)
 
   #Interpolate the VMS data
 interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,

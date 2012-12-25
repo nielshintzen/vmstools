@@ -8,7 +8,7 @@ this function the CI's are computed.
 
 }
 \usage{    
-calculateCI(int,tacint,params,grid,plot=F)
+calculateCI(int,tacint,params,grid,plot=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -37,7 +37,7 @@ tacsat     <- sortTacsat(tacsat)
 tacsat     <- tacsat[1:1000,]
 
   #Filter the Tacsat data
-tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
+tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=TRUE)
 
   #Interpolate the VMS data
 interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
@@ -52,5 +52,5 @@ res           <- calculateCI(interpolation[[4]],
                              tacsat[interpolation[[4]][1,],],
                              params=list(fm=0.25,distscale=3.1,sigline=0.4,st=c(2,6)),
                              grid=grid,
-                             plot=T)
+                             plot=TRUE)
 }

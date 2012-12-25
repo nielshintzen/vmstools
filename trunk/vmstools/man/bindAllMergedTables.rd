@@ -3,7 +3,7 @@
 \title{
 bind all individual merged tables into a big one 
 }
-\description{
+\description{Bind all individual merged tables into one table.
 }
 \usage{
 bindAllMergedTables(vessels, a.year, species.to.keep, folder,

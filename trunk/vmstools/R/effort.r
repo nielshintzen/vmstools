@@ -1,4 +1,4 @@
-effort <- function(x,level="trip",unit="hours",weight=c(0.5,0.5),fill.na=F){
+effort <- function(x,level="trip",unit="hours",weight=c(0.5,0.5),fill.na=FALSE){
 
               if("SI_FT" %in% colnames(x)) x$FT_REF <- x$SI_FT
               #-Add if necessary a datim column

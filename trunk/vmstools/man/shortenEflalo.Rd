@@ -24,6 +24,6 @@ Doug Beare
 }
 \examples{
 data(eflalo)
-shortenEflalo(data = eflalo, which.species = c("PLE")
+shortenEflalo(data = eflalo, which.species = c("PLE"))
 
 }

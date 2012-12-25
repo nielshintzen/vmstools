@@ -7,15 +7,15 @@ function(tacsat
   VMS <- tacsat
 if(!"SI_DATIM" %in% colnames(VMS))  VMS$SI_DATIM     <- as.POSIXct(paste(VMS$SI_DATE,  VMS$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
   #Remove duplicate records
-if(is.null(remDup)==F){
-  uniqueVMS <- which(duplicated(VMS[,c("VE_REF","SI_DATIM")])==F)
+if(is.null(remDup)==FALSE){
+  uniqueVMS <- which(duplicated(VMS[,c("VE_REF","SI_DATIM")])==FALSE)
   VMS.      <- VMS[uniqueVMS,]
   if(dim(VMS.)[1] != dim(VMS)[1]) warning("duplicate records have been removed")
 } else {
     VMS. <- VMS
   }
 
-if(is.null(hd)==F){
+if(is.null(hd)==FALSE){
   warning("It is assumed that VMS data is sorted by vessel and date")
     #Calculate the difference in heading between succeeding VMS datapoints
   diffHeading                           <- abs(VMS.$SI_HE[2:dim(VMS)[1]] - VMS.$SI_HE[1:(dim(VMS)[1]-1)])
@@ -28,7 +28,7 @@ if(is.null(hd)==F){
   VMS.                                  <- subset(VMS.,diffHeading %in% seq(hd[1],hd[2],1))
 }
 
-if(is.null(st)==F){
+if(is.null(st)==FALSE){
     #Subset based on the speed ranges
   if(length(st)>2) stop("More than two speed values selected")
   VMS. <- VMS.[which(VMS.$SI_SP >= st[1] & VMS.$SI_SP <= st[2]),]

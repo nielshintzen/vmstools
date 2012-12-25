@@ -50,9 +50,6 @@ selectMainSpecies(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE)
   \item{DiagFlag}{Boolean. If DiagFlag=TRUE, additional plots and diagnostics are produced. Not very used. 
 }
 }
-\details{
-}
-
 \value{
 The function produces a plot (saved in the "analysisName" working directory showing the number of species selected according to the method and 
 the percentage threshold selected for both 'Total' and 'Logevent' methods. 
@@ -105,7 +102,7 @@ eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
 # note that output plots will be sent to getwd()
 analysisName <- "metier_analysis_OTB"
 
-dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))]
+dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=TRUE))]
 names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 
 explo <- selectMainSpecies(dat, analysisName, RunHAC=TRUE, DiagFlag=FALSE)

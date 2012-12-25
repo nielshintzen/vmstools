@@ -18,7 +18,7 @@ print(names(habitat)) # print out potential polygons to examine
 print(unique(habitat[[what.habitat.grouping]]))
 #colors()[grep('brown',colors())]
 
-map("worldHires",xlim=c(min.lon,max.lon),ylim=c(min.lat,max.lat),fill=T,col="darkgreen"); map.axes()
+map("worldHires",xlim=c(min.lon,max.lon),ylim=c(min.lat,max.lat),fill=TRUE,col="darkgreen"); map.axes()
 
 sp <- SpatialPolygons(habitat@polygons)
 
@@ -27,11 +27,11 @@ sp <- SpatialPolygons(habitat@polygons)
 #sms <- grep("Sand to muddy sand", habitat[[what.habitat.grouping]])
 #rock <- grep("Rock or other hard substrata", habitat[[what.habitat.grouping]])
 #
-#plot(sp[sms],add=T,col="yellow",border="yellow")
-#plot(sp[rock],add=T,col="green",border="green")
+#plot(sp[sms],add=TRUE,col="yellow",border="yellow")
+#plot(sp[rock],add=TRUE,col="green",border="green")
 #
-#plot(sp[sb],add=T,col="thistle",border="thistle")
-#plot(sp[msm],add=T,col="brown",border="brown")
+#plot(sp[sb],add=TRUE,col="thistle",border="thistle")
+#plot(sp[msm],add=TRUE,col="brown",border="brown")
 #
 
 if (what.habitat.grouping == "Grouped")  {
@@ -58,9 +58,9 @@ lcolrs <- length(colrs)+1
 print(colrs)
 
 
-plot(sp,col=colrs,add=T,border=colrs) 
+plot(sp,col=colrs,add=TRUE,border=colrs) 
 
-map("worldHires",xlim=c(min.lon,max.lon),ylim=c(min.lat,max.lat),fill=T,add=T,col="darkgreen")
+map("worldHires",xlim=c(min.lon,max.lon),ylim=c(min.lat,max.lat),fill=TRUE,add=TRUE,col="darkgreen")
 legend("bottomleft",legend=c("Land",ac(unique(habitat[[what.habitat.grouping]]))),
 
         lwd=c(1,1,1,1),lty=rep(NA,10),pch=rep(22,lcolrs),ncol=2,
@@ -75,12 +75,12 @@ legend("bottomleft",legend=c("Land",ac(unique(habitat[[what.habitat.grouping]]))
 #plotHabitatMap(read.in.shapefile=TRUE,what.habitat.grouping="SubsGrpPlu",min.lon= -5,max.lon=10, min.lat=45,max.lat=65)
 
 
-map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=T,col="darkgreen");
+map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=TRUE,col="darkgreen");
 map.axes()
 
 sp <- SpatialPolygons(habitat@polygons)
 plot(sp,col=colrs[an(habitat$substrate)],
-     border=colrs[an(habitat$substrate)],add=T)
+     border=colrs[an(habitat$substrate)],add=TRUE)
      
 legend("bottomleft",legend=c("Land",levels(habitat$substrate)),
         lwd=c(1,1,1,1),lty=rep(NA,10),pch=rep(22,lcolrs),ncol=2,
@@ -92,11 +92,11 @@ x11()
         
 idx <- which(habitat$substrate == i)
 sp2 <- SpatialPolygons(habitat@polygons[idx])
-map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=T,col="darkgreen");
+map("worldHires",xlim=c(-5,10),ylim=c(48,62),fill=TRUE,col="darkgreen");
 title(i)
 map.axes()
 plot(sp2,col=colrs[an(habitat$substrate[idx])[order(sp2@plotOrder)]],
-     border=colrs[an(habitat$substrate[idx])[order(sp2@plotOrder)]],add=T)
+     border=colrs[an(habitat$substrate[idx])[order(sp2@plotOrder)]],add=TRUE)
 }
 
 

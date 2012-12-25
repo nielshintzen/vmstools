@@ -36,11 +36,11 @@ the speed is calculated between ping x and ping x+1 (weight = c(0,1)) or an inte
 \examples{
 data(tacsat)
 result <- calculateSpeed(tacsat[1:100,],level="vessel")
-result <- calculateSpeed(tacsat[1:100,],level="vessel",weight=c(2,1),fill.na=T)
+result <- calculateSpeed(tacsat[1:100,],level="vessel",weight=c(2,1),fill.na=TRUE)
 
 data(eflalo)
 tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
-result  <- calculateSpeed(tacsat[1:100,],level="trip",weight=c(1,1),fill.na=F)
+result  <- calculateSpeed(tacsatp[1:100,],level="trip",weight=c(1,1),fill.na=FALSE)
 
 
 }

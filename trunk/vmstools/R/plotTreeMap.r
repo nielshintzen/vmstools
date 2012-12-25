@@ -71,8 +71,8 @@ function (x, gridcell = c(0.1, 0.1), gear = "OTB", xlim = c(-1,
     idx.col <- grep("KG", names(byRect))
     byRect[, idx.col] <- sweep(byRect[, idx.col], 1, A.sum, FUN = "/")
     X11(7, 7)
-    library(mapdata)
-    map("worldHires", res = 1, xlim = xlim, ylim = ylim,
+    require(mapdata)
+    map("worldHires", resolution = 1, xlim = xlim, ylim = ylim,
         fill = T, col = "darkgreen")
     map.axes()
     box()
@@ -92,7 +92,7 @@ function (x, gridcell = c(0.1, 0.1), gear = "OTB", xlim = c(-1,
         col = grey(0.9))
     for (i in seq(ylim[1], ylim[2], by = gridcell[2])) abline(h = i,
         col = grey(0.9))
-    map("worldHires", add = TRUE, res = 1, xlim = xlim,
+    map("worldHires", add = TRUE, resolution = 1, xlim = xlim,
         ylim = ylim, fill = T, col = "darkgreen")
     map.axes()
     box()

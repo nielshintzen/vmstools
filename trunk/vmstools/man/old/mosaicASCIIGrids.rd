@@ -32,7 +32,7 @@ VmsGrid00<-vmsGridCreate(subset(tacsat,year(SI_DATIM)==1800), nameLon = "SI_LONG
             nameLat = "SI_LATI",cellsizeX=0.05, cellsizeY=0.05,
             nameVarToSum="",outGridFile="VmsGrid00.asc")
 # year 1801 from tacsat file
-VmsGrid01<-vmsGridCreate(subset(tacsat,year(SI_DATIM)==1801), nameLon = "SI_LONG",
+VmsGrid01<-vmsGridCreate(subset(tacsat,year(SI_DATIM)==1800), nameLon = "SI_LONG",
              nameLat = "SI_LATI",cellsizeX=0.05, cellsizeY=0.05,
              nameVarToSum="",outGridFile="VmsGrid01.asc")
 

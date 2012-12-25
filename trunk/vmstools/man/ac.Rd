@@ -6,7 +6,6 @@ Change the class of an object to character
 }
 \usage{
 ac(x)
-as.character(x)
 }
 \arguments{
   \item{x}{object to turn into character

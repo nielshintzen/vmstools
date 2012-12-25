@@ -3,7 +3,7 @@
  # need to install the ImageMagik freeware
 landingsMaps2GIFanim <- function(idir = file.path("C:","VMSanalysis","FemernBelt","jpegLandings"),
                            spp=c("COD","SPR","HER","PLE","FLE","DAB","WHB")){
-library(animation) 
+require(animation)
 for(sp in spp){
     for(met in list.files(file.path(idir, sp))){
      for(what in c("weight","value")){

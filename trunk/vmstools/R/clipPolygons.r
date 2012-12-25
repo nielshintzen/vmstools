@@ -5,7 +5,9 @@
 clipPolygons <- function ( shapeAll,
                            europa)
   {
-
+  require(adehabitat)
+  require(PBSmapping)
+  
   if (!exists("europa")) {load("europa.rda")}
 
   allSourcePoly<-numeric()

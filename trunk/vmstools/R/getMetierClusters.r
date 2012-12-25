@@ -9,6 +9,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
   # Load the table linking 3A-CODE (FAO CODE of species) to the species assemblage (level 5).
   data(correspLevel7to5)
+  require(lattice)
 
   LE_ID=rownames(datSpecies)
   nbSpec=ncol(datSpecies)
@@ -46,7 +47,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       print(paste("sample",i))
       # Sample of size 10000 logevents or 30% of all logevents
       minsam=min(nbLog,max(10000,round(nbLog*30/100)))
-      sam=sample(1:nbLog,size=minsam,replace=F)
+      sam=sample(1:nbLog,size=minsam,replace=FALSE)
       # Record the 5 samples
       sampleList=rbind(sampleList,sam)
       outofsam=setdiff(1:nbLog,sam)
@@ -55,7 +56,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
       # HAC on the sample
       log.hac=hcluster(sampleDatLog, method=param1, link=param2)
-      inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
+      inerties.vector=log.hac$height[order(log.hac$height,decreasing=TRUE)]
       nbClust=which(scree(inerties.vector)[,"epsilon"]<0)[3]
 
       # Cut the dendogram at the selected level
@@ -139,7 +140,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
       # Rectangles plotting
       png(paste(analysisName,numSample,"Sample_Dendogram.png",sep="_"), width = 1200, height = 800)
-      plclust(log.hac,labels=F,hang=-1,ann=F)
+      plclust(log.hac,labels=FALSE,hang=-1,ann=FALSE)
       title(main="HAC dendogram",xlab="Logevents",ylab="Height")
       rect.hclust(log.hac, k=nbClust)
       dev.off()
@@ -151,7 +152,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op <- par(las=2)
       barplot(meanprofile, main="Catch profile of the sample", xlab="Species", ylab="Percentage of catch")
       par(op)
-      mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
       dev.off()
 
 
@@ -186,7 +187,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
         op2 <- par(las=2)
         barplot(t(summarySampleClusters["Mean",,k]), names.arg=nameSpPlot[k,], xlab="Species", ylab="Percentage of catch", col="gray")
         par(op2)
-        mtext(paste("Cluster",k), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+        mtext(paste("Cluster",k), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
       }
       par(op)
       title(main=paste("Catch profile by cluster of the sample","\n","\n",sep=""))
@@ -214,7 +215,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
         op2 <- par(las=2)
         barplot(sdprofil[k,], names.arg=namSdPlot[k,], xlab="Species", ylab="Percentage of catch")
         par(op2)
-        mtext(paste("Cluster",k), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+        mtext(paste("Cluster",k), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
       }
       par(op)
       title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
@@ -250,7 +251,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
         op2 <- par(las=2)
         barplot(targetresval[k,],names.arg=nameTargetPlot[k,], cex.names=1, xlab="Species", ylab="Test-value")
         par(op2)
-        mtext(paste("Cluster",k), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+        mtext(paste("Cluster",k), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
       }
       par(op)
       title(main=paste("Profile of target species by cluster","\n","\n",sep=""))
@@ -279,7 +280,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # Determine the number of cluster thanks to the scree-test
-    inerties.vector=log.hac$height[order(log.hac$height,decreasing=T)]
+    inerties.vector=log.hac$height[order(log.hac$height,decreasing=TRUE)]
     nbClust=which(scree(inerties.vector)[,"epsilon"]<0)[3]
 
     # Cut the dendogram at the selected level
@@ -390,7 +391,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     # Rectangles plotting
     png(paste(analysisName,"Dendogram.png",sep="_"), width = 1200, height = 800)
-    plclust(log.hac,labels=F,hang=-1,ann=F)
+    plclust(log.hac,labels=FALSE,hang=-1,ann=FALSE)
     title(main="HAC dendogram",xlab="Logevents",ylab="Height")
     rect.hclust(log.hac, k=nbClust)
     dev.off()
@@ -402,7 +403,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     op <- par(las=2)
     barplot(meanprofile, main="Catch profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
-    mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+    mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     dev.off()
 
 
@@ -437,7 +438,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(t(summaryClusters["Mean",,i]), names.arg=nameSpPlot[i,], xlab="Species", ylab="Percentage of catch", col="gray")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Catch profile by cluster","\n","\n",sep=""))
@@ -481,7 +482,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(sdprofil[i,], names.arg=namSdPlot[i,], xlab="Species", ylab="Percentage of catch")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
@@ -517,7 +518,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(targetresval[i,],names.arg=nameTargetPlot[i,], cex.names=1, xlab="Species", ylab="Test-value")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Profile of test-values by cluster","\n","\n",sep=""))
@@ -530,8 +531,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusterDesc=matrix(0,nrow=9,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(i,
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)])<50))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)])<90))+1,
                         length(which(t(summaryClusters["Median",,i])>50)),
                         length(which(resval[,i]>1.96)),
                         length(which(resval[,i]>3.29)),
@@ -559,11 +560,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     listLibname=list()
     
     for(i in 1:nbClust){
-      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
+      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)][1:nbSpeciesCatch]
       a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
       colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
       if(length(a)!=0){
-        namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+        namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=TRUE)])
       }
       namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
     }
@@ -779,7 +780,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     op <- par(las=2)
     barplot(meanprofile, main="Catch profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
-    mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+    mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     dev.off()
 
 
@@ -814,7 +815,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(t(summaryClusters["Mean",,i]), names.arg=nameSpPlot[i,], xlab="Species", ylab="Percentage of catch", col="gray")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Catch profile by cluster","\n","\n",sep=""))
@@ -858,7 +859,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(sdprofil[i,], names.arg=namSdPlot[i,], xlab="Species", ylab="Percentage of catch")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
@@ -894,7 +895,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(targetresval[i,], cex.names=1, names.arg=nameTargetPlot[i,], xlab="Species", ylab="Test-value")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Profile of test-values by cluster","\n","\n",sep=""))
@@ -907,8 +908,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusterDesc=matrix(0,nrow=9,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(i,
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)])<50))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)])<90))+1,
                         length(which(t(summaryClusters["Median",,i])>50)),
                         length(which(resval[,i]>1.96)),
                         length(which(resval[,i]>3.29)),
@@ -936,11 +937,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     listLibname=list()
 
     for(i in 1:nbClust){
-      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
+      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)][1:nbSpeciesCatch]
       a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
       colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
       if(length(a)!=0){
-        namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+        namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=TRUE)])
       }
       namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
     }
@@ -1196,7 +1197,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     op <- par(las=2)
     barplot(meanprofile, main="Catch profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
-    mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+    mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     dev.off()
 
 
@@ -1231,7 +1232,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(t(summaryClusters["Mean",,i]), names.arg=nameSpPlot[i,], xlab="Species", ylab="Percentage of catch", col="gray")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Catch profile by cluster","\n","\n",sep=""))
@@ -1275,7 +1276,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(sdprofil[i,], names.arg=namSdPlot[i,], xlab="Species", ylab="Percentage of catch")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
@@ -1311,7 +1312,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(targetresval[i,],names.arg=nameTargetPlot[i,], xlab="Species", ylab="Test-value")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Profile of test-values by cluster","\n","\n",sep=""))
@@ -1323,8 +1324,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusterDesc=matrix(0,nrow=9,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(i,
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)])<50))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)])<90))+1,
                         length(which(t(summaryClusters["Median",,i])>50)),
                         length(which(resval[,i]>1.96)),
                         length(which(resval[,i]>3.29)),
@@ -1352,11 +1353,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     listLibname=list()
 
     for(i in 1:nbClust){
-      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
+      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)][1:nbSpeciesCatch]
       a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
       colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
       if(length(a)!=0){
-        namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+        namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=TRUE)])
       }
       namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
     }
@@ -1482,9 +1483,9 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     repeat{
       k=k+2
       print(k)
-      clustersClara=clara(datLog, k, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(propSample*nbLog+10*k)))
+      clustersClara=clara(datLog, k, metric=param1, stand=FALSE, samples=5, sampsize=min(nbLog,round(propSample*nbLog+10*k)))
       clustersClara.silcoeff[k]=clustersClara$silinfo$avg.width
-      clustersClara=clara(datLog, k+1, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(propSample*nbLog+10*(k+1))))
+      clustersClara=clara(datLog, k+1, metric=param1, stand=FALSE, samples=5, sampsize=min(nbLog,round(propSample*nbLog+10*(k+1))))
       clustersClara.silcoeff[k+1]=clustersClara$silinfo$avg.width
       if((clustersClara.silcoeff[k-2]<clustersClara.silcoeff[k-1] & clustersClara.silcoeff[k-1]>clustersClara.silcoeff[k]) & compMax<=2){
         if(compMax==2){
@@ -1526,7 +1527,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
 
     # CLARA with optimal k
-    clusters=clara(datLog, nbClust, metric=param1, stand=F, samples=5, sampsize=min(nbLog,round(propSample*nbLog+10*nbClust)))  # CLARA with optimal k
+    clusters=clara(datLog, nbClust, metric=param1, stand=FALSE, samples=5, sampsize=min(nbLog,round(propSample*nbLog+10*nbClust)))  # CLARA with optimal k
     summary(clusters)
 
 
@@ -1610,7 +1611,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     op <- par(las=2)
     barplot(meanprofile, main="Catch profile of the dataset", xlab="Species", ylab="Percentage of catch")
     par(op)
-    mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+    mtext(paste(nrow(datSpecies)," logevents"), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     dev.off()
 
 
@@ -1646,7 +1647,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(t(summaryClusters["Mean",,i]), names.arg=nameSpPlot[i,], xlab="Species", ylab="Percentage of catch", col="gray")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Catch profile by cluster","\n","\n",sep=""))
@@ -1670,7 +1671,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     # OR #
     mat <- t(summaryClusters["Mean",,])
-    #mat=mat[,order(colnames(mat),decreasing=T)]     # si on veut mettre les espèces par ordre descendant
+    #mat=mat[,order(colnames(mat),decreasing=TRUE)]     # si on veut mettre les espèces par ordre descendant
     rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
     sp <- apply(mat,2, function(x) length(which(x>20)))
     colnames(mat)[sp==0] <- ""
@@ -1701,7 +1702,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(sdprofil[i,], names.arg=namSdPlot[i,], xlab="Species", ylab="Percentage of catch")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Standard deviation profile by cluster","\n","\n",sep=""))
@@ -1735,7 +1736,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
       op2 <- par(las=2)
       barplot(targetresval[i,],names.arg=nameTargetPlot[i,], xlab="Species", ylab="Test-value")
       par(op2)
-      mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+      mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
     }
     par(op)
     title(main=paste("Profile of test-values by cluster","\n","\n",sep=""))
@@ -1747,8 +1748,8 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     clusterDesc=matrix(0,nrow=9,ncol=nbClust)
     for(i in 1:nbClust){
       clusterDesc[,i]=c(i,
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<50))+1,
-                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=T)])<90))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)])<50))+1,
+                        length(which(cumsum(t(summaryClusters["Mean",,i])[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)])<90))+1,
                         length(which(t(summaryClusters["Median",,i])>50)),
                         length(which(resval[,i]>1.96)),
                         length(which(resval[,i]>3.29)),
@@ -1776,11 +1777,11 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     listLibname=list()
 
     for(i in 1:nbClust){
-      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=T)][1:nbSpeciesCatch]
+      namesCapt[i,]=colnames(t(summaryClusters["Mean",,i]))[order(t(summaryClusters["Mean",,i]),decreasing=TRUE)][1:nbSpeciesCatch]
       a=as.data.frame(t(summaryClusters["Mean",target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])],i]))
       colnames(a)= target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])]
       if(length(a)!=0){
-        namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=T)])
+        namesTarget[i,1:length(target$tabnomespcib[i,1:nbSpeciesVT][!is.na(target$tabnomespcib[i,1:nbSpeciesVT])])]=colnames(a[order(a,decreasing=TRUE)])
       }
       namesSpecies[i,1:length(union(namesCapt[i,],namesTarget[i,]))]=union(namesCapt[i,],namesTarget[i,])
     }

@@ -10,7 +10,7 @@ outsideMaxRange <- function(int
                                tacint,
                                params,
                                grid,
-                               plot=F)
+                               plot=FALSE)
 
     mxr     <-  maxRangeCI(x=c(int[-1,1][1],rev(int[-1,1])[1]),
                            y  =c(int[-1,2][1],rev(int[-1,2])[1]),
@@ -20,7 +20,7 @@ outsideMaxRange <- function(int
 
     coords  <- coordinates(CI)
     propCI  <- point.in.polygon(coords[,1],coords[,2],mxr[[1]][,1],mxr[[1]][,2])
-    insideR <- sum(CI@data$data[which(propCI == 1)],na.rm=T) / sum(CI@data$data,na.rm=T) #Sum of total CI values inside the maximum range, should ideally be all the grid cells with values
-    outsideR<- sum(CI@data$data[which(propCI == 0)],na.rm=T) / sum(CI@data$data,na.rm=T)#Sum of total CI values outside the maximum range, should ideally be 0
-    maxR    <- max(CI@data$data[which(propCI == 1)],na.rm=T) #Top of the CI, should ideally equal to 1
+    insideR <- sum(CI@data$data[which(propCI == 1)],na.rm=TRUE) / sum(CI@data$data,na.rm=TRUE) #Sum of total CI values inside the maximum range, should ideally be all the grid cells with values
+    outsideR<- sum(CI@data$data[which(propCI == 0)],na.rm=TRUE) / sum(CI@data$data,na.rm=TRUE)#Sum of total CI values outside the maximum range, should ideally be 0
+    maxR    <- max(CI@data$data[which(propCI == 1)],na.rm=TRUE) #Top of the CI, should ideally equal to 1
 return(list(insideR,outsideR,maxR))}

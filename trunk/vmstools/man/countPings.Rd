@@ -38,10 +38,9 @@ data(tacsat)
 #make the tacsat file a bit smaller
 tacsat  <- tacsat[1:10000,]
 
-grid          <- createGrid(range(tacsat$SI_LONG,na.rm=T),
-                  range(tacsat$SI_LATI,na.rm=T),0.5,0.5)
-grid          <- SpatialGrid(grid=grid);
-gridded(grid) = TRUE
+grid          <- createGrid(range(tacsat$SI_LONG,na.rm=TRUE),
+                  range(tacsat$SI_LATI,na.rm=TRUE),0.5,0.5,type="SpatialGrid")
+
 result        <- countPings(~VE_REF+year+gridcell,tacsat,grid=grid)
 result        <- countPings(~VE_REF+week+year+icesrectangle,tacsat)
 }

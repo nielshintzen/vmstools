@@ -6,7 +6,6 @@ Change the class of an object to numeric
 }
 \usage{
 an(x)
-as.numeric(x)
 }
 \arguments{
   \item{x}{object to turn into numeric

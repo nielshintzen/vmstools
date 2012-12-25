@@ -24,11 +24,11 @@ extractTableMainSpecies = function(dat,namesMainSpeciesHAC,paramTotal=95,paramLo
     names(sumcol)=namesSpecies
 
     # Percent of each species in the total catch
-    propSp=sumcol/sum(sumcol,na.rm=T)*100
+    propSp=sumcol/sum(sumcol,na.rm=TRUE)*100
     # Columns number of each species by decreasing order of capture
-    numSp=order(propSp,decreasing=T)
+    numSp=order(propSp,decreasing=TRUE)
     # Percent of each species in the total catch by decreasing order
-    propSp=cumsum(propSp[order(propSp,decreasing=T)])
+    propSp=cumsum(propSp[order(propSp,decreasing=TRUE)])
 
     Store(objects())
     gc(reset=TRUE)

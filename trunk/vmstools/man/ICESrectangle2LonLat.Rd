@@ -28,7 +28,7 @@ Returns dataframe with longitude and latitude columns}
 res       <- data.frame(SI_LONG = c(1,2,2,4,2),
                         SI_LATI = c(53,53.2,54,56.7,55.2))
 rects     <- ICESrectangle(res)
-midpoints <- ICESrectangle2LonLat(rects,midpoint=T)
-corners   <- ICESrectangle2LonLat(rects,midpoint=F)
+midpoints <- ICESrectangle2LonLat(rects,midpoint=TRUE)
+corners   <- ICESrectangle2LonLat(rects,midpoint=FALSE)
 
 }

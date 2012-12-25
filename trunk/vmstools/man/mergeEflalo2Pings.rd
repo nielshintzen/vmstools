@@ -83,8 +83,6 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
 
 \references{Bastardie et al. 2010. Fisheries Research}
 \author{Francois Bastardie}
-\note{}
-
 
 \seealso{\code{\link{vmsGridCreate}}}
 

@@ -25,6 +25,8 @@ Fabrizio Manco
 }
 
 \examples{
+require(adehabitat)
+require(ade4)
 data(tacsat)
 tacsat <- tacsat[1:100,]
 tacsatMinimumConvexPolygon(tacsat,95)

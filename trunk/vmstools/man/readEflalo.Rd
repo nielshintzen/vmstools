@@ -25,7 +25,7 @@ dir.create("C:/tmpEflalo")
 
 #temporarily write tacsat file to disk to thereafter read it back in again
 write.table(eflalo, file = "C:/tmpEflalo/eflalo.csv", quote = TRUE, sep = ",",
-    eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
+    eol = "\n", na = "NA", dec = ".", row.names = FALSE,col.names = TRUE)
 
 #Read in tacsat file
 eflalo <- readEflalo("C:/tmpEflalo/eflalo.csv")

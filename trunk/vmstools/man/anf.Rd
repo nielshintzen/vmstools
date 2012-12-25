@@ -23,6 +23,6 @@ as.numeric attempts to coerce its argument to numeric type
 \examples{
 
 res <- as.factor(5.1)
-an(a)   #returns 1
-anf(a)  #returns the original 5.1
+an(res)   #returns 1
+anf(res)  #returns the original 5.1
 }

@@ -1,6 +1,5 @@
 countPings <- function(formula,tacsat,grid=NULL){
 
-                  origTacsat <- tacsat
                   #Turn selected variabels into element list
                   form <- formula
                   if (form[[1]] != "~")
@@ -44,7 +43,7 @@ countPings <- function(formula,tacsat,grid=NULL){
                       #Overlay the two spatial frameworks to see to which gridcell each tacsat coordinate belongs
                       gridCellIndex             <- overlay( grid, sPDF )
                       newCoords                 <- sPDF@coords[gridCellIndex,]
-                      
+
                       tacsat$GR_LONG            <- newCoords[,1]
                       tacsat$GR_LATI            <- newCoords[,2]
                       spatVars[which(spatVars=="gridcell")] <- "GR_LONG"; spatVars <- c(spatVars,"GR_LATI")
