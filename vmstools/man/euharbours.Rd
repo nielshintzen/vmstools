@@ -12,16 +12,11 @@ A list of harbour positions primarily located in Europe, including
 -range (in km) the harbour spans (radius).
 }
 \usage{data(euharbours)}
-\format{
-}
-\details{
-}
-\source{
-}
 \references{
 EU Lot 2 project, Niels T. Hintzen (niels.hintzen@wur.nl)
 }
 \examples{
+data(tacsat)
 data(euharbours); euharbours <- harbours
 
 #modify the range of the harbours to e.g. 2km

@@ -24,11 +24,11 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE,saveHa
           y1    <- lat[(chunks*rowSize-rowSize+1):(chunks*rowSize)]
         }
 
-      xr        <- range(x1,na.rm=T); xr <- c(xr[1]-0.05,xr[2]+0.05)
-      yr        <- range(y1,na.rm=T); yr <- c(yr[1]-0.05,yr[2]+0.05)
+      xr        <- range(x1,na.rm=TRUE); xr <- c(xr[1]-0.05,xr[2]+0.05)
+      yr        <- range(y1,na.rm=TRUE); yr <- c(yr[1]-0.05,yr[2]+0.05)
       res1      <- which(harb[,"xharb"] >= xr[1] & harb[,"xharb"] <= xr[2])
       res2      <- which(harb[,"yharb"] >= yr[1] & harb[,"yharb"] <= yr[2])
-      res3      <- res1[which(is.na(pmatch(res1,res2))==F)]
+      res3      <- res1[which(is.na(pmatch(res1,res2))==FALSE)]
 
       if(length(res3)>0){
         for(hars in res3){
@@ -75,7 +75,7 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE,saveHa
     store[ordxys] <- store
 
     if(returnNames) store <- replace(store, store=="0", NA)
-    if(saveHarbourList) write.table(harbours,file="harbourList_pointInHarbour.txt",append=F,sep="\t")
+    if(saveHarbourList) write.table(harbours,file="harbourList_pointInHarbour.txt",append=FALSE,sep="\t")
 
 return(store)}
     

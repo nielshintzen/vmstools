@@ -7,7 +7,7 @@ Interpolated points at equal distance
 Returns the interpolated dataset with only those points remaining that are at equal eucledian
 distance from each other, with the number of points to retreive remaining.
 }
-\usage{dequalDistance(interpolation,res=10)}
+\usage{equalDistance(interpolation,res=10)}
 \arguments{
   \item{interpolation}{interpolated dataset obtained from the interpolation() function}
   \item{res}{number of points to retreive from function}
@@ -23,7 +23,7 @@ tacsat     <- sortTacsat(tacsat)
 tacsat     <- tacsat[1:1000,]
 
 #Filter the Tacsat data
-tacsat     <- filterTacsat(tacsat,st,hd,remDup)
+tacsat     <- filterTacsat(tacsat,st=c(2,6),hd=NULL)
 
 #Interpolate the VMS data
 interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,

@@ -23,7 +23,7 @@ data(tacsat)
 #Speed threshold points (two values), NULL means use all points
 st        <- c(2,6)
 #Remove duplicate records in VMS dataset
-remDup    <- T
+remDup    <- TRUE
 
   #Sort the tacsat data
 tacsat     <- sortTacsat(tacsat)

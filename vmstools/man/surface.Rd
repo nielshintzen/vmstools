@@ -36,10 +36,10 @@ tacsat     <- sortTacsat(tacsat)
 tacsat     <- tacsat[1:1000,]
 
   #Get the ranges of the tacsat data
-xrange  <- range(tacsat$SI_LONG,na.rm=T);
+xrange  <- range(tacsat$SI_LONG,na.rm=TRUE);
 xrange  <- c(min(xrange) - min(xrange)*0.05,
              max(xrange) + max(xrange)*0.05)
-yrange  <- range(tacsat$SI_LATI,na.rm=T);
+yrange  <- range(tacsat$SI_LATI,na.rm=TRUE);
 yrange  <- c(min(yrange) - min(yrange)*0.05,
              max(yrange) + max(yrange)*0.05)
   #Setup a grid
@@ -49,7 +49,7 @@ sPDF    <- createGrid(xrange,yrange,resx=0.1,resy=0.05,type="SpatialGridDataFram
 sP      <- lonLat2SpatialPolygons(lst=list(data.frame(SI_LONG=c(4,4.5,4.7,4),SI_LATI=c(54,54,55.5,55.7))))
 
   #Calculate the cell surface
-result        <- surface(sPDF,method="Trapezoid",includeNA=T)
+result        <- surface(sPDF,method="Trapezoid",includeNA=TRUE)
 print(head(result@data))
 result        <- surface(sP,zone=31)
 print(result@polygons[[1]]@Polygons[[1]]@area)

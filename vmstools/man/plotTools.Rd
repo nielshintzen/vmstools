@@ -77,7 +77,7 @@ plotTools(eflalo,level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,
           log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL))
 x11()
 plotTools(tacsat,level="gridcell",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,
-          log=F,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL))
+          log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL))
 
 x11()
 plotTools(eflalo,level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,

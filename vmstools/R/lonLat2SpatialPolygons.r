@@ -1,8 +1,8 @@
 lonLat2SpatialPolygons <- function(SI_LONG=NULL,SI_LATI=NULL,lst=NULL){
-  if((is.null(SI_LONG)==T | is.null(SI_LATI)==T) & is.null(lst)==T) stop("Specify either longitude and latitude vectors or a list containing a dataframe with specified longitude and latitude vectors")
+  if((is.null(SI_LONG)==T | is.null(SI_LATI)==TRUE) & is.null(lst)==TRUE) stop("Specify either longitude and latitude vectors or a list containing a dataframe with specified longitude and latitude vectors")
 
   #- Return spatial polygons object when SI_LONG and SI_LATI vectors are supplied
-  if(is.null(SI_LONG)==F | is.null(SI_LATI)==F){
+  if(is.null(SI_LONG)==F | is.null(SI_LATI)==FALSE){
     if(length(SI_LONG) != length(SI_LATI)) stop("Length SI_LONG not equal to length SI_LATI")
     brks      <- which(is.na(SI_LONG)==T | is.na(SI_LATI) == T)
     storePols <- list()
@@ -43,8 +43,8 @@ lonLat2SpatialPolygons <- function(SI_LONG=NULL,SI_LATI=NULL,lst=NULL){
     spol        <- SpatialPolygons(storePols)
   }
   #- Return spatial polygons object when list with SI_LONG,SI_LATI dataframe is given
-  if(is.null(lst)==F){
-    if(is.null(names(lst))==T) names(lst) <- 1:length(lst)
+  if(is.null(lst)==FALSE){
+    if(is.null(names(lst))==TRUE) names(lst) <- 1:length(lst)
     storePols <- list()
     counter   <- 1
     for(j in 1:length(lst)){

@@ -6,7 +6,7 @@ function(tacsat                          #VMS datapoints
                               ,method="cHs"             #Specify the method to be used: Straight line (SL) of cubic Hermite spline (cHs)
                               ,params=list(fm=0.5,distscale=20,sigline=0.2,st=c(2,6))  #Specify the three parameters: fm, distscale, sigline, speedthreshold
                               ,headingAdjustment=0
-                              ,fast=F){
+                              ,fast=FALSE){
 
 if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM     <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
                               
@@ -39,9 +39,9 @@ if(fast){
                   return(do.call(rbind,connect))})
 
   if(method=="cHs") returnInterpolations <- unlist(lapply(as.list(names(unlist(lapply(spltTaCon,nrow)))),function(y){
-                                              return(interCubicHermiteSpline(spltx=splitTa[[y]],spltCon=spltTaCon[[y]],res,params,headingAdjustment))}),recursive=F)
+                                              return(interCubicHermiteSpline(spltx=splitTa[[y]],spltCon=spltTaCon[[y]],res,params,headingAdjustment))}),recursive=FALSE)
   if(method=="SL")  returnInterpolations <- unlist(lapply(as.list(names(unlist(lapply(spltTaCon,nrow)))),function(y){
-                                              return(interStraightLine(splitTa[[y]],spltTaCon[[y]],res))}),recursive=F)
+                                              return(interStraightLine(splitTa[[y]],spltTaCon[[y]],res))}),recursive=FALSE)
 
 } else {
   
@@ -57,7 +57,7 @@ if(fast){
       startVMS    <- 1
       ship        <- tacsat$VE_REF[startVMS]
     } else {
-        if(is.na(endVMS)==T) endVMS <- startVMS + 1
+        if(is.na(endVMS)==TRUE) endVMS <- startVMS + 1
         startVMS <- endVMS
         #-Check if the end of the dataset is reached
         if(endDataSet == 1 & rev(unique(tacsat$VE_REF))[1] != ship){
@@ -73,8 +73,8 @@ if(fast){
       result      <- findEndTacsat(tacsat,startVMS,interval,margin)
       endVMS      <- result[1]
       endDataSet  <- result[2]
-      if(is.na(endVMS)==T) int <- 0  #No interpolation possible
-      if(is.na(endVMS)==F) int <- 1  #Interpolation possible
+      if(is.na(endVMS)==TRUE) int <- 0  #No interpolation possible
+      if(is.na(endVMS)==FALSE) int <- 1  #Interpolation possible
 
         #Interpolate according to the Cubic Hermite Spline method
       if(method == "cHs" & int == 1){

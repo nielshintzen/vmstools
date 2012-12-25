@@ -1,4 +1,4 @@
-splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=T){
+splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TRUE){
 
   #level: day,ICESrectangle,trip
   #conserve: T,F
@@ -44,8 +44,8 @@ eflaloTrip              <- subset(eflalo,       FT_REF %in% sort(unique(tacsatTr
 eflaloNoTrip            <- eflalo[which(!eflalo$ID %in% eflaloTrip$ID),]
 #eflaloVessel            <- subset(eflaloNoTrip, VE_REF %in% sort(unique(tacsatTrip$VE_REF)))
 #eflaloNoVessel          <- subset(eflaloNoTrip,!VE_REF %in% sort(unique(tacsatTrip$VE_REF)))
-eflaloVessel            <- eflaloNoTrip[which(paste(eflaloNoTrip$VE_REF,year(eflaloNoTrip$LE_CDATIM)) %in% unique(paste(tacsatTrip$VE_REF,year(tacsatTrip$SI_DATIM)))),]
-eflaloNoVessel          <- eflaloNoTrip[which(!paste(eflaloNoTrip$VE_REF,year(eflaloNoTrip$LE_CDATIM)) %in% unique(paste(tacsatTrip$VE_REF,year(tacsatTrip$SI_DATIM)))),]
+eflaloVessel            <- eflaloNoTrip[which(paste(eflaloNoTrip$VE_REF,format(eflaloNoTrip$LE_CDATIM,"%Y")) %in% unique(paste(tacsatTrip$VE_REF,format(tacsatTrip$SI_DATIM,"%Y")))),]
+eflaloNoVessel          <- eflaloNoTrip[which(!paste(eflaloNoTrip$VE_REF,format(eflaloNoTrip$LE_CDATIM,"%Y")) %in% unique(paste(tacsatTrip$VE_REF,format(tacsatTrip$SI_DATIM,"%Y")))),]
 
 #-------------------------------------------------------------------------------
 # 1a) Merge eflalo to tacsat with matching FT_REF
@@ -110,7 +110,7 @@ if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
   tacsatFTREF[,kgeur(colnames(tacsatFTREF))]    <- sweep(tacsatFTREF[,kgeur(colnames(tacsatFTREF))],1,tacsatFTREF$pings,"/")
   tacsatFTREF$ID                                <- af(ac(tacsatFTREF$ID.x))
   DT                                            <- data.table(tacsatFTREF)
-  eq1                                           <- c.listquote(paste("sum(",colnames(tacsatFTREF[,kgeur(colnames(tacsatFTREF))]),",na.rm=T)",sep=""))
+  eq1                                           <- c.listquote(paste("sum(",colnames(tacsatFTREF[,kgeur(colnames(tacsatFTREF))]),",na.rm=TRUE)",sep=""))
   tacsatFTREF                                   <- DT[,eval(eq1),by=ID.x]; tacsatFTREF <- data.frame(tacsatFTREF); colnames(tacsatFTREF) <- c("ID",colnames(eflaloTrip[,kgeur(colnames(eflaloTrip))]))
 }
 
@@ -183,7 +183,7 @@ if(conserve == T){
     tacsatVEREF[,kgeur(colnames(tacsatVEREF))]    <- sweep(tacsatVEREF[,kgeur(colnames(tacsatVEREF))],1,tacsatVEREF$pings,"/")
     tacsatVEREF$ID                                <- af(ac(tacsatVEREF$ID.x))
     DT                                            <- data.table(tacsatVEREF)
-    eq1                                           <- c.listquote(paste("sum(",colnames(tacsatVEREF[,kgeur(colnames(tacsatVEREF))]),",na.rm=T)",sep=""))
+    eq1                                           <- c.listquote(paste("sum(",colnames(tacsatVEREF[,kgeur(colnames(tacsatVEREF))]),",na.rm=TRUE)",sep=""))
     tacsatVEREF                                   <- DT[,eval(eq1),by=ID.x]; tacsatVEREF <- data.frame(tacsatVEREF); colnames(tacsatVEREF) <- c("ID",colnames(eflaloVessel[,kgeur(colnames(eflaloVessel))]))
   }
   
@@ -245,7 +245,7 @@ if(conserve == T){
     tacsatREF[,kgeur(colnames(tacsatREF))]      <- sweep(tacsatREF[,kgeur(colnames(tacsatREF))],1,tacsatREF$pings,"/")
     tacsatREF$ID                                <- af(ac(tacsatREF$ID.x))
     DT                                          <- data.table(tacsatREF)
-    eq1                                         <- c.listquote(paste("sum(",colnames(tacsatREF[,kgeur(colnames(tacsatREF))]),",na.rm=T)",sep=""))
+    eq1                                         <- c.listquote(paste("sum(",colnames(tacsatREF[,kgeur(colnames(tacsatREF))]),",na.rm=TRUE)",sep=""))
     tacsatREF                                   <- DT[,eval(eq1),by=ID.x]; tacsatREF <- data.frame(tacsatREF); colnames(tacsatREF) <- c("ID",colnames(eflaloVessel[,kgeur(colnames(eflaloVessel))]))
   }
 }#End conserve
@@ -254,21 +254,21 @@ if(conserve == T){
 # 3) Merge all tacsat files together and return
 #-------------------------------------------------------------------------------
 
-if(conserve==T){
+if(conserve==TRUE){
   if(exists("tacsatFTREF")){one   <- tacsatFTREF} else{ one   <- numeric()}
   if(exists("tacsatVEREF")){two   <- tacsatVEREF} else{ two   <- numeric()}
   if(exists("tacsatREF"))  {three <- tacsatREF}   else{ three <- numeric()}
   tacsatTot       <- rbind(one,two,three)
   DT              <- data.table(tacsatTot)
-  eq1             <- c.listquote(paste("sum(",colnames(tacsatTot[,kgeur(colnames(tacsatTot))]),",na.rm=T)",sep=""))
+  eq1             <- c.listquote(paste("sum(",colnames(tacsatTot[,kgeur(colnames(tacsatTot))]),",na.rm=TRUE)",sep=""))
   tacsatTot       <- DT[,eval(eq1),by=ID]; tacsatTot <- data.frame(tacsatTot); colnames(tacsatTot) <- c("ID",colnames(eflalo[,kgeur(colnames(eflalo))]))
-  tacsatReturn    <- merge(tacsat,tacsatTot,by="ID",all.x=T)
+  tacsatReturn    <- merge(tacsat,tacsatTot,by="ID",all.x=TRUE)
   if(variable == "value") tacsatReturn <- tacsatReturn[,c(1:dim(tacsat)[2],grep("EURO",colnames(tacsatReturn)))]
   if(variable == "kgs")   tacsatReturn <- tacsatReturn[,c(1:dim(tacsat)[2],grep("KG",colnames(tacsatReturn)))]
   if(variable == "all")   tacsatReturn <- tacsatReturn
 } else {
-    if(exists("tacsatFTREF")==F){stop("You have selected not to conserve catches, but there is no trip identifier in the tacsat file")}
-    tacsatReturn  <- merge(tacsat,tacsatFTREF,by="ID",all.x=T)
+    if(exists("tacsatFTREF")==FALSE){stop("You have selected not to conserve catches, but there is no trip identifier in the tacsat file")}
+    tacsatReturn  <- merge(tacsat,tacsatFTREF,by="ID",all.x=TRUE)
     if(variable == "value") tacsatReturn <- tacsatReturn[,c(1:dim(tacsat)[2],grep("EURO",colnames(tacsatReturn)))]
     if(variable == "kgs")   tacsatReturn <- tacsatReturn[,c(1:dim(tacsat)[2],grep("KG",colnames(tacsatReturn)))]
     if(variable == "all")   tacsatReturn <- tacsatReturn

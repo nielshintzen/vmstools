@@ -24,10 +24,9 @@ range (in km) from these midpoints.
 \seealso{\code{\link{distance}}, \code{\link{lonLatRatio}}, \code{\link{sortTacsat}},
          \code{\link{filterTacsat}}, \code{\link{mergeEflalo2Tacsat}}}
 \examples{
-library(vmstools)
 data(eflalo)
 data(tacsat)
-data(euharbours; euharbours <- harbours
+data(euharbours); euharbours <- harbours
 
 #-Remove duplicated records from tacsat
 myf       <- paste(tacsat$VE_REF,tacsat$SI_LATI,tacsat$SI_LONG,
@@ -37,14 +36,14 @@ tacsat    <- tacsat[!duplicated(myf),];
 
 #-Find all the gps locations that are located within the port area
 idx <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,
-                      harbours=euharbours,returnNames=T)
+                      harbours=harbours,returnNames=TRUE)
 print(head(idx))
 getwd() #in this directory, the harbour list will be written to disk
 idx <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,
-                      harbours=euharbours,saveHarbourList=T)
+                      harbours=harbours,saveHarbourList=TRUE)
 
 idx <- pointInHarbour(lon=tacsat$SI_LONG,lat=tacsat$SI_LATI,
-                      harbours=euharbours)
+                      harbours=harbours)
 idx <- which(idx==1)
 
 #-Plot these port locations on a map
@@ -57,8 +56,8 @@ yrange <- range(tacsat$SI_LATI[idx])
 map('worldHires',xlim=xrange,ylim=yrange,col="darkgreen",fill=TRUE,
     resolution=1, bg="white", border=0)
 map.axes();
-mtext("Longitude",1,line=-2,outer=T,cex=1.2,font=2)
-mtext("Latitude",2,line=-2,outer=T,cex=1.2,font=2)
+mtext("Longitude",1,line=-2,outer=TRUE,cex=1.2,font=2)
+mtext("Latitude",2,line=-2,outer=TRUE,cex=1.2,font=2)
 
 points(tacsat$SI_LONG[idx],tacsat$SI_LATI[idx],cex=0.1,pch=16,col="red")
 }

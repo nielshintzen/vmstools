@@ -9,7 +9,7 @@ an interpolation of a straight line (on a x-y plane, not a sphere)
 \usage{
 interpolateTacsat(tacsat, interval = 120, margin = 12, res = 100,
                   method = "cHs", params = list(fm=0.2,distscale=20,
-                  sigline=0.2,st=c(2,6)),headingAdjustment=0,fast=F)
+                  sigline=0.2,st=c(2,6)),headingAdjustment=0,fast=FALSE)
 }
 \arguments{
   \item{tacsat}{Tacsat dataset with GPS points that need to be interpolated}
@@ -60,7 +60,7 @@ tacsat     <- sortTacsat(tacsat)
 tacsat     <- tacsat[1:1000,]
 
   #Filter the Tacsat data
-tacsat     <- filterTacsat(tacsat,st=c(2,6),hd=NULL,remDup)
+tacsat     <- filterTacsat(tacsat,st=c(2,6),hd=NULL)
 
   #Interpolate the VMS data
 interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,res=100,

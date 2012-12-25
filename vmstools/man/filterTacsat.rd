@@ -6,7 +6,7 @@ Filter out duplicated Tacsat datapoints and possible remove Tacsat datapoints th
 a certain speed range or heading range. A new Tacsat set, without the out-filtered records is returned.
 }
 \usage{
-filterTacsat(tacsat, st = c(2, 6), hd = NULL, remDup = T)
+filterTacsat(tacsat, st = c(2, 6), hd = NULL, remDup = TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -31,5 +31,5 @@ tacsat     <- tacsat[1:1000,]
 
   #Filter the VMS data
   #A warning is given that duplicated VMS points have been removed
-tacsat     <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=T)
+tacsat     <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=TRUE)
 }

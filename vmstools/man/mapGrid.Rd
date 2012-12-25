@@ -44,11 +44,8 @@ mapGrid(sGDF
   \item{outPlot}{optional name for a png file to be created from the plot}
   \item{\dots}{NOT used yet}
 }
-\details{}
-\value{ none }
 \references{EU Lot 2 project}
 \author{Andy South}
-\note{}
 \seealso{\code{vmsGridCreate()}}
 \examples{
 #mapGrid(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE",

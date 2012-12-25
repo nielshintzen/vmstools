@@ -9,7 +9,7 @@ the observation data positions in both time and space
 }
 \usage{
 clipObs2Tacsat(tacsat, obs, method, control.grid, control.euclidean,
-               temporalRange, all.t = F, rowSize)
+               temporalRange, all.t = FALSE, rowSize)
 }
 \arguments{
   \item{tacsat}{
@@ -70,8 +70,8 @@ obs$SI_LONG   <- jitter(obs$SI_LONG,factor=0.5)
 
 
 a <- clipObs2Tacsat(tacsat,obs,method="grid",control.grid=list(resx=0.1,resy=0.05,
-                    gridBbox="obs"),temporalRange=c(-30,120),all.t=F)
+                    gridBbox="obs"),temporalRange=c(-30,120),all.t=FALSE)
 a <- clipObs2Tacsat(tacsat,obs,method="euclidean",control.euclidean=list(threshold=1),
-                    temporalRange=c(-1e10,-1) ,all.t=F)
+                    temporalRange=c(-1e10,-1) ,all.t=FALSE)
 }
 

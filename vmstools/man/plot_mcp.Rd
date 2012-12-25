@@ -55,6 +55,8 @@ Randy Bui, Ron N. Buliung, Tarmo K. Remmel
 }
 
 \examples{
+calc_mcp(id=1, points = activities, filename="MCP_Output.txt",
+verbose = FALSE, pct = 100)
 plot_mcp(plotnew=TRUE, plotpoints=TRUE, titletxt="Title",
 xaxis= "Easting (m)", yaxis="Northing (m)")
 }

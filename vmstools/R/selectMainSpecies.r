@@ -33,7 +33,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
       gc(reset=TRUE)
 
       # Select the number of clusters by scree-test
-      inerties.vector=cah_var$height[order(cah_var$height,decreasing=T)]
+      inerties.vector=cah_var$height[order(cah_var$height,decreasing=TRUE)]
       nb.finalclusters=which(scree(inerties.vector)[,"epsilon"]<0)[1]
   
       if(!is.na(nb.finalclusters)){
@@ -41,7 +41,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
         cah_cluster_var=cutree(cah_var,k=nb.finalclusters)
 
         png(paste(analysisName,"HAC_Dendogram_Step1.png",sep="_"), width = 1200, height = 800)
-        plclust(cah_var,labels=F,hang=-1,ann=F)
+        plclust(cah_var,labels=FALSE,hang=-1,ann=FALSE)
         title(main="HAC dendogram",xlab="Species",ylab="Height")
         rect.hclust(cah_var, k=nb.finalclusters)
         dev.off()
@@ -90,7 +90,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
         # Dendogram of the first cut in the residual species cluster
         png(paste(analysisName,"HAC_Dendogram_Step1_ResidualSpecies.png",sep="_"), width = 1200, height = 800)
-        plclust(cah_var,labels=F,hang=-1,ann=F)
+        plclust(cah_var,labels=FALSE,hang=-1,ann=FALSE)
         title(main="HAC dendogram - Step",xlab="Species",ylab="Height")
         if((nb.finalclusters+nb_cut)>=(p-2)){
           rect.hclust(cah_var, k=kFinal)
@@ -138,11 +138,11 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
     names(sumcol)=names(dat)[-1]
 
     # Percent of each species in the total catch
-    propesp=sumcol/sum(sumcol,na.rm=T)*100
+    propesp=sumcol/sum(sumcol,na.rm=TRUE)*100
     # Columns number of each species by decreasing order of capture
-    numesp=order(propesp,decreasing=T)
+    numesp=order(propesp,decreasing=TRUE)
     # Percent of each species in the total catch by cumulated decreasing order
-    propesp=cumsum(propesp[order(propesp,decreasing=T)])
+    propesp=cumsum(propesp[order(propesp,decreasing=TRUE)])
 
     # We are taking all species until having at least seuil% of total catch
     nbMainSpeciesTotal=numeric()

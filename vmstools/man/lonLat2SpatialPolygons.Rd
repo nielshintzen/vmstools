@@ -41,5 +41,5 @@ eurPols     <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID)
 
 area        <- lonLat2SpatialPolygons(SI_LONG=c(2,2.5,2.7,2.1),SI_LATI=c(54,54.2,55.8,55.6))
 plot(eurPols,col="green",xlim=c(-4,10),ylim=c(48,62)); axis(1);axis(2);box()
-plot(area,add=T,col="red")
+plot(area,add=TRUE,col="red")
 }

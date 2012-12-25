@@ -29,9 +29,6 @@ predictMetier(learningData,clustersAffectation,newData)
 }
 }
 
-\details{
-}
-
 \value{
 A data frame giving the logevent ID (LE_ID) (first column) and the number of the cluster to which it belongs (second column), for all logevents
 in newData. The cluster number "0" corresponds to the unknown metier.
@@ -59,7 +56,7 @@ in newData. The cluster number "0" corresponds to the unknown metier.
   analysisName <- "metier_analysis_OTB"
 
   # Prepare datPred
-  datPred <- newEflalo[,c("LE_ID",grep("EURO",names(newEflalo),value=T))]
+  datPred <- newEflalo[,c("LE_ID",grep("EURO",names(newEflalo),value=TRUE))]
   datPred[is.na(datPred)] <- 0
   names(datPred)[-1] <- unlist(lapply(strsplit(names(datPred[,-1]),"_"),
                                function(x) x[[3]]))
@@ -80,6 +77,3 @@ in newData. The cluster number "0" corresponds to the unknown metier.
   }
 
 }
-
-\keyword{}
-                                       

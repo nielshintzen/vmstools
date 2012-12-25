@@ -4,7 +4,7 @@ clipObs2Tacsat <- function(tacsat,        #The tacsat dataset
                            control.grid=list(spatGrid=NULL,resx=NULL,resy=NULL,gridBbox="obs"), #gridBbox: whether bounding box should come from tacsat or observations
                            control.euclidean=list(threshold=NULL), #all.t = all.tacsat
                            temporalRange=NULL,#The range in which tacsat records may deviate from the observation time stamp
-                           all.t=F,
+                           all.t=FALSE,
                            rowSize=1000
                            ){
 
@@ -24,8 +24,8 @@ if(!"SI_DATIM" %in% colnames(obs))    obs$SI_DATIM      <- as.POSIXct(paste(obs$
 if(method == "grid" & is.null(control.grid$spatGrid) == T){
   if(is.null(control.grid$resx) == T | is.null(control.grid$resy) == T) stop("Method selected needs resx and resy statements")
 
-  xrangeO      <- range(obs$SI_LONG,na.rm=T); xrangeT <- range(tacsat$SI_LONG,na.rm=T)
-  yrangeO      <- range(obs$SI_LATI,na.rm=T); yrangeT <- range(tacsat$SI_LATI,na.rm=T)
+  xrangeO      <- range(obs$SI_LONG,na.rm=TRUE); xrangeT <- range(tacsat$SI_LONG,na.rm=TRUE)
+  yrangeO      <- range(obs$SI_LATI,na.rm=TRUE); yrangeT <- range(tacsat$SI_LATI,na.rm=TRUE)
   
   if(control.grid$gridBbox == "obs")     spatGrid    <- createGrid(xrangeO,yrangeO,control.grid$resx,control.grid$resx,type="SpatialGrid")
   if(control.grid$gridBbox == "tacsat")  spatGrid    <- createGrid(xrangeT,yrangeT,control.grid$resy,control.grid$resy,type="SpatialGrid")
@@ -49,10 +49,10 @@ if(method == "grid" & is.null(control.grid$spatGrid) == F){
   obs$GR_ID   <- resObs;
 
   
-  if(is.null(temporalRange)==F){
+  if(is.null(temporalRange)==FALSE){
 
     res       <- do.call(c,lapply(as.list(1:nrow(obs)),function(x){     res        <- which(resTac == resObs[x]);
-                                                                        restime    <- difftime(tacsat$SI_DATIM[res],obs$SI_DATIM[x],unit="mins");
+                                                                        restime    <- difftime(tacsat$SI_DATIM[res],obs$SI_DATIM[x],units="mins");
                                                                         #retrn      <- ifelse(restime <= temporalRange[2] & restime >=temporalRange[1],resObs[x],NA)
                                                                         retrn      <- which(restime <= temporalRange[2] & restime >= temporalRange[1])
                                                        return(res[retrn])}))
@@ -110,10 +110,10 @@ if(method == "euclidean"){
 
                                                                                     #- Calculate the distance between the observation and tacsat dataset
                                                                                     distObsTac  <- distance(ox[x],oy[x],tx,ty);
-                                                                                    if(is.null(control.euclidean$threshold)==F){ idx <- which(distObsTac <= control.euclidean$threshold)} else { idx <- 1:length(distObsTac) }
+                                                                                    if(is.null(control.euclidean$threshold)==FALSE){ idx <- which(distObsTac <= control.euclidean$threshold)} else { idx <- 1:length(distObsTac) }
 
-                                                                                    restime     <- difftime(tacsat$SI_DATIM[tacRows[idx]],obs$SI_DATIM[obsRows[x]],unit="mins")
-                                                                                    if(is.null(temporalRange)==F){ retrn       <- which(restime <= temporalRange[2] & restime >= temporalRange[1])
+                                                                                    restime     <- difftime(tacsat$SI_DATIM[tacRows[idx]],obs$SI_DATIM[obsRows[x]],units="mins")
+                                                                                    if(is.null(temporalRange)==FALSE){ retrn       <- which(restime <= temporalRange[2] & restime >= temporalRange[1])
                                                                                     } else { retrn <- 1:length(restime) }
                                                                                     if(length(tacRows[idx[retrn]])>0){ toReturn <- cbind(tacRows[idx[retrn]],obs$GR_ID[obsRows[x]])
                                                                                     } else { toReturn <- cbind(NA,NA) }
@@ -134,10 +134,10 @@ if(method == "euclidean"){
                                    return(distObsTac)})
                                 
        idx              <- apply(res,2,function(x){return(x <= control.euclidean$threshold)})
-       idx              <- which(idx == T,arr.ind=T)
-       restime          <- difftime(obs$SI_DATIM[obsRows[idx[,1]]],tacsat$SI_DATIM[tacRows[idx[,2]]],unit="mins")
+       idx              <- which(idx == T,arr.ind=TRUE)
+       restime          <- difftime(obs$SI_DATIM[obsRows[idx[,1]]],tacsat$SI_DATIM[tacRows[idx[,2]]],units="mins")
 
-       if(is.null(temporalRange)==F){ retrn       <- which(restime <= temporalRange[2] & restime >= temporalRange[1])
+       if(is.null(temporalRange)==FALSE){ retrn       <- which(restime <= temporalRange[2] & restime >= temporalRange[1])
        } else { retrn <- 1:length(restime) }
        if(length(retrn)>0){
          res              <- cbind(tacRows[idx[retrn,2]],obs$GR_ID[obsRows[idx[retrn,1]]])
@@ -156,6 +156,6 @@ if(method == "euclidean"){
   retrn   <- list(obs,dubTacsat)
 }#End method euclidean
 
-if(all.t) retrn[[2]] <- merge(retrn[[2]],tacsatOrig,by=colnames(tacsatOrig),all=T)
+if(all.t) retrn[[2]] <- merge(retrn[[2]],tacsatOrig,by=colnames(tacsatOrig),all=TRUE)
 
 return(retrn)}

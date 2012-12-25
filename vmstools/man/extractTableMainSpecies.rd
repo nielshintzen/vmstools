@@ -41,9 +41,6 @@ extractTableMainSpecies(dat,namesMainSpeciesHAC,
   will be retained. Default value is 100\% (logevents catching one and only one species).
 }
 }
-\details{
-}
-
 \value{
 The function returns a numerical matrix with Logevents as lines and species as columns, with percentage values (between 0 and 100) of each species in the logevent catches. 
 Logevent ID (LE_ID) are returned as row names. 
@@ -65,7 +62,7 @@ eflalo <- eflalo[eflalo$LE_GEAR=="OTB",]
 # note that output plots will be sent to getwd()
 analysisName <- "metier_analysis_OTB"
 
-dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))]
+dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=TRUE))]
 names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 
 explo <- selectMainSpecies(dat, analysisName, RunHAC=TRUE, DiagFlag=FALSE)

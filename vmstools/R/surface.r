@@ -1,4 +1,4 @@
-surface <- function(obj,method="Trapezoid",includeNA=T,zone=NULL){  #Methods can be "Trapezoid" and "UTM"
+surface <- function(obj,method="Trapezoid",includeNA=TRUE,zone=NULL){  #Methods can be "Trapezoid" and "UTM"
         require(sp)
         require(PBSmapping)
         if(!class(obj) %in% c('SpatialGridDataFrame','SpatialPolygons'))
@@ -20,7 +20,7 @@ surface <- function(obj,method="Trapezoid",includeNA=T,zone=NULL){  #Methods can
         if (class(obj) %in% c('SpatialGridDataFrame')) # not empty...
           {
              if(method == "Trapezoid"){
-               res <- max(obj@grid@cellsize,na.rm=T)/0.1 * 10  #automatic scaling
+               res <- max(obj@grid@cellsize,na.rm=TRUE)/0.1 * 10  #automatic scaling
                if(res < 3) res <- 3
                griddims <- summary(obj)$grid
                bboxdims <- bbox(obj)
@@ -37,7 +37,7 @@ surface <- function(obj,method="Trapezoid",includeNA=T,zone=NULL){  #Methods can
                heights  <- distance(lon=0,lat=stlat,lonRef=0,latRef=stlat+sizelat/(res-1))
                seqlats  <- mapply(seq,lats[1:(length(lats)-1)],lats[2:length(lats)],length.out=res)
 
-               base     <- matrix(mapply(distance,lon=0,lat=c(seqlats),lonRef=sizelon,latRef=c(seqlats)),ncol=res,byrow=T)
+               base     <- matrix(mapply(distance,lon=0,lat=c(seqlats),lonRef=sizelon,latRef=c(seqlats)),ncol=res,byrow=TRUE)
                if(dim(base)[1] == 1){
                   base1     <- base[1:(res-1)]
                   base2     <- base[2:res]

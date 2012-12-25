@@ -21,25 +21,21 @@ the 'data.table' package is required to perform the aggregation of the
 data.frame much faster.
 An area code is also added (e.g. from the ICESarea code)
 }
-\source{
-}
-\references{
-}
 \author{
 Francois Bastardie
 }
 
 \examples{
-  
+\dontrun{
 data(tacsat)
-
+dir.create("C:/output/")
 # CONVERT TO FISHFRAME FORMAT (might take some time running)
 # (by default, this will keep all the species in the output table)
 tmp <- bindAllMergedTables (vessels= unique(tacsat$VE_REF),
-          species.to.keep=character(),
+          species.to.keep=character(),a.year="1800",
           folder = file.path("C:","output"), all.in.one.table=FALSE)
 
 ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
-                        a.year=2009, a.country="NLD") )
+                        a.year=1800, a.country="Atlantis") )
 
-}
+}}

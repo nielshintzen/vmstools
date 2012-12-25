@@ -3,7 +3,7 @@ diffInter <- function(interpolation
 
 
       #Get the starting and ending positions of the interpolations
-    interIdx    <- matrix(unlist(lapply(interpolation,function(x){return(x[1,])})),ncol=2,nrow=length(interpolation),dimnames=list(interpolation=1:length(interpolation),c("x","y")),byrow=T)
+    interIdx    <- matrix(unlist(lapply(interpolation,function(x){return(x[1,])})),ncol=2,nrow=length(interpolation),dimnames=list(interpolation=1:length(interpolation),c("x","y")),byrow=TRUE)
       #Store the deviations from the interpolation and reference dataset
     storeDiffs  <- matrix(NA,nrow=length(interpolation),ncol=5,dimnames=list(1:length(interpolation),c("mean","logmean","sd","logsd","sum")))
 
@@ -34,10 +34,10 @@ diffInter <- function(interpolation
         #Calculate the distance between the reference points and the points on the interpolated track that are matched
       res <- distance(matchPx,matchPy,ref$SI_LONG,ref$SI_LATI)
         #Store the differences for each interpolation
-      storeDiffs[i,]<- c( mean(res[-c(1,length(res))],na.rm=T),
-                          exp(mean(log(res[-c(1,length(res))])[which(is.finite(log(res[-c(1,length(res))]))==T)],na.rm=T)),
-                          sd(res[-c(1,length(res))],na.rm=T),
-                          exp(sd(log(res[-c(1,length(res))])[which(is.finite(log(res[-c(1,length(res))]))==T)],na.rm=T)),
-                          sum(res[-c(1,length(res))],na.rm=T))
+      storeDiffs[i,]<- c( mean(res[-c(1,length(res))],na.rm=TRUE),
+                          exp(mean(log(res[-c(1,length(res))])[which(is.finite(log(res[-c(1,length(res))]))==TRUE)],na.rm=TRUE)),
+                          sd(res[-c(1,length(res))],na.rm=TRUE),
+                          exp(sd(log(res[-c(1,length(res))])[which(is.finite(log(res[-c(1,length(res))]))==TRUE)],na.rm=TRUE)),
+                          sum(res[-c(1,length(res))],na.rm=TRUE))
     }
 return(storeDiffs)}

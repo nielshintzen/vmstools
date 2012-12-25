@@ -6,13 +6,13 @@ equalDistance <- function(interpolation,res=10){
                     lngInt  <- lapply(interpolation,dim)
 
                     #Warn if resolution of equal distance is too high compared to original resolution of interpolation
-                    if(min(unlist(lngInt)[seq(1,length(totDist),2)],na.rm=T) < 9*res) warnings("Number of intermediate points in the interpolation might be too small for the equal distance pionts chosen")
+                    if(min(unlist(lngInt)[seq(1,length(totDist),2)],na.rm=TRUE) < 9*res) warnings("Number of intermediate points in the interpolation might be too small for the equal distance pionts chosen")
 
                     #Get distance steps to get equal distance
                     eqStep  <- totDist/(res-1)
                     
                     #Get x-y values of all interpolations
-                    intidx  <- matrix(unlist(lapply(interpolation,function(x){return(x[1,])})),ncol=2,byrow=T)
+                    intidx  <- matrix(unlist(lapply(interpolation,function(x){return(x[1,])})),ncol=2,byrow=TRUE)
 
                     #Do the calculation
                     result  <- lapply(interpolation,function(ind){

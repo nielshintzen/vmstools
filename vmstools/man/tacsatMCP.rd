@@ -25,6 +25,7 @@ The nodes of the MCP are also returned.
 \author{Fabrizio Manco}
 \seealso{\code{\link{indicators}}}
 \examples{
+require(PBSmapping)
 data(tacsat)
 
 # Flag the pings inside a polygon gathering 90\% of the pings

@@ -46,7 +46,7 @@
 
  
     # base::aggregate() replaced by fast grouping using the data.table library
-    library(data.table)
+    require(data.table)
     DT <- data.table(all.merged)
     qu = quote(list(sum(an(LE_EFF_VMS)),sum(an(KW_HOURS)),sum(an(totvalue)),sum(an(totweight))))
     ff.ve <- DT[,eval(qu), by=list(c_square,ICES_area, month,LE_MET_level6)]
@@ -126,7 +126,7 @@
          colnames(xx2) <- c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month", paste( "sp", 1:length(idx.col),sep='') )
        
          # 2. order before splitting in sub-blocks because aggregate() afterwards
-         library(doBy)
+         require(doBy)
          xx1 <- orderBy(~c_square+LE_MET_level6+month, data=xx1)
          xx2 <- orderBy(~c_square+LE_MET_level6+month, data=xx2)
          
@@ -162,7 +162,7 @@
             colnames(vsl.ff) <-  c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area", "c_square","month", "species", "weight", "value")
     
            # 6. aggregate with fast grouping (caution: > R.2.11.0) 
-           library(data.table)
+           require(data.table)
            vsl.ff$ICES_area <- factor(vsl.ff$ICES_area)
            DT <- data.table(vsl.ff)
            qu = quote(list(sum(an(weight)),sum(an(value))))
@@ -215,7 +215,7 @@
   # bind and order
   #(to get a VE line and then VSL lines, VE and then VSL lines, etc.)
   ff <- rbind(ve,vsl)
-  library(doBy)
+  require(doBy)
   ff <- orderBy(~col7+col9+col5+col6+col1, data=ff)
 
   # round the numbers

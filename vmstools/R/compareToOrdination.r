@@ -39,18 +39,18 @@ compareToOrdination=function(dat, Step2, clusters, targetSpecies){
   
   # Number of logevents linked to each species from the method "first species in catch"
   png("Number of logevents by ordination metier level7.png", width = 1200, height = 800)
-  barplot(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)], main="Number of logevents by ordination metier level7", xlab="Main species", ylab="Number of Logevents", las=3)
+  barplot(nbLogFirstSp[order(nbLogFirstSp,decreasing=TRUE)], main="Number of logevents by ordination metier level7", xlab="Main species", ylab="Number of Logevents", las=3)
   dev.off()
   # idem without the species with the biggest number of logevents
-  png(paste("Number of logevents by ordination metier level7 without ",names(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)])[1],".png",sep=""), width = 1200, height = 800)
-  barplot(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)][-1], main=paste("Number of logevents by ordination metier level7 without",names(nbLogFirstSp[order(nbLogFirstSp,decreasing=T)])[1],sep=" "), xlab="Main species", ylab="Number of Logevents", las=3)
+  png(paste("Number of logevents by ordination metier level7 without ",names(nbLogFirstSp[order(nbLogFirstSp,decreasing=TRUE)])[1],".png",sep=""), width = 1200, height = 800)
+  barplot(nbLogFirstSp[order(nbLogFirstSp,decreasing=TRUE)][-1], main=paste("Number of logevents by ordination metier level7 without",names(nbLogFirstSp[order(nbLogFirstSp,decreasing=TRUE)])[1],sep=" "), xlab="Main species", ylab="Number of Logevents", las=3)
   dev.off()
                                   
   
   # Names of species from the ordination method
   nomEspOrdi=names(nbLogFirstSp)
   nbEspOrdi=length(nomEspOrdi)
-  nomEspOrdi=nomEspOrdi[order(nomEspOrdi,decreasing=F)]
+  nomEspOrdi=nomEspOrdi[order(nomEspOrdi,decreasing=FALSE)]
   # Initialization
   numEspOrdiClarai=numeric()
   nomEspOrdiPlot=character()
@@ -84,7 +84,7 @@ compareToOrdination=function(dat, Step2, clusters, targetSpecies){
     op2 <- par(las=2)
     barplot(nbLogEspOrdiPlot[i,],names.arg=nomEspOrdiPlot[i,], las=3)
     par(op2)
-    mtext(paste("Cluster",i), side=3, outer=F, adj=0.5, line=0.5, col="darkblue")
+    mtext(paste("Cluster",i), side=3, outer=FALSE, adj=0.5, line=0.5, col="darkblue")
   }
   par(op)
   title(main=paste("Number of logevents linked to each metier from the ordination method 'first species' by cluster","\n","\n",sep=""))

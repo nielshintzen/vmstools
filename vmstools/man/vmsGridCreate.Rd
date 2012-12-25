@@ -56,26 +56,24 @@ vmsGridCreate(dF
   \item{outPlot}{optional name for a png file to be created from the plot}
   \item{\dots}{NOT used yet}
 }
-\details{}
 \value{ a \code{SpatialGridDataFrame} object of the grid defined in package \code{sp} }
 \references{EU VMS tools project}
 \author{Andy South}
-\note{}
 \seealso{\code{\link{mapGrid}}}
 \examples{
 #vmsGridCreate(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE",
 # cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',plotPoints=T )
 #get the example data
 data(tacsat)
+
 #subset the first 2000 points to avoid problems with NAs
 dFVMS <- tacsat[1:2000,]
+
 #create vms grid minimum call with defaults
 vmsGridCreate(dFVMS,nameLat='SI_LATI',nameLon='SI_LONG')
+
 #making the grid finer
 vmsGridCreate(dFVMS,nameLat='SI_LATI',nameLon='SI_LONG',
               cellsizeX=0.05,cellsizeY=0.05)
-#summing a data column and adding a title
-vmsGridCreate(dF2,nameLat='declat',nameLon='declon',
-              cellsizeX=0.05,cellsizeY=0.05,nameVarToSum='heading',
-              plotTitle='lot2 paris')
-              }
+
+}

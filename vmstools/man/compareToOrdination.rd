@@ -48,8 +48,6 @@ compareToOrdination(dat, Step2, clusters, tabClusters)
   using the function getMetierClusters(). 
 }
 }
-\details{
-}
 
 \value{
 The function returns a list with a number of tables on the comparison of the three methods:
@@ -96,7 +94,7 @@ The function returns a list with a number of tables on the comparison of the thr
   # note that output plots will be sent to getwd()
   analysisName <- "metier_analysis_OTB"
   
-  dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))]
+  dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=TRUE))]
   names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 
   explo <- selectMainSpecies(dat, analysisName, RunHAC=TRUE, DiagFlag=FALSE)
@@ -130,5 +128,3 @@ The function returns a list with a number of tables on the comparison of the thr
   }
   
 }
-
-\keyword{}

@@ -25,13 +25,13 @@ getEflaloMetierLevel7=function(dat, analysisName, path, critData="EURO", runHACi
   Store(eflalo_ori)
 
   # ! KEEPING ONLY LE_ID AND THE OUTPUT YOU WANT TO GET  (KG/EURO)
-  dat=dat[,c("LE_ID",grep(critData,names(dat),value=T))]
+  dat=dat[,c("LE_ID",grep(critData,names(dat),value=TRUE))]
   dat[is.na(dat)]=0
 
   # Removing negative and null values
   null.value <- vector()
   for (i in grep(critData,names(dat))) null.value <- c(null.value,which(dat[,i]<0))
-  null.value <- c(null.value,which(apply(dat[,2:ncol(dat)],1,sum,na.rm=T)==0))
+  null.value <- c(null.value,which(apply(dat[,2:ncol(dat)],1,sum,na.rm=TRUE)==0))
 
   if(length(null.value)!=0) {LogEvent.removed <- dat[sort(unique(null.value)),] ; dat <- dat[-sort(unique(null.value)),]}
 

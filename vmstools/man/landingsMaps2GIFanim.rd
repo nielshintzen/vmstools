@@ -16,10 +16,6 @@ from the merged table per year, per metier (level6), per metier-quarter all toge
 \details{
 Using some facilities providen by the 'animation' R package. Need ImageMagik installed. 
 }
-\source{
-}
-\references{
-}
 \author{
 Francois Bastardie
 }

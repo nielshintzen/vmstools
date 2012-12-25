@@ -7,7 +7,7 @@ Calculate effort from tacsat or eflalo file
 Calculate the effort in the tacsat or eflalo file by trip
 }
 \usage{
-effort(x, level = "trip", unit = "hours",weight=c(0.5,0.5),fill.na=F)
+effort(x, level = "trip", unit = "hours",weight=c(0.5,0.5),fill.na=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

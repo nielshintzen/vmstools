@@ -6,15 +6,15 @@
       }
 
       DT                    <- data.table(eflalo)
-      eq1                   <- c.listquote(paste("sum(",colnames(eflalo[,kgeur(colnames(eflalo))]),",na.rm=T)",sep=""))
+      eq1                   <- c.listquote(paste("sum(",colnames(eflalo[,kgeur(colnames(eflalo))]),",na.rm=TRUE)",sep=""))
       eq2                   <- c.listquote(vars)
 
       eflalo            <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(eflalo) <- c(vars,eflaloCol)
       eflalo$ID         <- 1:nrow(eflalo)
 
         #- Merge eflalo to pings to get number of pings per eflalo record
-      byPing             <- merge(eflalo,data.frame(pings),by=vars,all=F)
-      byTacsat           <- merge(tacsat,byPing,by=vars,all=F)
+      byPing             <- merge(eflalo,data.frame(pings),by=vars,all=FALSE)
+      byTacsat           <- merge(tacsat,byPing,by=vars,all=FALSE)
 
       try(print(paste("kg in eflalo",round(sum(byPing [,kgeur(colnames(byPing))])))))
       try(print(paste("kg in merged tacsat",round(sum(sweep(byTacsat[,kgeur(colnames(byTacsat))],1,byTacsat$pings,"/"))))))

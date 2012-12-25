@@ -36,9 +36,6 @@ Logevent ID (LE_ID) should be as row names. Typically, this table will be produc
   more appropriate for analysing large and heterogeneous datasets, by retaining more information for the subsequent clustering.  
 }
 }
-\details{
-}
-
 \value{
 If a PCA is run, a number of graphs are produced and directly saved in the working directory. These graphs describe 1) species projection on the first 
 factorial axes, 2) individuals (logevents) projections on the first factorial axes, 3) actual and cumulative percentage of inertia of factorial axes, and 4) eigenvalues.  
@@ -65,7 +62,7 @@ If no PCA is run, the function returns the same matrix as the input, with percen
   # note that output plots will be sent to getwd()
   analysisName <- "metier_analysis_OTB"
   
-  dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))]
+  dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=TRUE))]
   names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 
   explo <- selectMainSpecies(dat, analysisName, RunHAC=TRUE, DiagFlag=FALSE)
@@ -88,5 +85,3 @@ If no PCA is run, the function returns the same matrix as the input, with percen
   }
 
 }
-
-\keyword{}

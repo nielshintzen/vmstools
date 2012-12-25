@@ -29,7 +29,6 @@ of the peaks by 0.5knots precision.
 Returns a \code{\link{data.frame}} with a run scheme that can be used as input
 to \code{\link{activityTacsat}}
 }
-\references{}
 \author{Niels T. Hintzen}
 \seealso{
 \code{\link{activityTacsat}}, \code{\link{segmentedTacsatSpeed}}
@@ -42,9 +41,10 @@ tacsatp         <- mergeEflalo2Tacsat(eflalo,tacsat)
 tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
 
 tacsatp$LE_GEAR <- ac(tacsatp$LE_GEAR)
-tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==T)] <- "NO_GEAR"
+tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==TRUE)] <- "NO_GEAR"
 tacsat          <- tacsatp
 
+\dontrun{
 #--------- LE_GEAR -----------
 #- Visual analyses of activity, and define number of peaks / kernels that can
 #  be observed (either 3 or 5)
@@ -55,4 +55,5 @@ storeScheme   <- activityTacsatAnalyse(subset(tacsat,LE_GEAR == "OTM" &
                       year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR",
                       identify="means")
 
+}
 }

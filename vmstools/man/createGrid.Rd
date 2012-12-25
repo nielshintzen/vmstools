@@ -6,7 +6,7 @@ Function creates a grid with rounded (no decimal) begin and end longitude and la
 based on the ranges given. It creates this grid with gridcell size specified.
 }
 \usage{
-createGrid(xrange, yrange, resx, resy,type="GridToplogy",exactBorder=F)
+createGrid(xrange, yrange, resx, resy,type="GridToplogy",exactBorder=FALSE)
 }
 \arguments{
   \item{xrange}{specify minimum and maximum longitude / x values which should at least be in the grid}
@@ -26,15 +26,15 @@ class 'GridTopology'.
 \author{Niels T. Hintzen}
 \seealso{\code{\link{vmsGridCreate}}}
 \examples{
-x <- seq(-5,5,length.out=10)
-y <- seq(50,55,length.out=10)
-xrange <- range(x,na.rm=T)
-yrange <- range(y,na.rm=T)
+x <- seq(-4.999,5,length.out=10)
+y <- seq(50.002,55,length.out=10)
+xrange <- range(x,na.rm=TRUE)
+yrange <- range(y,na.rm=TRUE)
 
 #returns a grid with 1001 cells in the x-direction and 101 in the y-direction
 Grid <- createGrid(xrange,yrange,0.01,0.05,type="SpatialGrid")
 bbox(Grid)
-Grid <- createGrid(xrange,yrange,0.01,0.05,type="SpatialGrid",exactBorder=T)
+Grid <- createGrid(xrange,yrange,0.01,0.05,type="SpatialGrid",exactBorder=TRUE)
 bbox(Grid)
 }
 

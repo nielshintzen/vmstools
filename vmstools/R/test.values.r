@@ -10,7 +10,7 @@ test.values=function(groupes,data){
   nb_groupes=length(levels(as.factor(groupes)))
   noms_groupes=character(nb_groupes)
 
-  stats_globales=matrix(0,nr=p,ncol=2)
+  stats_globales=matrix(0,nrow=p,ncol=2)
   row.names(stats_globales)=noms_var
   colnames(stats_globales)=c("mean","variance")
   for (i in 1:p){
@@ -18,7 +18,7 @@ test.values=function(groupes,data){
     stats_globales[i,2]=var(data[,noms_var[i]])
   }
 
-  res=matrix(0,nr=p,ncol=nb_groupes)
+  res=matrix(0,nrow=p,ncol=nb_groupes)
   row.names(res)=noms_var
 
   for (j in 1:nb_groupes){

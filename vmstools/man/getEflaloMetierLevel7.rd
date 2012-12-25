@@ -41,9 +41,6 @@ getEflaloMetierLevel7(dat,analysisName,path,critData="EURO",
 }
 }
 
-\details{
-}
-
 \value{
 
 The function returns the same eflalo data set as was input, with an additional column giving the cluster name where each logevent has been allocated.
@@ -88,6 +85,3 @@ eflalo_metiers_level7 <- getEflaloMetierLevel7(eflalo, analysisName, path,
 }
 
 }
-
-\keyword{}
-

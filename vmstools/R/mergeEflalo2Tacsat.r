@@ -15,13 +15,13 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                           #-loop over all the vessels in tacsat
                           for(i in 1:length(tacefmatch)){
                           pm    <- tacefmatch[i]
-                            eftim <- splitEf[[pm]][which(duplicated(splitEf[[pm]]$FT_REF)==F),c("D_DATIM","L_DATIM","FT_REF")]
+                            eftim <- splitEf[[pm]][which(duplicated(splitEf[[pm]]$FT_REF)==FALSE),c("D_DATIM","L_DATIM","FT_REF")]
                             dtime <- eftim[,1]
                             ltime <- eftim[,2]
                             stime <- splitTa[[i]]$SI_DATIM
                             tripn <- eftim[,3]
                             
-                            if(is.na(tacefmatch[i])==T)
+                            if(is.na(tacefmatch[i])==TRUE)
                             { 
                             splitTa[[i]]$FT_REF <- 0
                             } 

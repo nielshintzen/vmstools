@@ -72,9 +72,6 @@ selected Principal Components will appear as columns. If no PCA was run, the mat
 }
 
 }
-\details{
-}
-
 \value{
 For any of the four methods used, a number of graphs are produced and saved directly in the working directory. 
 They describe 1) projections of results on factorial plans, 2) the mean profile of the whole dataset, i.e. the average percentage of the various species in a 
@@ -134,7 +131,7 @@ Finally, the function returns a list with a number of results and diagnostics on
   # note that output plots will be sent to getwd()
   analysisName <- "metier_analysis_OTB"
   
-  dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=T))]
+  dat <- eflalo[,c("LE_ID",grep("EURO",colnames(eflalo),value=TRUE))]
   names(dat)[-1] <- unlist(lapply(strsplit(names(dat[,-1]),"_"),function(x) x[[3]]))
 
   explo <- selectMainSpecies(dat, analysisName, RunHAC=TRUE, DiagFlag=FALSE)
@@ -161,6 +158,3 @@ Finally, the function returns a list with a number of results and diagnostics on
   }
 
 }
-
-\keyword{}
-                                       

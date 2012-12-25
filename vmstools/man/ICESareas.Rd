@@ -10,6 +10,7 @@ A pre-defined SpatialPolygons dataset with the ICES areas.
 \source{
 www.ices.dk}
 \examples{
+require(sp)
 data(ICESareas)
 plot(ICESareas)
 }

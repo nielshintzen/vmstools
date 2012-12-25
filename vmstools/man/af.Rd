@@ -6,7 +6,6 @@ Change the class of an object to factor
 }
 \usage{
 af(x)
-as.factor(x)
 }
 \arguments{
   \item{x}{object to turn into factor

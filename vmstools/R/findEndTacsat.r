@@ -24,7 +24,7 @@ if(clStartVMS != dim(VMS)[1]){
         warning("No succeeding point found, no interpolation possible")
         endVMS  <- NA
           #Check if end of dataset has been reached
-        ifelse(all((diffTime < (interval-margin))==T),endDataSet <- 1,endDataSet <- 0)
+        ifelse(all((diffTime < (interval-margin))==TRUE),endDataSet <- 1,endDataSet <- 0)
       } else {
           res <- which(diffTime >= (interval-margin) & diffTime <= (interval+margin))
           if(length(res)>1){
@@ -37,7 +37,7 @@ if(clStartVMS != dim(VMS)[1]){
             }
           }
         #Build-in check
-      if(is.na(endVMS)==F){
+      if(is.na(endVMS)==FALSE){
         if(!an(difftime(VMS.$SI_DATIM[endVMS],VMS.$SI_DATIM[startVMS],units=c("mins"))) %in% seq((interval-margin),(interval+margin),1)) stop("found endVMS point not within interval range")
         endVMS <- clStartVMS + (endVMS - startVMS)
       }

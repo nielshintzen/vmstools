@@ -76,13 +76,13 @@ mergeEflalo2Pings <-
     xx <- cbind.data.frame(xx, icessquare= rep(0,nrow(xx)))
 
 
-    rlong      <- range(anf(xx$SI_LONG),na.rm=T)
+    rlong      <- range(anf(xx$SI_LONG),na.rm=TRUE)
     vect.long  <- signif(seq(floor(rlong[1]), ceiling(rlong[2]), by=1),4)   # long (x)
     label.long <- rep(paste(rep(LETTERS,each=10),0:9,sep=""),each=1)
     names(label.long) <- signif(seq(-50, 209, by=1),4)   # long (x)
     label.long <- label.long[!is.na(names(label.long))]  # => correspondance long (-50 to 209) / sq letter (A0 to Z9)
     label.long <- label.long[as.character(vect.long)]
-    rlat      <- range(anf(xx$SI_LATI), na.rm=T)
+    rlat      <- range(anf(xx$SI_LATI), na.rm=TRUE)
     vect.lat   <- signif(seq(floor(rlat[1]), ceiling(rlat[2]),by=0.5),4) # lat  (y)
     label.lat  <- rep(paste(seq(1,75,1)),each=1)
     names(label.lat) <-   paste(signif(seq(36,73, by=0.5),4))
@@ -244,7 +244,7 @@ mergeEflalo2Pings <-
          #!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#!#
        NIELS <- FALSE
        if(NIELS){
-           eftim <- .logbk[which(duplicated(.logbk$FT_REF)==F),c("LE_DTIME","LE_LTIME","FT_REF")]
+           eftim <- .logbk[which(duplicated(.logbk$FT_REF)==FALSE),c("LE_DTIME","LE_LTIME","FT_REF")]
            dtime <- eftim[,1]
            ltime <- eftim[,2]
            stime <- .vms$SI_DATIM
@@ -375,7 +375,7 @@ mergeEflalo2Pings <-
           for(i in 1:length(fa1)) { # for each level in vms
              tmp <-  abs(as.numeric( as.POSIXct(fa2, tz='GMT') - as.POSIXct(fa1, tz='GMT')[i] ))
              if(all(is.na(tmp))) tmp <- abs(as.numeric( as.Date(fa2) - as.Date(fa1)[i] )) # debug the R bug in case of mid-time at 00:00 hour
-             new.levels[i] <- fa2 [which(tmp == min(tmp, na.rm=T) )]  # find the nearest level in logbook
+             new.levels[i] <- fa2 [which(tmp == min(tmp, na.rm=TRUE) )]  # find the nearest level in logbook
           }
           .vms$SI_MIDTIME <- factor(as.character(.vms$SI_MIDTIME))
           sauv <- .vms$SI_MIDTIME
@@ -454,7 +454,7 @@ mergeEflalo2Pings <-
          fa2 <-  levels(factor(vms$SI_MIDTIME))
          for(i in 1:length(fa1)) { # for each level in logbk
           tmp <-  abs(as.numeric( as.POSIXct(fa2, tz='GMT') - as.POSIXct(fa1, tz='GMT')[i] ))
-          new.levels[i] <- fa2 [which(tmp == min(tmp, na.rm=T) )]  # find the nearest level in vms
+          new.levels[i] <- fa2 [which(tmp == min(tmp, na.rm=TRUE) )]  # find the nearest level in vms
          }
          bk$LE_MIDTIME <- factor(as.character(bk$LE_MIDTIME))
          levels(bk$LE_MIDTIME) <- new.levels # and change mid.time in logbk to force the merging
