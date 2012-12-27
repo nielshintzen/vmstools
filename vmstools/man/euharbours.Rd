@@ -1,5 +1,6 @@
 \name{euharbours}
 \alias{euharbours}
+\alias{harbours}
 \docType{data}
 \title{
 Dataframe containing > 3500 harbours primarily Europe

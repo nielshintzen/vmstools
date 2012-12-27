@@ -6,10 +6,10 @@
 Reformat all the columns of the tacsat data to ensure that all data is in the right format
 }
 \usage{
-formatTacsat(tacsat)
+formatTacsat(x)
 }
 \arguments{
-  \item{tacsat}{ tacsat file
+  \item{x}{ tacsat file
 }
 }
 \value{

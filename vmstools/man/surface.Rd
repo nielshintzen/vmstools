@@ -7,7 +7,7 @@ Calculate surface from grid cells or polygons
 Calculate the surface in km2 of the grid / polygons that has been used
 }
 \usage{
-surface(obj, method = "Trapezoid", includeNA = T,zone=NULL)
+surface(obj, method = "Trapezoid", includeNA = TRUE, zone = NULL)
 }
 \arguments{
   \item{obj}{defined SpatialGridDataFrame or SpatialPolygons object (see 'sp'
@@ -46,7 +46,9 @@ yrange  <- c(min(yrange) - min(yrange)*0.05,
 sPDF    <- createGrid(xrange,yrange,resx=0.1,resy=0.05,type="SpatialGridDataFrame")
 
   #Setup a polygon
-sP      <- lonLat2SpatialPolygons(lst=list(data.frame(SI_LONG=c(4,4.5,4.7,4),SI_LATI=c(54,54,55.5,55.7))))
+sP      <- lonLat2SpatialPolygons(lst=list(data.frame(
+              SI_LONG=c(4,4.5,4.7,4),
+              SI_LATI=c(54,54,55.5,55.7))))
 
   #Calculate the cell surface
 result        <- surface(sPDF,method="Trapezoid",includeNA=TRUE)

@@ -49,7 +49,7 @@ Francois Bastardie
   
  # create some animations from the sequential jpeg files...
  # (need the 'animation' R package and ImageMagik installed)
- mapsLandings2GIFanim(idir = file.path("C:","output"), spp=c("COD") )
+ landingsMaps2GIFanim(idir = file.path("C:","output"), spp=c("COD") )
  
 }
 

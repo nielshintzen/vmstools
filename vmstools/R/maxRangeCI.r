@@ -1,6 +1,6 @@
 
 
-maxRangeCI <- function(x,y,time.,speed){
+maxRangeCI <- function(x,y,Time,speed){
 
   #Pre-Calculation to speed up the code
   pi180 <- pi/180
@@ -8,7 +8,7 @@ maxRangeCI <- function(x,y,time.,speed){
   cosy2 <- cos(y[2]*pi180)
   
   #Calculate maximum distance in km
-  dmax <- time./60*sum(speed,na.rm=TRUE)/2*1.852
+  dmax <- Time/60*sum(speed,na.rm=TRUE)/2*1.852
   
   #Calculate d from Haversine function
   d   <- distance(x[1],y[1],x[2],y[2])

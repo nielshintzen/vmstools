@@ -8,11 +8,11 @@ Convert the ICES rectangle to the longitude and latitude position of that
 specific rectangle, with either midpoint or lower-left corner.
 }
 \usage{
-ICESrectangle2LonLat(rectangle, midpoint)
+ICESrectangle2LonLat(statsq, midpoint = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{rectangle}{
+  \item{statsq}{
 character vector of ICES rectangles}
   \item{midpoint}{
 logical statement if returned values need to be midpoints of rectangle or not (default)

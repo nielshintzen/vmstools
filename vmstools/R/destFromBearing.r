@@ -1,9 +1,9 @@
-destFromBearing <- function(lon1,lat1,bearing,distance){
+destFromBearing <- function(lon,lat,bearing,distance){
 
                   pd    <- pi/180
                   dist  <- (distance/6371)
-                  y1    <- lat1 * pd
-                  x1    <- lon1 * pd
+                  y1    <- lat * pd
+                  x1    <- lon * pd
                   bear  <- bearing * pd
 
                   y2  <- asin(sin(y1) * cos(dist) + cos(y1) * sin(dist) * cos(bear))

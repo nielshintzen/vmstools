@@ -2,7 +2,7 @@
 function(tacsat
                          ,st=c(2,6)                #Speed threshold points (two values), NULL means use all points
                          ,hd=NULL                  #Heading threshold points (two values), NULL means use all points
-                         ,remDup=T                 #Specify if you want to remove duplicated VMS records (these should not occur in the first place)
+                         ,remDup=TRUE              #Specify if you want to remove duplicated VMS records (these should not occur in the first place)
                          ){
   VMS <- tacsat
 if(!"SI_DATIM" %in% colnames(VMS))  VMS$SI_DATIM     <- as.POSIXct(paste(VMS$SI_DATE,  VMS$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")

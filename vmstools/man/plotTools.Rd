@@ -7,8 +7,9 @@ Plot eflalo or tacsat files
 Plot eflalo or tacsat given a grid and column name as a map of intensity
 }
 \usage{
-plotTools(x,level,xlim,ylim,zlim,log,gridcell,color,control.tacsat,
-          control.eflalo, ...)
+plotTools(x,level= "ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,
+          gridcell=c(0.1,0.05),color=NULL,control.tacsat= list(clm = NULL),
+          control.eflalo = list(clm = NULL), returnRange = FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

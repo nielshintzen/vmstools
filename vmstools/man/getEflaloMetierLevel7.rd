@@ -36,8 +36,8 @@ getEflaloMetierLevel7(dat,analysisName,path,critData="EURO",
   \item{critPca}{character. Choice if a PCA must be run or not (="NO_PCA"), and if yes, which criterion is used for selecting the number of axes, to be chosen between
   scree test (="PCA_SC") or 70\% of cumulated inertia (="PCA_70")
 }
-  \item{algoClust}{character. Choice of the clustering algorithm, either "CLARA","HAC"
-  or "KMEANS".
+  \item{algoClust}{character. Choice of the clustering algorithm,
+                   either "CLARA", "HAC" or "KMEANS".
 }
 }
 
@@ -60,8 +60,7 @@ Beside, a number of sub-directories are created, with intermediate results and p
 \code{\link{extractTableMainSpecies}},
 \code{\link{getTableAfterPCA}},
 \code{\link{getMetierClusters}},
-\code{\link{compareToOrdination}}}
-
+}
 \examples{
 
 \dontrun{

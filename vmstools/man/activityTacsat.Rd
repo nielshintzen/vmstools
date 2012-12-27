@@ -8,7 +8,8 @@ fitting normal distributions through these speed profiles, fishing and other
 activities.
 }
 \usage{
-activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NULL,level="all",sigma=0.911)
+activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NULL,
+               plot = FALSE, level="all",sigma=0.911)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

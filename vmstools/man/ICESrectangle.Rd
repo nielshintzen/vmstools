@@ -8,10 +8,10 @@ Get the ICES rectangle from any lon,lat position, given that this position is
 within the ICES region.
 }
 \usage{
-ICESrectangle(x)
+ICESrectangle(dF)
 }
 \arguments{
-  \item{x}{
+  \item{dF}{
 dataframe given that they have 'SI_LONG' and 'SI_LATI' columns
 }
 }

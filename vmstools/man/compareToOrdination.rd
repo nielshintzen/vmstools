@@ -26,7 +26,7 @@ exhaustive and accurately defined metiers.
 }
 
 \usage{
-compareToOrdination(dat, Step2, clusters, tabClusters)
+compareToOrdination(dat, Step2, clusters, targetSpecies)
 
 }
 

@@ -54,7 +54,8 @@ plot a graph
 
 
   graphics.off()
-  df1 <- all.merged[, c("LE_MET_level6", "LE_GEAR","SI_STATE", "SI_LATI","SI_LONG","LE_KG_COD","LE_KG_PLE")]
+  df1 <- all.merged[, c("LE_MET_level6", "LE_GEAR","SI_STATE", "SI_LATI",
+                        "SI_LONG","LE_KG_COD","LE_KG_PLE")]
   df1$SI_LONG <- anf(df1$SI_LONG)
   df1$SI_LATI <- anf(df1$SI_LATI)
   df1 <-   df1[ !is.na(df1$SI_LATI),]

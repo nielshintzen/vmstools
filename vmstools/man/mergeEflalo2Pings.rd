@@ -153,7 +153,8 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
 
   # TEST FOR A GIVEN SET OF VESSELS
   # (if detect.fishing is true then do also detection of fishing activity
-  # e.g. if speed='segment' the segmentTacsatSpeed() automatic detection of fishing states
+  # e.g. if speed='segment' the segmentTacsatSpeed()
+  #automatic detection of fishing states
   # that will overwrite the existing SI_STATE)
   mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=c("738", "804"),
                      general=list(output.path=file.path("C:","output"),
@@ -197,9 +198,10 @@ These data.frame could be later bound into a big one using bindAllMergedTable()
 
  # but you need to remove steaming points before gridding!
   df2<-df1[-which(is.na(df1$LE_KG_COD)),]
-  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", we = 3, ea = 6, so = 50, no = 54,
-                nameVarToSum = "LE_KG_COD",cellsizeX =0.1,
-                cellsizeY =0.05,  legendtitle = "COD landings (kg)", plotPoints =TRUE, 
+  vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", we = 3, ea = 6,
+                so = 50, no = 54,nameVarToSum = "LE_KG_COD",
+                cellsizeX =0.1,cellsizeY =0.05,
+                legendtitle = "COD landings (kg)", plotPoints =TRUE,
                 breaks0=c(1,2,4,8,16,32,64,100000))
 
 

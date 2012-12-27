@@ -24,7 +24,9 @@ data(europa)
 require(PBSmapping)
 
 eurPols     <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
-                        function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,SI_LATI=subset(europa,SID==x)$Y)}))
+                        function(x){data.frame(
+                          SI_LONG=subset(europa,SID==x)$X,
+                          SI_LATI=subset(europa,SID==x)$Y)}))
 
 plot(eurPols,col="green",xlim=c(-4,10),ylim=c(48,62))
 }

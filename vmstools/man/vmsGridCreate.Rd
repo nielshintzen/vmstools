@@ -22,11 +22,17 @@ vmsGridCreate(dF
              , plotMap = TRUE
              , plotTitle = ""
              , numCats = 5
+             , paletteCats = "heat.colors"
              , addLegend = TRUE
              , legendx = "bottomleft"
              , legendncol = 1
              , legendtitle = "fishing activity"
              , plotPoints = TRUE
+             , legPoints = FALSE
+             , colPoints = 1
+             , colLand = "sienna"
+             , addICESgrid = FALSE
+             , addScale = TRUE
              , outGridFile = ""  
              , outPlot = ""
              , ...)
@@ -47,11 +53,17 @@ vmsGridCreate(dF
   \item{plotMap}{whether to plot a map of the resulting grid}
   \item{plotTitle}{optional title to add to the plot}
   \item{numCats}{how many categories to classify grid values into for map plot (uses\code{pretty()}) classification)}
+  \item{paletteCats}{color pallete to use}
   \item{addLegend}{whether to add a legend to the plot}
   \item{legendx}{position of legend should be one of 'bottomright', 'bottom', 'bottomleft', 'left', 'topleft', 'top', 'topright', 'right', 'center'}
   \item{legendncol}{number of columns in the legend}
   \item{legendtitle}{legend title}
   \item{plotPoints}{whether to add the original points to the plot}
+  \item{legPoints}{Logical. Points in legend}
+  \item{colPoints}{color of points to plot}
+  \item{colland}{color of land}
+  \item{addICESgrid}{Logical. Adding ICES grid on top}
+  \item{addScale}{Logical. Adding axes}
   \item{outGridFile}{optional name for a gridAscii file to be created from the grid}
   \item{outPlot}{optional name for a png file to be created from the plot}
   \item{\dots}{NOT used yet}
