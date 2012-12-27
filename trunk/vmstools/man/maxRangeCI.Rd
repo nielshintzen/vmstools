@@ -11,13 +11,13 @@ than the possible distance able to travel in the amount of time and speed given,
 that the vessel must have travelled faster than the given speeds.
 }
 \usage{
-maxRangeCI(lon, lat, time, speed)
+maxRangeCI(x, y, Time, speed)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{lon}{Longitudes of the GPS positions}
-  \item{lat}{Latitudes of the GPS positions}
-  \item{time}{Time in minutes between the succeeding datapoints}
+  \item{x}{Longitudes of the GPS positions}
+  \item{y}{Latitudes of the GPS positions}
+  \item{Time}{Time in minutes between the succeeding datapoints}
   \item{speed}{Speeds at the GPS positions in nots}
 }
 \details{

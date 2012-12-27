@@ -6,6 +6,7 @@ tacsatMinimumConvexPolygon <- function (tacsat,
                                         pctThreshold=90)
 {
   require(aspace)
+  require(ade4)
 
   vmsPoints<-cbind(tacsat$SI_LONG, tacsat$SI_LATI)
 

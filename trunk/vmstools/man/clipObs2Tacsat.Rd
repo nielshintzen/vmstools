@@ -28,7 +28,8 @@ clipObs2Tacsat(tacsat, obs, method, control.grid, control.euclidean,
    the outermargins can be given by the tacsat dataset (gridBox="tacsat") or the
    observation dataset (gridBox="obs").
 
-   Example: control.grid=list(spatGrid=NULL,resx=c(0.5,1),resy=NULL,gridBbox="obs")
+   Example: control.grid=list(spatGrid = NULL, resx = c(0.5,1),
+                              resy = NULL, gridBbox = "obs")
 }
   \item{control.euclidean}{
    If method = "euclidean" then a maximum distance the tacsat position may deviate
@@ -54,8 +55,6 @@ second element is the tacsat records with the same GR_IDs.
 }
 \author{
 Niels T. Hintzen
-}
-\seealso{\code{\link{clipPolygons}}
 }
 \examples{
 data(tacsat)

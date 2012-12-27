@@ -8,7 +8,7 @@ an interpolation of a straight line (on a x-y plane, not a sphere)
 }
 \usage{
 interpolateTacsat(tacsat, interval = 120, margin = 12, res = 100,
-                  method = "cHs", params = list(fm=0.2,distscale=20,
+                  method = "cHs", params = list(fm=0.5,distscale=20,
                   sigline=0.2,st=c(2,6)),headingAdjustment=0,fast=FALSE)
 }
 \arguments{

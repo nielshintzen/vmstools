@@ -146,10 +146,11 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
               if(length(which(abs(an(names(tbl))) %in% spd))>1) idx <- c(idx,sample(which(subset(tygmr,VE_REF==iShip)$SI_SP==(-1*spd)),tbl[ac(-1*spd)]-tbl[nxt]*2,replace=FALSE))
             } else { idx <- -1:-nrow(subset(tygmr,VE_REF==iShip))}
 
+            shipTacsat        <- subset(tygmr,VE_REF == iShip)
+
             if(length(res[[names(which.max(table(shipTacsat$LE_GEAR)))]])==3){ constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
             if(length(res[[names(which.max(table(shipTacsat$LE_GEAR)))]])==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
 
-            shipTacsat        <- subset(tygmr,VE_REF == iShip)
             shipFit[[iShip]]  <- try(normalmixEM(shipTacsat$SI_SP[-idx],mu=res[[names(which.max(table(shipTacsat$LE_GEAR)))]],maxit=2000,mean.constr=constraintmn,sd.constr=constraintsd))
 
             if(class(shipFit[[iShip]])!= "try-error"){
@@ -322,5 +323,5 @@ leftOverTacsat  <- tacsatOrig[which(!tacsatOrig$ID %in% tacsat$ID),]
 tacsat          <- rbind(tacsat,leftOverTacsat)
 tacsat          <- orderBy(~ID,tacsat)
 cat("Note that in case of 5 peaks: no fishing = 1, fishing = 2, steaming / no fishing = 3\n")
-cat("Note that in case of 3 peaks: fishing = 2, steaming / no fishing = 3\n")
+cat("Note that in case of 3 peaks: fishing = 1, steaming / no fishing = 2\n")
 return(tacsat$SI_STATE)}

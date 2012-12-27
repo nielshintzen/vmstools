@@ -6,7 +6,7 @@ Function creates a grid with rounded (no decimal) begin and end longitude and la
 based on the ranges given. It creates this grid with gridcell size specified.
 }
 \usage{
-createGrid(xrange, yrange, resx, resy,type="GridToplogy",exactBorder=FALSE)
+createGrid(xrange, yrange, resx, resy,type="GridTopology",exactBorder=FALSE)
 }
 \arguments{
   \item{xrange}{specify minimum and maximum longitude / x values which should at least be in the grid}

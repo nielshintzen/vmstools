@@ -9,16 +9,16 @@ This function estimates the DCF indicators 5, 6 and 7 from the tacsat dataset.
 \usage{
 indicators(indicatorNum=5,
            tacsat,
-           minThreshold=0,
+           minThreshold=10,
            pctThreshold=90,
            ltGear="",
            inShapeArea="", 
            cellresX=0.05, 
            cellresY=0.05, 
            calcAreaMethod="Trapezoid", 
-           plotMapTF=TRUE, 
-           exportTableName="", 
-           exportGridName="")
+           plotMapTF=FALSE,
+           exportGridName="",
+           exportTableName="")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -32,8 +32,8 @@ indicators(indicatorNum=5,
   \item{cellresY}{The cell size along axis Y}
   \item{calcAreaMethod}{The method used to calculate the cell area, can be "Trapezoid" (quick and less acurate) or "UTM" (slow and accurate)}
   \item{plotMapTF}{Plot the maps}
-  \item{exportTableName}{Name of the csv file containing the results}
   \item{exportGridName}{If mentionned, each grid will be exported as a ASCII grid}
+  \item{exportTableName}{Name of the csv file containing the results}
 }
 \details{
 SUMMARY
@@ -65,7 +65,6 @@ For DCF Indicator 7: a annual value is returned and a grid is exported (if expor
          \code{\link{vmsGridCreate}}
          \code{\link{tacsatMCP}}
          \code{\link{surface}}
-         \code{\link{clipPolygons}}
 }
 \examples{
 # load the library

@@ -8,10 +8,10 @@ Convert the CSquare notation to GPS location where you can define what resolutio
 you want the GPS notation to be.
 }
 \usage{
-CSquare2LonLat(CSquare, degrees)
+CSquare2LonLat(csqr, degrees)
 }
 \arguments{
-  \item{CSquare}{
+  \item{csqr}{
 CSquare notation like: 1400:134:120:356
 }
   \item{degrees}{

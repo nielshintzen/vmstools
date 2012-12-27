@@ -6,10 +6,10 @@ Sort the Tacsat data first by vessel, then by date, speed and heading. Needs to 
 to be effectively used in other EU lot 2 project generic functions.
 }
 \usage{
-sortTacsat(tacsat)
+sortTacsat(dat)
 }
 \arguments{
-  \item{tacsat}{tacsat dataframe}
+  \item{dat}{tacsat dataframe}
 }
 
 \references{EU lot 2 project}

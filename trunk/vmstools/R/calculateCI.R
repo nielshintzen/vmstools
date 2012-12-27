@@ -9,7 +9,7 @@ calculateCI <- function(    int
             sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M")
   mxr     <-  maxRangeCI(x  =c(int[-1,1][1],rev(int[-1,1])[1]),
                          y  =c(int[-1,2][1],rev(int[-1,2])[1]),
-                         time.=c(difftime(tacint$SI_DATIM[2],tacint$SI_DATIM[1],units="mins")),
+                         Time=c(difftime(tacint$SI_DATIM[2],tacint$SI_DATIM[1],units="mins")),
                          speed=pmax(tacint$SI_SP,rep(distanceInterpolation(list(int)) / 1.852 /
                                                      c(difftime(tacint$SI_DATIM[2],tacint$SI_DATIM[1],units="hours")),2)))
                                                      

@@ -26,13 +26,11 @@ A clipped resulting polyset is returned.
 \seealso{\code{indicators()}}
 \examples{
 \dontrun{
-# Load the shapefile containing the set of polygons to be clipped
-# Name of the shapefile without the .shp extension
-inShapeArea<-"testClosedAreaMultiple"
-shapeAll<-read.shapefile(inShapeArea)
 
 # Load the set of polygons used for the clipping, in our case, lands
-load("europa.rda")
+data(europa)
+
+shapeAll <- lonLat2SpatialPolygons(SI_LONG=c(0,1,1,0),SI_LATI=c(54,54,54.5,54.5))
 
 # Do the clipping
 clipShapeFromLand<-clipPolygons (shapeAll, europa)

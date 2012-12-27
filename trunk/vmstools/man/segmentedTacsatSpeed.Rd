@@ -26,8 +26,8 @@ Analyse tacsat by gear ("LE_GEAR") or vessel ("VE_REF").
 }
   \item{speed}{
 Define if speed profile used must be taken as given in the tacsat file
-(speed="instantanious") or if internally speed must be calculated
-(speed="calculated"). Default is "calculated"
+ (speed = "instantanious") or if internally speed must be calculated
+(speed = "calculated"). Default is "calculated"
 }
   \item{logfit}{
 Logical. Define whether the speed profile frequencies must be log-transformed.

@@ -7,7 +7,8 @@ Analyse speed profiles to define number of peaks.
 Analyse histrogram of speed profiles by gear or vessel to define number of peaks
 }
 \usage{
-activityTacsatAnalyse(tacsat, units = "year", analyse.by = "LE_GEAR",identify="peaks")
+activityTacsatAnalyse(tacsat, units = "year", analyse.by = "LE_GEAR",
+                      identify="peaks")
 }
 \arguments{
   \item{tacsat}{tacsat dataset}

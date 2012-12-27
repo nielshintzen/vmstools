@@ -8,12 +8,13 @@ Get the ICES area from any lon,lat position, given that this position is
 within the ICES region.
 }
 \usage{
-ICESarea(x,areas,proj4string=NULL)
+ICESarea(tacsat,areas,proj4string=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
-dataframe given that they have 'SI_LONG' and 'SI_LATI' columns
+  \item{tacsat}{
+dataframe given that they have 'SI_LONG' and 'SI_LATI' columns (either tacsat
+format or other dataset with SI_LONG and SI_LATI columns)
 }
   \item{areas}{
 ICES areas as SpatialPolygons}

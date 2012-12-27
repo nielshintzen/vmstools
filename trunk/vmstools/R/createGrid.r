@@ -4,7 +4,7 @@ function(xrange
                              ,resx
                              ,resy
                              ,type="GridTopology"
-                             ,exactBorder=F
+                             ,exactBorder=FALSE
                              ){
                 
                 require(sp)

@@ -6,7 +6,8 @@ Find points in harbour within specified range
 \description{
 Method to find the gps positions given with tacsat data that are situated within a range of a port.
 }
-\usage{pointInHarbour(lon,lat,harbour)}
+\usage{pointInHarbour(lon,lat,harbour,rowSize = 30, returnNames = FALSE,
+                 saveHarbourList = TRUE)}
 \arguments{
   \item{lon}{Longitudinal positions of the TACSAT formatted data}
   \item{lat}{Latitudinal positions of teh TACSAT formatted data}

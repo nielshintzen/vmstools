@@ -16,8 +16,9 @@ The method returns tacsat (a subset if vessels informed) with the SI_STATE infor
   \item{tacsat}{tacsat with LE_GEAR informed for each ping}
   \item{general}{a list of general settings e.g. the output path for saving the plot}
   \item{...}{vessels, a vector of vessel identifiers VE_REF that can be found
-              in tacsat, force.lower.bound might also be used to fix the lower
-              speed at some value for gillnet and seine gear types}
+             in tacsat.
+             force.lower.bound might also be used to fix the lower
+             speed at some value for gillnet and seine gear types}
 }
 \details{
 A (quick and dirty) vessel and gear-specific method has been suggested by Bastardie et al. 2010 

@@ -6,10 +6,10 @@
 Reformat all the columns of the Eflalo data to ensure that all data is in the right format
 }
 \usage{
-formatEflalo(eflalo)
+formatEflalo(x)
 }
 \arguments{
-  \item{eflalo}{ eflalo file
+  \item{x}{ eflalo file
 }
 }
 \value{
