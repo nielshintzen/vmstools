@@ -192,14 +192,14 @@ mergeEflalo2Pings <-
 
 
          # if does not exist, add SI_DATIM for handling the time in R
-         if(!("SI_DATIM" %in% colnames(tacsat))){
           tacsat.this.vessel$SI_TIME <- as.character(tacsat.this.vessel$SI_TIME)
           tacsat.this.vessel[tacsat.this.vessel$SI_TIME=="24:00", "SI_TIME"] <- "00:00"  # debug
+          tacsat.this.vessel[tacsat.this.vessel$SI_DATE=="29/02/1801", "SI_DATE"] <- "01/03/1801"  # debug
           tacsat.this.vessel$SI_DATIM <- as.POSIXct(  paste(tacsat.this.vessel$SI_DATE, tacsat.this.vessel$SI_TIME) ,
                                  tz='GMT',   "%d/%m/%Y %H:%M" )
           tacsat.this.vessel <- tacsat.this.vessel[!is.na(tacsat.this.vessel$SI_DATIM),]   # debug e.g. when 29/02/1801
-         }
-
+         
+         
          # keep only the essential
          vms.this.vessel  <- tacsat.this.vessel [, c("VE_REF","SI_LATI","SI_LONG",
                           "SI_DATIM","SI_FT", "SI_SP", "SI_HE", "SI_HARB", "SI_STATE")]
@@ -530,6 +530,15 @@ mergeEflalo2Pings <-
                                          )
                 #=> (semi)automatic detection of the fishing peak
                 # (put here because the LE_GEAR need to be informed)
+         # alternatively,
+         if(FALSE){
+             .vms$SI_STATE  <- 0
+             .vms           <- segmentedTacsatSpeed(.vms[.vms$VE_REF==a.vesselid,], units="year", analyse.by="LE_GEAR",
+                                  speed="instantaneous", logfit=FALSE, CI=0.95)
+             .vms$SI_STATE  <- .vms$SI_STATE+1 # back compatibility with mergeEflalo2Pings() i.e. 1: fishing, 2: steaming
+            # ...but what about the passive gears then?
+          }
+
 
             .vms <- .vms[, !colnames(.vms) %in% "LE_GEAR"] # remove after use to avoid future conflict.
          }
@@ -916,7 +925,7 @@ return()
 
 
   #\dontrun{
-   data(eflalo)
+  data(eflalo)
   data(tacsat)
   data(euharbours); euharbours <- harbours
 
