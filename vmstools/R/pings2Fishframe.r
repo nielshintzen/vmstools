@@ -2,7 +2,7 @@
 
  pings2Fishframe <- function(general=list(output.path=
              file.path("H:","DIFRES","VMSanalysis","results_merged","DKWaters"),
-                                          a.year=2009, a.country="DNK")){
+                                          a.year=2009, a.country="DNK", degree=0.05)){
                                           
   
   # TO FISHFRAME (author: F. Bastardie)
@@ -10,7 +10,7 @@
 # required: the data.table package
 # optional: the ICES_areas shape file (if not provided as arg then loaded from the vmstools library)
  mergedTable2FishframeVE <- function (general=list(output.path=file.path("C:","output"),
-                                          a.year=2009, a.country="DNK"),...){
+                                          a.year=2009, a.country="DNK", degree=0.05),...){
     lstargs <- list(...)
 
     for(what in c('value','weight')){
@@ -37,7 +37,7 @@
     }else{
        all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
     }
-    all.merged$c_square  <-CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05)
+    all.merged$c_square  <-CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=general$degree)
     all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
     all.merged$LE_EFF_VMS <- an(all.merged$LE_EFF_VMS) / 24 # convert in hours
     all.merged <- all.merged[,c("LE_EFF_VMS","KW_HOURS","totvalue", "totweight", "LE_MET_level6","ICES_area","c_square","month")]
@@ -46,7 +46,7 @@
 
  
     # base::aggregate() replaced by fast grouping using the data.table library
-    require(data.table)
+    library(data.table)
     DT <- data.table(all.merged)
     qu = quote(list(sum(an(LE_EFF_VMS)),sum(an(KW_HOURS)),sum(an(totvalue)),sum(an(totweight))))
     ff.ve <- DT[,eval(qu), by=list(c_square,ICES_area, month,LE_MET_level6)]
@@ -78,7 +78,7 @@
  # require: the 'data.table' and 'doBy' packages
  # optional: the ICES_areas shape file (if not provided as arg then loaded from the vmstools library)
  mergedTable2FishframeVSL <- function (general=list(output.path=file.path("C:","output"),
-                                          a.year=2009, a.country="DNK"),...){
+                                          a.year=2009, a.country="DNK", degree=0.05),...){
       lstargs <- list(...)
       
       an <- function (x) as.numeric(as.character(x))
@@ -98,7 +98,7 @@
          }else{
          all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
          }
-         all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05))
+         all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=general$degree))
          all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
          nm1 <- colnames(all.merged)
          idx.c <- which (nm1 %in% c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month"))
@@ -118,7 +118,7 @@
          }else{
          all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
          }
-        all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=0.05))
+        all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=general$degree))
          all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
          nm2 <- colnames(all.merged)
          idx.c <- which (nm2 %in% c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month"))
@@ -126,7 +126,7 @@
          colnames(xx2) <- c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month", paste( "sp", 1:length(idx.col),sep='') )
        
          # 2. order before splitting in sub-blocks because aggregate() afterwards
-         require(doBy)
+         library(doBy)
          xx1 <- orderBy(~c_square+LE_MET_level6+month, data=xx1)
          xx2 <- orderBy(~c_square+LE_MET_level6+month, data=xx2)
          
@@ -162,7 +162,7 @@
             colnames(vsl.ff) <-  c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area", "c_square","month", "species", "weight", "value")
     
            # 6. aggregate with fast grouping (caution: > R.2.11.0) 
-           require(data.table)
+           library(data.table)
            vsl.ff$ICES_area <- factor(vsl.ff$ICES_area)
            DT <- data.table(vsl.ff)
            qu = quote(list(sum(an(weight)),sum(an(value))))
@@ -215,7 +215,7 @@
   # bind and order
   #(to get a VE line and then VSL lines, VE and then VSL lines, etc.)
   ff <- rbind(ve,vsl)
-  require(doBy)
+  library(doBy)
   ff <- orderBy(~col7+col9+col5+col6+col1, data=ff)
 
   # round the numbers
@@ -238,9 +238,11 @@
 
 
 # calls
-# vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","VMSanalysis","results_merged","DKWaters"),
-#                                          a.year=2009, a.country="DNK") )
-# ve <- mergedTable2FishframeVE (general=list(output.path=file.path("C:","VMSanalysis","results_merged","DKWaters"),
-#                                          a.year=2009, a.country="DNK") )
- #ff <- mergedTable2Fishframe (general=list(output.path=file.path("C:","VMSanalysis","results_merged","DKWaters"),
- #                                         a.year=2009, a.country="DNK") )
+# vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","merging", "EflaloAndTacsat"),
+#                                          a.year=2009, a.country="DNK", degree=0.05) )
+# ve <- mergedTable2FishframeVE  (general=list(output.path=file.path("C:","merging", "EflaloAndTacsat"),
+#                                          a.year=2009, a.country="DNK", degree=0.05) )
+
+for (a_year in as.character(2005:2010)) 
+  ff <- pings2Fishframe (general=list(output.path=file.path("C:","merging", "EflaloAndTacsat"),
+                                          a.year=a_year, a.country="DNK", degree=0.01) )
