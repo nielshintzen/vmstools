@@ -5,10 +5,10 @@
                                           a.year=2009, a.country="DNK", degree=0.05)){
                                           
   
-  # TO FISHFRAME (author: F. Bastardie)
-# create the VE table to upload in fishframe
-# required: the data.table package
-# optional: the ICES_areas shape file (if not provided as arg then loaded from the vmstools library)
+ # TO FISHFRAME (author: F. Bastardie)
+ # create the VE table to upload in fishframe
+ # required: the data.table package
+ # optional: the  "areas" shape file for ICESarea()(if not provided as arg then loaded from the vmstools library)
  mergedTable2FishframeVE <- function (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="DNK", degree=0.05),...){
     lstargs <- list(...)
@@ -32,32 +32,33 @@
     all.merged <- all.merged[, !colnames(all.merged) %in% c('fuelcons', 'flag')]
     all.merged <- all.merged[all.merged$SI_STATE==1,] # keep only fishing pings
     nm <- colnames(all.merged)
-    if(length(lstargs$shape.file)==0) {
-    all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+    if(length(lstargs$spatialPolygons)==0) {
+       data(ICESareas)
+       all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')], areas=ICESareas)
     }else{
-       all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+       all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')], areas=lstargs$spatialPolygons)
     }
-    all.merged$c_square  <-CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=general$degree)
-    all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
+    all.merged$c_square   <- CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=general$degree)
+    all.merged$month      <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
     all.merged$LE_EFF_VMS <- an(all.merged$LE_EFF_VMS) / 24 # convert in hours
-    all.merged <- all.merged[,c("LE_EFF_VMS","KW_HOURS","totvalue", "totweight", "LE_MET_level6","ICES_area","c_square","month")]
-    all.merged$c_square <- factor(all.merged$c_square)
-    all.merged$ICES_area <- factor(all.merged$ICES_area)
+    all.merged            <- all.merged[,c("LE_EFF_VMS","KW_HOURS","totvalue", "totweight", "LE_MET_level6","ICES_area","c_square","month")]
+    all.merged$c_square   <- factor(all.merged$c_square)
+    all.merged$ICES_area  <- factor(all.merged$ICES_area)
 
  
     # base::aggregate() replaced by fast grouping using the data.table library
     library(data.table)
-    DT <- data.table(all.merged)
-    qu = quote(list(sum(an(LE_EFF_VMS)),sum(an(KW_HOURS)),sum(an(totvalue)),sum(an(totweight))))
-    ff.ve <- DT[,eval(qu), by=list(c_square,ICES_area, month,LE_MET_level6)]
+    DT     <- data.table(all.merged)
+    qu     <- quote(list(sum(an(LE_EFF_VMS)),sum(an(KW_HOURS)),sum(an(totvalue)),sum(an(totweight))))
+    ff.ve  <- DT[,eval(qu), by=list(c_square,ICES_area, month,LE_MET_level6)]
     colnames(ff.ve) <- c('c_square','ICES_area', 'month','LE_MET_level6','hours','kw_hours', 'totvalue','totweight')
 
     # additional
-    ff.ve$year        <- general$a.year
-    ff.ve$country     <- general$a.country
-    ff.ve$nationalFAC <- " "
-    ff.ve$recordtype  <- "VE"
-    ff.ve$quarter <- ff.ve$month  # init
+    ff.ve$year            <- general$a.year
+    ff.ve$country         <- general$a.country
+    ff.ve$nationalFAC     <- " "
+    ff.ve$recordtype      <- "VE"
+    ff.ve$quarter         <- ff.ve$month  # init
     levels(ff.ve$quarter) <- c(1,1,1,2,2,2,3,3,3,4,4,4)
 
 
@@ -76,7 +77,7 @@
  # TO FISHFRAME (author: F. Bastardie)
  # create the VSL table to upload in fishframe
  # require: the 'data.table' and 'doBy' packages
- # optional: the ICES_areas shape file (if not provided as arg then loaded from the vmstools library)
+ # optional: the  "areas" shape file for ICESarea()(if not provided as arg then loaded from the vmstools library)
  mergedTable2FishframeVSL <- function (general=list(output.path=file.path("C:","output"),
                                           a.year=2009, a.country="DNK", degree=0.05),...){
       lstargs <- list(...)
@@ -93,37 +94,39 @@
          all.merged$SI_LONG <- an( all.merged$SI_LONG)
          all.merged$SI_LATI <- an( all.merged$SI_LATI)
          all.merged <- all.merged[all.merged$SI_STATE==1,] # keep only fishing pings
-         if(length(lstargs$shape.file)==0) {
-         all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+         if(length(lstargs$spatialPolygons)==0) {
+         all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')], areas=ICESareas)
          }else{
-         all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+         data(ICESareas)
+         all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')], areas=lstargs$spatialPolygons)
          }
          all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=general$degree))
-         all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
-         nm1 <- colnames(all.merged)
-         idx.c <- which (nm1 %in% c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month"))
-         xx1 <-  all.merged [, c(idx.c,idx.col)]
-         colnames(xx1) <- c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month", paste( "sp", 1:length(idx.col),sep='') )
+         all.merged$month     <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
+         nm1                  <- colnames(all.merged)
+         idx.c                <- which (nm1 %in% c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month"))
+         xx1                  <-  all.merged [, c(idx.c,idx.col)]
+         colnames(xx1)        <- c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month", paste( "sp", 1:length(idx.col),sep='') )
          
          what <- "value"
          load(file.path(general$output.path, paste("all_merged_",what,"_",general$a.year,".RData",sep='')))
          all.merged[all.merged$LE_MET_level6=="", "LE_MET_level6"] <-"NA"  # debug
-         nm <- colnames(all.merged)
-         idx.col  <- grep('EURO', nm) # index columns with species
+         nm                 <- colnames(all.merged)
+         idx.col            <- grep('EURO', nm) # index columns with species
          all.merged$SI_LONG <- an( all.merged$SI_LONG)
          all.merged$SI_LATI <- an( all.merged$SI_LATI)
-         all.merged <- all.merged[all.merged$SI_STATE==1,] # keep only fishing pings
-         if(length(lstargs$shape.file)==0) {
-         all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+         all.merged         <- all.merged[all.merged$SI_STATE==1,] # keep only fishing pings
+         if(length(lstargs$spatialPolygons)==0) {
+             data(ICESareas)
+             all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')], areas=ICESareas)
          }else{
-         all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')])
+             all.merged$ICES_area <- ICESarea (all.merged[,c('SI_LONG','SI_LATI')], areas=lstargs$spatialPolygons)
          }
         all.merged$c_square  <- factor(CSquare(an(all.merged$SI_LONG), an(all.merged$SI_LATI), degrees=general$degree))
-         all.merged$month <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
-         nm2 <- colnames(all.merged)
-         idx.c <- which (nm2 %in% c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month"))
-         xx2 <-  all.merged [, c(idx.c,idx.col)]
-         colnames(xx2) <- c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month", paste( "sp", 1:length(idx.col),sep='') )
+        all.merged$month     <- factor(format(as.POSIXct(all.merged$SI_DATE), "%m"))  # add month
+        nm2                  <- colnames(all.merged)
+        idx.c                <- which (nm2 %in% c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month"))
+        xx2                  <- all.merged [, c(idx.c,idx.col)]
+        colnames(xx2)        <- c('VE_REF', 'FT_REF',"LE_MET_level6","ICES_area","c_square","month", paste( "sp", 1:length(idx.col),sep='') )
        
          # 2. order before splitting in sub-blocks because aggregate() afterwards
          library(doBy)
@@ -164,9 +167,9 @@
            # 6. aggregate with fast grouping (caution: > R.2.11.0) 
            library(data.table)
            vsl.ff$ICES_area <- factor(vsl.ff$ICES_area)
-           DT <- data.table(vsl.ff)
-           qu = quote(list(sum(an(weight)),sum(an(value))))
-           vsl.ff <- DT[,eval(qu), by=list(species,ICES_area,c_square,month,LE_MET_level6)]
+           DT      <- data.table(vsl.ff)
+           qu      <- quote(list(sum(an(weight)),sum(an(value))))
+           vsl.ff  <- DT[,eval(qu), by=list(species,ICES_area,c_square,month,LE_MET_level6)]
            colnames(vsl.ff ) <- c('species','ICES_area','c_square','month','LE_MET_level6','weight','value')
 
            # 7. bind all chunks
@@ -174,16 +177,17 @@
            }
  
   # 8. additional
-  res$year        <- general$a.year
-  res$country     <- general$a.country
-  res$nationalFAC <- " "
-  res$recordtype  <- "VSL"
-  res$quarter <- res$month  # init
+  res$year            <- general$a.year
+  res$country         <- general$a.country
+  res$nationalFAC     <- " "
+  res$recordtype      <- "VSL"
+  res$quarter         <- res$month  # init
   levels(res$quarter) <- c(1,1,1,2,2,2,3,3,3,4,4,4)
 
   # 9. convert species fao code to fishframe latin species names
   data(speciesLatinNames)
-  res$species <-  speciesLatinNames$ff_species_latin[match(as.character(res$species), as.character(speciesLatinNames$fao_code))]
+  res$species <-  speciesLatinNames$ff_species_latin[match(as.character(res$species),
+                               as.character(speciesLatinNames$fao_code))]
 
    
   # 10. order colums
@@ -209,7 +213,7 @@
 
   # add a fake column to get the same ncol()
   vsl <- cbind(vsl, 0)
-  colnames(ve) <- paste('col', 1:ncol(ve), sep='')
+  colnames(ve)  <- paste('col', 1:ncol(ve), sep='')
   colnames(vsl) <- paste('col', 1:ncol(vsl), sep='')
 
   # bind and order
@@ -237,12 +241,14 @@
   }
 
 
-# calls
+# example calls
 # vsl <- mergedTable2FishframeVSL (general=list(output.path=file.path("C:","merging", "EflaloAndTacsat"),
 #                                          a.year=2009, a.country="DNK", degree=0.05) )
 # ve <- mergedTable2FishframeVE  (general=list(output.path=file.path("C:","merging", "EflaloAndTacsat"),
 #                                          a.year=2009, a.country="DNK", degree=0.05) )
 
-for (a_year in as.character(2005:2010)) 
-  ff <- pings2Fishframe (general=list(output.path=file.path("C:","merging", "EflaloAndTacsat"),
-                                          a.year=a_year, a.country="DNK", degree=0.01) )
+# alternatively:
+#for (a_year in as.character(2005:2010)) 
+#  ff <- pings2Fishframe (general=list(output.path=file.path("C:","merging", "EflaloAndTacsat"),
+#                                          a.year=a_year, a.country="DNK", degree=0.01) )
+
