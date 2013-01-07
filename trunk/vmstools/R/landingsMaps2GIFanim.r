@@ -11,8 +11,9 @@ for(sp in spp){
            filename <- paste("map_landings_",what,"_merged_vessels_",sp,"_",met,"_",sep='')
            cat(paste(filename,"\n"))
            wildcard = paste(filename, "*.", "jpeg", sep = "")
-           im.convert(wildcard, interval = 1, loop = 0, output = "anim.gif",  # library(animation)
-           outdir = getwd(), convert = "convert", cmd.fun = system, clean = FALSE)   
+           im.convert(wildcard, output = file.path(getwd(), paste("anim",".gif", sep='')),  # library(animation)
+                         convert = "convert",
+                          cmd.fun = system, clean = FALSE)   
     } # end what
   } # end met
  } # end sp
