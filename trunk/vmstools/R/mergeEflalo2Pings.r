@@ -1048,7 +1048,7 @@ return()
                               all.in.one.table=FALSE)
 
   ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
-                          a.year=1800, a.country="NLD") )
+                          a.year=1800, a.country="NLD", degree=0.05 ) )
 
 
   # TO DO....
