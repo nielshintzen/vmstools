@@ -70,8 +70,8 @@ data(eflalo)
 tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
 tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
 
-#-Fit based on gear and instantanious speed
+#-Fit based on gear and instantaneous speed
 newTacsat <- segmentedTacsatSpeed(tacsatp,units="year",analyse.by="LE_GEAR",
-                                  speed="instantanious",logfit=FALSE,CI=0.95)
+                                  speed="instantaneous",logfit=FALSE,CI=0.95)
 
 }

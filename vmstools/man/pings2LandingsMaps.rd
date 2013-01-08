@@ -4,13 +4,24 @@
 generate some landings maps from the merged output table
 }
 \description{
-generate landings maps from the merged table per year, per metier (level6), per metier-quarter all together
+generate landings maps from the merged table per year, per metier (DCF Level6), per metier-quarter all together
 }
-\usage{pings2LandingsMaps()}
+\usage{
+pings2LandingsMaps(all.merged, sp="LE_KG_COD", output= file.path("C:","VMSanalysis", "FemernBelt"),
+        cellsizeX =0.05, cellsizeY =0.05, we=9.8, ea=12.7, no=55.2, so=54.0,
+          breaks0= c(0,100, 100*(2^1),100*(2^2),100*(2^3),100*(2^4),100*(2^5),100*(2^6), 100*(2^7),100*(2^8),100*(2^9), 10000000))
+}
 \arguments{
-  \item{all.merged}{the data.frame from merged VMS with logbooks }
+  \item{all.merged}{the data.frame from merged VMS to logbooks }
   \item{sp}{sp name (FAO code) }
   \item{output}{a path for the output to be located}
+  \item{cellsizeX}{additional arguments for mapGrid}
+  \item{cellsizeY}{additional arguments for mapGrid}
+  \item{we}{additional arguments for mapGrid}
+  \item{ea}{additional arguments for mapGrid}
+  \item{no}{additional arguments for mapGrid}
+  \item{so}{additional arguments for mapGrid}
+  \item{breaks0}{additional arguments for mapGrid}
 }
 \details{
 using some arguments informing mapGrid(). Performing automatic creation of a hierarchy of output folders. 
