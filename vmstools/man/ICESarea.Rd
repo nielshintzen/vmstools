@@ -8,7 +8,7 @@ Get the ICES area from any lon,lat position, given that this position is
 within the ICES region.
 }
 \usage{
-ICESarea(tacsat,areas,proj4string=NULL)
+ICESarea(tacsat,areas,proj4string=NULL,fast=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -19,6 +19,8 @@ format or other dataset with SI_LONG and SI_LATI columns)
   \item{areas}{
 ICES areas as SpatialPolygons}
 \item{proj4string}{Projection string, default to NULL.}
+\item{fast}{If memory allocation is not a problem, a faster version can be
+switched on}
 }
 
 \value{
