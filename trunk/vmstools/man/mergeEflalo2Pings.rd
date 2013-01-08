@@ -57,7 +57,10 @@ and possible allocation of landings on locations we know that a stock is not pre
 }
 
 \usage{
-mergeEflalo2Pings(eflalo, tacsat, general = list(detectFishing=TRUE), ...)
+mergeEflalo2Pings(eflalo, tacsat, general=list(output.path=file.path("C:"),
+                     visual.check=TRUE, detectFishing=FALSE, speed="segment", 
+                      what.speed="calculated", conserve.all=TRUE,
+                       ), ...)
 }
 
 \arguments{

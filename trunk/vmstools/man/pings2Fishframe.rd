@@ -8,18 +8,24 @@ This includes the aggregation of fishing pings (VMS effort and logbook landings)
 by CSquare area code and month. 
 }
 \usage{
-pings2Fishframe (general=list(output.path=file.path("C:","output"),
-                 a.year=2009, a.country="NLD") )}
-
+pings2Fishframe (general=list(output.path=
+             file.path("H:","DIFRES","VMSanalysis","results_merged","DKWaters"),
+                                       a.year=2009, a.country="DNK", degree=0.05))
+}
 \arguments{
   \item{general}{a list with general settings, e.g. the output.path}
+  \item{a.year}{a year to be inserted in the csv}
+  \item{a.country}{a country to be inserted in the csv}
+  \item{degree}{XY grid resolution in degree}
 }
 \details{
 The function first starts by searching the input data.frame in the output.path folder.
 The result will be saved in the output.path folder as well.
 the 'data.table' package is required to perform the aggregation of the
 data.frame much faster.
-An area code is also added (e.g. from the ICESarea code)
+An area code is also added (e.g. from the ICESarea() function). This latter step is costly in 
+terms of computation time due to the spatial polygon inclusion test performed for a lot of VMS positions
+(across a lot of polygons!) and this explains the current poor time performance of the whole function.
 }
 \author{
 Francois Bastardie

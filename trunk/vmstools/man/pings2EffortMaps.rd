@@ -6,11 +6,21 @@ generate some fishing effort maps from the merged output table
 \description{
 generate some effort maps (jpeg files) from the merged table per year, per metier (level6), per metier-quarter all together
 }
-\usage{pings2EffortMaps()}
+\usage{
+pings2EffortMaps(all.merged,  output= file.path("C:","VMSanalysis", "FemernBelt"),
+        cellsizeX =0.05, cellsizeY =0.05, we=9.8, ea=12.7, no=55.2, so=54.0,
+         breaks0=c(0,25, 50,100,200,400,800,1600, 3200,6400,12800, 100000))
+}
 \arguments{
   \item{all.merged}{the data.frame from merged VMS with logbooks }
   \item{output}{a path for the output folder to be created}
-  \item{...}{additional arguments for mapGrid}
+  \item{cellsizeX}{additional arguments for mapGrid}
+  \item{cellsizeY}{additional arguments for mapGrid}
+  \item{we}{additional arguments for mapGrid}
+  \item{ea}{additional arguments for mapGrid}
+  \item{no}{additional arguments for mapGrid}
+  \item{so}{additional arguments for mapGrid}
+  \item{breaks0}{additional arguments for mapGrid}
 }
 \details{
 using some arguments informing mapGrid(). Performing automatic creation of a hierarchy of output folders. 
