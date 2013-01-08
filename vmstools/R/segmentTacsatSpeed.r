@@ -12,7 +12,8 @@ segmentTacsatSpeed <- function(tacsat,
                                     ), ...){
 
  
-  lstargs <- list(...)
+   lstargs <-  as.list( sys.call() ) # equivalent to lstargs <- list(...) but suppress the r cmd build warning? 
+
   if(length(lstargs$vessels)!=0) {
      vessels <- lstargs$vessels
   } else{
