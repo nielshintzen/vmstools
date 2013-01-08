@@ -26,6 +26,8 @@ activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NUL
                starting values. level = "vessel" turns this option on.}
   \item{sigma}{Fixed sigma value for distribution around zero. NULL if parameter
                needs to be estimated.}
+  \item{fixPeaks}{Option to fix the top of the density curves at the initial
+                  parameter values from 'storeScheme'}
 }
 \details{
 The analyses assumes that the speed profile close to 0 can be mirrored to create
