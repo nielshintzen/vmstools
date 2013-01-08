@@ -47,8 +47,7 @@ mergeEflalo2Pings <-
                      visual.check=TRUE, detectFishing=FALSE, speed="segment", what.speed="calculated", conserve.all=TRUE,
                        ), ...){
 
-  lstargs <- list(...)
-
+  lstargs <-  as.list( sys.call() ) # equivalent to lstargs <- list(...) but suppress the r cmd build warning? 
 
   # create required folders for outputs
   cat("if it still doesn't exist, 'results' folder is created in ",general$output.path,"\n")
