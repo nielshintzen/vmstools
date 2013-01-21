@@ -1,4 +1,4 @@
-splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TRUE){
+splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TRUE,by=NULL){
 
   #level: day,ICESrectangle,trip
   #conserve: T,F
@@ -12,6 +12,9 @@ if(level == "trip" & conserve == T) stop("conserve catches only at level = ICESr
 if(!"SI_DATIM" %in%   colnames(tacsat)) tacsat$SI_DATIM     <- as.POSIXct(paste(tacsat$SI_DATE,   tacsat$SI_TIME,     sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
 if(!"LE_CDATIM" %in%  colnames(eflalo)) eflalo$LE_CDATIM    <- as.POSIXct(eflalo$LE_CDAT,                                     tz="GMT", format="%d/%m/%Y")
 
+if(is.null(by)==F){
+  if(any(is.na(tacsat[,by])) | any(tacsat[,by] == 0)) stop("'by' column in tacsat contains NA or zero's. Cannot execute with NA's or zeros")
+}
 
   #- Levels have hierachy, and need to be suplemented with lower levels
 if(level == "day"){               level <- c("day","ICESrectangle","trip")
@@ -61,10 +64,10 @@ if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
     if(!"SI_DAY" %in%  colnames(eflaloTrip))  eflaloTrip$SI_DAY     <- an(format(eflaloTrip$LE_CDATIM,format="%j"))
 
       #- Count pings in tacsat set
-    nPings                <- countPings(~year+VE_REF+FT_REF+icesrectangle+day,tacsatTrip)
+    nPings                <- countPings(~year+VE_REF+FT_REF+icesrectangle+day,tacsatTrip,by=by)
 
       #- Do the merging of eflalo to tacsat
-    res           <- eflalo2Pings(eflaloTrip,tacsatTrip,nPings,c("SI_YEAR","VE_REF","FT_REF","LE_RECT","SI_DAY"),eflaloCol[c(kgs,eur)],remainTacsat)
+    res           <- eflalo2Pings(eflaloTrip,tacsatTrip,nPings,c("SI_YEAR","VE_REF","FT_REF","LE_RECT","SI_DAY"),eflaloCol[c(kgs,eur)],remainTacsat,by=by)
     eflaloTrip    <- res[["eflalo"]]
     byDayTacsat   <- res[["tacsat"]]
     remainTacsat  <- res[["remainTacsat"]]
@@ -76,10 +79,10 @@ if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
     if(!"SI_YEAR" %in% colnames(eflaloTrip))  eflaloTrip$SI_YEAR    <- an(format(eflaloTrip$LE_CDATIM,format="%Y"))
 
       #- Count pings in tacsat set
-    nPings                <- countPings(~year+VE_REF+FT_REF+icesrectangle,tacsatTrip)
+    nPings                <- countPings(~year+VE_REF+FT_REF+icesrectangle,tacsatTrip,by=by)
 
       #- Do the merging of eflalo to tacsat
-    res           <- eflalo2Pings(eflaloTrip,tacsatTrip,nPings,c("SI_YEAR","VE_REF","FT_REF","LE_RECT"),        eflaloCol[c(kgs,eur)],remainTacsat)
+    res           <- eflalo2Pings(eflaloTrip,tacsatTrip,nPings,c("SI_YEAR","VE_REF","FT_REF","LE_RECT"),        eflaloCol[c(kgs,eur)],remainTacsat,by=by)
     eflaloTrip    <- res[["eflalo"]]
     byRectTacsat  <- res[["tacsat"]]
     remainTacsat  <- res[["remainTacsat"]]
@@ -89,10 +92,10 @@ if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
     if(!"SI_YEAR" %in% colnames(eflaloTrip))  eflaloTrip$SI_YEAR    <- an(format(eflaloTrip$LE_CDATIM,format="%Y"))
 
       #- Count pings in tacsat set
-    nPings                <- countPings(~year+VE_REF+FT_REF,tacsatTrip)
+    nPings                <- countPings(~year+VE_REF+FT_REF,tacsatTrip,by=by)
 
       #- Do the merging of eflalo to tacsat
-    res           <- eflalo2Pings(eflaloTrip,tacsatTrip,nPings,c("SI_YEAR","VE_REF","FT_REF"),                  eflaloCol[c(kgs,eur)],remainTacsat)
+    res           <- eflalo2Pings(eflaloTrip,tacsatTrip,nPings,c("SI_YEAR","VE_REF","FT_REF"),                  eflaloCol[c(kgs,eur)],remainTacsat,by=by)
     eflaloTrip    <- res[["eflalo"]]
     byTripTacsat  <- res[["tacsat"]]
     remainTacsat  <- res[["remainTacsat"]]
@@ -136,10 +139,10 @@ if(conserve == T){
       if(!"SI_DAY" %in%  colnames(eflaloVessel))  eflaloVessel$SI_DAY     <- an(format(eflaloVessel$LE_CDATIM,format="%j"))
 
         #- Count pings in tacsat set
-      nPings                <- countPings(~year+VE_REF+icesrectangle+day,tacsat)
+      nPings                <- countPings(~year+VE_REF+icesrectangle+day,tacsat,by=by)
 
         #- Do the merging of eflalo to tacsat
-      res           <- eflalo2Pings(eflaloVessel,tacsat,nPings,c("SI_YEAR","VE_REF","LE_RECT","SI_DAY"),      eflaloCol[c(kgs,eur)],NULL)
+      res           <- eflalo2Pings(eflaloVessel,tacsat,nPings,c("SI_YEAR","VE_REF","LE_RECT","SI_DAY"),      eflaloCol[c(kgs,eur)],NULL,by=by)
       eflaloVessel  <- res[["eflalo"]]
       byDayTacsat   <- res[["tacsat"]]
     }
@@ -151,10 +154,10 @@ if(conserve == T){
       if(!"SI_YEAR" %in% colnames(eflaloVessel))  eflaloVessel$SI_YEAR    <- an(format(eflaloVessel$LE_CDATIM,format="%Y"))
 
         #- Count pings in tacsat set
-      nPings                <- countPings(~year+VE_REF+icesrectangle,tacsat)
+      nPings                <- countPings(~year+VE_REF+icesrectangle,tacsat,by=by)
 
         #- Do the merging of eflalo to tacsat
-      res           <- eflalo2Pings(eflaloVessel,tacsat,nPings,c("SI_YEAR","VE_REF","LE_RECT"),               eflaloCol[c(kgs,eur)],NULL)
+      res           <- eflalo2Pings(eflaloVessel,tacsat,nPings,c("SI_YEAR","VE_REF","LE_RECT"),               eflaloCol[c(kgs,eur)],NULL,by=by)
       eflaloVessel  <- res[["eflalo"]]
       byRectTacsat  <- res[["tacsat"]]
     }
@@ -163,10 +166,10 @@ if(conserve == T){
       if(!"SI_YEAR" %in% colnames(eflaloVessel))  eflaloVessel$SI_YEAR    <- an(format(eflaloVessel$LE_CDATIM,format="%Y"))
 
         #- Count pings in tacsat set
-      nPings                <- countPings(~year+VE_REF,tacsat)
+      nPings                <- countPings(~year+VE_REF,tacsat,by=by)
 
         #- Do the merging of eflalo to tacsat
-      res           <- eflalo2Pings(eflaloVessel,tacsat,nPings,c("SI_YEAR","VE_REF" ),               eflaloCol[c(kgs,eur)],NULL)
+      res           <- eflalo2Pings(eflaloVessel,tacsat,nPings,c("SI_YEAR","VE_REF" ),               eflaloCol[c(kgs,eur)],NULL,by=by)
       eflaloVessel  <- res[["eflalo"]]
       byVessTacsat  <- res[["tacsat"]]
     }
@@ -200,10 +203,10 @@ if(conserve == T){
       if(!"SI_DAY" %in%  colnames(eflaloNoVessel))  eflaloNoVessel$SI_DAY     <- an(format(eflaloNoVessel$LE_CDATIM,format="%j"))
 
         #- Count pings in tacsat set
-      nPings                <- countPings(~year+icesrectangle+day,tacsat)
+      nPings                <- countPings(~year+icesrectangle+day,tacsat,by=by)
 
        #- Do the merging of eflalo to tacsat
-      res               <- eflalo2Pings(eflaloNoVessel,tacsat,nPings,c("SI_YEAR","LE_RECT","SI_DAY"),               eflaloCol[c(kgs,eur)],NULL)
+      res               <- eflalo2Pings(eflaloNoVessel,tacsat,nPings,c("SI_YEAR","LE_RECT","SI_DAY"),               eflaloCol[c(kgs,eur)],NULL,by=by)
       eflaloNoVessel    <- res[["eflalo"]]
       byDayTacsat       <- res[["tacsat"]]
     }
@@ -215,10 +218,10 @@ if(conserve == T){
       if(!"SI_YEAR" %in% colnames(eflaloNoVessel))  eflaloNoVessel$SI_YEAR    <- an(format(eflaloNoVessel$LE_CDATIM,format="%Y"))
 
         #- Count pings in tacsat set
-      nPings            <- countPings(~year+icesrectangle,tacsat)
+      nPings            <- countPings(~year+icesrectangle,tacsat,by=by)
 
        #- Do the merging of eflalo to tacsat
-      res               <- eflalo2Pings(eflaloNoVessel,tacsat,nPings,c("SI_YEAR","LE_RECT"),                        eflaloCol[c(kgs,eur)],NULL)
+      res               <- eflalo2Pings(eflaloNoVessel,tacsat,nPings,c("SI_YEAR","LE_RECT"),                        eflaloCol[c(kgs,eur)],NULL,by=by)
       eflaloNoVessel    <- res[["eflalo"]]
       byRectTacsat      <- res[["tacsat"]]
     }
@@ -227,10 +230,10 @@ if(conserve == T){
       if(!"SI_YEAR" %in% colnames(eflaloNoVessel))  eflaloNoVessel$SI_YEAR    <- an(format(eflaloNoVessel$LE_CDATIM,format="%Y"))
 
         #- Count pings in tacsat set
-      nPings            <- countPings(~year,tacsat)
+      nPings            <- countPings(~year,tacsat,by=by)
 
        #- Do the merging of eflalo to tacsat
-      res               <- eflalo2Pings(eflaloNoVessel,tacsat,nPings,c("SI_YEAR"),                        eflaloCol[c(kgs,eur)],NULL)
+      res               <- eflalo2Pings(eflaloNoVessel,tacsat,nPings,c("SI_YEAR"),                        eflaloCol[c(kgs,eur)],NULL,by=by)
       eflaloNoVessel    <- res[["eflalo"]]
       byVessTacsat      <- res[["tacsat"]]
     }
