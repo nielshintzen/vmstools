@@ -29,6 +29,12 @@ Levels can be: "day", "ICESrectangle", "trip"
   \item{conserve}{
 Logical, if kgs or value needs to be conserved if merging by trip number is not possible (default = TRUE)
 }
+  \item{by}{
+Name of tacsat column by which KG and EURO should be dispatched. Default to NULL which
+distributes KG and EURO equally by each ping. A tacsat column can be used instead
+to generate a 'weighted' dispatch of KG and EURO.
+}
+
 }
 \details{
 Levels have hierachy, so if "day" is specified, also "ICESrectangle" and "trip" will be used.
@@ -57,8 +63,18 @@ tacsatFilter      <- filterTacsat(tacsatp,st=c(1,6),hd=NULL,remDup=TRUE)
 tacsatp$SI_STATE  <- 0
 tacsatp$SI_STATE[tacsatFilter$IDX] <- 1
 
+#-Add interval to tacsatp
+tacsatp           <- intervalTacsat(tacsatp,level="trip",fill.na.=T)
+
 tacsatp           <- subset(tacsatp,SI_STATE == 1)
 
 tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
                         variable="all",level="day",conserve=TRUE)
+                        
+                        
+#- When using the 'by' statement, make sure the by column does not contain NA,
+#  or zeros
+tacsatp           <- subset(tacsatp,!is.na(tacsatp$INTV) | tacsatp$INTV != 0)
+tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
+                        variable="all",level="day",conserve=TRUE,by="INTV")
 }
