@@ -18,6 +18,7 @@ if(!method %in% c("cHs","SL"))  stop("method selected that does not exist")
 #-------------------------------------------------------------------------------
 if(fast){
   #Interpolation only by vessel, so split tacsat up
+  tacsat$ID <- 1:nrow(tacsat)
   splitTa   <- split(tacsat,tacsat$VE_REF)
   spltTaCon <- lapply(splitTa,function(spltx){
                   #Calculate time different between every record
