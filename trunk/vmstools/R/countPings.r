@@ -1,4 +1,4 @@
-countPings <- function(formula,tacsat,grid=NULL){
+countPings <- function(formula,tacsat,grid=NULL,by=NULL){
 
                   #Turn selected variabels into element list
                   form <- formula
@@ -52,7 +52,11 @@ countPings <- function(formula,tacsat,grid=NULL){
                     if("icesarea" %in% spatVars){        tacsat$LE_AREA <- ICESarea(tacsat)     ; spatVars[which(spatVars=="icesarea")] <- "LE_AREA"}
                   }
 
-                  tacsat$SUM      <- 1
+                  if(is.null(by)){
+                    tacsat$SUM      <- 1
+                  } else {
+                    tacsat$SUM      <- tacsat[,by]
+                    }
                   totVars         <- c(Vars,timeVars,spatVars)
 
                   #Do the counting of pings
