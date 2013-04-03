@@ -6,15 +6,33 @@ surface <- function(obj,method="Trapezoid",includeNA=TRUE,zone=NULL){  #Methods 
         
         if(class(obj) == 'SpatialPolygons')
           {
+            allSourcePoly <- numeric()
+            counter       <- 0
             for(iPol1 in 1:length(obj@polygons)){
               for(iPol2 in 1:length(obj@polygons[[iPol1]])){
+                counter   <- counter + 1
                 sourcePoly <- data.frame(cbind(1,1:nrow(obj@polygons[[iPol1]]@Polygons[[iPol2]]@coords),
                                          obj@polygons[[iPol1]]@Polygons[[iPol2]]@coords[,1],obj@polygons[[iPol1]]@Polygons[[iPol2]]@coords[,2]))
                 rownames(sourcePoly)<-1:nrow(sourcePoly)
                 colnames(sourcePoly)<-c("PID","POS","X","Y")
-                obj@polygons[[iPol1]]@Polygons[[iPol2]]@area <- calcArea(as.PolySet(sourcePoly, projection="LL",zone=zone))$area
+                sourcePoly$PID[]    <-counter
+                
+                allSourcePoly       <- rbind(allSourcePoly,sourcePoly)
               }
             }
+            areas   <- calcArea(as.PolySet(allSourcePoly, projection="LL",zone=zone))$area
+            areas   <- data.frame(
+                        cbind(areas,do.call(rbind,lapply(obj@polygons,function(x){return(x@labpt)})),
+                                    do.call(rbind,lapply(obj@polygons,function(x){return(x@ID)}))),stringsAsFactors=F)
+            colnames(areas) <- c("areas","labptx","labpty","ID")
+
+
+            obj     <- SpatialPolygons(lapply(SP@polygons,function(x){
+                                res <- lapply( x@Polygons,function(y){
+                                                            subAreas <- subset(areas,ID == x@ID & labptx == ac(y@labpt[1]) & labpty == ac(y@labpt[2]))
+                                                            y@area   <- anf(subAreas$areas);return(y)});
+                                                          return(Polygons(res,ID=x@ID))}))
+
           }
         if(!method %in% c("Trapezoid","UTM")) stop("method not available")
         if (class(obj) %in% c('SpatialGridDataFrame')) # not empty...
