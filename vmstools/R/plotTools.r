@@ -1,8 +1,7 @@
 plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),returnRange=FALSE){
-  require(RColorBrewer)
   require(maps)
   require(mapdata)
-  if(is.null(color)==TRUE) color <- brewer.pal(9,"YlOrRd")
+  if(is.null(color)==TRUE) color <- rev(heat.colors[1:9])
   
     #TACSAT
   if(all(c("SI_LATI","SI_LONG") %in% colnames(x))){
