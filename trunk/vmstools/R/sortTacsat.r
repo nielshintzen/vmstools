@@ -1,5 +1,6 @@
 `sortTacsat` <-
 function(dat){
+require(doBy)
 
 if(!"SI_DATIM" %in% colnames(dat)) dat$SI_DATIM  <- as.POSIXct(paste(dat$SI_DATE,  dat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
 
