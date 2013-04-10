@@ -49,12 +49,19 @@ nestedGrid <- function(tacsat,resx,resy,maxstep = 10, n = 20,control=list(clm=NU
   return(SPDF)
 }
 
-
+round2 < function(x, n){
+    posneg = sign(x)
+    z = abs(x)*10^n
+    z = z + 0.5
+    z = trunc(z)
+    z = z/10^n
+    z*posneg
+  }
 
 polyDef <- function(lon, lat, gridx, gridy){
   # round to the nearest rectangle mid-point
-  lon1 <- round((lon - gridx/2)/gridx , 0) * gridx + gridx/2
-  lat1 <- round((lat - gridy/2)/gridy , 0) * gridy + gridy/2
+  lon1 <- round2((lon - gridx/2)/gridx , 0) * gridx + gridx/2
+  lat1 <- round2((lat - gridy/2)/gridy , 0) * gridy + gridy/2
 
   # create WKT sting
   out <- paste('Polygon(cbind(c('
