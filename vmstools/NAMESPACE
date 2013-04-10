@@ -85,6 +85,7 @@ export(
 "rbindTacsat",                    
 "readEflalo",                     
 "readTacsat",
+"round2",
 "scree",
 "segmentTacsatSpeed",             
 "segmentedTacsatSpeed",  
