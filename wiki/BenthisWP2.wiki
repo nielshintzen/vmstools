@@ -1,3 +1,29 @@
 =Benthis WP2 workflow example=
 
 Please find below an example workflow to treat VMS and Logbook in a systematic manner to create swept area maps.
+
+
+  * Installing & loading libraries
+  * setting directories
+  * loading VMS and Logbook data
+  * turning VMS and Logbook data into tacsat and eflalo
+  * cleaning tacsat
+  * cleaning eflalo
+  * merge eflalo and tacsat
+  * link gear characteristics to tacsat (additional table)
+  * define activity
+    * speed profiles
+    * need for Fock??
+  * interpolate data
+    * interpolateTacsat
+    * buffer area
+  * interpolation two tacsat 
+    * swept area calculation per ping
+  * labeling hauls
+  * link habitat map to vms
+    * shapefile 
+    * raster
+  * define grid
+    * mid-point polygon distance distribution
+    * random process of fishing activity
+  * maps + sum / average different grids
