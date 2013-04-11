@@ -1,0 +1,3 @@
+=Benthis WP2 workflow example=
+
+Please find below an example workflow to treat VMS and Logbook in a systematic manner to create swept area maps.
