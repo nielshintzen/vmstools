@@ -14,4 +14,5 @@
     * [examples_coupling Coupling VMS and Logbooks]
     * [MetiersLogbook Define metiers]
     * [DCFIndicators Calculate indicators]
-  * Benthis WP2 [BenthisWP2]
+  * Benthis WP2 
+    * [BenthisWP2]
