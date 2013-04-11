@@ -12,6 +12,7 @@ Please find below an example workflow to treat VMS and Logbook in a systematic m
   * merge eflalo and tacsat
   * link gear characteristics to tacsat 
     * read in table (from interviews / experimental studies)
+    * make use of functional relationship between vessel HP or length to gear size
   * define activity
     * speed profiles
     * need for Fock??
