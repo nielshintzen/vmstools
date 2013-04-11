@@ -5,6 +5,8 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                           if(!"L_DATIM" %in% colnames(eflalo2)) eflalo2$L_DATIM   <- as.POSIXct(paste(eflalo2$FT_LDAT, eflalo2$FT_LTIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
                           if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM   <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
                           #-Order the data by time
+                          if(class(eflalo2$VE_REF) != "character") eflalo2$VE_REF <- ac(eflalo2$VE_REF)
+                          if(class(tacsat$VE_REF)  != "character") tacsat$VE_REF  <- ac(tacsat$VE_REF)
                           Ef        <- orderBy(~VE_REF+D_DATIM+L_DATIM,data=eflalo2)
                           Ta        <- orderBy(~VE_REF+SI_DATIM,data=tacsat)
                           #-Split the Eflalo and Tacsat data by vessel
