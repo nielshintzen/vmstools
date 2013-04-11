@@ -10,7 +10,8 @@ Please find below an example workflow to treat VMS and Logbook in a systematic m
   * cleaning tacsat
   * cleaning eflalo
   * merge eflalo and tacsat
-  * link gear characteristics to tacsat (additional table)
+  * link gear characteristics to tacsat 
+    * read in table (from interviews / experimental studies)
   * define activity
     * speed profiles
     * need for Fock??
@@ -20,6 +21,8 @@ Please find below an example workflow to treat VMS and Logbook in a systematic m
   * interpolation two tacsat 
     * swept area calculation per ping
   * labeling hauls
+  * severity of activity
+    * read in table (from interviews / experimental studies)
   * link habitat map to vms
     * shapefile 
     * raster
