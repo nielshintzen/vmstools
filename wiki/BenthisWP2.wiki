@@ -16,9 +16,9 @@ Please find below an example workflow to treat VMS and Logbook in a systematic m
     * speed profiles
     * need for Fock??
   * interpolate data
-    * interpolateTacsat
-    * buffer area
-  * interpolation two tacsat 
+    * interpolateTacsat (active towed gear)
+    * buffer area (passive gear)
+  * interpolation conversion into tacsat 
     * swept area calculation per ping
   * labeling hauls
   * severity of activity
@@ -30,3 +30,5 @@ Please find below an example workflow to treat VMS and Logbook in a systematic m
     * mid-point polygon distance distribution
     * random process of fishing activity
   * maps + sum / average different grids
+
+  * non-vms maps
