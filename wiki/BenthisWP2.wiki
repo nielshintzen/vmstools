@@ -344,7 +344,7 @@ the nb of nets released per operation times the unit net length. This need to be
   * interpolate data (or not) and compute the swept area
 
 
-    * interpolate the tracks between VMS fishing positions for active towed gears (excluding seiners)
+   - interpolate the tracks between VMS fishing positions for active towed gears (excluding seiners)
    i.e. OTB, TBB, PTB, PTM and DRB using interpolateTacsat() 
    and convert back to the tacsat format using interpolation2Tacsat(). 
    The swept area is assigned to each ping.
@@ -443,7 +443,7 @@ the nb of nets released per operation times the unit net length. This need to be
 
 
 
-    * buffer area (passive gear)
+   - buffer area (passive gear)
 
 <code>  
 all_gears      <- levels(tacsatp$LE_GEAR)
@@ -822,7 +822,9 @@ tacsat <- labelHauls(tacsat)
 
 </code>  
 
-
+or using createGrid()
+<code>  
+</code>  
 
 
 
