@@ -24,15 +24,15 @@ activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NUL
   \item{level}{If analyse.by="LE_GEAR" is selected, there is an option to analyse
                at vessel level too, but taking the gear parameter estimates as
                starting values. level = "vessel" turns this option on.}
-  \item{sigma}{Fixed sigma value for distribution around zero. NULL if parameter
-               needs to be estimated.}
-  \item{fixPeaks}{Option to fix the top of the density curves at the initial
-                  parameter values from 'storeScheme'}
 }
 \details{
 The analyses assumes that the speed profile close to 0 can be mirrored to create
 a good normal distribution.
 Success of fit might depend on the initial guess in peaks or mean peak values.
+
+Note that the default value of sigma0 = 0.911 (used when prior estimates of parameters
+are not given). The value of 0.911 corresponds to a width of 1.5knots on each side
+of the mean under a 90 percent CI.
 }
 \value{
 In general, a 5-peak analyses results in h=no fishing / in harbour, f=fishing, s=steaming.
