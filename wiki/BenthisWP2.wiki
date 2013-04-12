@@ -31,7 +31,6 @@ memory.size(4000)
   * setting working directories
 
  <code>  
-
 user <- "FRANCOIS"
 if(user == "FRANCOIS"){
   codePath  <- ""
@@ -53,55 +52,293 @@ if(substr(R.Version()$os,1,3)== "lin"){
   polPath   <- sub("N:/","/media/n/",polPath)
 }
      
-
+# some global variables
+spThres   <- 20   #Maximum speed threshold in analyses in nm
+intThres  <- 5    #Minimum difference in time interval in minutes to prevent pseudo duplicates
+lanThres  <- 1.5  #Maximum difference in log10-transformed sorted weights
+spatBound <- list(xrange = c(-4,10),yrange = c(50,62))
+year      <- 2011
 </code>  
 
   * loading VMS and Logbook data
  
 <code>  
+ load(file.path(dataPath,"tacsat_2011.RData")); tacsat <- tacsat
+ load(file.path(dataPath,"eflalo_2011.RData")); eflalo <- eflalo
 </code>  
 
-  * turning VMS and Logbook data into tacsat and eflalo
+We assume that the fishing activities/metier (LE_MET) are fully informed in the eflalo data
+ 
+  * load vmstools underlying data
+<code>  
+  data(euharbours)
+  data(ICESareas)
+  data(europa)
+</code>  
+
+  * have a look at e.g. harbours e.g. using ggmap
 
 <code>  
+  coord.ports <- harbours
+  coord.ports$color <- factor(sample(c(1,2), size=nrow(coord.ports),replace=TRUE)) # fake just to test
+  require(ggmap)
+  require(mapproj)
+  map.center <- geocode("copenhaguen")
+  SHmap <- qmap(c(lon=map.center$lon, lat=map.center$lat), maprange = TRUE, source="google", zoom=7)
+  
+  coord.ports$lon <- as.numeric(as.character(coord.ports$lon ))
+  coord.ports$lat <- as.numeric(as.character(coord.ports$lat ))
+  
+  SHmap + geom_point(
+  aes(x=lon, y=lat, colour= "black"), data=coord.ports) +
+  scale_colour_manual(values=c("1"="dark blue","2"="orange"))
+  savePlot(filename=file.path(outPath,
+       paste("ggmap_ports.jpeg",sep='')), type="jpeg")
 </code>  
+
 
   * cleaning tacsat
 
 <code>  
-</code>  
+  #-------------------------------------------------------------------------------
+  #- Keep track of removed points
+  #-------------------------------------------------------------------------------
+  remrecsTacsat     <- matrix(NA,nrow=6,ncol=2,dimnames=list(c("total","duplicates","notPossible","pseudoDuplicates","harbour","land"),c("rows","percentage")))
+  remrecsTacsat["total",] <- c(nrow(tacsat),"100%")
 
+  #-------------------------------------------------------------------------------
+  #- Remove duplicate records
+  #-------------------------------------------------------------------------------
+  tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+  uniqueTacsat    <- paste(tacsat$VE_REF,tacsat$SI_LATI,tacsat$SI_LONG,tacsat$SI_DATIM)
+  tacsat          <- tacsat[!duplicated(uniqueTacsat),]
+  remrecsTacsat["duplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+
+  #-------------------------------------------------------------------------------
+  #- Remove points that cannot be possible
+  #-------------------------------------------------------------------------------
+  idx             <- which(abs(tacsat$SI_LATI) > 90 | abs(tacsat$SI_LONG) > 180)
+  idx             <- unique(c(idx,which(tacsat$SI_HE < 0 | tacsat$SI_HE > 360)))
+  idx             <- unique(c(idx,which(tacsat$SI_SP > spThres)))
+  if(length(idx)>0) tacsat          <- tacsat[-idx,]
+  remrecsTacsat["notPossible",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+
+  #-------------------------------------------------------------------------------
+  #- Remove points which are pseudo duplicates as they have an interval rate < x minutes
+  #-------------------------------------------------------------------------------
+  tacsat          <- sortTacsat(tacsat)
+  tacsatp         <- intervalTacsat(tacsat,level="vessel",fill.na=T)
+  tacsat          <- tacsatp[which(tacsatp$INTV > intThres | is.na(tacsatp$INTV)==T),-grep("INTV",colnames(tacsatp))]
+  remrecsTacsat["pseudoDuplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+
+  #-------------------------------------------------------------------------------
+  #- Remove points in harbour
+  #-------------------------------------------------------------------------------
+  idx             <- pointInHarbour(tacsat$SI_LONG,tacsat$SI_LATI,harbours); pih <- tacsat[which(idx == 1),]
+  save(pih,file=paste(outPath,"pointInHarbour.RData",sep=""))
+  tacsat          <- tacsat[which(idx == 0),]
+  remrecsTacsat["harbour",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+
+  #-------------------------------------------------------------------------------
+  #- Remove points on land
+  #-------------------------------------------------------------------------------
+  pols            <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
+                        function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,SI_LATI=subset(europa,SID==x)$Y)}))
+  idx             <- pointOnLand(tacsat,pols); pol <- tacsat[which(idx == 1),]
+  save(pol,file=paste(outPath,"pointOnLand.RData",sep=""))
+  tacsat          <- tacsat[which(idx == 0),]
+  remrecsTacsat["land",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+
+  #-------------------------------------------------------------------------------
+  #- Save the remrecsTacsat file
+  #-------------------------------------------------------------------------------
+  save(remrecsTacsat,file=file.path(outPath,"remrecsTacsat.RData"))
+
+  #-------------------------------------------------------------------------------
+  #- Save the cleaned tacsat file
+  #-------------------------------------------------------------------------------
+  save(tacsat,file=file.path(outPath,"cleanTacsat.RData"))
+  </code>  
+
+ 
+ 
+ 
   * cleaning eflalo
 
-<code>  
+<code>
+  #-------------------------------------------------------------------------------
+  #- Keep track of removed points
+  #-------------------------------------------------------------------------------
+  remrecsEflalo     <- matrix(NA,nrow=5,ncol=2,dimnames=list(c("total","duplicated","impossible time","before 1st Jan","departArrival"),c("rows","percentage")))
+  remrecsEflalo["total",] <- c(nrow(eflalo),"100%")
+
+  #-------------------------------------------------------------------------------
+  #- Remove non-unique trip numbers
+  #-------------------------------------------------------------------------------
+  eflalo <- eflalo[!duplicated(paste(eflalo$LE_ID,eflalo$LE_CDAT,sep="-")),]
+  remrecsEflalo["duplicated",] <- c(nrow(eflalo),100+round((nrow(eflalo) - an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
+  
+  #-------------------------------------------------------------------------------
+  #- Remove impossible time stamp records
+  #-------------------------------------------------------------------------------
+  
+  eflalo$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME, sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M")
+  eflalo$FT_LDATIM <- as.POSIXct(paste(eflalo$FT_LDAT,eflalo$FT_LTIME, sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M")
+
+  eflalo <- eflalo[!(is.na(eflalo$FT_DDATIM) |is.na(eflalo$FT_LDATIM)),] 
+  remrecsEflalo["impossible time",] <- c(nrow(eflalo),100+round((nrow(eflalo) - an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
+
+  #-------------------------------------------------------------------------------
+  #- Remove trip starting befor 1st Jan
+  #-------------------------------------------------------------------------------
+  eflalo <- eflalo[eflalo$FT_DDATIM>=strptime(paste(year,"-01-01 00:00:00",sep=''),"%Y-%m-%d %H:%M:%S"),]
+  remrecsEflalo["before 1st Jan",] <- c(nrow(eflalo),100+round((nrow(eflalo) - an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
+                                                                                                                                                                                                                                
+  #-------------------------------------------------------------------------------
+  #- Remove records with arrival date before departure date
+  #-------------------------------------------------------------------------------
+  eflalop           <- eflalo
+  eflalop$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,  eflalo$FT_DTIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+  eflalop$FT_LDATIM <- as.POSIXct(paste(eflalo$FT_LDAT,  eflalo$FT_LTIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+  idx               <- which(eflalop$FT_LDATIM >= eflalop$FT_DDATIM)
+  eflalo            <- eflalo[idx,]
+  remrecsEflalo["departArrival",] <- c(nrow(eflalo),100+round((nrow(eflalo) - an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
+ 
+  #-------------------------------------------------------------------------------
+  #- Save the remrecsEflalo file
+  #-------------------------------------------------------------------------------
+  save(remrecsEflalo,file=file.path(outPath,"remrecsEflalo.RData"))  
+
+  #-------------------------------------------------------------------------------
+  #- Save the cleaned eflalo file
+  #-------------------------------------------------------------------------------
+  save(eflalo,file=file.path(outPath,"cleanEflalo.RData"))
 </code>  
+
+
+
+
+
 
   * merge eflalo and tacsat
 
 <code>  
+  tacsatp           <- mergeEflalo2Tacsat(eflalo,tacsat)
 </code>  
+
+
+
+
+
+
+
+
+
 
   * link gear characteristics to tacsat 
 
 <code>  
+  tacsatp$LE_GEAR   <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+  tacsatp$VE_LEN    <- eflalo$VE_LEN[ match(tacsatp$FT_REF,eflalo$FT_REF)]
+  tacsatp$LE_MET    <- eflalo$LE_MET[ match(tacsatp$FT_REF,eflalo$FT_REF)]
+  save(tacsatp,   file=paste(outPath,"tacsatMerged.RData",   sep=""))
+
+  head(tacsatp[is.na(tacsatp$LE_GEAR),])  # check for some cases with no match!
 </code>  
 
-  * read in table (from interviews / experimental studies)
+
+
+
+
+
+  * read in look-up table (industry data from interviews / experimental studies)
+     making use of functional relationship between vessel HP or length to gear size
 
 <code>  
 </code>  
 
-  * make use of functional relationship between vessel HP or length to gear size
-
 <code>  
+  # create a fake input file to show the required format
+  #dd <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_GEAR)), ] 
+  #fake_gear_width_table <- dd[,c('VE_REF', 'LE_GEAR')]
+  #fake_gear_width_table$LE_GEAR_WIDTH <- 0.5 # in km
+  # gear_width_table <- fake_gear_width_table  
+  #save(gear_width_table,   file=paste(dataPath,"gear_width_vid_gr.RData",   sep=""))
+  
+  load(file.path(dataPath, "gear_width_vid_gr.RData"))
+  tacsatp <- merge(tacsatp, gear_width_table) 
+    
+  # save 
+  save(tacsatp,   file=paste(outPath,"tacsatMergedWidth.RData",   sep=""))
 </code>  
 
-  * define activity
 
+
+
+
+
+
+
+
+
+  * Save not merged tacsat data
 <code>  
+  tacsatpmin        <- subset(tacsatp,FT_REF == 0)
+  save(tacsatpmin,file=paste(outPath,"tacsatNotMerged.RData",sep=""))
 </code>  
 
-  * speed profiles
+
+
+
+
+
+  * define activity depending on speed profiles
+
+<code>  
+  #-------------------------------------------------------------------------------
+  #- Remove points with NA's in them in critial places
+  #-------------------------------------------------------------------------------
+  idx             <- which(is.na(tacsatp$VE_REF) == T   | is.na(tacsatp$SI_LONG) == T | is.na(tacsatp$SI_LATI) == T |
+                           is.na(tacsatp$SI_DATIM) == T |  is.na(tacsatp$SI_SP) == T)
+  if(length(idx)>0) tacsatp         <- tacsatp[-idx,]
+
+  #-------------------------------------------------------------------------------
+  #- Analyse activity automated
+  #-------------------------------------------------------------------------------
+  storeScheme     <- activityTacsatAnalyse(tacsatp, units = "year", analyse.by = "LE_GEAR",identify="means") #use 5 peaks only!!
+  storeScheme     <- storeScheme[-which(is.na(storeScheme$analyse.by)==T),]
+  save(storeScheme,file=paste(outPath,"storeScheme.RData",sep=""))
+
+  #   cat("Note that in case of 5 peaks: no fishing = 1, fishing = 2, steaming / no fishing = 3\n")
+  #  cat("Note that in case of 3 peaks: fishing = 1, steaming / no fishing = 2\n")
+
+  storeScheme    <- storeScheme[storeScheme$years==year,]    # debug added fba
+  storeScheme$years <- as.numeric(as.character(storeScheme$years))  # debug added fba
+  tacsatp$year   <- format(tacsatp$SI_DATIM, "%Y") # debug added fba
+  tacsatp        <- tacsatp[tacsatp$year %in% year,] # debug added fba
+
+ 
+  activity        <- activityTacsat(tacsatp,units="year",analyse.by="LE_GEAR",storeScheme,
+                                  plot=TRUE,level="all",sigma=1)
+  tacsatp$SI_STATE<- NA
+  tacsatp$SI_STATE<- activity
+
+
+  #-------------------------------------------------------------------------------
+  #- Assign for the remaining points a simple speed rule classification
+  #-------------------------------------------------------------------------------
+  idx             <- which(is.na(tacsatp$SI_STATE))
+  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >= 1.5 & tacsatp$SI_SP[idx] <= 7.5)]] <- 2
+  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] < 1.5)]]                              <- 1
+  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] > 7.5)]]                              <- 3
+
+  #-------------------------------------------------------------------------------
+  #- Save the analysed scheme and defined activity tacsat file
+  #-------------------------------------------------------------------------------
+  save(storeScheme, file=file.path(outPath,"storeScheme.RData"))
+  save(tacsatp,     file=file.path(outPath,"tacsatActivity.RData"))
+</code>  
+
 
 <code>  
 </code>  
