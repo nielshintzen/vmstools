@@ -511,7 +511,7 @@ passive_gears  <- all_gears[!all_gears %in% towed_gears]
     }
     tacsatp <- do.call("rbind", lst) 
     # save (a file by gr_vid)
-    save(tacsatInt, file=file.path(outPath, paste("tacsatInt.RData", sep="")))
+    save(tacsatp, file=file.path(outPath, paste("tacsatSweptArea.RData", sep="")))
  
 </code>  
 
@@ -534,7 +534,7 @@ labelHauls <- function(tacsat){
             tacsat$HL_ID                              <- cumsum(tacsat$SS_ID ) # fishing sequences labelled.
             tacsat[tacsat$SI_STATE==1, 'HL_ID']       <- 0 # correct label 0 for steaming
             tacsat$HL_ID                              <- factor(tacsat$HL_ID)
-            levels(tacsat$FS_REF) <- 0: (length(levels(tacsat$FS_REF))-1) # rename the id for increasing numbers from 0
+            levels(tacsat$FS_REF) <- 0: (length(levels(tacsat$HL_ID))-1) # rename the id for increasing numbers from 0
             tacsat$HL_ID                             <- as.character(tacsat$HL_ID)
             # then assign a unique id
             idx <- tacsat$FS_REF!=0
