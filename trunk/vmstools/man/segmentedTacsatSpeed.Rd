@@ -22,7 +22,8 @@ Analyse by: "year", "month" and "week". "month" and "week"
 cannot be used at same time.
 }
   \item{analyse.by}{
-Analyse tacsat by gear ("LE_GEAR") or vessel ("VE_REF").
+Analyse tacsat by gear ("LE_GEAR"), vessel ("VE_REF") or a combination of gear
+and vessel ("VE_REF+LE_GEAR").
 }
   \item{speed}{
 Define if speed profile used must be taken as given in the tacsat file
@@ -39,6 +40,10 @@ Define confidence interval for calculated segmented break points. Default is
 }
   \item{saveDir}{
 Directory to save overview and success of fit. Default = tempdir().
+}
+  \item{forceLowerBound}{
+  Fix the lower breakpoint value at the forceLowerBound given. If not specified,
+  lower breakpoint is estimated.
 }
 }
 \details{
