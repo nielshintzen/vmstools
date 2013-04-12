@@ -1,10 +1,57 @@
 =Benthis WP2 workflow example=
 
+Objectives
+* To map habitat types and sea bed impact from fishing activities in EU waters to identify where fisheries
+potentially compromises seafloor integrity conflicts of ecosystem services
+* to develop and implement new methodology, combining VMS, logbook and industry data, to assess
+actual seabed impact from large scale fishing activities on an appropriate spatial and temporal scale
+
 Please find below an example workflow to treat VMS and Logbook in a systematic manner to create swept area maps.
 
 
   * Installing & loading libraries
+  The VMStools software available [http://code.google.com/p/vmstools/downloads/ here]
+  The procedure for installing the VMStools library under R is described [http://code.google.com/p/vmstools/w/edit/Introduction here]
+  
+<code>  
+
+rm(list=ls())
+library(vmstools)
+library(maps)
+library(mapdata)
+memory.size(4000)
+
+<\code>  
+  
+
+
   * setting directories
+ <code>  
+
+user <- "FRANCOIS"
+if(user == "FRANCOIS"){
+  codePath  <- ""
+  dataPath  <- "C:/merging/EflaloAndTacsat/"
+  pricePath <- ""
+  outPath   <- "C:/merging/BENTHIS/outputs/"
+  polPath   <- "C:/merging/BalanceMaps"
+} else {
+    codePath  <- "N:/Projecten/Value maps North Sea/8 Code/R/"
+    dataPath  <- "R:/tacsatEflalo/"
+    pricePath <- "N:/Projecten/Value maps North Sea/8 Code/Data/"
+    outPath   <- "N:/Projecten/Value maps North Sea/8 Code/Results/"
+    polPath   <- "D:/Repository/VMStools/polygons/"
+  }
+if(substr(R.Version()$os,1,3)== "lin"){
+  codePath  <- sub("N:/","/media/n/",codePath)
+  dataPath  <- sub("N:/","/media/n/",dataPath)
+  outPath   <- sub("N:/","/media/n/",outPath)
+  polPath   <- sub("N:/","/media/n/",polPath)
+}
+
+
+<\code>  
+
   * loading VMS and Logbook data
   * turning VMS and Logbook data into tacsat and eflalo
   * cleaning tacsat
