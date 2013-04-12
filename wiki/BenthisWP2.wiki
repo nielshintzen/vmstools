@@ -12,7 +12,7 @@ Please find below an example workflow to treat VMS and Logbook in a systematic m
 
 
   * Installing VMStools
-    * The VMStools software available [http://code.google.com/p/vmstools/downloads/ here]
+    * The VMStools software is available [http://code.google.com/p/vmstools/downloads/ here]
     * The procedure for installing the VMStools library under R is described [http://code.google.com/p/vmstools/w/edit/Introduction here]
   
     * Loading the required libraries into the R console
@@ -30,7 +30,7 @@ memory.size(4000)
 
   * setting working directories
 
- <code>  
+<code>  
 user <- "FRANCOIS"
 if(user == "FRANCOIS"){
   codePath  <- ""
@@ -80,7 +80,6 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
 
 <code>  
   coord.ports <- harbours
-  coord.ports$color <- factor(sample(c(1,2), size=nrow(coord.ports),replace=TRUE)) # fake just to test
   require(ggmap)
   require(mapproj)
   map.center <- geocode("copenhaguen")
@@ -103,7 +102,7 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
   #-------------------------------------------------------------------------------
   #- Keep track of removed points
   #-------------------------------------------------------------------------------
-  remrecsTacsat     <- matrix(NA,nrow=6,ncol=2,dimnames=list(c("total","duplicates","notPossible","pseudoDuplicates","harbour","land"),c("rows","percentage")))
+  remrecsTacsat     <- matrix(NA,nrow=6,ncol=2,dimnames= list(c("total","duplicates","notPossible","pseudoDuplicates","harbour","land"),c("rows","percentage")))
   remrecsTacsat["total",] <- c(nrow(tacsat),"100%")
 
   #-------------------------------------------------------------------------------
@@ -242,8 +241,8 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
   tacsatp$VE_LEN    <- eflalo$VE_LEN[ match(tacsatp$FT_REF,eflalo$FT_REF)]
   tacsatp$LE_MET    <- eflalo$LE_MET[ match(tacsatp$FT_REF,eflalo$FT_REF)]
   save(tacsatp,   file=paste(outPath,"tacsatMerged.RData",   sep=""))
-
-  head(tacsatp[is.na(tacsatp$LE_GEAR),])  # check for some cases with no match!
+  head(tacsatp[is.na(tacsatp$LE_GEAR),]) 
+   # =>check for some cases with no match!
 </code>  
 
 
@@ -251,11 +250,8 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
 
 
 
-  * read in look-up table (industry data from interviews / experimental studies)
-     making use of functional relationship between vessel HP or length to gear size
-
-<code>  
-</code>  
+  * read in look-up table (industry data from interviews / experimental studies) making use 
+of functional relationship between vessel HP or length to gear size
 
 <code>  
   # create a fake input file to show the required format
@@ -303,29 +299,29 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
   if(length(idx)>0) tacsatp         <- tacsatp[-idx,]
 
   #-------------------------------------------------------------------------------
-  #- Analyse activity automated
+  #- Analyse activity (semi-)automated
   #-------------------------------------------------------------------------------
-  storeScheme     <- activityTacsatAnalyse(tacsatp, units = "year", analyse.by = "LE_GEAR",identify="means") #use 5 peaks only!!
+  storeScheme     <- activityTacsatAnalyse(tacsatp, units = "year", analyse.by = "LE_GEAR",identify="means") # use 5 peaks for all gears only!!
   storeScheme     <- storeScheme[-which(is.na(storeScheme$analyse.by)==T),]
   save(storeScheme,file=paste(outPath,"storeScheme.RData",sep=""))
 
-  #   cat("Note that in case of 5 peaks: no fishing = 1, fishing = 2, steaming / no fishing = 3\n")
+  #  cat("Note that in case of 5 peaks: no fishing = 1, fishing = 2, steaming / no fishing = 3\n")
   #  cat("Note that in case of 3 peaks: fishing = 1, steaming / no fishing = 2\n")
 
-  storeScheme    <- storeScheme[storeScheme$years==year,]    # debug added fba
+  storeScheme       <- storeScheme[storeScheme$years==year,]    # debug added fba
   storeScheme$years <- as.numeric(as.character(storeScheme$years))  # debug added fba
-  tacsatp$year   <- format(tacsatp$SI_DATIM, "%Y") # debug added fba
-  tacsatp        <- tacsatp[tacsatp$year %in% year,] # debug added fba
+  tacsatp$year      <- format(tacsatp$SI_DATIM, "%Y") # debug added fba
+  tacsatp           <- tacsatp[tacsatp$year %in% year,] # debug added fba
 
  
-  activity        <- activityTacsat(tacsatp,units="year",analyse.by="LE_GEAR",storeScheme,
+  activity          <- activityTacsat(tacsatp,units="year",analyse.by="LE_GEAR",storeScheme,
                                   plot=TRUE,level="all",sigma=1)
-  tacsatp$SI_STATE<- NA
-  tacsatp$SI_STATE<- activity
+  tacsatp$SI_STATE  <- NA
+  tacsatp$SI_STATE  <- activity
 
 
   #-------------------------------------------------------------------------------
-  #- Assign for the remaining points a simple speed rule classification
+  #- Assign for the remaining (NA) points a simple speed rule classification
   #-------------------------------------------------------------------------------
   idx             <- which(is.na(tacsatp$SI_STATE))
   tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >= 1.5 & tacsatp$SI_SP[idx] <= 7.5)]] <- 2
@@ -353,40 +349,195 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
 <code>  
 </code>  
 
-  * interpolateTacsat (active towed gear)
+  * interpolate the tracks between VMS fishing positions for active towed gears (excluding seiners)
+   i.e. OTB, TBB, PTB, PTM and DRB using interpolateTacsat() 
+   and convert back to the tacsat format using interpolation2Tacsat(). 
+   The swept area is assigned to each ping.
+ 
 
 <code>  
-</code>  
+  load(file=paste(outPath,"tacsatActivity.RData",   sep="")) # get tacsatp
+      #=> SI_STATE 1: slow motion; SI_STATE 2: fishing; SI_STATE 3: steaming 
+
+  towed_gears <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')
+  
+  # order chronologically (if not done yet)
+  tacsatp           <- orderBy(~VE_REF+SI_DATIM,data=tacsatp)  
+   
+  # frame each haul by two steaming positions
+  is_transition  <- c(0,diff(tacsatp$SI_STATE))
+  is_transition2 <- c(diff(tacsatp$SI_STATE), 0)
+  tacsatp <- tacsatp[ !is.na(tacsatp$SI_STATE) & (tacsatp$SI_STATE ==2 | is_transition!=0 | is_transition2!=0),] 
+   
+  # create an output folder for storing files 
+  dir.create(file.path(outPath, "interpolated"))
+   
+  # apply per gear per vessel (otherwise risk for 'out of memory')
+    for(gr in  towed_gears){
+      tacsatp_gr        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==gr,]
+      tacsatp_gr$VE_REF <- factor(tacsatp_gr$VE_REF)
+   
+      for(vid in levels(tacsatp_gr$VE_REF)){
+          cat(paste("apply on ", vid, " and ", gr, "\n", sep=""))
+  
+          tacsatp_gr_vid <- tacsatp_gr[tacsatp_gr$VE_REF %in% vid,]
+          if(nrow(tacsatp_gr_vid)>3) {
+ 
+          #Interpolate according to the cubic-hermite spline interpolation
+          interpolationcHs <- interpolateTacsat(tacsatp_gr_vid,
+                            interval=60,
+                            margin=10, # i.e. will make disconnected interpolations if interval out of the 50 70min range
+                            res=100,
+                            method="cHs",
+                            params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),   # rmenber that st not in use....
+                            headingAdjustment=0,
+                            fast=FALSE)
+
+          #Make a picture of all interpolations first
+          #Get the ranges of the total picture
+          #ranges <- do.call(rbind,lapply(cHs,function(x){return(apply(x[-1,],2,range))}))
+          #xrange <- range(ranges[,"x"])
+          #yrange <- range(ranges[,"y"])
+ 
+          #plot(tacsatp_gr_vid$SI_LONG, tacsatp_gr_vid$SI_LATI, 
+          #       xlim=xrange,ylim=yrange,pch=19,col="blue",xlab="Longitude",ylab="Latitude")
+          #for(iInt in 1:length(cHs)){
+          #lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2])}
+
+              
+          #Convert the interpolation to tacsat style data
+          tacsatp_gr_vid$SI_TIME <- as.character(tacsatp_gr_vid$SI_TIME) # debug fba
+          tacsatInt_gr_vid       <- interpolation2Tacsat(interpolationEQ, tacsatp_gr_vid) 
+          # => note that equalDistance() is encapsulated in interpolation2Tacsat()
+          # Each interpolation is splitted into 10 equally spaced points (including the start and the end point). 
+          # In total 8 new points are added per interpolation.
+          
+                                
+          # visual check
+          plot(tacsatInt_gr_vid$SI_LONG, tacsatInt_gr_vid$SI_LATI, pch=".", col=2)
+          points(tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE!=2,'SI_LONG'], 
+                       tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE!=2,'SI_LATI'], col=3, pch=16) # steaming (remaining ones (because we are conservative here))
+          points(tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE==2,'SI_LONG'], 
+                       tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE==2,'SI_LATI'], col=2, pch=16) # fishnig
+
+  
+        # What is the distance traveled within each of these interpolations?
+        sum(distanceInterpolation(interpolationcHs))
+
+        #compute the swept area from the distance and the gear width
+        #.......
+        # tacsatp_gr_vid$SWEPT_AREA_KM2 <- distance()*width
+          
+       
+       # save (a file by gr_vid)
+       save(tacsatInt_gr_vid, file=file.path(outPath, "interpolated", 
+           paste("tacsatFishSeqInterpolAndWidth_",vid, "_", gr, ".RData", sep="")))
+     } # end if enough records
+    } # end vid
+  } # end gr
+ 
+ 
+ </code>  
+
+
+
+
+
+
+
+
 
   * buffer area (passive gear)
 
 <code>  
 </code>  
 
-  * interpolation conversion into tacsat 
+
+
+
+
+
+
+
+
+
+  * bound all the files to one
+  
+<code>  
+   # after having subsetted per gear per vessel (because 'out of memory' otherwise)
+    lst <- list(NULL) ; count <- 0
+    for(gr in levels(tacsatp$LE_GEAR)){
+      tacsatp_gr        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==gr,]
+      tacsatp_gr$VE_REF <- factor(tacsatp_gr$VE_REF)
+   
+      for(vid in levels(tacsatp_gr$VE_REF)){
+          count <- count+1
+        
+          cat(paste("load ", vid, " and ", gr, "\n", sep=""))
+          load(file.path(outPath, "interpolated", 
+                paste("tacsatFishSeqInterpolAndWidth_", vid, "_", gr, ".RData", sep="")))
+
+          lst[[count]] <-  tacsatInt_gr_vid
+     
+      }
+      
+    }
+    tacsatp <- do.call("rbind", lst) 
+</code>  
+
+
+
+
+
+
+  * labelling each haul  
+
+<code>  
+# assign an identifier in'HL_ID' to each of the fishing sequences
+# (useful to count them in a grid...)
+labelHauls <- function(tacsat){
+            tacsat[is.na(tacsat$SI_STATE), 'SI_STATE'] <- 1 # assign steaming
+            tacsat[tacsat$SI_STATE!=2, 'SI_STATE']     <- 1 # assign steaming
+            tacsat$FS_REF                              <- c(0, diff(tacsat$SI_STATE))   # init
+            tacsat$FS_REF                              <- cumsum(tacsat$FS_REF) # fishing sequences detected.
+            tacsat$SS_REF                              <- 1- tacsat$FS_REF  # steaming sequences detected.
+            tacsat$FS_REF                              <- cumsum(tacsat$SS_REF ) # fishing sequences labelled.
+            tacsat[tacsat$SI_STATE==1, 'FS_REF']       <- 0 # correct label 0 for steaming
+            tacsat$FS_REF                              <- factor(tacsat$FS_REF)
+            levels(tacsat$FS_REF) <- 0: (length(levels(tacsat$FS_REF))-1) # rename the id for increasing numbers from 0
+            tacsat$FS_REF                             <- as.character(tacsat$FS_REF)
+            # then assign a unique id
+            idx <- tacsat$FS_REF!=0
+            tacsat[idx, "FS_REF"] <- paste(
+                                    tacsat$VE_REF[idx], "_", 
+                                    tacsat$LE_GEAR[idx], "_", 
+                                    tacsat$FS_REF[idx],
+                                    sep="")
+          tacsat <- tacsat[, !colnames(tacsat) %in% 'SS_REF'] # remove useless column
+          return(tacsat)
+       }  
+
+# label fishing sequecnes with a unique identifier (method based on SI_STATE) 
+tacsat <- labelHauls(tacsat)  
+   
+ 
+
+
+
+</code>  
+
+
+
+  * severity of activity: read a look-up table (from interviews / experimental studies)
+
 
 <code>  
 </code>  
 
-  * swept area calculation per ping
 
-<code>  
-</code>  
 
-  * labeling hauls
 
-<code>  
-</code>  
 
-  * severity of activity
-
-<code>  
-</code>  
-
-  * read in table (from interviews / experimental studies)
-
-<code>  
-</code>  
 
   * link habitat map to vms
 
@@ -401,26 +552,50 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
 <code>  
 </code>  
 
+
+
+
+
+
+
   * define grid
     * mid-point polygon distance distribution
 
 <code>  
 </code>  
 
+
+
+
+
+
     * random process of fishing activity
 
 <code>  
 </code>  
+
+
+
+
+
 
   * maps + sum / average different grids
 
 <code>  
 </code>  
 
+
+
+
+
   * non-vms maps
 
 <code>  
 </code>  
+
+
+
+
 
   * testing
 
