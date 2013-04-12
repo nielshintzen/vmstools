@@ -25,6 +25,11 @@ right-hand side and therefore potential identified peaks should be mirrored as w
 The detailed 'means' approach does take more time to identify but is more succesful
 in fitting distributions to the speed profile. It pays off to specify mean values
 of the peaks by 0.5knots precision.
+
+Additional Parameters:
+Sigma0: Fixed sigma value for distribution around zero. Zero (0) if parameter needs to be estimated.
+FixPeaks: Option to fix the top of the density curves at the initial parameter values from 'storeScheme'.
+
 }
 \value{
 Returns a \code{\link{data.frame}} with a run scheme that can be used as input
