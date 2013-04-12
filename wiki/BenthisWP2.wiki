@@ -277,7 +277,7 @@ the nb of nets released per operation times the unit net length. This need to be
   * Save not merged tacsat data
 <code>  
   tacsatpmin        <- subset(tacsatp,FT_REF == 0)
-  save(tacsatpmin,file=paste(outPath,"tacsatNotMerged.RData",sep=""))
+  save(tacsatpmin, file=paste(outPath,"tacsatNotMerged.RData",sep=""))
 </code>  
 
 
@@ -298,12 +298,9 @@ the nb of nets released per operation times the unit net length. This need to be
   #-------------------------------------------------------------------------------
   #- Analyse activity (semi-)automated
   #-------------------------------------------------------------------------------
-  storeScheme     <- activityTacsatAnalyse(tacsatp, units = "year", analyse.by = "LE_GEAR",identify="means") # use 5 peaks for all gears only!!
+  storeScheme     <- activityTacsatAnalyse(tacsatp, units = "year", analyse.by = "LE_GEAR",identify="means") # use 3 or 5 peaks 
   storeScheme     <- storeScheme[-which(is.na(storeScheme$analyse.by)==T),]
-  save(storeScheme,file=paste(outPath,"storeScheme.RData",sep=""))
-
-  #  cat("Note that in case of 5 peaks: no fishing = 1, fishing = 2, steaming / no fishing = 3\n")
-  #  cat("Note that in case of 3 peaks: fishing = 1, steaming / no fishing = 2\n")
+  save(storeScheme, file=paste(outPath,"storeScheme.RData",sep=""))
 
   storeScheme       <- storeScheme[storeScheme$years==year,]    # debug added fba
   storeScheme$years <- as.numeric(as.character(storeScheme$years))  # debug added fba
@@ -321,9 +318,9 @@ the nb of nets released per operation times the unit net length. This need to be
   #- Assign for the remaining (NA) points a simple speed rule classification
   #-------------------------------------------------------------------------------
   idx             <- which(is.na(tacsatp$SI_STATE))
-  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >= 1.5 & tacsatp$SI_SP[idx] <= 7.5)]] <- 2
-  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] < 1.5)]]                              <- 1
-  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] > 7.5)]]                              <- 3
+  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >= 1.5 & tacsatp$SI_SP[idx] <= 7.5)]] <- 'f'
+  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] < 1.5)]]                              <- 'h'
+  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] > 7.5)]]                              <- 's'
 
   #-------------------------------------------------------------------------------
   #- Save the analysed scheme and defined activity tacsat file
@@ -352,7 +349,7 @@ the nb of nets released per operation times the unit net length. This need to be
 
 <code>  
   load(file=paste(outPath,"tacsatActivity.RData",   sep="")) # get tacsatp
-      #=> SI_STATE 1: slow motion; SI_STATE 2: fishing; SI_STATE 3: steaming 
+      #=> SI_STATE "h": slow motion/handling; SI_STATE "f": fishing; SI_STATE "s": steaming 
 
   towed_gears <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')
   
@@ -458,7 +455,7 @@ passive_gears  <- all_gears[!all_gears %in% towed_gears]
           cat(paste("apply on ", vid, " and ", gr, "\n", sep=""))
 
           tacsatp_gr_vid <- tacsatp_gr[tacsatp_gr$VE_REF %in% vid,]
-          tacsatp_gr_vid <- tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE==2,] # keep fishing pings only
+          tacsatp_gr_vid <- tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE=='f',] # keep fishing pings only
       
          # compute a buffer area around each fishing location
          # and assign the area to the point
@@ -512,7 +509,7 @@ passive_gears  <- all_gears[!all_gears %in% towed_gears]
       
     }
     tacsatp <- do.call("rbind", lst) 
-    # save (a file by gr_vid)
+    # save 
     save(tacsatp, file=file.path(outPath, paste("tacsatSweptArea.RData", sep="")))
  
 </code>  
@@ -525,54 +522,27 @@ passive_gears  <- all_gears[!all_gears %in% towed_gears]
   * labelling each haul  
 
 <code>  
-# assign an identifier in'HL_ID' to each of the fishing sequences
+# assign an identifier in 'HL_ID' to each of the fishing sequences
+# (based on SI_STATE, assuming the "h", "f", "s" coding)
 # (useful to count them in a grid...)
-labelHauls <- function(tacsat){
-            tacsat[is.na(tacsat$SI_STATE), 'SI_STATE'] <- 1 # assign steaming
-            tacsat[tacsat$SI_STATE!=2, 'SI_STATE']     <- 1 # assign steaming
-            tacsat$HL_ID                              <- c(0, diff(tacsat$SI_STATE))   # init
-            tacsat$HL_ID                              <- cumsum(tacsat$HL_ID) # fishing sequences detected.
-            tacsat$HL_ID                              <- 1- tacsat$HL_ID  # steaming sequences detected.
-            tacsat$HL_ID                              <- cumsum(tacsat$SS_ID ) # fishing sequences labelled.
-            tacsat[tacsat$SI_STATE==1, 'HL_ID']       <- 0 # correct label 0 for steaming
-            tacsat$HL_ID                              <- factor(tacsat$HL_ID)
-            levels(tacsat$FS_REF) <- 0: (length(levels(tacsat$HL_ID))-1) # rename the id for increasing numbers from 0
-            tacsat$HL_ID                             <- as.character(tacsat$HL_ID)
-            # then assign a unique id
-            idx <- tacsat$FS_REF!=0
-            tacsat[idx, "HL_ID"] <- paste(
-                                    tacsat$VE_REF[idx], "_", 
-                                    tacsat$LE_GEAR[idx], "_", 
-                                    tacsat$HL_ID[idx],
-                                    sep="")
-          tacsat <- tacsat[, !colnames(tacsat) %in% 'SS_ID'] # remove useless column
-          return(tacsat)
-       }  
-
-# label fishing sequecnes with a unique identifier (method based on SI_STATE) 
-tacsat <- labelHauls(tacsat)  
-   
- 
-
-
-
+tacsat <- labellingHauls(tacsat)  
 </code>  
 
 
 
-  * severity of activity: read a look-up table (from interviews / experimental studies)
+  * severity of activity: read in a look-up table (from interviews / experimental studies)
 
 
 <code>  
   ## by gear/metier by habitat
      
   # create a fake input file to show the required format
-  #dd <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_GEAR, tacsatp$LE_MET)), ] 
-  #fake_gear_metier_habitat_severity_table <- dd[,c('VE_REF', 'LE_GEAR', 'LE_MET')]
-  #fake_gear_metier_habitat_severity_table <- cbind(dd, HAB_SEVERITY=1)
-  #fake_gear_metier_habitat_severity_table $LE_GEAR_WIDTH <- 0.5 # in km
-  #gear_metier_habitat_severity_table  <- fake_gear_metier_habitat_severity_table   
-  #save(gear_metier_habitat_severity_table,   file=paste(dataPath,"gear_metier_habitat_severity_table.RData",   sep=""))
+  dd <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_GEAR, tacsatp$LE_MET)), ] 
+  fake_gear_metier_habitat_severity_table <- dd[,c('VE_REF', 'LE_GEAR', 'LE_MET')]
+  fake_gear_metier_habitat_severity_table <- cbind(dd, HAB_SEVERITY=1)
+  fake_gear_metier_habitat_severity_table $LE_GEAR_WIDTH <- 0.5 # in km
+  gear_metier_habitat_severity_table  <- fake_gear_metier_habitat_severity_table   
+  save(gear_metier_habitat_severity_table,   file=paste(dataPath,"gear_metier_habitat_severity_table.RData",   sep=""))
   
   # load a table for HAB_SEVERITY per vid LE_REF per gr LE_GEAR per met LE_MET
   load(file.path(dataPath, "gear_metier_habitat_severity_table.RData"))
