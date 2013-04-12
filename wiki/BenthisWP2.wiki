@@ -339,10 +339,8 @@ of functional relationship between vessel HP or length to gear size
 <code>  
 </code>  
 
-  * interpolate data
+  * interpolate data and compute the swept area
 
-<code>  
-</code>  
 
   * interpolate the tracks between VMS fishing positions for active towed gears (excluding seiners)
    i.e. OTB, TBB, PTB, PTM and DRB using interpolateTacsat() 
@@ -422,13 +420,12 @@ of functional relationship between vessel HP or length to gear size
         #compute the swept area from the interpolated distance and the gear width
         #.......
          tacsatInt_gr_vid$SWEPT_AREA_KM2 <- distance(c(tacsatInt_gr_vid$SI_LONG[-1],0),  c(tacsatInt_gr_vid$SI_LATI[-1],0),
-                                                       tacsatInt_gr_vid$SI_LONG,  tacsatInt_gr_vid$SI_LATI)*
-                                              tacsatInt_gr_vid$LE_GEAR_WIDTH
+                                                       tacsatInt_gr_vid$SI_LONG,  tacsatInt_gr_vid$SI_LATI)*tacsatInt_gr_vid$LE_GEAR_WIDTH
           
        
        # save (a file by gr_vid)
        save(tacsatInt_gr_vid, file=file.path(outPath, "interpolated", 
-           paste("tacsatFishSeqInterpolAndWidth_",vid, "_", gr, ".RData", sep="")))
+          paste("tacsatSweptArea_",vid, "_", gr, ".RData", sep="")))
      } # end if enough records
     } # end vid
   } # end gr
@@ -449,12 +446,33 @@ of functional relationship between vessel HP or length to gear size
 <code>  
 all_gears      <- levels(tacsatp$LE_GEAR)
 passive_gears  <- all_gears[!all_gears %in% towed_gears]
-# TO DO.......
-# compute a buffer area around each fishing location
-# and assign the area to the point
-# the radius of the circle is given by: area= pi*(R)^2 = pi*(C/(2*pi))^2
-# with C the length of the nets, or the nb of nets * length of a unit net
-# for seiners and netters respectively
+
+  # apply per gear per vessel (otherwise risk for 'out of memory')
+    for(gr in passive_gears){
+      tacsatp_gr        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==gr,]
+      tacsatp_gr$VE_REF <- factor(tacsatp_gr$VE_REF)
+   
+      for(vid in levels(tacsatp_gr$VE_REF)){
+          cat(paste("apply on ", vid, " and ", gr, "\n", sep=""))
+
+          tacsatp_gr_vid <- tacsatp_gr[tacsatp_gr$VE_REF %in% vid,]
+          tacsatp_gr_vid <- tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE==2,] # keep fishing pings only
+      
+         # compute a buffer area around each fishing location
+         # and assign the area to the point
+         # the radius of the circle is given by: area= pi*(R)^2 = pi*(C/(2*pi))^2
+         # with C the length of the nets, or the nb of nets * length of a unit net
+         # for seiners and netters respectively
+         C                            <- tacsat_gr_vid$LE_GEAR_WIDTH
+         tacsat_gr_vid$SWEPT_AREA_KM2 <- pi*(C/(2*pi))^2 
+
+         # save (a file by gr_vid)
+         save(tacsatInt_gr_vid, file=file.path(outPath, "interpolated", 
+           paste("tacsatSweptArea_",vid, "_", gr, ".RData", sep="")))
+
+      }
+   } 
+
 </code>  
 
 
@@ -480,7 +498,7 @@ passive_gears  <- all_gears[!all_gears %in% towed_gears]
         
           cat(paste("load ", vid, " and ", gr, "\n", sep=""))
           er <- try(load(file.path(outPath, "interpolated", 
-                paste("tacsatFishSeqInterpolAndWidth_", vid, "_", gr, ".RData", sep=""))),
+                paste("tacsatSweptArea_",vid, "_", gr, ".RData", sep=""))),
                 silent=TRUE)
           if(class(er)=="try-error"){
           count <- count -1
