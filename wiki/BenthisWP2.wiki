@@ -1,10 +1,12 @@
 =Benthis WP2 workflow example=
 
-Objectives
-* To map habitat types and sea bed impact from fishing activities in EU waters to identify where fisheries
+==Objectives==
+  * To map habitat types and sea bed impact from fishing activities in EU waters to identify where fisheries
 potentially compromises seafloor integrity conflicts of ecosystem services
-* to develop and implement new methodology, combining VMS, logbook and industry data, to assess
+  * to develop and implement new methodology, combining VMS, logbook and industry data, to assess
 actual seabed impact from large scale fishing activities on an appropriate spatial and temporal scale
+
+==workflow==
 
 Please find below an example workflow to treat VMS and Logbook in a systematic manner to create swept area maps.
 
@@ -21,11 +23,12 @@ library(maps)
 library(mapdata)
 memory.size(4000)
 
-<\code>  
+</code>  
   
 
 
   * setting directories
+
  <code>  
 
 user <- "FRANCOIS"
@@ -50,34 +53,138 @@ if(substr(R.Version()$os,1,3)== "lin"){
 }
 
 
-<\code>  
+</code>  
 
   * loading VMS and Logbook data
+ 
+<code>  
+</code>  
+
   * turning VMS and Logbook data into tacsat and eflalo
+
+<code>  
+</code>  
+
   * cleaning tacsat
+
+<code>  
+</code>  
+
   * cleaning eflalo
+
+<code>  
+</code>  
+
   * merge eflalo and tacsat
+
+<code>  
+</code>  
+
   * link gear characteristics to tacsat 
-    * read in table (from interviews / experimental studies)
-    * make use of functional relationship between vessel HP or length to gear size
+
+<code>  
+</code>  
+
+  * read in table (from interviews / experimental studies)
+
+<code>  
+</code>  
+
+  * make use of functional relationship between vessel HP or length to gear size
+
+<code>  
+</code>  
+
   * define activity
-    * speed profiles
-    * need for Fock??
+
+<code>  
+</code>  
+
+  * speed profiles
+
+<code>  
+</code>  
+
+  * need for Fock??
+
+<code>  
+</code>  
+
   * interpolate data
-    * interpolateTacsat (active towed gear)
-    * buffer area (passive gear)
+
+<code>  
+</code>  
+
+  * interpolateTacsat (active towed gear)
+
+<code>  
+</code>  
+
+  * buffer area (passive gear)
+
+<code>  
+</code>  
+
   * interpolation conversion into tacsat 
-    * swept area calculation per ping
+
+<code>  
+</code>  
+
+  * swept area calculation per ping
+
+<code>  
+</code>  
+
   * labeling hauls
+
+<code>  
+</code>  
+
   * severity of activity
-    * read in table (from interviews / experimental studies)
+
+<code>  
+</code>  
+
+  * read in table (from interviews / experimental studies)
+
+<code>  
+</code>  
+
   * link habitat map to vms
+
+
     * shapefile 
+
+<code>  
+</code>  
+
     * raster
+
+<code>  
+</code>  
+
   * define grid
     * mid-point polygon distance distribution
+
+<code>  
+</code>  
+
     * random process of fishing activity
+
+<code>  
+</code>  
+
   * maps + sum / average different grids
 
+<code>  
+</code>  
+
   * non-vms maps
+
+<code>  
+</code>  
+
   * testing
+
+<code>  
+</code>  
