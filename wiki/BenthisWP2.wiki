@@ -51,20 +51,13 @@ if(substr(R.Version()$os,1,3)== "lin"){
   outPath   <- sub("N:/","/media/n/",outPath)
   polPath   <- sub("N:/","/media/n/",polPath)
 }
-     
-# some global variables
-spThres   <- 20   #Maximum speed threshold in analyses in nm
-intThres  <- 5    #Minimum difference in time interval in minutes to prevent pseudo duplicates
-lanThres  <- 1.5  #Maximum difference in log10-transformed sorted weights
-spatBound <- list(xrange = c(-4,10),yrange = c(50,62))
-year      <- 2011
 </code>  
 
   * loading VMS and Logbook data
  
 <code>  
- load(file.path(dataPath,"tacsat_2011.RData")); tacsat <- tacsat
- load(file.path(dataPath,"eflalo_2011.RData")); eflalo <- eflalo
+ load(file.path(dataPath,"tacsat_2011.RData")); # get the tacsat object
+ load(file.path(dataPath,"eflalo_2011.RData")); # get the eflalo object
 </code>  
 
 We assume that the fishing activities/metier (LE_MET) are fully informed in the eflalo data
@@ -116,6 +109,7 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
   #-------------------------------------------------------------------------------
   #- Remove points that cannot be possible
   #-------------------------------------------------------------------------------
+  spThres         <- 20   #Maximum speed threshold in analyses in nm
   idx             <- which(abs(tacsat$SI_LATI) > 90 | abs(tacsat$SI_LONG) > 180)
   idx             <- unique(c(idx,which(tacsat$SI_HE < 0 | tacsat$SI_HE > 360)))
   idx             <- unique(c(idx,which(tacsat$SI_SP > spThres)))
@@ -125,6 +119,7 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
   #-------------------------------------------------------------------------------
   #- Remove points which are pseudo duplicates as they have an interval rate < x minutes
   #-------------------------------------------------------------------------------
+  intThres        <- 5    # Minimum difference in time interval in minutes to prevent pseudo duplicates
   tacsat          <- sortTacsat(tacsat)
   tacsatp         <- intervalTacsat(tacsat,level="vessel",fill.na=T)
   tacsat          <- tacsatp[which(tacsatp$INTV > intThres | is.na(tacsatp$INTV)==T),-grep("INTV",colnames(tacsatp))]
@@ -407,7 +402,7 @@ of functional relationship between vessel HP or length to gear size
               
           #Convert the interpolation to tacsat style data
           tacsatp_gr_vid$SI_TIME <- as.character(tacsatp_gr_vid$SI_TIME) # debug fba
-          tacsatInt_gr_vid       <- interpolation2Tacsat(interpolationEQ, tacsatp_gr_vid) 
+          tacsatInt_gr_vid       <- interpolation2Tacsat(interpolationcHs, tacsatp_gr_vid) 
           # => note that equalDistance() is encapsulated in interpolation2Tacsat()
           # Each interpolation is splitted into 10 equally spaced points (including the start and the end point). 
           # In total 8 new points are added per interpolation.
@@ -424,9 +419,11 @@ of functional relationship between vessel HP or length to gear size
         # What is the distance traveled within each of these interpolations?
         sum(distanceInterpolation(interpolationcHs))
 
-        #compute the swept area from the distance and the gear width
+        #compute the swept area from the interpolated distance and the gear width
         #.......
-        # tacsatp_gr_vid$SWEPT_AREA_KM2 <- distance()*width
+         tacsatInt_gr_vid$SWEPT_AREA_KM2 <- distance(c(tacsatInt_gr_vid$SI_LONG[-1],0),  c(tacsatInt_gr_vid$SI_LATI[-1],0),
+                                                       tacsatInt_gr_vid$SI_LONG,  tacsatInt_gr_vid$SI_LATI)*
+                                              tacsatInt_gr_vid$LE_GEAR_WIDTH
           
        
        # save (a file by gr_vid)
@@ -453,6 +450,11 @@ of functional relationship between vessel HP or length to gear size
 all_gears      <- levels(tacsatp$LE_GEAR)
 passive_gears  <- all_gears[!all_gears %in% towed_gears]
 # TO DO.......
+# compute a buffer area around each fishing location
+# and assign the area to the point
+# the radius of the circle is given by: area= pi*(R)^2 = pi*(C/(2*pi))^2
+# with C the length of the nets, or the nb of nets * length of a unit net
+# for seiners and netters respectively
 </code>  
 
 
