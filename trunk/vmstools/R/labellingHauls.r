@@ -30,7 +30,7 @@ labellingHauls <- function(tacsat){
        }
 
 # label fishing sequecnes with a unique identifier (method based on SI_STATE)
-tacsat <- labellingHauls(tacsat)
+#tacsat <- labellingHauls(tacsat)
 
 
 
