@@ -246,7 +246,9 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
 
 
   * read in look-up table (industry data from interviews / experimental studies) making use 
-of functional relationship between vessel HP or length to gear size
+of functional relationships between vessel HP or length to gear size. The gear width for a trawl is straightforward.
+The gear width for a seine should be the length of the net. The gear width of a gillnets or other should be
+the nb of nets released per operation times the unit net length. This need to be confirmed by the industry.
 
 <code>  
   # create a fake input file to show the required format
@@ -357,7 +359,7 @@ of functional relationship between vessel HP or length to gear size
   # order chronologically (if not done yet)
   tacsatp           <- orderBy(~VE_REF+SI_DATIM,data=tacsatp)  
    
-  # frame each haul by two steaming positions
+  # you might frame each haul by two steaming positions to be conservative
   is_transition  <- c(0,diff(tacsatp$SI_STATE))
   is_transition2 <- c(diff(tacsatp$SI_STATE), 0)
   tacsatp <- tacsatp[ !is.na(tacsatp$SI_STATE) & (tacsatp$SI_STATE ==2 | is_transition!=0 | is_transition2!=0),] 
