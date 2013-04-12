@@ -525,7 +525,7 @@ passive_gears  <- all_gears[!all_gears %in% towed_gears]
 # assign an identifier in 'HL_ID' to each of the fishing sequences
 # (based on SI_STATE, assuming the "h", "f", "s" coding)
 # (useful to count them in a grid...)
-tacsat <- labellingHauls(tacsat)  
+tacsatp <- labellingHauls(tacsatp)  
 </code>  
 
 
@@ -796,6 +796,17 @@ or using createGrid()
 <code>  
 </code>  
 
+...and stack some layers making use of mosaic() from raster layers.
+
+<code>  
+# from ascgridfile eg. returned by VMSGridCreate()
+dd <- 
+nn <- 
+fun1  <-  function(x)  { x[ is.na(x)]  <- 0;  return(x)  }            # remove NA such zero
+dd <-  calc(dd,  fun1)
+nn <-  calc(nn,  fun1)
+a_stack <-mosaic(dd, nn, na.rm=TRUE, fun = sum, keepres=TRUE) 
+</code>  
 
 
   * non-vms maps. For non VMS-equipped vessels, the mapping of the fishing effort
