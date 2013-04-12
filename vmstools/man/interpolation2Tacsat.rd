@@ -9,7 +9,7 @@ that all the functions that work on tacsat can work with this new, larger interp
 distribute the landings among the new pings.  The npoints argument is the optional number of pings between each real or actual ping.
 }
 \usage{
-interpolation2Tacsat(interpolation, tacsat, npoints = 10)
+interpolation2Tacsat(interpolation, tacsat, npoints = 10,equalDist=T)
 }
 
 \arguments{
@@ -18,10 +18,13 @@ interpolation2Tacsat(interpolation, tacsat, npoints = 10)
 }
   \item{npoints}{The number of pings or positions required between each real or actual vessel position or ping}
 }
+  \item{equalDist}{Logical. Whether the number of positions returned should be equally spaced or not}
+}
 \details{The distances between the new vessel positions are assumed to be equal.
 }
 \value{
 A data frame in tacsat format is returned with estimated locations, speeds and headings between each real or actual vessel position.
+The column added HL_ID refers to the ID given to each individual interpolation.
 }
 \references{EU Lot 2 project}
 \author{Niels Hintzen, Doug Beare
@@ -48,6 +51,6 @@ interpolation <- interpolateTacsat(tacsat=input,interval=120,
 #Convert the interpolated data back to tacsat with 10 locations or
 # pings between each real or actual vessel location.
 tacsat        <- interpolation2Tacsat(interpolation=interpolation,
-                                      tacsat=input,npoints=10)
+                                      tacsat=input,npoints=10,equalDist=TRUE)
   
 }

@@ -9,7 +9,7 @@ activities.
 }
 \usage{
 activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NULL,
-               plot = FALSE, level="all",sigma=0.911)
+               plot = FALSE, level="all",sigma=0.911,fixPeaks=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -35,7 +35,8 @@ a good normal distribution.
 Success of fit might depend on the initial guess in peaks or mean peak values.
 }
 \value{
-In general, a 5-peak analyses results in 1=no fishing / in harbour, 2=fishing, 3=steaming.
+In general, a 5-peak analyses results in h=no fishing / in harbour, f=fishing, s=steaming.
+A 3-peak analyses results in f=fishing (closest to zero speed) and s=steaming.
 }
 \author{Niels T. Hintzen}
 \seealso{
