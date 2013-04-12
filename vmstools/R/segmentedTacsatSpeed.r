@@ -1,4 +1,4 @@
-segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=FALSE,CI=0.95,saveDir=tempdir()){
+segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=FALSE,CI=0.95,saveDir=tempdir(),forceLowerBound=NULL){
 
   require(segmented)
   tacsat$idx <- 1:nrow(tacsat)
@@ -7,7 +7,12 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
   if(!'SI_STATE' %in% colnames(tacsat)) tacsat$SI_STATE  <- NA
   if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM  <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
   if(analyse.by == "LE_GEAR"){ if(!"LE_GEAR" %in% colnames(tacsat)) stop("Provide gear type (as column 'LE_GEAR' and if unknown, provide it as 'MIS'")}
-  if(!analyse.by %in% c("LE_GEAR","VE_REF")) warning("Analysing by unknown column variable, please check!")
+  if(!analyse.by %in% c("LE_GEAR","VE_REF","VE_REF+LE_GEAR")) warning("Analysing by unknown column variable, please check!")
+  if(analyse.by == "VE_REF+LE_GEAR"){
+    if(!"VE_REF" %in% colnames(tacsat) | !"LE_GEAR" %in% colnames(tacsat)) stop("VE_REF and LE_GEAR not both in tacsat available")
+    tacsat$VE_REF_LE_GEAR <- paste(tacsat$VE_REF,tacsat$LE_GEAR)
+    analyse.by <- "VE_REF_LE_GEAR"
+  }
 
   tacsatOrig <- tacsat
   if(analyse.by %in% colnames(tacsat)){
@@ -41,6 +46,14 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
             if(mth == 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & LE_GEAR == aby)
             if(mth == 0 & wk != 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & week( tacsat$SI_DATIM) == wk & LE_GEAR == aby)
             if(mth != 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & month(tacsat$SI_DATIM) == mth & LE_GEAR == aby)
+          }
+      }
+      if(analyse.by == "VE_REF_LE_GEAR"){
+        if(nrow(storeScheme)==1){ sTacsat <- tacsat
+        } else {
+            if(mth == 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & VE_REF_LE_GEAR == aby )
+            if(mth == 0 & wk != 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & week( tacsat$SI_DATIM) == wk & VE_REF_LE_GEAR == aby)
+            if(mth != 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & month(tacsat$SI_DATIM) == mth & VE_REF_LE_GEAR == aby)
           }
       }
       
@@ -102,11 +115,15 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
           }
 
           #Save the bounds
+          if(is.null(forceLowerBound)==F)
+            bound1 <- forceLowerBound
+          if(bound2 < bound1)
+            bound2 <- bound1
           storeScheme[iRun,"lower"] <- bound1
           storeScheme[iRun,"upper"] <- bound2
 
-          tacsatOrig$SI_STATE[sTacsat$idx[which(sTacsat$SI_SP >= storeScheme[iRun,"lower"] & sTacsat$SI_SP <= storeScheme[iRun,"upper"])]] <- 1 #Fishing
-          tacsatOrig$SI_STATE[sTacsat$idx[which(sTacsat$SI_SP <  storeScheme[iRun,"lower"] | sTacsat$SI_SP >  storeScheme[iRun,"upper"])]] <- 0 #Steaming / in harbour
+          tacsatOrig$SI_STATE[sTacsat$idx[which(sTacsat$SI_SP >= storeScheme[iRun,"lower"] & sTacsat$SI_SP <= storeScheme[iRun,"upper"])]] <- "f" #Fishing
+          tacsatOrig$SI_STATE[sTacsat$idx[which(sTacsat$SI_SP <  storeScheme[iRun,"lower"] | sTacsat$SI_SP >  storeScheme[iRun,"upper"])]] <- "nf" #Steaming / in harbour
         }
       }
     }
@@ -116,7 +133,7 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
       "versus unsuccessful fits",length(which(storeScheme$success == 0)),"\n\n",
       "Check ",file.path(saveDir,"storeScheme.csv"),"for details \n\n")
       
-  cat("Note: fishing = 1, no fishing = 0\n")
+  cat("Note: fishing = f, no fishing = nf\n")
 return(tacsatOrig[,-grep("idx",colnames(tacsatOrig))])}
     
 #res <- segmentedTacsatSpeed(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=FALSE,CI=0.95)
