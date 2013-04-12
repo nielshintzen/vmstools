@@ -2,7 +2,7 @@
 
 ==Objectives==
   * To map habitat types and sea bed impact from fishing activities in EU waters to identify where fisheries
-potentially compromises seafloor integrity conflicts of ecosystem services
+potentially compromises seafloor integrity and conflicts of ecosystem services
   * To develop and implement new methodology, combining VMS, logbook and industry data, to assess
 actual seabed impact from large scale fishing activities on an appropriate spatial and temporal scale
 
@@ -373,7 +373,7 @@ of functional relationship between vessel HP or length to gear size
   dir.create(file.path(outPath, "interpolated"))
    
   # apply per gear per vessel (otherwise risk for 'out of memory')
-    for(gr in  towed_gears){
+    for(gr in towed_gears){
       tacsatp_gr        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==gr,]
       tacsatp_gr$VE_REF <- factor(tacsatp_gr$VE_REF)
    
@@ -450,6 +450,9 @@ of functional relationship between vessel HP or length to gear size
   * buffer area (passive gear)
 
 <code>  
+all_gears      <- levels(tacsatp$LE_GEAR)
+passive_gears  <- all_gears[!all_gears %in% towed_gears]
+# TO DO.......
 </code>  
 
 
@@ -464,7 +467,7 @@ of functional relationship between vessel HP or length to gear size
   * bound all the files to one
   
 <code>  
-   # after having subsetted per gear per vessel (because 'out of memory' otherwise)
+   # after having subsetted per gear per vessel (because risk of 'out of memory')
     lst <- list(NULL) ; count <- 0
     for(gr in levels(tacsatp$LE_GEAR)){
       tacsatp_gr        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==gr,]
@@ -474,10 +477,14 @@ of functional relationship between vessel HP or length to gear size
           count <- count+1
         
           cat(paste("load ", vid, " and ", gr, "\n", sep=""))
-          load(file.path(outPath, "interpolated", 
-                paste("tacsatFishSeqInterpolAndWidth_", vid, "_", gr, ".RData", sep="")))
-
+          er <- try(load(file.path(outPath, "interpolated", 
+                paste("tacsatFishSeqInterpolAndWidth_", vid, "_", gr, ".RData", sep=""))),
+                silent=TRUE)
+          if(class(er)=="try-error"){
+          count <- count -1
+          } else{      
           lst[[count]] <-  tacsatInt_gr_vid
+          }
      
       }
       
@@ -498,22 +505,22 @@ of functional relationship between vessel HP or length to gear size
 labelHauls <- function(tacsat){
             tacsat[is.na(tacsat$SI_STATE), 'SI_STATE'] <- 1 # assign steaming
             tacsat[tacsat$SI_STATE!=2, 'SI_STATE']     <- 1 # assign steaming
-            tacsat$FS_REF                              <- c(0, diff(tacsat$SI_STATE))   # init
-            tacsat$FS_REF                              <- cumsum(tacsat$FS_REF) # fishing sequences detected.
-            tacsat$SS_REF                              <- 1- tacsat$FS_REF  # steaming sequences detected.
-            tacsat$FS_REF                              <- cumsum(tacsat$SS_REF ) # fishing sequences labelled.
-            tacsat[tacsat$SI_STATE==1, 'FS_REF']       <- 0 # correct label 0 for steaming
-            tacsat$FS_REF                              <- factor(tacsat$FS_REF)
+            tacsat$HL_ID                              <- c(0, diff(tacsat$SI_STATE))   # init
+            tacsat$HL_ID                              <- cumsum(tacsat$HL_ID) # fishing sequences detected.
+            tacsat$HL_ID                              <- 1- tacsat$HL_ID  # steaming sequences detected.
+            tacsat$HL_ID                              <- cumsum(tacsat$SS_ID ) # fishing sequences labelled.
+            tacsat[tacsat$SI_STATE==1, 'HL_ID']       <- 0 # correct label 0 for steaming
+            tacsat$HL_ID                              <- factor(tacsat$HL_ID)
             levels(tacsat$FS_REF) <- 0: (length(levels(tacsat$FS_REF))-1) # rename the id for increasing numbers from 0
-            tacsat$FS_REF                             <- as.character(tacsat$FS_REF)
+            tacsat$HL_ID                             <- as.character(tacsat$HL_ID)
             # then assign a unique id
             idx <- tacsat$FS_REF!=0
-            tacsat[idx, "FS_REF"] <- paste(
+            tacsat[idx, "HL_ID"] <- paste(
                                     tacsat$VE_REF[idx], "_", 
                                     tacsat$LE_GEAR[idx], "_", 
-                                    tacsat$FS_REF[idx],
+                                    tacsat$HL_ID[idx],
                                     sep="")
-          tacsat <- tacsat[, !colnames(tacsat) %in% 'SS_REF'] # remove useless column
+          tacsat <- tacsat[, !colnames(tacsat) %in% 'SS_ID'] # remove useless column
           return(tacsat)
        }  
 
