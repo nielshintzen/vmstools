@@ -11,6 +11,8 @@ activityTacsatAnalyse <- function(tacsat,units="year",analyse.by="LE_GEAR",ident
     runScheme                 <- expand.grid(years=yrs,months=mths,weeks=wks)
     storeScheme               <- expand.grid(years=yrs,months=mths,weeks=wks,analyse.by=unique(tacsat[,analyse.by]))
     storeScheme$peaks         <- NA
+    storeScheme$fixPeaks      <- FALSE
+    storeScheme$sigma0        <- 0.911
     if(identify == "means") storeScheme$means         <- NA
     for(iRun in 1:nrow(runScheme)){
       yr  <- runScheme[iRun,"years"]

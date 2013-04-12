@@ -1,4 +1,4 @@
-activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=NULL,plot=FALSE,level="all",sigma=0.911,fixPeaks=FALSE){
+activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=NULL,plot=FALSE,level="all"){
 
   require("mixtools")
   if (!"SI_DATIM" %in% colnames(tacsat))
@@ -14,7 +14,7 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
   tacsat      <- tacsat[idx,]
   
   #- If sigma is NULL it needs to be estimated and gets a variable name
-  if(is.null(sigma)) sigma <- "d"
+  storeScheme$sigma0[which(storeScheme$sigma0==0)] <- "d"
 
   if(units == "all"){   yrs <- 0;                                   mths  <- 0;                                    wks  <- 0}
   if(units == "year"){  yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); mths  <- 0;                                    wks  <- 0}
@@ -65,31 +65,58 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
             if(length(which(abs(an(names(tbl))) %in% spd))>1) idx <- c(idx,sample(which(subset(tygmr,LE_GEAR==iGr)$SI_SP==(-1*spd)),tbl[ac(-1*spd)]-tbl[nxt]*2,replace=FALSE))
           } else { idx <- -1:-nrow(subset(tygmr,LE_GEAR==iGr))}
 
+        #-----------------------------------------------------------------------------
+        # Fit the 3 or 5 normal distributions. If parameter guestimates are
+        #  available, then use these
+        #-----------------------------------------------------------------------------
         if(is.null(storeScheme)==TRUE){
-          res[[iGr]]    <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5,maxrestarts=20,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"),sigma=rep(1,5)))
+          res[[iGr]]    <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5,maxrestarts=20,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b"),sigma=rep(1,5)))
         } else {
+            #- Fitting model when mean values of peaks has been defined
             if("means" %in% colnames(storeScheme)){
+
+              #- Extract parameters from storeScheme
               ss          <- storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
                                                storeScheme$weeks == wk & storeScheme$analyse.by == iGr),"means"]
+              sigma       <- anf(storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
+                                               storeScheme$weeks == wk & storeScheme$analyse.by == iGr),"sigma0"])
+              fixPeaks    <- ac( storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
+                                               storeScheme$weeks == wk & storeScheme$analyse.by == iGr),"fixPeaks"])
+
+              #- Setup parameter estimate vectors for mu and sigma
               if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintmn <- c("-a",0,"a") } else { constraintmn <- c("-b","-a",0,"a","b")}
               if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")} else { constraintsd <- c("b","a",sigma,"a","b")}
               if(fixPeaks) constraintmn <- c(na.omit(anf(unlist(strsplit(ss," ")))))
+
+              #- Fit the actual model through the normalmixEM function
               res[[iGr]]   <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,mu=c(na.omit(as.numeric(strsplit(ss," ")[[1]]))), sigma=rep(1,length(constraintsd)),
                                               maxrestarts=20,mean.constr=constraintmn,sd.constr=constraintsd))
             } else {
+              #- Fitting model when number of peaks has been defined
+              
+              #- Extract parameters from storeScheme
               ss          <- storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
                                                storeScheme$weeks == wk & storeScheme$analyse.by == iGr),"peaks"]
+              sigma       <- anf(storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
+                                               storeScheme$weeks == wk & storeScheme$analyse.by == iGr),"sigma0"])
+              fixPeaks    <- ac( storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
+                                               storeScheme$weeks == wk & storeScheme$analyse.by == iGr),"fixPeaks"])
+
+              #- Setup parameter estimate vectors for mu and sigma
               if(ss==3){ constraintmn <- c("-a",0,"a") } else { constraintmn <- c("-b","-a",0,"a","b")}
-              if(ss==5){ constraintsd <- c("a","b","a")} else { constraintsd <- c("b","a",sigma,"a","b")}
+              if(ss==3){ constraintsd <- c("a","b","a")} else { constraintsd <- c("b","a",sigma,"a","b")}
               if(length(ss)>0){
-                if(is.na(ss)==TRUE)  res[[iGr]]   <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5, maxrestarts=20,  mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"),sigma=rep(1,5)))
-                if(is.na(ss)==FALSE)  res[[iGr]]   <- try(normalmixEM(x=subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=ss,maxrestarts=20,mean.constr=constraintmn,sd.constr=constraintsd,sigma=rep(1,length(constraintsd))))
-              } else {            res[[iGr]]   <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5, maxrestarts=20,  mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"),sigma=rep(1,5)))}
+
+                #- Fit the actual model through the normalmixEM function
+                if(is.na(ss)==TRUE)  res[[iGr]]    <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5, maxrestarts=20,  mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"),sigma=rep(1,5)))
+                if(is.na(ss)==FALSE) res[[iGr]]    <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=ss,maxrestarts=20,  mean.constr=constraintmn,          sd.constr=constraintsd,            sigma=rep(1,length(constraintsd))))
+              } else {               res[[iGr]]    <- try(normalmixEM(subset(tygmr,LE_GEAR==iGr)$SI_SP[-idx],maxit=1000,k=5, maxrestarts=20,  mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"),sigma=rep(1,5)))}
             }
           }
         if(plot==TRUE) plot(res[[iGr]],2,breaks=100,xlim=c(-20,20))
       }
       if(level == "vessel"){
+        #- Transform the output into the right format
         for(iGr in unique(tyg$LE_GEAR))
           if(!class(res[[iGr]]) == "try-error"){ res[[iGr]] <- res[[iGr]]$mu } else { res[[iGr]] <- rep(NA,5)}
         res             <- lapply(res,function(x){if(class(x)=="try-error"){x<-rep(NA,5)}else{x}})
@@ -119,22 +146,32 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
 
             shipTacsat        <- subset(tygmr,VE_REF == iShip)
 
-            if(length(res[[names(which.max(table(shipTacsat$LE_GEAR)))]])==3){ constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
-            if(length(res[[names(which.max(table(shipTacsat$LE_GEAR)))]])==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
+            #-----------------------------------------------------------------------------
+            # Fit the 3 or 5 normal distributions. If parameter guestimates are
+            #  available, then use these
+            #-----------------------------------------------------------------------------
 
+            #- Setup parameter estimate vectors for mu and sigma
+            if(length(res[[names(which.max(table(shipTacsat$LE_GEAR)))]])==3){ constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
+            if(length(res[[names(which.max(table(shipTacsat$LE_GEAR)))]])==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",0.911,"a","b")}
+
+            #- Fit the actual model through the normalmixEM function
             shipFit[[iShip]]  <- try(normalmixEM(shipTacsat$SI_SP[-idx],mu=res[[names(which.max(table(shipTacsat$LE_GEAR)))]],maxit=2000,
                                                  sigma=rep(1,length(constraintsd)),mean.constr=constraintmn,sd.constr=constraintsd))
 
             if(class(shipFit[[iShip]])!= "try-error"){
+
+              #- Analyse the fit and turn it into a result of fishing - no fishing
               mu                <- sort.int(shipFit[[iShip]]$mu,index.return=TRUE)
               sds               <- shipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
 
               probs             <- dnorm(x=shipTacsat$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
               for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=shipTacsat$SI_SP,mean=mu[i],sd=sds[i]))
               SI_STATE          <- apply(probs,1,which.max)
-              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){
+              
+              if(length(mu)==3){
                 SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("f","s"); SI_STATE <- ac(SI_STATE)}
-              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==5){
+              if(length(mu)==5){
                 SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("h","f","s"); SI_STATE <- ac(SI_STATE)}
               tacsat$SI_STATE[which(tacsat$ID %in% shipTacsat$ID)] <- SI_STATE[1:(length(SI_STATE)/2)]
             } else { tacsat$SI_STATE[which(tacsat$ID %in% shipTacsat$ID)] <- NA}
@@ -143,14 +180,17 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
         } else {
           for(iGr in unique(tyg$LE_GEAR)){
             if(!class(res[[iGr]]) == "try-error"){
+
+              #- Analyse the fit and turn it into a result of fishing - no fishing
               mu                  <- sort.int(res[[iGr]]$mu,index.return=TRUE)
               sds                 <- res[[iGr]]$sigma[mu$ix]; mu <- mu$x
               probs               <- dnorm(x=subset(tyg,LE_GEAR==iGr)$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
               for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=subset(tyg,LE_GEAR==iGr)$SI_SP,mean=mu[i],sd=sds[i]))
               SI_STATE            <- apply(probs,1,which.max)
-              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){
+
+              if(length(mu)==3){
                 SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("f","s"); SI_STATE <- ac(SI_STATE)}
-              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==5){
+              if(length(mu)==5){
                 SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("h","f","s"); SI_STATE <- ac(SI_STATE)}
               tacsat$SI_STATE[which(tacsat$ID %in% subset(tyg,LE_GEAR == iGr)$ID)] <- SI_STATE
             }
@@ -175,26 +215,39 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
               if(length(which(abs(an(names(tbl))) %in% spd))>1) idx <- c(idx,sample(which(subset(tngmr,VE_REF==iShip)$SI_SP==(-1*spd)),tbl[ac(-1*spd)]-tbl[nxt]*2,replace=FALSE))
             } else { idx <- -1:-nrow(subset(tngmr,VE_REF==iShip))}
 
+            #-----------------------------------------------------------------------------
+            # Fit the 3 or 5 normal distributions. If parameter guestimates are
+            #  available, then use these
+            #-----------------------------------------------------------------------------
+
             shipTacsat          <- subset(tngmr,VE_REF == iShip)
             if(exists("shipFit")){
               if(iShip %in% names(shipFit)){
+
+                #- Setup parameter estimate vectors for mu and sigma
                 if(length(shipFit[[iShip]]$mu)==3){constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
-                if(length(shipFit[[iShip]]$mu)==3){constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
+                if(length(shipFit[[iShip]]$mu)==3){constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",0.911,"a","b")}
+
+                #- Fit the actual model through the normalmixEM function
                 nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=length(shipFit[[iShip]]$mu),maxit=2000,
                                                        sigma=rep(1,length(constraintsd)),mean.constr=constraintmn,sd.constr=constraintsd))
             } else {
-                nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=5,maxit=2000,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"),sigma=rep(1,5)))}
+                #- Fit the actual model through the normalmixEM function
+                nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=5,maxit=2000,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b"),sigma=rep(1,5)))}
 
             if(!class(nonshipFit[[iShip]]) == "try-error"){
+
+              #- Analyse the fit and turn it into a result of fishing - no fishing
               mu                  <- sort.int(nonshipFit[[iShip]]$mu,index.return=TRUE)
               sds                 <- nonshipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
 
               probs               <- dnorm(x=shipTacsat$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
               for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=shipTacsat$SI_SP,mean=mu[i],sd=sds[i]))
               SI_STATE            <- apply(probs,1,which.max)
-              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){
+              
+              if(length(mu)==3){
                 SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("f","s"); SI_STATE <- ac(SI_STATE)}
-              if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==5){
+              if(length(mu)==5){
                 SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("h","f","s"); SI_STATE <- ac(SI_STATE)}
               tacsat$SI_STATE[which(tacsat$ID %in% shipTacsat$ID)] <- SI_STATE[1:(length(SI_STATE)/2)]
             }
@@ -220,6 +273,7 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
       if(exists("shipList")){
         for(iShip in shipList){
 
+          #- Get rid of very influential data points
           tbl                 <- table(subset(tyvmr,VE_REF==iShip)$SI_SP);
           spd                 <- an(names(rev(sort(tbl))[1]))
           idx                 <- which(subset(tyvmr,VE_REF==iShip)$SI_SP==spd)
@@ -231,23 +285,49 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
 
           shipTacsat        <- subset(tyvmr,VE_REF == iShip)
 
+          #-----------------------------------------------------------------------------
+          # Fit the 3 or 5 normal distributions. If parameter guestimates are
+          #  available, then use these
+          #-----------------------------------------------------------------------------
           if(is.null(storeScheme)==TRUE){
-            shipFit[[iShip]]    <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"),sigma=rep(1,5)))
+            shipFit[[iShip]]    <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",0.911,"a","b"),sigma=rep(1,5)))
           } else {
+              #- Fitting model when mean values of peaks has been defined
               if("means" %in% colnames(storeScheme)){
+
+                #- Extract parameters from storeScheme
                 ss          <- storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
                                                  storeScheme$weeks == wk & storeScheme$analyse.by == iShip),"means"]
+                sigma       <- anf(storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
+                                                 storeScheme$weeks == wk & storeScheme$analyse.by == iShip),"sigma0"])
+                fixPeaks    <- ac( storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
+                                                 storeScheme$weeks == wk & storeScheme$analyse.by == iShip),"fixPeaks"])
+
+                #- Setup parameter estimate vectors for mu and sigma
                 if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
                 if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
                 if(fixPeaks) constraintmn <- c(na.omit(anf(unlist(strsplit(ss," ")))))
+
+                #- Fit the actual model through the normalmixEM function
                 shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],mu=c(na.omit(as.numeric(strsplit(ss," ")[[1]]))), maxit=2000,
                                            mean.constr=constraintmn,sd.constr=constraintsd,sigma=rep(1,length(constraintsd))))
               } else {
+                #- Fitting model when number of peaks has been defined
+
+                #- Extract parameters from storeScheme
                 ss          <- storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
                                                  storeScheme$weeks == wk & storeScheme$analyse.by == iShip),"peaks"]
+                sigma       <- anf(storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
+                                                 storeScheme$weeks == wk & storeScheme$analyse.by == iShip),"sigma0"])
+                fixPeaks    <- ac( storeScheme[which(storeScheme$years == yr & storeScheme$months     == mth &
+                                                 storeScheme$weeks == wk & storeScheme$analyse.by == iShip),"fixPeaks"])
+
+                #- Setup parameter estimate vectors for mu and sigma
                 if(ss==3){ constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
                 if(ss==3){ constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
                 if(length(ss)>0){
+
+                  #- Fit the actual model through the normalmixEM function
                   if(is.na(ss)==TRUE) shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"),sigma=rep(1,5)))
                   if(is.na(ss)==FALSE) shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=ss,mean.constr=constraintmn,sd.constr=constraintsd,sigma=rep(1,length(constraintsd))))
                 } else {           shipFit[[iShip]]   <- try(normalmixEM(subset(tyvmr,VE_REF==iShip)$SI_SP[-idx],maxit=2000,k=5,mean.constr=c("-b","-a",0,"a","b"),sd.constr=c("b","a",sigma,"a","b"),sigma=rep(1,5)))}
@@ -255,15 +335,18 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
             }
           if(plot==TRUE) plot(shipFit[[iShip]],2,breaks=100,xlim=c(-20,20))
           if(!class(shipFit[[iShip]]) == "try-error"){
+
+            #- Analyse the fit and turn it into a result of fishing - no fishing
             mu                <- sort.int(shipFit[[iShip]]$mu,index.return=TRUE)
             sds               <- shipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
 
             probs             <- dnorm(x=shipTacsat$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
             for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=shipTacsat$SI_SP,mean=mu[i],sd=sds[i]))
             SI_STATE          <- apply(probs,1,which.max)
-            if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3){
+
+            if(length(mu)==3){
               SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("f","s"); SI_STATE <- ac(SI_STATE)}
-            if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==5){
+            if(length(mu)==5){
               SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("h","f","s"); SI_STATE <- ac(SI_STATE)}
             tacsat$SI_STATE[which(tacsat$ID %in% shipTacsat$ID)] <- SI_STATE[1:(length(SI_STATE)/2)]
           }
@@ -289,20 +372,29 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
           } else { idx <- -1:-nrow(subset(tnvmr,VE_REF==iShip))}
 
           shipTacsat          <- subset(tnvmr,VE_REF == iShip)
+          #-----------------------------------------------------------------------------
+          # Fit the 3 or 5 normal distributions. If parameter guestimates are
+          #  available, then use these
+          #-----------------------------------------------------------------------------
           if(length(shipFit[[iShip]]$mu)==3){constraintmn <- c("-a",0,"a")} else { constraintmn <- c("-b","-a",0,"a","b")}
-          if(length(shipFit[[iShip]]$mu)==3){constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",sigma,"a","b")}
+          if(length(shipFit[[iShip]]$mu)==3){constraintsd <- c("a","b","a")}else { constraintsd <- c("b","a",0.911,"a","b")}
+
+          #- Fit the actual model through the normalmixEM function
           nonshipFit[[iShip]] <- try(normalmixEM(shipTacsat$SI_SP[-idx],k=length(shipFit[[iShip]]$mu),maxit=2000,mean.constr=constraintmn,sd.constr=constraintsd,sigma=rep(1,length(constraintsd))))
 
           if(!class(nonshipFit[[iShip]]) == "try-error"){
+
+            #- Analyse the fit and turn it into a result of fishing - no fishing
             mu                  <- sort.int(nonshipFit[[iShip]]$mu,index.return=TRUE)
             sds                 <- nonshipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
 
             probs               <- dnorm(x=shipTacsat$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
             for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=shipTacsat$SI_SP,mean=mu[i],sd=sds[i]))
             SI_STATE            <- apply(probs,1,which.max)
-            if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==3)
+
+            if(length(mu)==3)
               SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("f","s"); SI_STATE <- ac(SI_STATE)
-            if(length(c(na.omit(as.numeric(strsplit(ss," ")[[1]]))))==5)
+            if(length(mu)==5)
               SI_STATE        <- af(SI_STATE); levels(SI_STATE) <- c("h","f","s"); SI_STATE <- ac(SI_STATE)
             tacsat$SI_STATE[which(tacsat$ID %in% shipTacsat$ID)] <- SI_STATE[1:(length(SI_STATE)/2)]
           }
@@ -314,6 +406,6 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
 leftOverTacsat  <- tacsatOrig[which(!tacsatOrig$ID %in% tacsat$ID),]
 tacsat          <- rbind(tacsat,leftOverTacsat)
 tacsat          <- orderBy(~ID,tacsat)
-cat("Note that in case of 5 peaks: no fishing = 1, fishing = 2, steaming / no fishing = 3\n")
-cat("Note that in case of 3 peaks: fishing = 1, steaming / no fishing = 2\n")
+cat("Note that in case of 5 peaks: no fishing = h, fishing = f, steaming / no fishing = s\n")
+cat("Note that in case of 3 peaks: fishing = f, steaming / no fishing = s\n")
 return(tacsat$SI_STATE)}
