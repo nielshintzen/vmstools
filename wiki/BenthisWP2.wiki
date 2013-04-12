@@ -3,7 +3,7 @@
 ==Objectives==
   * To map habitat types and sea bed impact from fishing activities in EU waters to identify where fisheries
 potentially compromises seafloor integrity conflicts of ecosystem services
-  * to develop and implement new methodology, combining VMS, logbook and industry data, to assess
+  * To develop and implement new methodology, combining VMS, logbook and industry data, to assess
 actual seabed impact from large scale fishing activities on an appropriate spatial and temporal scale
 
 ==workflow==
@@ -11,10 +11,11 @@ actual seabed impact from large scale fishing activities on an appropriate spati
 Please find below an example workflow to treat VMS and Logbook in a systematic manner to create swept area maps.
 
 
-  * Installing & loading libraries
-  The VMStools software available [http://code.google.com/p/vmstools/downloads/ here]
-  The procedure for installing the VMStools library under R is described [http://code.google.com/p/vmstools/w/edit/Introduction here]
+  * Installing VMStools
+    * The VMStools software available [http://code.google.com/p/vmstools/downloads/ here]
+    * The procedure for installing the VMStools library under R is described [http://code.google.com/p/vmstools/w/edit/Introduction here]
   
+    * Loading the required libraries into the R console
 <code>  
 
 rm(list=ls())
@@ -27,7 +28,7 @@ memory.size(4000)
   
 
 
-  * setting directories
+  * setting working directories
 
  <code>  
 
@@ -51,7 +52,7 @@ if(substr(R.Version()$os,1,3)== "lin"){
   outPath   <- sub("N:/","/media/n/",outPath)
   polPath   <- sub("N:/","/media/n/",polPath)
 }
-
+     
 
 </code>  
 
