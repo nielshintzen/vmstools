@@ -33,3 +33,4 @@ Please find below an example workflow to treat VMS and Logbook in a systematic m
   * maps + sum / average different grids
 
   * non-vms maps
+  * testing
