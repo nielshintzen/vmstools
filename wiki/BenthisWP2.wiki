@@ -83,7 +83,7 @@ We assume that the fishing activities/metier (LE_MET) are fully informed in the 
   
   SHmap + geom_point(
   aes(x=lon, y=lat, colour= "black"), data=coord.ports) +
-  scale_colour_manual(values=c("1"="dark blue","2"="orange"))
+  #scale_colour_manual(values=c("1"="dark blue","2"="orange"))
   savePlot(filename=file.path(outPath,
        paste("ggmap_ports.jpeg",sep='')), type="jpeg")
 </code>  
@@ -357,9 +357,13 @@ the nb of nets released per operation times the unit net length. This need to be
   tacsatp           <- orderBy(~VE_REF+SI_DATIM,data=tacsatp)  
    
   # you might frame each haul by two steaming positions to be conservative
-  is_transition  <- c(0,diff(tacsatp$SI_STATE))
-  is_transition2 <- c(diff(tacsatp$SI_STATE), 0)
-  tacsatp <- tacsatp[ !is.na(tacsatp$SI_STATE) & (tacsatp$SI_STATE ==2 | is_transition!=0 | is_transition2!=0),] 
+  tacsatp$SI_STATE_num <- NA
+  tacsatp[tacsatp$SI_STATE=="h","SI_STATE_num"] <- 1 
+  tacsatp[tacsatp$SI_STATE=="f","SI_STATE_num"] <- 2 
+  tacsatp[tacsatp$SI_STATE=="s","SI_STATE_num"] <- 3 
+  is_transition  <- c(0,diff(tacsatp$SI_STATE_num))
+  is_transition2 <- c(diff(tacsatp$SI_STATE_num), 0)
+  tacsatp <- tacsatp[ !is.na(tacsatp$SI_STATE_num) & (tacsatp$SI_STATE_num ==2 | is_transition!=0 | is_transition2!=0),] 
    
   # create an output folder for storing files 
   dir.create(file.path(outPath, "interpolated"))
@@ -462,8 +466,8 @@ passive_gears  <- all_gears[!all_gears %in% towed_gears]
          # the radius of the circle is given by: area= pi*(R)^2 = pi*(C/(2*pi))^2
          # with C the length of the nets, or the nb of nets * length of a unit net
          # for seiners and netters respectively
-         C                            <- tacsat_gr_vid$LE_GEAR_WIDTH
-         tacsat_gr_vid$SWEPT_AREA_KM2 <- pi*(C/(2*pi))^2 
+         C                            <- tacsatp_gr_vid$LE_GEAR_WIDTH
+         tacsatp_gr_vid$SWEPT_AREA_KM2 <- pi*(C/(2*pi))^2 
 
          # save (a file by gr_vid)
          save(tacsatInt_gr_vid, file=file.path(outPath, "interpolated", 
@@ -526,6 +530,7 @@ passive_gears  <- all_gears[!all_gears %in% towed_gears]
 # (based on SI_STATE, assuming the "h", "f", "s" coding)
 # (useful to count them in a grid...)
 tacsatp <- labellingHauls(tacsatp)  
+gc(reset=TRUE)
 </code>  
 
 
@@ -549,26 +554,32 @@ tacsatp <- labellingHauls(tacsatp)
                                          proj4string=CRS("+proj=longlat +ellps=WGS84"))
 
   
+  
+  load("C:\\merging\\BENTHIS\\outputs\\tacsatSweptArea.RData") # get 'tacsatp' with all data 
+  #....or load only one instance eg load("C:\\merging\\BENTHIS\\outputs\\interpolated\\tacsatSweptArea_DNK000005269_OTB.RData")
+  #tacsatp <- tacsatInt_gr_vid
+  
+  coord <-  tacsatp[, c('SI_LONG', 'SI_LATI')]
+  names(habitat_map) # return the name of the coding variable
  
- # load a tacsatInt file
- load("C:\\merging\\BENTHIS\\outputs\\interpolated\\tacsatFishSeqInterpolAndWidth_DNK000005269_OTB.RData")
- coord <-  tacsatInt_gr_vid[, c('SI_LONG', 'SI_LATI')]
- names(habitat_map) # return the name of the coding variable
- 
- #Turn the polygons into spatial polygons
- sp <- SpatialPolygons(habitat_map@polygons)
- projection(sp) <-  CRS("+proj=longlat +ellps=WGS84")
+  #Turn the polygons into spatial polygons
+  sp <- SpatialPolygons(habitat_map@polygons)
+  projection(sp) <-  CRS("+proj=longlat +ellps=WGS84")
 
- #Turn the point into a spatial point
- spo <- SpatialPoints(coordinates(data.frame(SI_LONG=coord[,1],
+  #Turn the point into a spatial point
+  spo <- SpatialPoints(coordinates(data.frame(SI_LONG=coord[,1],
                                              SI_LATI=coord[,2])))
- projection(spo) <-  CRS("+proj=longlat +ellps=WGS84")
+  projection(spo) <-  CRS("+proj=longlat +ellps=WGS84")
 
- #Use the magic 'over' function to see in which polygon it is located
- idx <- over(spo,sp); print(idx)
- tacsatInt_gr_vid$SUBSTRATE <- habitat_map$BAL_CODE[idx] 
+  #Use the magic 'over' function to see in which polygon it is located
+  idx <- over(spo,sp); print(idx)
+  tacsatp$SUBSTRATE <- habitat_map$BAL_CODE[idx] 
  
- plot(tacsatInt_gr_vid[, c("SI_LONG","SI_LATI")], col=tacsatInt_gr_vid$SUBSTRATE)
+  # plot
+  plot(tacsatp[, c("SI_LONG","SI_LATI")], col=tacsatp$SUBSTRATE)
+  
+  # save
+  savePlot(filename=file.path(outPath, "VMSpingsAttachedToSedimentMap.jpeg"), type="jpeg")
 </code>  
 
  
@@ -597,28 +608,27 @@ tacsatp <- labellingHauls(tacsatp)
   
   save(landscapes_proj, file=file.path(polPath, "landscapes_proj.RData"))
   
-   # for (){
-  # load() per vid per gr
-  # TO DO....
   
-  #eg load("C:\\merging\\BENTHIS\\outputs\\interpolated\\tacsatFishSeqInterpolAndWidth_DNK000005269_OTB.RData")
+  load("C:\\merging\\BENTHIS\\outputs\\tacsatSweptArea.RData") # get 'tacsatp' with all data 
+  #....or load only one instance eg load("C:\\merging\\BENTHIS\\outputs\\interpolated\\tacsatSweptArea_DNK000005269_OTB.RData")
+  #tacsatp <- tacsatInt_gr_vid
 
   
-  coord <- cbind(x=anf(tacsatInt_gr_vid$SI_LONG), y=anf(tacsatInt_gr_vid$SI_LATI))
+  coord <- cbind(x=anf(tacsatp$SI_LONG), y=anf(tacsatp$SI_LATI))
   
   dd <- extract (landscapes_proj, coord[,1:2]) # get the landscape on the coord points!
 
   coord <- cbind(coord,  landscapes_code=cut(dd, breaks=c(0,100,200,300,400,500,600)))
 
-  tacsatInt_gr_vid <- cbind(tacsatInt_gr_vid, coord$landscapes_code)
+  tacsatp <- cbind(tacsatp, coord$landscapes_code)
   
   # plot and save...
   plot(0,0, type="n", xlim=c(10,15), ylim=c(53.5,56.2), xlab="Longitude", ylab="Latitude")
   plot(sh_coastlines, add=TRUE)  # better for plotting the western baltic sea coastline!
   points(coord[,"x"], coord[,"y"], col=coord[,"landscapes_code"], pch=".", cex=1)
 
-  savePlot(filename=file.path(outPath, paste("landscapes_map.jpeg",sep='')), type="jpeg")
- 
+  # save
+  savePlot(filename=file.path(outPath, "VMSpingsAttachedToLandscapeMap.jpeg"), type="jpeg")
   
 </code>  
 
@@ -635,9 +645,9 @@ tacsatp <- labellingHauls(tacsatp)
   # create a fake input file to show the required format
   dd <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_GEAR, tacsatp$LE_MET)), ] 
   fake_gear_metier_habitat_severity_table <- dd[,c('VE_REF', 'LE_GEAR', 'LE_MET')]
-  fake_gear_metier_habitat_severity_table <- cbind(dd, HAB_SEVERITY=1)
-  fake_gear_metier_habitat_severity_table $LE_GEAR_WIDTH <- 0.5 # in km
-  gear_metier_habitat_severity_table  <- fake_gear_metier_habitat_severity_table   
+  fake_gear_metier_habitat_severity_table <- cbind(fake_gear_metier_habitat_severity_table, HAB_SEVERITY=1)
+  gear_metier_habitat_severity_table  <- fake_gear_metier_habitat_severity_table  
+  gear_metier_habitat_severity_table  <-   gear_metier_habitat_severity_table[complete.cases( gear_metier_habitat_severity_table),] 
   save(gear_metier_habitat_severity_table,   file=paste(dataPath,"gear_metier_habitat_severity_table.RData",   sep=""))
   
   # load a table for HAB_SEVERITY per vid LE_REF per gr LE_GEAR per met LE_MET
