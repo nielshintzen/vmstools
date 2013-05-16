@@ -285,7 +285,9 @@ the nb of nets released per operation times the unit net length. This need to be
 
 
 
-  * define activity depending on speed profiles
+  * define activity depending on speed profiles.
+    This step identifies the fishing activities from the steaming phases by analysing the vessel-specific speed profile and knowing the type of gear used from the logbooks.
+
 
 <code>  
   #-------------------------------------------------------------------------------
@@ -693,7 +695,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
 
 
   * maps + sum / average different grids
-  using quick gridding code at various resolution.
+  using a quick gridding code at various resolution.
 
     * For example, grid the swept area, or the number of hauls, or the fishing pressure, etc.
 <code>  
@@ -706,12 +708,20 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     what <- "SWEPT_AREA_KM2"
     #what <- "HL_ID"
     #what <- "pressure"
+    #a_func <- function(x) {unique(length(x))} # for HL_ID, to be tested.
     a_func <- "sum"
     this <- tacsatInt_gr_vid [,c('SI_LONG', 'SI_LATI', what)]
     colnames(this) <- c('x', 'y', 'what')
 
-    dx <- 6.25  # a finer grid will be produced if a higher value is put here
-    #dx <- 12  # a finer grid will be produced if a higher value is put here
+    #dx <- 6.25  # a finer grid will be produced if a higher value is put here
+    dx <- 12  # a finer grid will be produced if a higher value is put here
+   
+    # retrieve the geo resolution, for info
+    long <- seq(1,15,by=0.01)
+    res_long <- diff( long [1+which(diff(round(long*dx)/dx)!=0)] )
+    res_lat <- diff( long [1+which(diff(round(long*dx/2)/dx/2)!=0)] )
+
+
    
      the_breaks <-  c(0,1,2,4,8,16,32,64,128, 256, 512)^0.9 
     # a quick gridding method...
@@ -743,7 +753,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
      xlim=range(xs), ylim=range(ys),
      add=FALSE
      )
-    #title(sp)
+    title("")
 
     plot(sh1, add=TRUE, col=grey(0.7))
     legend("topright", fill=terrain.colors(length(the_breaks)-1),
@@ -765,7 +775,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
  
  
  [[Image:http://code.google.com/p/vmstools/source/browse/wiki/GriddedSweepAreaExample.jpeg|thumb|center|upright=2.0|alt=Gridded Swept Area. 
- Gridded Swept Area example in km2 for one vessel in the Baltic Sea. | Original VMS pings are overlayed]] 
+ Gridded Swept Area example in km2 for one vessel in the Baltic Sea. | Original VMS pings are overlaid]] 
 
 
 or using createGrid()
@@ -776,6 +786,7 @@ or using createGrid()
 
 <code>  
 # from ascgridfile eg. returned by VMSGridCreate()
+# TO DO:
 dd <- 
 nn <- 
 fun1  <-  function(x)  { x[ is.na(x)]  <- 0;  return(x)  }            # remove NA such zero
@@ -788,7 +799,10 @@ a_stack <-mosaic(dd, nn, na.rm=TRUE, fun = sum, keepres=TRUE)
   * non-vms maps. For non VMS-equipped vessels, the mapping of the fishing effort
   can be generated at the ICES rectangle resolution as a proxy of the fishing pressure on the benthic habitats 
 
-<code>  
+<code> 
+# TO DO from e.g. plotTools()
+#....
+# TO DO: stack several layers with various geographical resolutions 
 </code>  
 
 
