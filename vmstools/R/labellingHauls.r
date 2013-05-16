@@ -5,15 +5,15 @@
 labellingHauls <- function(tacsat){
             tacsat$SI_STATE2                             <- tacsat$SI_STATE
             tacsat$SI_STATE                              <- as.character(tacsat$SI_STATE)
-            tacsat[is.na(tacsat$SI_STATE), 'SI_STATE']   <- '1' # assign steaming
-            tacsat[tacsat$SI_STATE!='f', 'SI_STATE']     <- '1' # assign steaming
-            tacsat[tacsat$SI_STATE=='f', 'SI_STATE']     <- '2' # assign fishing
+            tacsat[is.na(tacsat$SI_STATE), 'SI_STATE']   <- '2' # assign steaming
+            tacsat[tacsat$SI_STATE!='f', 'SI_STATE']     <- '2' # assign steaming
+            tacsat[tacsat$SI_STATE=='f', 'SI_STATE']     <- '1' # assign fishing
             tacsat$SI_STATE                              <- as.numeric(tacsat$SI_STATE)
-            tacsat$HL_ID                              <- c(0, diff(tacsat$SI_STATE))   # init
-            tacsat$HL_ID                              <- cumsum(tacsat$HL_ID) # fishing sequences detected.
-            tacsat$SS_ID                              <- 1- tacsat$HL_ID  # steaming sequences detected.
+            tacsat$SS_ID                              <- c(0, diff(tacsat$SI_STATE))   # init
+            tacsat$SS_ID                              <- cumsum(tacsat$SS_ID) # steaming sequences detected.
+            tacsat$HL_ID                              <- 1- tacsat$SS_ID  # fishing sequences detected.
             tacsat$HL_ID                              <- cumsum(tacsat$SS_ID ) # fishing sequences labelled.
-            tacsat[tacsat$SI_STATE==1, 'HL_ID']       <- 0 # correct label 0 for steaming
+            tacsat[tacsat$SI_STATE==2, 'HL_ID']       <- 0 # correct label 0 for steaming
             tacsat$HL_ID                              <- factor(tacsat$HL_ID)
             levels(tacsat$HL_ID) <- 0: (length(levels(tacsat$HL_ID))-1) # rename the id for increasing numbers from 0
             tacsat$HL_ID                             <- as.character(tacsat$HL_ID)
