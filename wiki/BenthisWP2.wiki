@@ -553,10 +553,11 @@ gc(reset=TRUE)
   habitat_map           <- readShapePoly(file.path(polPath,"sediment_lat_long"),
                                          proj4string=CRS("+proj=longlat +ellps=WGS84"))
 
+  sh_coastlines            <- readShapePoly(file.path(polPath,"francois_EU"))
+ 
   
-  
-  load("C:\\merging\\BENTHIS\\outputs\\tacsatSweptArea.RData") # get 'tacsatp' with all data 
-  #....or load only one instance eg load("C:\\merging\\BENTHIS\\outputs\\interpolated\\tacsatSweptArea_DNK000005269_OTB.RData")
+  load(file.path(outPath, "tacsatSweptArea.RData")) # get 'tacsatp' with all data 
+  #....or load only one instance eg load(file.path(outPath, "interpolated","tacsatSweptArea_DNK000005269_OTB.RData"))
   #tacsatp <- tacsatInt_gr_vid
   
   coord <-  tacsatp[, c('SI_LONG', 'SI_LATI')]
@@ -576,8 +577,11 @@ gc(reset=TRUE)
   tacsatp$SUBSTRATE <- habitat_map$BAL_CODE[idx] 
  
   # plot
-  plot(tacsatp[, c("SI_LONG","SI_LATI")], col=tacsatp$SUBSTRATE)
-  
+  plot(habitat_map, xlim=c(11,14), ylim=c(55,56))
+  axis(1) ; axis(2, las=2) ; box()
+  points(tacsatp[, c("SI_LONG","SI_LATI")], col=tacsatp$SUBSTRATE, pch=".")
+  #plot(sh_coastlines, add=TRUE)
+
   # save
   savePlot(filename=file.path(outPath, "VMSpingsAttachedToSedimentMap.jpeg"), type="jpeg")
 </code>  
@@ -608,9 +612,10 @@ gc(reset=TRUE)
   
   save(landscapes_proj, file=file.path(polPath, "landscapes_proj.RData"))
   
-  
-  load("C:\\merging\\BENTHIS\\outputs\\tacsatSweptArea.RData") # get 'tacsatp' with all data 
-  #....or load only one instance eg load("C:\\merging\\BENTHIS\\outputs\\interpolated\\tacsatSweptArea_DNK000005269_OTB.RData")
+  load(file.path(polPath, "landscapes_proj.RData")) 
+ 
+  load(file.path(outPath, "tacsatSweptArea.RData")) # get 'tacsatp' with all data 
+  #....or load only one instance eg load("C:\\merging\\BENTHIS\\outputs\\interpolated\\tacsatSweptArea_DNK000005269_OTB.RData"))
   #tacsatp <- tacsatInt_gr_vid
 
   
@@ -620,11 +625,11 @@ gc(reset=TRUE)
 
   coord <- cbind(coord,  landscapes_code=cut(dd, breaks=c(0,100,200,300,400,500,600)))
 
-  tacsatp <- cbind(tacsatp, coord$landscapes_code)
+  tacsatp <- cbind(tacsatp, landscapes_code= coord[,'landscapes_code'])
   
   # plot and save...
-  plot(0,0, type="n", xlim=c(10,15), ylim=c(53.5,56.2), xlab="Longitude", ylab="Latitude")
-  plot(sh_coastlines, add=TRUE)  # better for plotting the western baltic sea coastline!
+  plot(landscapes_proj, xlim=c(10,14), ylim=c(54.5,56.5))
+  plot(sh_coastlines,  xlim=c(10,14), ylim=c(54.5,56.5), add=TRUE)  # better for plotting the western baltic sea coastline!
   points(coord[,"x"], coord[,"y"], col=coord[,"landscapes_code"], pch=".", cex=1)
 
   # save
@@ -722,10 +727,11 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     the_points <- tapply(this$what,
                   list(this$round_lat, this$round_long), a_func)
 
-   
-    image(
-     x=as.numeric(as.character(colnames(the_points)))/dx,
-     y=as.numeric(as.character(rownames(the_points)))/(dx*2),
+    xs <- (as.numeric(as.character(colnames(the_points)))/dx)
+    ys <- (as.numeric(as.character(rownames(the_points)))/(dx*2))
+    graphics:::image(
+     x=xs,
+     y=ys,
      z= t(the_points)  ,
      breaks=c(the_breaks),
      col = terrain.colors(length(the_breaks)-1),
@@ -733,7 +739,8 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
      xlab="",
      ylab="",
      axes=FALSE,
-     xlim=c(-2, 20 ), ylim=c(53,61)
+     xlim=range(xs), ylim=range(ys),
+     add=FALSE
      )
     #title(sp)
 
@@ -750,8 +757,14 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
 
     points (tacsatInt_gr_vid [,c('SI_LONG', 'SI_LATI')], pch=".")
 
+    # save
+    savePlot(filename=file.path(outPath, "GriddedSweepAreaExample.jpeg"), type="jpeg")
+
 </code>  
-  
+ 
+ 
+ [[File:GriddedSweepAreaExample.jpeg|thumb|center|upright=2.0|alt=Gridded Swept Area. 
+ Gridded Swept Area example in km2 for one vessel in the Baltic Sea. | Original VMS pings are overlayed]] 
 
 or using createGrid()
 <code>  
