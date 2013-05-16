@@ -763,7 +763,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
 </code>  
  
  
- [[http://code.google.com/p/vmstools/source/browse/wiki/GriddedSweepAreaExample.jpeg|thumb|center|upright=2.0|alt=Gridded Swept Area. 
+ [[Image:http://code.google.com/p/vmstools/source/browse/wiki/GriddedSweepAreaExample.jpeg|thumb|center|upright=2.0|alt=Gridded Swept Area. 
  Gridded Swept Area example in km2 for one vessel in the Baltic Sea. | Original VMS pings are overlayed]] 
 
 or using createGrid()
