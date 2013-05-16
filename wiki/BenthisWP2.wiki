@@ -711,6 +711,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     colnames(this) <- c('x', 'y', 'what')
 
     dx <- 6.25  # a finer grid will be produced if a higher value is put here
+    #dx <- 12  # a finer grid will be produced if a higher value is put here
    
      the_breaks <-  c(0,1,2,4,8,16,32,64,128, 256, 512)^0.9 
     # a quick gridding method...
@@ -720,8 +721,8 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
                               what=0,
                               x=0,
                               y=0,
-                              round_long=unique(this$round_long),
-                              round_lat=unique(this$round_lat)
+                              round_long=seq(range(this$round_long)[1], range(this$round_long)[2]),
+                              round_lat=seq(range(this$round_lat)[1], range(this$round_lat)[2])
                               )
     this <- rbind(this, background)
     the_points <- tapply(this$what,
@@ -746,16 +747,16 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
 
     plot(sh1, add=TRUE, col=grey(0.7))
     legend("topright", fill=terrain.colors(length(the_breaks)-1),
-             legend=round(the_breaks[-1],1), bty="n", cex=0.6, ncol=2, title="")                   
+             legend=round(the_breaks[-1],1), bty="n", cex=0.8, ncol=2, title="")                   
     box()
     axis(1)
     axis(2, las=2)
 
     mtext(side=1, "Longitude", cex=1, adj=0.5, line=2)
     mtext(side=2, "Latitude", cex=1, adj=0.5, line=2)
-    mtext(side=3, "(a)", cex=1.5, adj=0, line=1)
+    #mtext(side=3, "(a)", cex=1.5, adj=0, line=1)
 
-    points (tacsatInt_gr_vid [,c('SI_LONG', 'SI_LATI')], pch=".")
+    points (tacsatInt_gr_vid [,c('SI_LONG', 'SI_LATI')], pch=".", col="white")
 
     # save
     savePlot(filename=file.path(outPath, "GriddedSweepAreaExample.jpeg"), type="jpeg")
@@ -765,6 +766,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
  
  [[Image:http://code.google.com/p/vmstools/source/browse/wiki/GriddedSweepAreaExample.jpeg|thumb|center|upright=2.0|alt=Gridded Swept Area. 
  Gridded Swept Area example in km2 for one vessel in the Baltic Sea. | Original VMS pings are overlayed]] 
+
 
 or using createGrid()
 <code>  
