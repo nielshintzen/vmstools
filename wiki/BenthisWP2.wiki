@@ -6,10 +6,12 @@ Please note that at this stage (May 2013), VMStools will only operate on R-2.15.
 versions. Details on how to install VMStools can be found [https://code.google.com/p/vmstools/wiki/Introduction?tm=6 here]
 
 ==Objectives==
-  * To map habitat types and sea bed impact from fishing activities in EU waters to identify where fisheries
-  potentially compromises seafloor integrity and conflicts of ecosystem services
-  * To develop and implement new methodology, combining VMS, logbook and industry data, to assess
-  actual seabed impact from large scale fishing activities on an appropriate spatial and temporal scale
+  * To map habitat types and sea bed impact from fishing activities in EU waters
+  to identify where fisheries potentially compromises seafloor integrity and
+  conflicts of ecosystem services
+  * To develop and implement new methodology, combining VMS, logbook and industry
+  data, to assess actual seabed impact from large scale fishing activities on an
+  appropriate spatial and temporal scale
 
 ==workflow==
 
