@@ -43,9 +43,12 @@ polPath   <- "D:/Benthis/Data/Polygons/"
  
 The VMS data we use in this analyses must be formatted to the 'tacsat' style. The logbook data must be formatted in the 'eflalo' style. You can download a description of these formats [http://code.google.com/p/vmstools/downloads/list here] and if you want another example, in the VMStools package an example tacsat and eflalo dataset are embedded. Load the VMStools library and call these by typing {{{data(tacsat)}}} or {{{data(eflalo)}}}.
 If you have the data in R format already, you can read them in as below.
+Make sure that they are in the right column format too!
 <code>  
 load(file.path(dataPath,"tacsat.RData")); # get the tacsat object
 load(file.path(dataPath,"eflalo.RData")); # get the eflalo object
+tacsat <- formatTacsat(tacsat) # format each of the columns to the specified class
+eflalo <- formatEflalo(eflalo) # format each of the columns to the specified class
 </code>  
 
 If they are in a .csv format, you could use the following lines.
@@ -306,7 +309,7 @@ A common way to define activity of a vessel is to look at its speed profiles.
 In general, you can identify for most bottom trawling gear 3 peaks. One peak
 would be situated right at the zero-knots boundary, one peak somewhere between
 4-8 knots and a third one between 8 and 12 knots. For example, see the speed profile
-below:<br>
+below (top: instantaneous speeds, below: calculated speeds):<br>
 [http://vmstools.googlecode.com/svn/wiki/figures/speedProfiles.png]
 
 
@@ -372,147 +375,117 @@ save(tacsatp,     file=file.path(outPath,"tacsatActivity.RData"))
 
   * Alternative activity identification: (Based on Fock 2008)
 
+  * Interpolate tacsat data (or not)
+In some occasions, and especially for towed trawl gear, it can be useful to artificially
+increase the density of VMS points. Through the use of an interpolation algorithm
+this is possible. Based on speed and heading a spline will be fitted between two
+consecutive fishing pings and the result can be converted into the tacsat format
+again, now containing an additional set of intermediate pings.
 
+<code>
+load(file=paste(outPath,"tacsatActivity.RData",   sep=""))
 
-  * interpolate data (or not) and compute the swept area
+#- Select towed gears only
+towed_gears       <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')  # TO DO: list to be checked
+tacsatp           <- orderBy(~VE_REF+SI_DATIM,data=tacsatp)
+</code>
 
+As these interpolations can become rather large, it is sensible to loop over the
+gears and store the results in between. Therefore, we first create an output folder
+by typing {{{dir.create(file.path(outPath, "interpolated"))}}}.
 
-   - interpolate the tracks between VMS fishing positions for active towed gears (excluding seiners)
-   i.e. OTB, TBB, PTB, PTM and DRB using interpolateTacsat() 
-   and convert back to the tacsat format using interpolation2Tacsat(). 
-   The swept area is assigned to each ping.
- 
+Interpolation should only occur on the fishing points, so we need to get rid to
+all non-fishing points. To be conservative, we start each 'haul' with a steaming
+point and finish with a steaming point too.
 
-<code>  
-  load(file=paste(outPath,"tacsatActivity.RData",   sep="")) # get tacsatp
-      #=> SI_STATE "h": slow motion/handling; SI_STATE "f": fishing; SI_STATE "s": steaming 
+<code>
+tacsatp$SI_STATE_num <- NA
+tacsatp$SI_STATE_num[which(tacsatp$SI_STATE=="h")] <- 1
+tacsatp$SI_STATE_num[tacsatp$SI_STATE=="f"] <- 2
+tacsatp$SI_STATE_num[tacsatp$SI_STATE=="s"] <- 3
+is_transition     <- c(0,diff(tacsatp$SI_STATE_num))
+is_transition2    <- c(diff(tacsatp$SI_STATE_num), 0)
+tacsatp           <- tacsatp[ !is.na(tacsatp$SI_STATE_num) & (tacsatp$SI_STATE_num ==2 |
+                                      is_transition!=0 | is_transition2!=0),]
+tacsatp           <- tacsatp[,-grep("SI_STATE_num",colnames(tacsatp))]
+tacsatp$SI_STATE  <- "f"
+</code>
 
-  towed_gears <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')  # TO DO: list to be checked
+Now that we remain with fishing points only, we can perform the interpolation
+
+<code>
+for(iGr in towed_gears){
+  tacsatpGear        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==iGr,]
+
+  for(iVE_REF in sort(unique(tacsatpGear$VE_REF))){
+    tacsatpGearVEREF <- tacsatpGear[tacsatpGear$VE_REF %in% iVE_REF,]
+    if(nrow(tacsatpGearVEREF)>3) {
+
+    #- Interpolate according to the cubic-hermite spline interpolation
+    interpolationcHs <- interpolateTacsat(tacsatpGearVEREF,
+                          interval=120,
+                          margin=10, # i.e. will make disconnected interpolations if interval out of the 110 130 min range
+                          res=100,
+                          method="cHs",
+                          params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),
+                          headingAdjustment=0,
+                          fast=FALSE)
+
+    #- Convert the interpolation to tacsat style data
+    tacsatIntGearVEREF <- interpolation2Tacsat(interpolationcHs, tacsatpGearVEREF)
+
+    #- Correct for HL_ID skipping
+    tacsatIntGearVEREF$HL_ID[which(diff(tacsatIntGearVEREF$HL_ID)<0)] <- tacsatIntGearVEREF$HL_ID[(which(diff(tacsatIntGearVEREF$HL_ID)<0)-1)]
+
+    save(tacsatIntGearVEREF, file=file.path(outPath, "interpolated",
+          paste("tacsatInt",iVE_REF, "_", iGr, ".RData", sep="")))
+    }
+  }
+}
+</code>
+
+This is how an interpolation could look like, including the sampled points from it.
+The blue points are the original VMS pings while the black solid line represents
+the connection of all interpolated points (100). The 8 intermediate red points are
+sampled from this set of 100 (representing equal distance between points).<br>
+[http://vmstools.googlecode.com/svn/wiki/figures/interpolation.png]
+
+Additionally, we can calculate the swept area as we know its distacnce travelled
+and the width of the gear.
+
+<code>
+tacsatIntGearVEREF$SWEPT_AREA_KM2 <- NA
+tacsatIntGearVEREF$SWEPT_AREA_KM2 <- distance(c(tacsatIntGearVEREF$SI_LONG[-1],0),  c(tacsatIntGearVEREF$SI_LATI[-1],0),
+                                                tacsatIntGearVEREF$SI_LONG,           tacsatIntGearVEREF$SI_LATI) *
+                                              tacsatIntGearVEREF$LE_GEAR_WIDTH
+</code>
+
+  * Buffer area
+
+For those vessels where we cannot interpolate (because it doesn't make sense,
+we can apply a certain buffer area, representing some sort of circle around a
+VMS ping. To derive the swept area from that circle we apply simple mathematics.
+
+We do that here for those gear types that were not in our towed_gear list.
+
+<code>
+all_gears            <- sort(unique(tacsatp$LE_GEAR))
+passive_gears        <- all_gears[!all_gears %in% towed_gears]
+
+for(iGr in passive_gears){
+  tacsatpGear        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==iGr,]
+
+  for(iVE_REF in sort(unique(tacsatpGear$VE_REF)){
+    tacsatpGearVEREF <- tacsatpGear[tacsatpGear$VE_REF %in% iVE_REF,]
+    tacsatpGearVEREF <- tacsatpGearVEREF[tacsatpGearVEREF$SI_STATE=='f',] # keep fishing pings only
   
-  # order chronologically (if not done yet)
-  tacsatp           <- orderBy(~VE_REF+SI_DATIM,data=tacsatp)  
-   
-  # you might frame each haul by two steaming positions to be conservative
-  tacsatp$SI_STATE_num <- NA
-  tacsatp[tacsatp$SI_STATE=="h","SI_STATE_num"] <- 1 
-  tacsatp[tacsatp$SI_STATE=="f","SI_STATE_num"] <- 2 
-  tacsatp[tacsatp$SI_STATE=="s","SI_STATE_num"] <- 3 
-  is_transition  <- c(0,diff(tacsatp$SI_STATE_num))
-  is_transition2 <- c(diff(tacsatp$SI_STATE_num), 0)
-  tacsatp <- tacsatp[ !is.na(tacsatp$SI_STATE_num) & (tacsatp$SI_STATE_num ==2 | is_transition!=0 | is_transition2!=0),] 
-   
-  # create an output folder for storing files 
-  dir.create(file.path(outPath, "interpolated"))
-   
-  # apply per gear per vessel (otherwise risk for 'out of memory')
-    for(gr in towed_gears){
-      tacsatp_gr        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==gr,]
-      tacsatp_gr$VE_REF <- factor(tacsatp_gr$VE_REF)
-   
-      for(vid in levels(tacsatp_gr$VE_REF)){
-          cat(paste("apply on ", vid, " and ", gr, "\n", sep=""))
-  
-          tacsatp_gr_vid <- tacsatp_gr[tacsatp_gr$VE_REF %in% vid,]
-          if(nrow(tacsatp_gr_vid)>3) {
- 
-          #Interpolate according to the cubic-hermite spline interpolation
-          interpolationcHs <- interpolateTacsat(tacsatp_gr_vid,
-                            interval=60,
-                            margin=10, # i.e. will make disconnected interpolations if interval out of the 50 70min range
-                            res=100,
-                            method="cHs",
-                            params=list(fm=0.2,distscale=20,sigline=0.2,st=c(2,6)),   # rmenber that st not in use....
-                            headingAdjustment=0,
-                            fast=FALSE)
+    tacsatpGearVEREF$SWEPT_AREA_KM2 <- pi*(tacsatpGearVEREF$LE_GEAR_WIDTH/(2*pi))^2
 
-          #Make a picture of all interpolations first
-          #Get the ranges of the total picture
-          #ranges <- do.call(rbind,lapply(cHs,function(x){return(apply(x[-1,],2,range))}))
-          #xrange <- range(ranges[,"x"])
-          #yrange <- range(ranges[,"y"])
- 
-          #plot(tacsatp_gr_vid$SI_LONG, tacsatp_gr_vid$SI_LATI, 
-          #       xlim=xrange,ylim=yrange,pch=19,col="blue",xlab="Longitude",ylab="Latitude")
-          #for(iInt in 1:length(cHs)){
-          #lines(cHs[[iInt]][-1,1],cHs[[iInt]][-1,2])}
-
-              
-          #Convert the interpolation to tacsat style data
-          tacsatp_gr_vid$SI_TIME <- as.character(tacsatp_gr_vid$SI_TIME) # debug fba
-          tacsatInt_gr_vid       <- interpolation2Tacsat(interpolationcHs, tacsatp_gr_vid) 
-          # => note that equalDistance() is encapsulated in interpolation2Tacsat()
-          # Each interpolation is splitted into 10 equally spaced points (including the start and the end point). 
-          # In total 8 new points are added per interpolation.
-          
-                                
-          # visual check
-          plot(tacsatInt_gr_vid$SI_LONG, tacsatInt_gr_vid$SI_LATI, pch=".", col=2)
-          points(tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE!=2,'SI_LONG'], 
-                       tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE!=2,'SI_LATI'], col=3, pch=16) # steaming (remaining ones (because we are conservative here))
-          points(tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE==2,'SI_LONG'], 
-                       tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE==2,'SI_LATI'], col=2, pch=16) # fishnig
-
-  
-        # What is the distance traveled within each of these interpolations?
-        sum(distanceInterpolation(interpolationcHs))
-
-        #compute the swept area from the interpolated distance and the gear width
-        #.......
-         tacsatInt_gr_vid$SWEPT_AREA_KM2 <- distance(c(tacsatInt_gr_vid$SI_LONG[-1],0),  c(tacsatInt_gr_vid$SI_LATI[-1],0),
-                                                       tacsatInt_gr_vid$SI_LONG,  tacsatInt_gr_vid$SI_LATI)*tacsatInt_gr_vid$LE_GEAR_WIDTH
-          
-       
-       # save (a file by gr_vid)
-       save(tacsatInt_gr_vid, file=file.path(outPath, "interpolated", 
-          paste("tacsatSweptArea_",vid, "_", gr, ".RData", sep="")))
-     } # end if enough records
-    } # end vid
-  } # end gr
- 
- 
- </code>  
-
-
-
-
-
-
-
-
-
-   - buffer area (passive gear)
-
-<code>  
-all_gears      <- levels(tacsatp$LE_GEAR)
-passive_gears  <- all_gears[!all_gears %in% towed_gears]
-
-  # apply per gear per vessel (otherwise risk for 'out of memory')
-    for(gr in passive_gears){
-      tacsatp_gr        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==gr,]
-      tacsatp_gr$VE_REF <- factor(tacsatp_gr$VE_REF)
-   
-      for(vid in levels(tacsatp_gr$VE_REF)){
-          cat(paste("apply on ", vid, " and ", gr, "\n", sep=""))
-
-          tacsatp_gr_vid <- tacsatp_gr[tacsatp_gr$VE_REF %in% vid,]
-          tacsatp_gr_vid <- tacsatp_gr_vid[tacsatp_gr_vid$SI_STATE=='f',] # keep fishing pings only
-      
-         # compute a buffer area around each fishing location
-         # and assign the area to the point
-         # the radius of the circle is given by: area= pi*(R)^2 = pi*(C/(2*pi))^2
-         # with C the length of the nets, or the nb of nets * length of a unit net
-         # for seiners and netters respectively
-         C                            <- tacsatp_gr_vid$LE_GEAR_WIDTH
-         tacsatp_gr_vid$SWEPT_AREA_KM2 <- pi*(C/(2*pi))^2 
-
-         # save (a file by gr_vid)
-         save(tacsatInt_gr_vid, file=file.path(outPath, "interpolated", 
-           paste("tacsatSweptArea_",vid, "_", gr, ".RData", sep="")))
-
-      }
-   } 
-
-</code>  
+    save(tacsatIntGearVEREF, file=file.path(outPath, "interpolated",
+       paste("tacsatSweptArea_",iVE_REF, "_", iGr, ".RData", sep="")))
+  }
+} 
+</code>
 
 
 
