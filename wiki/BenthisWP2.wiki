@@ -373,9 +373,9 @@ save(storeScheme, file=file.path(outPath,"storeScheme.RData"))
 save(tacsatp,     file=file.path(outPath,"tacsatActivity.RData"))
 </code>  
 
-  * Alternative activity identification: (Based on Fock 2008)
+=== Alternative activity identification: (Based on Fock 2008) ===
 
-  * Interpolate tacsat data (or not)
+=== Interpolate tacsat data (or not) ===
 In some occasions, and especially for towed trawl gear, it can be useful to artificially
 increase the density of VMS points. Through the use of an interpolation algorithm
 this is possible. Based on speed and heading a spline will be fitted between two
@@ -460,7 +460,7 @@ tacsatIntGearVEREF$SWEPT_AREA_KM2 <- distance(c(tacsatIntGearVEREF$SI_LONG[-1],0
                                               tacsatIntGearVEREF$LE_GEAR_WIDTH
 </code>
 
-  * Buffer area
+=== Buffer area ===
 
 For those vessels where we cannot interpolate (because it doesn't make sense,
 we can apply a certain buffer area, representing some sort of circle around a
@@ -487,68 +487,23 @@ for(iGr in passive_gears){
 } 
 </code>
 
+=== Swept area dataset ===
+As we've now calculated the swept area for both the interpolated gear types and
+the remaining ones via the buffer method, we can now combine all of them.
 
+<code>
+TODO. Also read in the interpolation dataset to get the full set
+</code>
 
+=== Labelling each haul ===
+Assign an identifier (HL_ID) to each of the fishing sequences. This can especially
+be useful when you want to count the number of hauls in an aggregated grid.
 
+<code>
+tacsatp   <- labellingHauls(tacsatp)
+</code>
 
-
-
-
-
-
-  * bound all the files to one
-  
-<code>  
-   # after having subsetted per gear per vessel (because risk of 'out of memory')
-    lst <- list(NULL) ; count <- 0
-    for(gr in levels(tacsatp$LE_GEAR)){
-      tacsatp_gr        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==gr,]
-      tacsatp_gr$VE_REF <- factor(tacsatp_gr$VE_REF)
-   
-      for(vid in levels(tacsatp_gr$VE_REF)){
-          count <- count+1
-        
-          cat(paste("load ", vid, " and ", gr, "\n", sep=""))
-          er <- try(load(file.path(outPath, "interpolated", 
-                paste("tacsatSweptArea_",vid, "_", gr, ".RData", sep=""))),
-                silent=TRUE)
-          if(class(er)=="try-error"){
-          count <- count -1
-          } else{      
-          lst[[count]] <-  tacsatInt_gr_vid
-          }
-     
-      }
-      
-    }
-    tacsatp <- do.call("rbind", lst) 
-    # save 
-    save(tacsatp, file=file.path(outPath, paste("tacsatSweptArea.RData", sep="")))
- 
-</code>  
-
-
-
-
-
-
-  * labelling each haul  
-
-<code>  
-# assign an identifier in 'HL_ID' to each of the fishing sequences
-# (based on SI_STATE, assuming the "h", "f", "s" coding)
-# (useful to count them in a grid...)
-tacsatp <- labellingHauls(tacsatp)  
-gc(reset=TRUE)
-</code>  
-
-
-
-
-
-
-
-  * link habitat map to vms
+=== link habitat map to vms ===
 
 
 
