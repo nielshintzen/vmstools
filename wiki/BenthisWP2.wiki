@@ -133,12 +133,16 @@ remrecsTacsat["harbour",] <- c(nrow(tacsat),100+round((nrow(tacsat) -
 <code>
 pols            <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
                         function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,SI_LATI=subset(europa,SID==x)$Y)}))
-idx             <- pointOnLand(tacsat,pols); pol <- tacsat[which(idx == 1),]
+idx             <- pointOnLand(tacsat,pols);
+pol             <- tacsat[which(idx == 1),]
 save(pol,file=paste(outPath,"pointOnLand.RData",sep=""))
 tacsat          <- tacsat[which(idx == 0),]
 remrecsTacsat["land",] <- c(nrow(tacsat),100+round((nrow(tacsat) -
                 an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
+If you would plot those points on land, it would look something like this:<br>
+[http://vmstools.googlecode.com/svn/wiki/figures/pointOnLand.png]
+
 
   * Save the remrecsTacsat file
 <code>
@@ -279,6 +283,7 @@ dataset.
 <code>  
 vesselGear            <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_GEAR)), ]
 fakeGearWidth         <- vesselGear[,c('VE_REF', 'LE_GEAR')]
+fakeGearWidth         <- fakeGearWidth[-which(is.na(fakeGearWidth$VE_REF) | is.na(fakeGearWidth$LE_GEAR)),]
 fakeGearWidth$LE_GEAR_WIDTH <- 0.5 # in km
 save(fakeGearWidth, file=paste(dataPath,"gearWidth.RData",   sep=""))
   
@@ -290,26 +295,14 @@ save(tacsatp,   file=paste(outPath,"tacsatMergedWidth.RData",   sep=""))
 </code>  
 
 
-
-
-
-
-
-
-
-
-  * Save not merged tacsat data
+=== Separate tacsat that is not merged ===
 <code>  
-  tacsatpmin        <- subset(tacsatp,FT_REF == 0)
-  save(tacsatpmin, file=paste(outPath,"tacsatNotMerged.RData",sep=""))
+tacsatpmin        <- subset(tacsatp,FT_REF == 0)
+save(tacsatpmin, file=paste(outPath,"tacsatNotMerged.RData",sep=""))
 </code>  
 
-
-
-
-
-
-  * define activity depending on speed profiles.
+=== define activity ===
+A common way to define activity of a vessel is to look at its speed profiles.
     This step identifies the fishing activities from the steaming phases by analysing the vessel-specific speed profile and knowing the type of gear used from the logbooks.
 
 
