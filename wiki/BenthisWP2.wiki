@@ -230,59 +230,63 @@ save(eflalo,file=file.path(outPath,"cleanEflalo.RData"))
 </code>  
 
 
+As we now have cleaned both the tacsat and eflalo datasets, we can start to explore
+the potential of combining these datasets. Both datasets have two aspects in common:
+vessel name or identifier and a date / time stamp. On this basis, both datasets
+can be merged together. One tries to find those tacsat records that fall within
+the trip departure and arrival date registered in the logbooks.
 
+In VMStools, a special function is designed to do this automatically.
 
+=== merge eflalo and tacsat ===
 
-
-  * merge eflalo and tacsat
-
+The code itself is simple. Note that the trip identifier (FT_REF) in the eflalo
+dataset is assigned to the tacsat file if a match is found. If not, the FT_REF
+column in the tacsat dataset will state '0'.
 <code>  
-  tacsatp           <- mergeEflalo2Tacsat(eflalo,tacsat)
+tacsatp           <- mergeEflalo2Tacsat(eflalo,tacsat)
 </code>  
 
+As we've now established some links, we can assign more attributes from the
+eflalo data to the tacsat data, such as gear characteristics (LE_GEAR), vessel
+length (VE_LEN) or fishery type (LE_MET).
 
-
-
-
-
-
-
-
-
-  * link gear characteristics to tacsat 
+  * Link gear characteristics to tacsat
 
 <code>  
-  tacsatp$LE_GEAR   <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
-  tacsatp$VE_LEN    <- eflalo$VE_LEN[ match(tacsatp$FT_REF,eflalo$FT_REF)]
-  tacsatp$LE_MET    <- eflalo$LE_MET[ match(tacsatp$FT_REF,eflalo$FT_REF)]
-  save(tacsatp,   file=paste(outPath,"tacsatMerged.RData",   sep=""))
-  head(tacsatp[is.na(tacsatp$LE_GEAR),]) 
-   # =>check for some cases with no match!
-</code>  
+tacsatp$LE_GEAR   <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+tacsatp$VE_LEN    <- eflalo$VE_LEN[ match(tacsatp$FT_REF,eflalo$FT_REF)]
+tacsatp$LE_MET    <- eflalo$LE_MET[ match(tacsatp$FT_REF,eflalo$FT_REF)]
+save(tacsatp,   file=paste(outPath,"tacsatMerged.RData",   sep=""))
+</code>
+In some cases, no match could be found. The result will look something like this:
+[http://vmstools.googlecode.com/svn/wiki/figures/missingMatch.png]
 
+  * read in look-up table (industry data from interviews / experimental studies)
+To calculate bottom impact in a later stage, we need the width of the gear. It is not
+always easy to derive these widths though.
+The gear width for a (beam) trawl is straightforward, the gear width for a seine
+could be the length of the net and the gear width of a gillnets or other could be
+the number of nets released per operation times the unit net length. However
+, this needs to be confirmed by the industry and potentially making use of a functional
+relationships between vessel HP or length to gear size.
 
+A table specifying all these gear - width combinations should be put together and
+read into the workflow.
 
-
-
-
-  * read in look-up table (industry data from interviews / experimental studies) making use 
-of functional relationships between vessel HP or length to gear size. The gear width for a trawl is straightforward.
-The gear width for a seine should be the length of the net. The gear width of a gillnets or other should be
-the nb of nets released per operation times the unit net length. This need to be confirmed by the industry.
-
+Here we create a fake gearwidth table as an example and merge it to the tacsat
+dataset.
 <code>  
-  # create a fake input file to show the required format
-  #dd <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_GEAR)), ] 
-  #fake_gear_width_table <- dd[,c('VE_REF', 'LE_GEAR')]
-  #fake_gear_width_table$LE_GEAR_WIDTH <- 0.5 # in km
-  # gear_width_table <- fake_gear_width_table  
-  #save(gear_width_table,   file=paste(dataPath,"gear_width_vid_gr.RData",   sep=""))
+vesselGear            <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_GEAR)), ]
+fakeGearWidth         <- vesselGear[,c('VE_REF', 'LE_GEAR')]
+fakeGearWidth$LE_GEAR_WIDTH <- 0.5 # in km
+save(fakeGearWidth, file=paste(dataPath,"gearWidth.RData",   sep=""))
   
-  load(file.path(dataPath, "gear_width_vid_gr.RData"))
-  tacsatp <- merge(tacsatp, gear_width_table) 
+load(file.path(dataPath, "gearWidth.RData"))
+tacsatp               <- merge(tacsatp, fakeGearWidth,by=c("VE_REF","LE_GEAR"),
+                               all.x=T,all.y=F)
     
-  # save 
-  save(tacsatp,   file=paste(outPath,"tacsatMergedWidth.RData",   sep=""))
+save(tacsatp,   file=paste(outPath,"tacsatMergedWidth.RData",   sep=""))
 </code>  
 
 
