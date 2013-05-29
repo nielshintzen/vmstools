@@ -41,22 +41,28 @@ polPath   <- "D:/Benthis/Data/Polygons/"
 
 === loading VMS and Logbook data ===
  
-The VMS data we use in this analyses must be formatted to the 'tacsat' style. 
+The VMS data we use in this analyses must be formatted to the 'tacsat' style. The logbook data must be formatted in the 'eflalo' style. You can download a description of these formats [http://code.google.com/p/vmstools/downloads/list here] and if you want another example, in the VMStools package an example tacsat and eflalo dataset are embedded. Load the VMStools library and call these by typing {{{data(tacsat)}}} or {{{data(eflalo)}}}.
+If you have the data in R format already, you can read them in as below.
 <code>  
- load(file.path(dataPath,"tacsat_2011.RData")); # get the tacsat object
- load(file.path(dataPath,"eflalo_2011.RData")); # get the eflalo object
+load(file.path(dataPath,"tacsat.RData")); # get the tacsat object
+load(file.path(dataPath,"eflalo.RData")); # get the eflalo object
 </code>  
+If they are in a .csv format, you could use the following lines.
+<code>
+tacsat <- readTacsat(file.path(dataPath,"tacsat.csv"))
+eflalo <- readEflalo(file.path(dataPath,"eflalo.csv"))
+</code>
 
-We assume that the fishing activities/metier (LE_MET) are fully informed in the eflalo data
+Make sure that the fishing activities / metier (the 'LE_MET' column in eflalo) is present and complete.
  
-  * load vmstools underlying data
+=== load VMStools additional datasets ===
 <code>  
-  data(euharbours)
-  data(ICESareas)
-  data(europa)
+data(euharbours)
+data(ICESareas)
+data(europa)
 </code>  
 
-  * have a look at e.g. harbours e.g. using ggmap
+Let's take a look at e.g. the harbours dataset.
 
 <code>  
   coord.ports <- harbours
