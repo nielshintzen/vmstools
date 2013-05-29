@@ -141,7 +141,7 @@ remrecsTacsat["land",] <- c(nrow(tacsat),100+round((nrow(tacsat) -
                 an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 If you would plot those points on land, it would look something like this:<br>
-[http://vmstools.googlecode.com/svn/wiki/figures/pointOnLand.png]
+[http://vmstools.googlecode.com/svn/wiki/figures/pointsOnLand.png]
 
 
   * Save the remrecsTacsat file
