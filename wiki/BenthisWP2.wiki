@@ -182,7 +182,7 @@ remrecsEflalo["duplicated",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
 eflalo$FT_DDATIM  <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME, sep = " "),
                                tz = "GMT", format = "%d/%m/%Y  %H:%M")
 eflalo$FT_LDATIM  <- as.POSIXct(paste(eflalo$FT_LDAT,eflalo$FT_LTIME, sep = " "),
-                               tz = "GMT", format = "%d/%m/%Y  %H:%M")
+                               tz = "GMT", format = "%d/%m/%Y  %H:%M") 
 
 eflalo            <- eflalo[!(is.na(eflalo$FT_DDATIM) |is.na(eflalo$FT_LDATIM)),]
 remrecsEflalo["impossible time",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
@@ -253,10 +253,10 @@ length (VE_LEN) or fishery type (LE_MET).
 
   * Link gear characteristics to tacsat
 
-<code>  
-tacsatp$LE_GEAR   <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
-tacsatp$VE_LEN    <- eflalo$VE_LEN[ match(tacsatp$FT_REF,eflalo$FT_REF)]
-tacsatp$LE_MET    <- eflalo$LE_MET[ match(tacsatp$FT_REF,eflalo$FT_REF)]
+<code>
+tacsatp$LE_GEAR   <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)] 
+tacsatp$VE_LEN    <- eflalo$VE_LEN[ match(tacsatp$FT_REF,eflalo$FT_REF)] 
+tacsatp$LE_MET    <- eflalo$LE_MET[ match(tacsatp$FT_REF,eflalo$FT_REF)] 
 save(tacsatp,   file=paste(outPath,"tacsatMerged.RData",   sep=""))
 </code>
 In some cases, no match could be found. The result will look something like this:<br>
