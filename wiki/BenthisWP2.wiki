@@ -13,24 +13,23 @@ Please note that at this stage (May 2013), VMStools will only operate on R-2.15.
 Please find below an example workflow to treat VMS and Logbook in a systematic manner to create swept area maps.
 
 
-  * Installing VMStools
-    * The VMStools software is available [http://code.google.com/p/vmstools/downloads/list]
-    * The procedure for installing the VMStools library under R is described [http://code.google.com/p/vmstools/wiki/Introduction?tm=6]
+=== Installing VMStools ===
+  * The VMStools software is available [http://code.google.com/p/vmstools/downloads/list here]
+  * The procedure for installing the VMStools library under R is described [http://code.google.com/p/vmstools/wiki/Introduction?tm=6 here]
   
-    * Loading the required libraries into the R console
+=== Loading the required libraries into the R console ===
+We load three different libraries, to start with the VMStools one, followed by two packages that help us to create maps. If you have not installed them, please use {{{install.packages("maps",repos=getOption("repos")}}} and select the correct packages.
 <code>  
-
 rm(list=ls())
 library(vmstools)
 library(maps)
 library(mapdata)
 memory.size(4000)
-
 </code>  
   
+In general, workflows can be easily adapted to each users' computer by setting working directories first. You may need to adjust these to direct to the folders you would like to store the results in.
 
-
-  * setting working directories
+=== setting working directories ===
 
 <code>  
 user <- "FRANCOIS"
