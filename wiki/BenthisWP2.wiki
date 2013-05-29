@@ -82,16 +82,18 @@ In general, the tacsat dataset contains many errors, such as duplicates, points 
   
   * It is a good idea to keep track of those records you have removed 
 <code>
-remrecsTacsat     <- matrix(NA,nrow=6,ncol=2,dimnames= list(c("total","duplicates","notPossible","pseudoDuplicates","harbour","land"),c("rows","percentage")))
-  remrecsTacsat["total",] <- c(nrow(tacsat),"100%")
+remrecsTacsat     <- matrix(NA,nrow=6,ncol=2,dimnames= list(c("total","duplicates","notPossible",
+                                                              "pseudoDuplicates","harbour","land"),
+                                                            c("rows","percentage")))
+remrecsTacsat["total",] <- c(nrow(tacsat),"100%")
 </code>
 
   * Remove duplicate records 
 <code>
 tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-  uniqueTacsat    <- paste(tacsat$VE_REF,tacsat$SI_LATI,tacsat$SI_LONG,tacsat$SI_DATIM)
-  tacsat          <- tacsat[!duplicated(uniqueTacsat),]
-  remrecsTacsat["duplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+uniqueTacsat    <- paste(tacsat$VE_REF,tacsat$SI_LATI,tacsat$SI_LONG,tacsat$SI_DATIM)
+tacsat          <- tacsat[!duplicated(uniqueTacsat),]
+remrecsTacsat["duplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Remove points that cannot be possible
@@ -100,34 +102,35 @@ spThres         <- 20   #Maximum speed threshold in analyses in nm
   idx             <- which(abs(tacsat$SI_LATI) > 90 | abs(tacsat$SI_LONG) > 180)
   idx             <- unique(c(idx,which(tacsat$SI_HE < 0 | tacsat$SI_HE > 360)))
   idx             <- unique(c(idx,which(tacsat$SI_SP > spThres)))
-  if(length(idx)>0) tacsat          <- tacsat[-idx,]
-  remrecsTacsat["notPossible",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+if(length(idx)>0) tacsat          <- tacsat[-idx,]
+remrecsTacsat["notPossible",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Remove points which are pseudo duplicates as they have an interval rate < x minutes
-<code>  intThres        <- 5    # Minimum difference in time interval in minutes to prevent pseudo duplicates
-  tacsat          <- sortTacsat(tacsat)
-  tacsatp         <- intervalTacsat(tacsat,level="vessel",fill.na=T)
-  tacsat          <- tacsatp[which(tacsatp$INTV > intThres | is.na(tacsatp$INTV)==T),-grep("INTV",colnames(tacsatp))]
-  remrecsTacsat["pseudoDuplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+<code>
+intThres        <- 5    # Minimum difference in time interval in minutes to prevent pseudo duplicates
+tacsat          <- sortTacsat(tacsat)
+tacsatp         <- intervalTacsat(tacsat,level="vessel",fill.na=T)
+tacsat          <- tacsatp[which(tacsatp$INTV > intThres | is.na(tacsatp$INTV)==T),-grep("INTV",colnames(tacsatp))]
+remrecsTacsat["pseudoDuplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Remove points in harbour
 <code>
 idx             <- pointInHarbour(tacsat$SI_LONG,tacsat$SI_LATI,harbours); pih <- tacsat[which(idx == 1),]
-  save(pih,file=paste(outPath,"pointInHarbour.RData",sep=""))
-  tacsat          <- tacsat[which(idx == 0),]
-  remrecsTacsat["harbour",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+save(pih,file=paste(outPath,"pointInHarbour.RData",sep=""))
+tacsat          <- tacsat[which(idx == 0),]
+remrecsTacsat["harbour",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Remove points on land
 <code>
 pols            <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
                         function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,SI_LATI=subset(europa,SID==x)$Y)}))
-  idx             <- pointOnLand(tacsat,pols); pol <- tacsat[which(idx == 1),]
-  save(pol,file=paste(outPath,"pointOnLand.RData",sep=""))
-  tacsat          <- tacsat[which(idx == 0),]
-  remrecsTacsat["land",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+idx             <- pointOnLand(tacsat,pols); pol <- tacsat[which(idx == 1),]
+save(pol,file=paste(outPath,"pointOnLand.RData",sep=""))
+tacsat          <- tacsat[which(idx == 0),]
+remrecsTacsat["land",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Save the remrecsTacsat file
