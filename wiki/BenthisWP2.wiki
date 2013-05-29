@@ -179,13 +179,13 @@ remrecsEflalo["duplicated",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
 
   * Remove impossible time stamp records
 <code>
-  eflalo$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME, sep = " "),
-                                 tz = "GMT", format = "%d/%m/%Y  %H:%M")
-  eflalo$FT_LDATIM <- as.POSIXct(paste(eflalo$FT_LDAT,eflalo$FT_LTIME, sep = " "),
-                                 tz = "GMT", format = "%d/%m/%Y  %H:%M")
+eflalo$FT_DDATIM  <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME, sep = " "),
+                               tz = "GMT", format = "%d/%m/%Y  %H:%M")
+eflalo$FT_LDATIM  <- as.POSIXct(paste(eflalo$FT_LDAT,eflalo$FT_LTIME, sep = " "),
+                               tz = "GMT", format = "%d/%m/%Y  %H:%M")
 
-  eflalo <- eflalo[!(is.na(eflalo$FT_DDATIM) |is.na(eflalo$FT_LDATIM)),] 
-  remrecsEflalo["impossible time",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
+eflalo            <- eflalo[!(is.na(eflalo$FT_DDATIM) |is.na(eflalo$FT_LDATIM)),]
+remrecsEflalo["impossible time",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
                   an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
 </code>
   
