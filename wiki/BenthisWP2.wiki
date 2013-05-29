@@ -2,16 +2,11 @@
 
 Welcome to the Benthis workflow example wiki. The page is hosted on the VMStools page
 as for this analyses you will be required to install the VMStools software for R.
-Please note that at this stage (May 2013), VMStools will only operate on R-2.15.x
-versions. Details on how to install VMStools can be found [https://code.google.com/p/vmstools/wiki/Introduction?tm=6 here]
+Please note that at this stage (May 2013), VMStools will only operate on R-2.15.x versions.
 
 ==Objectives==
-  * To map habitat types and sea bed impact from fishing activities in EU waters
-  to identify where fisheries potentially compromises seafloor integrity and
-  conflicts of ecosystem services
-  * To develop and implement new methodology, combining VMS, logbook and industry
-  data, to assess actual seabed impact from large scale fishing activities on an
-  appropriate spatial and temporal scale
+  * To map habitat types and sea bed impact from fishing activities in EU waters to identify where fisheries potentially compromises seafloor integrity and conflicts of ecosystem services
+  * To develop and implement new methodology, combining VMS, logbook and industry data, to assess actual seabed impact from large scale fishing activities on an appropriate spatial and temporal scale
 
 ==workflow==
 
@@ -19,8 +14,8 @@ Please find below an example workflow to treat VMS and Logbook in a systematic m
 
 
   * Installing VMStools
-    * The VMStools software is available [http://code.google.com/p/vmstools/downloads/ here]
-    * The procedure for installing the VMStools library under R is described [http://code.google.com/p/vmstools/w/edit/Introduction here]
+    * The VMStools software is available [http://code.google.com/p/vmstools/downloads/list]
+    * The procedure for installing the VMStools library under R is described [http://code.google.com/p/vmstools/wiki/Introduction?tm=6]
   
     * Loading the required libraries into the R console
 <code>  
