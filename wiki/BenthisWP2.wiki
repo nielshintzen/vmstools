@@ -259,7 +259,7 @@ tacsatp$VE_LEN    <- eflalo$VE_LEN[ match(tacsatp$FT_REF,eflalo$FT_REF)]
 tacsatp$LE_MET    <- eflalo$LE_MET[ match(tacsatp$FT_REF,eflalo$FT_REF)]
 save(tacsatp,   file=paste(outPath,"tacsatMerged.RData",   sep=""))
 </code>
-In some cases, no match could be found. The result will look something like this:
+In some cases, no match could be found. The result will look something like this:<br>
 [http://vmstools.googlecode.com/svn/wiki/figures/missingMatch.png]
 
   * read in look-up table (industry data from interviews / experimental studies)
