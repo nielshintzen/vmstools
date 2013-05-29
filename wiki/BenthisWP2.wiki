@@ -301,61 +301,78 @@ tacsatpmin        <- subset(tacsatp,FT_REF == 0)
 save(tacsatpmin, file=paste(outPath,"tacsatNotMerged.RData",sep=""))
 </code>  
 
-=== define activity ===
+=== define (fishing) activity ===
 A common way to define activity of a vessel is to look at its speed profiles.
-    This step identifies the fishing activities from the steaming phases by analysing the vessel-specific speed profile and knowing the type of gear used from the logbooks.
+In general, you can identify for most bottom trawling gear 3 peaks. One peak
+would be situated right at the zero-knots boundary, one peak somewhere between
+4-8 knots and a third one between 8 and 12 knots. For example, see the speed profile
+below:<br>
+[http://vmstools.googlecode.com/svn/wiki/figures/speedProfiles.png]
 
 
-<code>  
-  #-------------------------------------------------------------------------------
-  #- Remove points with NA's in them in critial places
-  #-------------------------------------------------------------------------------
-  idx             <- which(is.na(tacsatp$VE_REF) == T   | is.na(tacsatp$SI_LONG) == T | is.na(tacsatp$SI_LATI) == T |
+The following step identifies the fishing activities from the steaming phases
+by analysing the vessel-specific speed profile and knowing the type of gear used from the logbooks.
+
+
+First remove points with NA's in them in critial places
+<code>
+idx               <- which(is.na(tacsatp$VE_REF) == T   | is.na(tacsatp$SI_LONG) == T | is.na(tacsatp$SI_LATI) == T |
                            is.na(tacsatp$SI_DATIM) == T |  is.na(tacsatp$SI_SP) == T)
-  if(length(idx)>0) tacsatp         <- tacsatp[-idx,]
+if(length(idx)>0) tacsatp         <- tacsatp[-idx,]
+</code>
 
-  #-------------------------------------------------------------------------------
-  #- Analyse activity (semi-)automated
-  #-------------------------------------------------------------------------------
-  storeScheme     <- activityTacsatAnalyse(tacsatp, units = "year", analyse.by = "LE_GEAR",identify="means") # use 3 or 5 peaks 
-  storeScheme     <- storeScheme[-which(is.na(storeScheme$analyse.by)==T),]
-  save(storeScheme, file=paste(outPath,"storeScheme.RData",sep=""))
+The identification of these activities is sensitive to starting conditions on where
+the peaks are approximately. Hence, a pre-analyses needs to take place to roughly
+estimate where each of the three peaks is situated. You can either spot 2 or 3 peaks
+(one around zero knots, around 4-8 knots and around 8-12 knots or one around zero
+nots and one around 6-12 knots). To reliably estimate these peaks, the speed profile
+is mirrored in the y-axis and therefore you can either spot 3 or 5 peaks. The
+following routine will ask for the number of peaks and where they roughly are
+situated.
+<code>
+storeScheme       <- activityTacsatAnalyse(tacsatp, units = "year", analyse.by = "LE_GEAR",identify="means")
+storeScheme       <- storeScheme[-which(is.na(storeScheme$analyse.by)==T),]
+save(storeScheme, file=paste(outPath,"storeScheme.RData",sep=""))
+</code>
+In case you have many vessels, you could create the storeScheme object yourself outside
+of this function.
 
-  storeScheme       <- storeScheme[storeScheme$years==year,]    # debug added fba
-  storeScheme$years <- as.numeric(as.character(storeScheme$years))  # debug added fba
-  tacsatp$year      <- format(tacsatp$SI_DATIM, "%Y") # debug added fba
-  tacsatp           <- tacsatp[tacsatp$year %in% year,] # debug added fba
+It is in many cases easier to perform the calculation on a year-by-year basis.
+<code>
+storeScheme       <- storeScheme[storeScheme$years==1800,]
+storeScheme$years <- as.numeric(as.character(storeScheme$years))
+tacsatp$year      <- format(tacsatp$SI_DATIM, "%Y")
+tacsatp           <- tacsatp[tacsatp$year %in% 1800,]
+</code>
 
- 
-  activity          <- activityTacsat(tacsatp,units="year",analyse.by="LE_GEAR",storeScheme,
-                                  plot=TRUE,level="all",sigma=1)
-  tacsatp$SI_STATE  <- NA
-  tacsatp$SI_STATE  <- activity
+The following routine is the function that actually identifies the peaks and the
+result is returned in the 'activity' object.
+<code>
+activity          <- activityTacsat(tacsatp,units="year",analyse.by="LE_GEAR",storeScheme,
+                                plot=TRUE,level="all",sigma=1)
+tacsatp$SI_STATE  <- activity
+</code>
 
+In most cases however, you have still a few records that have no activity associated
+as yet. You need to 'fix' this manually. An example is given below.
 
-  #-------------------------------------------------------------------------------
-  #- Assign for the remaining (NA) points a simple speed rule classification
-  #-------------------------------------------------------------------------------
-  idx             <- which(is.na(tacsatp$SI_STATE))
-  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >= 1.5 & tacsatp$SI_SP[idx] <= 7.5)]] <- 'f'
-  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] < 1.5)]]                              <- 'h'
-  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] > 7.5)]]                              <- 's'
+<code>
+idx               <- which(is.na(tacsatp$SI_STATE))
+tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >= 1.5 &
+                           tacsatp$SI_SP[idx] <= 7.5)]] <- 'f'
+tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] <  1.5)]] <- 'h'
+tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >  7.5)]] <- 's'
+</code>
 
-  #-------------------------------------------------------------------------------
-  #- Save the analysed scheme and defined activity tacsat file
-  #-------------------------------------------------------------------------------
-  save(storeScheme, file=file.path(outPath,"storeScheme.RData"))
-  save(tacsatp,     file=file.path(outPath,"tacsatActivity.RData"))
+Make sure you save the results, else you might need to do the analyse all over!
+<code>
+save(storeScheme, file=file.path(outPath,"storeScheme.RData"))
+save(tacsatp,     file=file.path(outPath,"tacsatActivity.RData"))
 </code>  
 
+  * Alternative activity identification: (Based on Fock 2008)
 
-<code>  
-</code>  
 
-  * need for Fock??
-
-<code>  
-</code>  
 
   * interpolate data (or not) and compute the swept area
 
