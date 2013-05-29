@@ -90,20 +90,23 @@ remrecsTacsat["total",] <- c(nrow(tacsat),"100%")
 
   * Remove duplicate records 
 <code>
-tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "),
+                              tz="GMT", format="%d/%m/%Y  %H:%M")
 uniqueTacsat    <- paste(tacsat$VE_REF,tacsat$SI_LATI,tacsat$SI_LONG,tacsat$SI_DATIM)
 tacsat          <- tacsat[!duplicated(uniqueTacsat),]
-remrecsTacsat["duplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+remrecsTacsat["duplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) -
+                an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Remove points that cannot be possible
 <code>
 spThres         <- 20   #Maximum speed threshold in analyses in nm
-  idx             <- which(abs(tacsat$SI_LATI) > 90 | abs(tacsat$SI_LONG) > 180)
-  idx             <- unique(c(idx,which(tacsat$SI_HE < 0 | tacsat$SI_HE > 360)))
-  idx             <- unique(c(idx,which(tacsat$SI_SP > spThres)))
+  idx           <- which(abs(tacsat$SI_LATI) > 90 | abs(tacsat$SI_LONG) > 180)
+  idx           <- unique(c(idx,which(tacsat$SI_HE < 0 | tacsat$SI_HE > 360)))
+  idx           <- unique(c(idx,which(tacsat$SI_SP > spThres)))
 if(length(idx)>0) tacsat          <- tacsat[-idx,]
-remrecsTacsat["notPossible",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+remrecsTacsat["notPossible",] <- c(nrow(tacsat),100+round((nrow(tacsat) -
+                an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Remove points which are pseudo duplicates as they have an interval rate < x minutes
@@ -112,15 +115,18 @@ intThres        <- 5    # Minimum difference in time interval in minutes to prev
 tacsat          <- sortTacsat(tacsat)
 tacsatp         <- intervalTacsat(tacsat,level="vessel",fill.na=T)
 tacsat          <- tacsatp[which(tacsatp$INTV > intThres | is.na(tacsatp$INTV)==T),-grep("INTV",colnames(tacsatp))]
-remrecsTacsat["pseudoDuplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+remrecsTacsat["pseudoDuplicates",] <- c(nrow(tacsat),100+round((nrow(tacsat) -
+                an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Remove points in harbour
 <code>
-idx             <- pointInHarbour(tacsat$SI_LONG,tacsat$SI_LATI,harbours); pih <- tacsat[which(idx == 1),]
+idx             <- pointInHarbour(tacsat$SI_LONG,tacsat$SI_LATI,harbours)
+pih             <- tacsat[which(idx == 1),]
 save(pih,file=paste(outPath,"pointInHarbour.RData",sep=""))
 tacsat          <- tacsat[which(idx == 0),]
-remrecsTacsat["harbour",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+remrecsTacsat["harbour",] <- c(nrow(tacsat),100+round((nrow(tacsat) -
+                an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Remove points on land
@@ -130,7 +136,8 @@ pols            <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$
 idx             <- pointOnLand(tacsat,pols); pol <- tacsat[which(idx == 1),]
 save(pol,file=paste(outPath,"pointOnLand.RData",sep=""))
 tacsat          <- tacsat[which(idx == 0),]
-remrecsTacsat["land",] <- c(nrow(tacsat),100+round((nrow(tacsat) - an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
+remrecsTacsat["land",] <- c(nrow(tacsat),100+round((nrow(tacsat) -
+                an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
 </code>
 
   * Save the remrecsTacsat file
@@ -157,44 +164,57 @@ Very similar to cleaning the tacsat dataset, we need to clean the eflalo dataset
 
   * Keep track of removed points
 <code>
-  remrecsEflalo     <- matrix(NA,nrow=5,ncol=2,dimnames=list(c("total","duplicated","impossible time","before 1st Jan","departArrival"),c("rows","percentage")))
-  remrecsEflalo["total",] <- c(nrow(eflalo),"100%")
+remrecsEflalo     <- matrix(NA,nrow=5,ncol=2,dimnames=list(c("total","duplicated","impossible time",
+                                                             "before 1st Jan","departArrival"),
+                                                           c("rows","percentage")))
+remrecsEflalo["total",] <- c(nrow(eflalo),"100%")
 </code>
 
   * Remove non-unique trip numbers
 <code>
-  eflalo <- eflalo[!duplicated(paste(eflalo$LE_ID,eflalo$LE_CDAT,sep="-")),]
-  remrecsEflalo["duplicated",] <- c(nrow(eflalo),100+round((nrow(eflalo) - an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
+eflalo            <- eflalo[!duplicated(paste(eflalo$LE_ID,eflalo$LE_CDAT,sep="-")),]
+remrecsEflalo["duplicated",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
+                  an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
 </code>
 
   * Remove impossible time stamp records
 <code>
-  eflalo$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME, sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M")
-  eflalo$FT_LDATIM <- as.POSIXct(paste(eflalo$FT_LDAT,eflalo$FT_LTIME, sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M")
+  eflalo$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,eflalo$FT_DTIME, sep = " "),
+                                 tz = "GMT", format = "%d/%m/%Y  %H:%M")
+  eflalo$FT_LDATIM <- as.POSIXct(paste(eflalo$FT_LDAT,eflalo$FT_LTIME, sep = " "),
+                                 tz = "GMT", format = "%d/%m/%Y  %H:%M")
 
   eflalo <- eflalo[!(is.na(eflalo$FT_DDATIM) |is.na(eflalo$FT_LDATIM)),] 
-  remrecsEflalo["impossible time",] <- c(nrow(eflalo),100+round((nrow(eflalo) - an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
+  remrecsEflalo["impossible time",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
+                  an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
 </code>
   
   * Remove trip starting befor 1st Jan
 <code>
-year <- min(year(eflalo$FT_DDATIM))
-eflalo <- eflalo[eflalo$FT_DDATIM>=strptime(paste(year,"-01-01 00:00:00",sep=''),"%Y-%m-%d %H:%M:%S"),]
-  remrecsEflalo["before 1st Jan",] <- c(nrow(eflalo),100+round((nrow(eflalo) - an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
+year              <- min(year(eflalo$FT_DDATIM))
+eflalo            <- eflalo[eflalo$FT_DDATIM>=strptime(paste(year,"-01-01 00:00:00",sep=''),
+                                                             "%Y-%m-%d %H:%M:%S"),]
+remrecsEflalo["before 1st Jan",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
+                  an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
 </code>
 
   * Remove records with arrival date before departure date
 <code>
 eflalop           <- eflalo
-  eflalop$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,  eflalo$FT_DTIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-  eflalop$FT_LDATIM <- as.POSIXct(paste(eflalo$FT_LDAT,  eflalo$FT_LTIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-  idx               <- which(eflalop$FT_LDATIM >= eflalop$FT_DDATIM)
-  eflalo            <- eflalo[idx,]
-  remrecsEflalo["departArrival",] <- c(nrow(eflalo),100+round((nrow(eflalo) - an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
+eflalop$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT,  eflalo$FT_DTIME,   sep=" "),
+                                tz="GMT", format="%d/%m/%Y  %H:%M")
+eflalop$FT_LDATIM <- as.POSIXct(paste(eflalo$FT_LDAT,  eflalo$FT_LTIME,   sep=" "),
+                                tz="GMT", format="%d/%m/%Y  %H:%M")
+idx               <- which(eflalop$FT_LDATIM >= eflalop$FT_DDATIM)
+eflalo            <- eflalo[idx,]
+remrecsEflalo["departArrival",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
+                  an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
 </code>
 
   * Save the remrecsEflalo file
-  save(remrecsEflalo,file=file.path(outPath,"remrecsEflalo.RData"))  
+<code>
+save(remrecsEflalo,file=file.path(outPath,"remrecsEflalo.RData"))
+</code>
 
 The result, based on the VMStools eflalo dataset, looks like:
 || *Category* || *Records left* || *Percentage of original* ||
