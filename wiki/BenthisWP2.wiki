@@ -47,7 +47,9 @@ If you have the data in R format already, you can read them in as below.
 load(file.path(dataPath,"tacsat.RData")); # get the tacsat object
 load(file.path(dataPath,"eflalo.RData")); # get the eflalo object
 </code>  
+
 If they are in a .csv format, you could use the following lines.
+
 <code>
 tacsat <- readTacsat(file.path(dataPath,"tacsat.csv"))
 eflalo <- readEflalo(file.path(dataPath,"eflalo.csv"))
@@ -65,21 +67,12 @@ data(europa)
 Let's take a look at e.g. the harbours dataset.
 
 <code>  
-  coord.ports <- harbours
-  require(ggmap)
-  require(mapproj)
-  map.center <- geocode("copenhaguen")
-  SHmap <- qmap(c(lon=map.center$lon, lat=map.center$lat), maprange = TRUE, source="google", zoom=7)
-  
-  coord.ports$lon <- as.numeric(as.character(coord.ports$lon ))
-  coord.ports$lat <- as.numeric(as.character(coord.ports$lat ))
-  
-  SHmap + geom_point(
-  aes(x=lon, y=lat, colour= "black"), data=coord.ports) +
-  #scale_colour_manual(values=c("1"="dark blue","2"="orange"))
-  savePlot(filename=file.path(outPath,
-       paste("ggmap_ports.jpeg",sep='')), type="jpeg")
+map("worldHires",xlim=c(-15,15),ylim=c(40,65),fill=T,col="#7FBC41",oma=rep(0,4),mar=rep(2.5,4))
+map.axes()
+points(harbours$lon,harbours$lat,pch=16,col="blue",cex=0.4)
 </code>  
+It should look something like this:<br>
+[http://vmstools.googlecode.com/svn/wiki/figures/harbours.png]
 
 
   * cleaning tacsat
