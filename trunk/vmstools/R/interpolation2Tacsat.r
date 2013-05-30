@@ -3,7 +3,8 @@ interpolation2Tacsat <- function(interpolation,tacsat,npoints=10,equalDist=TRUE)
 
 # This function takes the list of tracks output by interpolateTacsat and converts them back to tacsat format.
 # The npoints argument is the optional number of points between each 'real' position.
-if(!"ID" %in% colnames(tacsat)) tacsat$HL_ID <- 1:nrow(tacsat)
+tacsat            <- sortTacsat(tacsat)
+if(!"HL_ID" %in% colnames(tacsat)) tacsat$HL_ID <- 1:nrow(tacsat)
 if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM  <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
 if(equalDist){
   interpolationEQ <- equalDistance(interpolation,npoints)  #Divide points equally along interpolated track (default is 10).
@@ -35,7 +36,12 @@ res <- lapply(interpolationEQ,function(x){
 
 #interpolationTot  <- do.call(rbind,res)
 interpolationTot  <- res[[1]][,which(duplicated(colnames(res[[1]]))==FALSE)]
-if(length(res)>1) for(i in 2:length(res)) interpolationTot  <- rbindTacsat(interpolationTot,res[[i]][,which(duplicated(colnames(res[[i]]))==FALSE)])
+if(length(res)>1){
+  for(i in 2:length(res)){
+    if(nrow(res[[i]])>0)
+      interpolationTot  <- rbindTacsat(interpolationTot,res[[i]][,which(duplicated(colnames(res[[i]]))==FALSE)])
+  }
+}
 #tacsatInt         <- rbind(interpolationTot,tacsat[,colnames(interpolationTot)])
 tacsatInt         <- rbindTacsat(tacsat,interpolationTot)
 tacsatInt         <- sortTacsat(tacsatInt)
