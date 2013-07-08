@@ -7,6 +7,7 @@ nearest <- function(x,y){
   lns         <- y@lines
   #- Access points
   pts         <- data.frame(coordinates(x))
+  colnames(pts) <- c("SI_LONG","SI_LATI")
   pts$ID      <- NA
   pts$idx     <- 1:nrow(pts); ptsOrig <- pts
 
