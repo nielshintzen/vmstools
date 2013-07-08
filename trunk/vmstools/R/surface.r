@@ -27,7 +27,7 @@ surface <- function(obj,method="Trapezoid",includeNA=TRUE,zone=NULL){  #Methods 
             colnames(areas) <- c("areas","labptx","labpty","ID")
 
 
-            obj     <- SpatialPolygons(lapply(SP@polygons,function(x){
+            obj     <- SpatialPolygons(lapply(obj@polygons,function(x){
                                 res <- lapply( x@Polygons,function(y){
                                                             subAreas <- subset(areas,ID == x@ID & labptx == ac(y@labpt[1]) & labpty == ac(y@labpt[2]))
                                                             y@area   <- anf(subAreas$areas);return(y)});
