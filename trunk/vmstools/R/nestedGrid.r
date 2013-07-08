@@ -49,7 +49,7 @@ nestedGrid <- function(tacsat,resx,resy,maxstep = 10, n = 20,control=list(clm=NU
   return(SPDF)
 }
 
-round2 < function(x, n){
+round2 <- function(x, n){
     posneg = sign(x)
     z = abs(x)*10^n
     z = z + 0.5
