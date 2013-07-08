@@ -14,10 +14,8 @@ interpolation2Tacsat(interpolation, tacsat, npoints = 10,equalDist=T)
 
 \arguments{
   \item{interpolation}{A list of tracks between actual pings output by the interpolateTacsat function.}
-  \item{tacsat}{Tacsat data used when the interpolateTacsat function was called. 
-}
+  \item{tacsat}{Tacsat data used when the interpolateTacsat function was called.}
   \item{npoints}{The number of pings or positions required between each real or actual vessel position or ping}
-}
   \item{equalDist}{Logical. Whether the number of positions returned should be equally spaced or not}
 }
 \details{The distances between the new vessel positions are assumed to be equal.

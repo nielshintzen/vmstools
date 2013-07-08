@@ -36,7 +36,7 @@ Any points that lie exactly on the border between two grid cells will be assigne
 Hans D Gerritsen
 }
 \seealso{
-\code{\link{nestedGrid}}
+\code{\link{nestedGrid}}}
 \examples{
 lon <- rnorm(25,3)
 lat <- rnorm(25,53)
