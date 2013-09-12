@@ -665,43 +665,62 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
    # 
     sh1 <- readShapePoly(file.path(polPath,"francois_EU"))
 
-   
-    ### the swept area-------------------------------------------
+ 
+  ### the swept area-------------------------------------------
     what <- "SWEPT_AREA_KM2"
     #what <- "HL_ID"
     #what <- "pressure"
     #a_func <- function(x) {unique(length(x))} # for HL_ID, to be tested.
     a_func <- "sum"
-    this <- tacsatInt_gr_vid [,c('SI_LONG', 'SI_LATI', what)]
-    colnames(this) <- c('x', 'y', 'what')
+    all_gears            <- sort(unique(tacsatp$LE_GEAR))
+    towed_gears          <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')  # TO DO: list to be checked
+    passive_gears        <- all_gears[!all_gears %in% towed_gears]
+    this <- tacsatp [tacsatp$LE_GEAR %in% towed_gears , c('SI_LONG', 'SI_LATI', 'SI_DATE', what)]
 
-    #dx <- 6.25  # a finer grid will be produced if a higher value is put here
-    dx <- 12  # a finer grid will be produced if a higher value is put here
-   
-    # retrieve the geo resolution, for info
+
+    dx <- 20  # grid resolution correspond to 0.05 degrees i.e. a 3´ angle = 3nm in latitude but vary in longitude 
+              # (a finer grid will be produced if a higher value for dx is put here)
+    this$round_long <- round(as.numeric(as.character(this$SI_LONG))*dx*2)
+    this$round_lat  <- round(as.numeric(as.character(this$SI_LATI))*dx)
+    this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
+    this$xs         <- (this$round_long/(dx*2))
+    this$ys         <- (this$round_lat/(dx))
+
+    colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')
+
+    # restrict to the study area
+     we <- 10; ea <- 13; no <- 59; so <- 55;
+     this<- this[this$x>we & this$x<ea & this$y>so & this$x<no,]
+
+
+
+    # retrieve the geo resolution in degree, for info
     long <- seq(1,15,by=0.01)
-    res_long <- diff( long [1+which(diff(round(long*dx)/dx)!=0)] )
-    res_lat <- diff( long [1+which(diff(round(long*dx/2)/dx/2)!=0)] )
+    res_long <- diff( long [1+which(diff(round(long*dx)/dx/2)!=0)] )
+    res_lat <- diff( long [1+which(diff(round(long*dx/2)/dx)!=0)] )
+    print(res_long) ; print(res_lat)
 
 
-   
-     the_breaks <-  c(0,1,2,4,8,16,32,64,128, 256, 512)^0.9 
     # a quick gridding method...
-    this$round_long <- round(as.numeric(as.character(this$x))*dx) 
-    this$round_lat  <- round(as.numeric(as.character(this$y))*dx*2)
     background <- expand.grid(
-                              what=0,
                               x=0,
                               y=0,
+                              date=0,
+                              what=0,
                               round_long=seq(range(this$round_long)[1], range(this$round_long)[2]),
-                              round_lat=seq(range(this$round_lat)[1], range(this$round_lat)[2])
+                              round_lat=seq(range(this$round_lat)[1], range(this$round_lat)[2]),
+                              cell=0,
+                              xs=0,
+                              ys=0
                               )
     this <- rbind(this, background)
     the_points <- tapply(this$what,
                   list(this$round_lat, this$round_long), a_func)
 
-    xs <- (as.numeric(as.character(colnames(the_points)))/dx)
-    ys <- (as.numeric(as.character(rownames(the_points)))/(dx*2))
+    xs <- (as.numeric(as.character(colnames(the_points)))/(dx*2))
+    ys <- (as.numeric(as.character(rownames(the_points)))/(dx))
+
+    the_breaks <-  c(0, (1:12)^3.5 )
     graphics:::image(
      x=xs,
      y=ys,
@@ -719,7 +738,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
 
     plot(sh1, add=TRUE, col=grey(0.7))
     legend("topright", fill=terrain.colors(length(the_breaks)-1),
-             legend=round(the_breaks[-1],1), bty="n", cex=0.8, ncol=2, title="")                   
+             legend=round(the_breaks[-1],1), bty="n", cex=0.8, ncol=2, title="")
     box()
     axis(1)
     axis(2, las=2)
@@ -728,10 +747,38 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     mtext(side=2, "Latitude", cex=1, adj=0.5, line=2)
     #mtext(side=3, "(a)", cex=1.5, adj=0, line=1)
 
-    points (tacsatInt_gr_vid [,c('SI_LONG', 'SI_LATI')], pch=".", col="white")
+    points (tacsatp [,c('SI_LONG', 'SI_LATI')], pch=".", col="white")
 
     # save
     savePlot(filename=file.path(outPath, "GriddedSweepAreaExample.jpeg"), type="jpeg")
+
+
+    # export the quantity per cell and date
+    library(data.table)
+    DT                <-  data.table(this)
+    qu                <-  quote(list(sum(what)))
+    quantity_per_cell <- DT[,eval(qu), by=list(cell, xs,ys)]
+    quantity_per_date <- DT[,eval(qu), by=list(date, xs,ys)]
+    quantity_per_cell_date <- DT[,eval(qu), by=list(cell,date, xs,ys)]
+    quantity_per_cell_date <- as.data.frame(quantity_per_cell_date)
+    colnames(quantity_per_cell_date)   <- c('cell','date', 'xs','ys', 'quantity')
+    rm(DT) ; gc(reset=TRUE)
+    save(quantity_per_cell_date, res_long, res_lat,  we, ea, no, so, file=file.path(outPath,"quantity_per_cell_date.RData") )
+
+    
+    # export the cumul per cell and date
+    quantity_per_cell_date <- orderBy(~date, data=quantity_per_cell_date)
+    quantity_cumul_per_cell_date <- do.call("rbind", lapply(
+      split(quantity_per_cell_date, f=quantity_per_cell_date$cell),
+               function(x){
+               x$quantity <- cumsum(x$quantity)
+               x
+               })  )
+    # check the cumul on a given cell
+    # head(quantity_cumul_per_cell_date[quantity_cumul_per_cell_date$cell=="C_197_2722",])
+    save(quantity_cumul_per_cell_date, res_long, res_lat,  we, ea, no, so, file=file.path(outPath,"quantity_cumul_per_cell_date.RData") )
+
+               
 
 </code>  
  
