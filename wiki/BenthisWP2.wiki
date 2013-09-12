@@ -690,7 +690,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
 
     # restrict to the study area
      we <- 10; ea <- 13; no <- 59; so <- 55;
-     this<- this[this$x>we & this$x<ea & this$y>so & this$x<no,]
+     this<- this[this$x>we & this$x<ea & this$y>so & this$y<no,]
 
 
 
