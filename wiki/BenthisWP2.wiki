@@ -664,7 +664,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
    ##-----------------------------------------------------------------------------
    # 
   
-    ## user selection here----
+  ## user selection here----
     what                 <- "SWEPT_AREA_KM2"
     #what                <- "HL_ID"
     #what                <- "pressure"
@@ -678,14 +678,14 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
 
     # subset for relevant fisheries
     this            <- tacsatp [tacsatp$LE_GEAR %in% towed_gears , ]
- 
+
     # restrict the study area
     we <- 10; ea <- 13; no <- 59; so <- 55;
-    this <- this[this$x>we & this$x<ea & this$y>so & this$y<no,]
+    this <- this[this$SI_LONG>we & this$SI_LONG<ea & this$SI_LATI>so & this$SI_LATI<no,]
 
     # grid the data (in decimal or in UTM)
     if(is_utm){
-      dx <- 0.001
+      dx <- 0.005 # 5km x 5km
       # convert to UTM
       library(sp)
       library(rgdal)
@@ -711,7 +711,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     this$xs         <- (this$round_long/(dx*2))
     this$ys         <- (this$round_lat/(dx))
     colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')
-  
+
 
     # retrieve the geo resolution in degree, for info
     #long <- seq(1,15,by=0.01)
@@ -755,8 +755,11 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
      )
     title("")
 
-    sh1 <- readShapePoly(file.path(polPath,"francois_EU"))
+    # land
+    sh1 <- readShapePoly(file.path(polPath,"francois_EU"),  proj4string=CRS("+proj=longlat +datum=WGS84"))
+    if(is_utm) sh1 <- spTransform(sh1, CRS("+proj=utm  +ellps=intl +zone=32 +towgs84=-84,-107,-120,0,0,0,0,0"))
     plot(sh1, add=TRUE, col=grey(0.7))
+
     legend("topright", fill=terrain.colors(length(the_breaks)-1),
              legend=round(the_breaks[-1],1), bty="n", cex=0.8, ncol=2, title="")
     box()
@@ -783,7 +786,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     rm(DT) ; gc(reset=TRUE)
     save(quantity_per_cell_date, res_long, res_lat,  we, ea, no, so, file=file.path(outPath,"quantity_per_cell_date.RData") )
 
-    
+                   
     # export the cumul per cell and date
     quantity_per_cell_date <- orderBy(~date, data=quantity_per_cell_date)
     quantity_cumul_per_cell_date <- do.call("rbind", lapply(
@@ -796,7 +799,8 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     # head(quantity_cumul_per_cell_date[quantity_cumul_per_cell_date$cell=="C_197_2722",])
     save(quantity_cumul_per_cell_date, res_long, res_lat,  we, ea, no, so, file=file.path(outPath,"quantity_cumul_per_cell_date.RData") )
 
-               
+
+           
 
 </code>  
  
