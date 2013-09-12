@@ -663,42 +663,61 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
 <code>  
    ##-----------------------------------------------------------------------------
    # 
-    sh1 <- readShapePoly(file.path(polPath,"francois_EU"))
-
- 
-  ### the swept area-------------------------------------------
-    what <- "SWEPT_AREA_KM2"
-    #what <- "HL_ID"
-    #what <- "pressure"
-    #a_func <- function(x) {unique(length(x))} # for HL_ID, to be tested.
-    a_func <- "sum"
+  
+    ## user selection here----
+    what                 <- "SWEPT_AREA_KM2"
+    #what                <- "HL_ID"
+    #what                <- "pressure"
+    #a_func              <- function(x) {unique(length(x))} # for HL_ID, to be tested.
+    a_func               <- "sum"
+    is_utm               <- FALSE
     all_gears            <- sort(unique(tacsatp$LE_GEAR))
     towed_gears          <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')  # TO DO: list to be checked
     passive_gears        <- all_gears[!all_gears %in% towed_gears]
-    this <- tacsatp [tacsatp$LE_GEAR %in% towed_gears , c('SI_LONG', 'SI_LATI', 'SI_DATE', what)]
+    ##------------------------
 
+    # subset for relevant fisheries
+    this            <- tacsatp [tacsatp$LE_GEAR %in% towed_gears , ]
+ 
+    # restrict the study area
+    we <- 10; ea <- 13; no <- 59; so <- 55;
+    this <- this[this$x>we & this$x<ea & this$y>so & this$y<no,]
 
-    dx <- 20  # grid resolution correspond to 0.05 degrees i.e. a 3´ angle = 3nm in latitude but vary in longitude 
-              # (a finer grid will be produced if a higher value for dx is put here)
-    this$round_long <- round(as.numeric(as.character(this$SI_LONG))*dx*2)
-    this$round_lat  <- round(as.numeric(as.character(this$SI_LATI))*dx)
+    # grid the data (in decimal or in UTM)
+    if(is_utm){
+      dx <- 0.001
+      # convert to UTM
+      library(sp)
+      library(rgdal)
+      SP <- SpatialPoints(cbind(as.numeric(as.character(this$SI_LONG)), as.numeric(as.character(this$SI_LATI))),
+                       proj4string=CRS("+proj=longlat +datum=WGS84"))
+      this <- cbind(this,
+                 spTransform(SP, CRS("+proj=utm  +ellps=intl +zone=32 +towgs84=-84,-107,-120,0,0,0,0,0")))    # convert to UTM
+      this            <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', 'coords.x1', 'coords.x2', what)]
+      this$round_long <- round(as.numeric(as.character(this$coords.x1))*dx*2)
+      this$round_lat  <- round(as.numeric(as.character(this$coords.x2))*dx)
+      this            <- this[, !colnames(this) %in% c('coords.x1', 'coords.x2')]
+    }  else {
+      dx <- 20
+      this <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', what)]
+      this$round_long <- round(as.numeric(as.character(this$SI_LONG))*dx*2)
+      this$round_lat  <- round(as.numeric(as.character(this$SI_LATI))*dx)
+    }
+     # if the coordinates in decimal then dx=20 corresponds to grid resolution of 0.05 degrees
+     # i.e. a 3´ angle = 3nm in latitude but vary in longitude (note that a finer grid will be produced if a higher value for dx is put here)
+     # if coord in UTM then 0.001 correspond to grid of 1 by 1 km (to check)
+
     this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
     this$xs         <- (this$round_long/(dx*2))
     this$ys         <- (this$round_lat/(dx))
-
     colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')
-
-    # restrict to the study area
-     we <- 10; ea <- 13; no <- 59; so <- 55;
-     this<- this[this$x>we & this$x<ea & this$y>so & this$y<no,]
-
-
+  
 
     # retrieve the geo resolution in degree, for info
-    long <- seq(1,15,by=0.01)
-    res_long <- diff( long [1+which(diff(round(long*dx)/dx/2)!=0)] )
-    res_lat <- diff( long [1+which(diff(round(long*dx/2)/dx)!=0)] )
-    print(res_long) ; print(res_lat)
+    #long <- seq(1,15,by=0.01)
+    #res_long <- diff( long [1+which(diff(round(long*dx)/dx/2)!=0)] )
+    #res_lat <- diff( long [1+which(diff(round(long*dx/2)/dx)!=0)] )
+    #print(res_long) ; print(res_lat)
 
 
     # a quick gridding method...
@@ -736,6 +755,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
      )
     title("")
 
+    sh1 <- readShapePoly(file.path(polPath,"francois_EU"))
     plot(sh1, add=TRUE, col=grey(0.7))
     legend("topright", fill=terrain.colors(length(the_breaks)-1),
              legend=round(the_breaks[-1],1), bty="n", cex=0.8, ncol=2, title="")
@@ -745,9 +765,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
 
     mtext(side=1, "Longitude", cex=1, adj=0.5, line=2)
     mtext(side=2, "Latitude", cex=1, adj=0.5, line=2)
-    #mtext(side=3, "(a)", cex=1.5, adj=0, line=1)
-
-    points (tacsatp [,c('SI_LONG', 'SI_LATI')], pch=".", col="white")
+    #points (tacsatp [,c('SI_LONG', 'SI_LATI')], pch=".", col="white")
 
     # save
     savePlot(filename=file.path(outPath, "GriddedSweepAreaExample.jpeg"), type="jpeg")
