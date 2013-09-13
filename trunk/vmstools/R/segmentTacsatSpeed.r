@@ -4,21 +4,19 @@
 # F. Bastardie
 
 segmentTacsatSpeed <- function(tacsat,
-                         general=list(
+                               vessels= unique(tacsat$VE_REF),
+                               force.lower.bound=0.5,  
+                               gears.to.force= c('GNS','GND','GNC','GNF','GTR','GTN','GEN','GN','SDN','SSC'),
+                               general=list(
                                    output.path=file.path('C:','output'),
                                    visual.check=TRUE, 
                                    a.year=2009,
                                    what.speed="calculated", 
-                                    ), ...){
+                                    ),
+                                ...){
 
  
-   lstargs <-  as.list( sys.call() ) # equivalent to lstargs <- list(...) but suppress the r cmd build warning? 
-
-  if(length(lstargs$vessels)!=0) {
-     vessels <- lstargs$vessels
-  } else{
-  vessels <- unique(tacsat$VE_REF)
-  }
+   lstargs <-  as.list( sys.call() ) # deprecated
 
   # checks
   if(!'SI_STATE' %in% colnames(tacsat)) tacsat$SI_STATE <- NA
@@ -363,12 +361,10 @@ segmentTacsatSpeed <- function(tacsat,
 
   # maybe you want to only keep the upper bound
   # and then set the lower one for a particular gear?
-  if(length(lstargs$force.lower.bound)!=0) {
-     if(gr %in% lstargs$gears.to.force){
-                bound1 <- lstargs$force.lower.bound
-              cat(paste(gr," force lower bound at", lstargs$force.lower.bound, "knots\n"))
+  if(gr %in% gears.to.force){
+                bound1 <- force.lower.bound
+              cat(paste(gr," force lower bound at", force.lower.bound, "knots\n"))
              }
-  }
 
   # then, assign...
   xxx[xxx$speed < bound1, "SI_STATE"]                        <- 2 # steaming
