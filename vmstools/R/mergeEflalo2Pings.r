@@ -573,7 +573,7 @@ mergeEflalo2Pings <-
               countp                            <- countPings(~VE_REF+FT_REF, .vms[.vms$SI_STATE=="1",])
               rownames(countp)                  <-  countp$FT_REF
               levels(.vms$count.fping.trip)     <- countp[levels(.vms$count.fping.trip),"pings"]    # mapping
-              .vms[.vms$SI_STATE==2,]$count.fping.trip <- NA
+              if(any(.vms$SI_STATE %in% 2)) .vms[.vms$SI_STATE==2,]$count.fping.trip <- NA
               } else{.vms$count.fping.trip <- NA}
 
     
