@@ -24,7 +24,8 @@ labellingHauls <- function(tacsat){
                                     tacsat$LE_GEAR[idx], "_",
                                     tacsat$HL_ID[idx],
                                     sep="")
-          tacsat <- tacsat[, !colnames(tacsat) %in% 'SS_ID', 'SI_STATE2'] # remove useless column
+           tacsat$SI_STATE                             <- tacsat$SI_STATE2
+           tacsat <- tacsat[, !colnames(tacsat) %in% c('SS_ID', 'SI_STATE2')] # remove useless column
           return(tacsat)
        }
 
