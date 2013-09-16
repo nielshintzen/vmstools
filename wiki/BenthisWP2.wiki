@@ -496,12 +496,58 @@ for(iGr in passive_gears){
 } 
 </code>
 
-=== Swept area dataset ===
+=== fishing effort ===
+
+<code>
+# compute (discrete point) effort_days and effort_KWdays 
+ #......
+  library(doBy)
+  tacsatp                  <- orderBy(~VE_REF+SI_DATIM+FT_REF,data=tacsatp)
+  tacsatp$effort_days      <- as.numeric(as.character(difftime(c(tacsatp$SI_DATIM[-1],0),tacsatp$SI_DATIM,units="days")))
+  tacsatp$effort_KWdays    <- tacsatp$effort_days *  as.numeric(as.character(tacsatp$VE_KW))
+  #tacsatp$effort_days   [which(diff(as.numeric(tacsatp$HL_ID))<0)]     <- 0  # correct (to do: but pble of steaming pts which have been converted to fish. pts)
+  #tacsatp$effort_KWdays [which(diff(as.numeric(tacsatp$HL_ID))<0)]     <- 0  # correct
+  ## for the time being, do:
+  tacsatp$effort_days[tacsatp$effort_days>0.014] <- 0  # correct (i.e. set at 0 if >3hours as a sign for a change of haul)
+
+</code>
+
+
+=== dataset incl. swept area and effort ===
 As we've now calculated the swept area for both the interpolated gear types and
 the remaining ones via the buffer method, we can now combine all of them.
 
 <code>
-TODO. Also read in the interpolation dataset to get the full set
+   lst <- list(NULL) ; count <- 0
+    for(iGr in unique(tacsatp$LE_GEAR)){
+      tacsatpGear        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==iGr,]
+
+         for(iVE_REF in sort(unique(tacsatpGear$VE_REF))){
+
+          cat(paste(iGr, " ", iVE_REF, "\n"))
+
+          count <- count+1
+
+          cat(paste("load ", iVE_REF, " and ", iGr, "\n", sep=""))
+          er <- try(load(file.path(outPath, "interpolated",
+                paste("tacsatSweptArea_",iVE_REF, "_", iGr, ".RData", sep=""))),
+                silent=TRUE)
+          if(class(er)=="try-error"){
+          count <- count -1
+          } else{
+          lst[[count]] <-  tacsatIntGearVEREF
+          }
+
+      }
+
+    }
+    tacsatp <- do.call("rbind", lst)
+
+    # save
+    save(tacsatp, file=file.path(outPath, paste("tacsatSweptArea.RData", sep="")))
+
+
+
 </code>
 
 
