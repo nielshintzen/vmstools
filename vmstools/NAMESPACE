@@ -59,6 +59,7 @@ export(
 "intervalTacsat",                 
 "kgeur",                          
 "km2Degree",                      
+"labellingHauls",
 "landingsMaps2GIFanim",           
 "lonLat2SpatialPolygons",         
 "lonLatRatio",                    
