@@ -374,6 +374,15 @@ save(tacsatp,     file=file.path(outPath,"tacsatActivity.RData"))
 </code>  
 
 === Alternative activity identification: (Based on Fock 2008) ===
+TO DO
+
+=== Labelling each haul ===
+Assign an identifier (HL_ID) to each of the fishing sequences. This can especially
+be useful when you want to count the number of hauls in an aggregated grid.
+
+<code>
+tacsatp   <- labellingHauls(tacsatp)
+</code>
 
 === Interpolate tacsat data (or not) ===
 In some occasions, and especially for towed trawl gear, it can be useful to artificially
@@ -495,13 +504,6 @@ the remaining ones via the buffer method, we can now combine all of them.
 TODO. Also read in the interpolation dataset to get the full set
 </code>
 
-=== Labelling each haul ===
-Assign an identifier (HL_ID) to each of the fishing sequences. This can especially
-be useful when you want to count the number of hauls in an aggregated grid.
-
-<code>
-tacsatp   <- labellingHauls(tacsatp)
-</code>
 
 === link habitat map to vms ===
 
