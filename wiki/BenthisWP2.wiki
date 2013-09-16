@@ -432,7 +432,7 @@ for(iGr in towed_gears){
 
     #- Interpolate according to the cubic-hermite spline interpolation
     interpolationcHs <- interpolateTacsat(tacsatpGearVEREF,
-                          interval=120,
+                          interval=120, # note that the ping rate is likely to be specific to the country
                           margin=10, # i.e. will make disconnected interpolations if interval out of the 110 130 min range
                           res=100,
                           method="cHs",
@@ -443,8 +443,8 @@ for(iGr in towed_gears){
     #- Convert the interpolation to tacsat style data
     tacsatIntGearVEREF <- interpolation2Tacsat(interpolationcHs, tacsatpGearVEREF)
 
-    #- Correct for HL_ID skipping
-    tacsatIntGearVEREF$HL_ID[which(diff(tacsatIntGearVEREF$HL_ID)<0)] <- tacsatIntGearVEREF$HL_ID[(which(diff(tacsatIntGearVEREF$HL_ID)<0)-1)]
+    #- Correct for HL_ID skipping (not in use if labellingHauls() called before)
+    #tacsatIntGearVEREF$HL_ID[which(diff(tacsatIntGearVEREF$HL_ID)<0)] <- tacsatIntGearVEREF$HL_ID[(which(diff(tacsatIntGearVEREF$HL_ID)<0)-1)]
 
     save(tacsatIntGearVEREF, file=file.path(outPath, "interpolated",
           paste("tacsatInt",iVE_REF, "_", iGr, ".RData", sep="")))
