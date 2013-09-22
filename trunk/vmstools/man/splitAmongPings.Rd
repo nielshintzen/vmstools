@@ -10,7 +10,7 @@ Also there is a possibility to merge the eflalo records without a matching tacsa
 }
 \usage{
 splitAmongPings(tacsat, eflalo, variable = "all",
-                level = "day", conserve = TRUE)
+                level = "day", conserve = TRUE,by=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
