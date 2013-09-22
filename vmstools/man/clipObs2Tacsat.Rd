@@ -63,7 +63,10 @@ obs           <- tacsat[round(seq(1,nrow(tacsat),length.out=30)),]
 obs           <- obs[,c(1,2,3,4,5,6)]
 obs$OB_TYP    <- "Benthos"
 colnames(obs) <- c("OB_COU","OB_REF","SI_LATI","SI_LONG","SI_DATE","SI_TIME","OB_TYP")
+obs$SI_DATIM  <- as.POSIXct(paste(obs$SI_DATE, obs$SI_TIME,sep = " "),
+                            tz = "GMT", format = "%d/%m/%Y  %H:%M")
 newTime       <- obs$SI_DATIM - runif(30,-60*20,60*20)
+obs$SI_DATIM  <- newTime
 obs$SI_LATI   <- jitter(obs$SI_LATI,factor=0.25)
 obs$SI_LONG   <- jitter(obs$SI_LONG,factor=0.5)
 

@@ -11,13 +11,40 @@ clipObs2Tacsat <- function(tacsat,        #The tacsat dataset
 tacsat      <- sortTacsat(tacsat)
 obs         <- sortTacsat(obs)
 
-  #- If you want to get the full tacsat dataset back, make a copy of it first
+#- If you want to get the full tacsat dataset back, make a copy of it first
 if(all.t){
   tacsat$ID   <- 1:nrow(tacsat)
   tacsatOrig  <- tacsat
 }
+
 if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM   <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
 if(!"SI_DATIM" %in% colnames(obs))    obs$SI_DATIM      <- as.POSIXct(paste(obs$SI_DATE,    obs$SI_TIME,    sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+
+#- Subset tacsat that can never have match with obs because of temporal or space ranges
+if(method == "euclidean" & is.null(control.euclidean$threshold)==FALSE){
+  rix         <- km2Degree(range(obs$SI_LONG,na.rm=T)[1],range(obs$SI_LATI,na.rm=T)[1],control.euclidean$threshold)
+  minXobs     <- range(obs$SI_LONG,na.rm=T)[1] - rix
+  raiy        <- control.euclidean$threshold/111.1949
+  minYobs     <- range(obs$SI_LATI,na.rm=T)[1] - raiy
+  rax         <- km2Degree(range(obs$SI_LONG,na.rm=T)[2],range(obs$SI_LATI,na.rm=T)[2],control.euclidean$threshold)
+  maxXobs     <- range(obs$SI_LONG,na.rm=T)[2] + rax
+  maxYobs     <- range(obs$SI_LATI,na.rm=T)[2] + raiy
+  tacsat      <- subset(tacsat,SI_LONG >= minXobs & SI_LONG <= maxXobs & SI_LATI >= minYobs & SI_LATI <= maxYobs)
+}
+if(method == "grid"){
+  minXobs     <- range(obs$SI_LONG,na.rm=T)[1] - resx
+  maxXobs     <- range(obs$SI_LONG,na.rm=T)[2] + resx
+  minYobs     <- range(obs$SI_LATI,na.rm=T)[1] - resy
+  maxYobs     <- range(obs$SI_LATI,na.rm=T)[2] + resy
+  tacsat      <- subset(tacsat,SI_LONG >= minXobs & SI_LONG <= maxXobs & SI_LATI >= minYobs & SI_LATI <= maxYobs)
+}
+
+if(is.null(temporalRange)==FALSE){
+  minTobs     <- range(obs$SI_DATIM,na.rm=T)[1] + temporalRange[1]
+  maxTobs     <- range(obs$SI_DATIM,na.rm=T)[2] + temporalRange[2]
+  tacsat      <- subset(tacsat,SI_DATIM >= minTobs & SI_DATIM <= maxTobs)
+}
+if(nrow(tacsat)==0) stop("Number of tacsat records that are within reach of obs dataset is zero")
 
 
 #- Gridcell wanted, but not given yet, so create one
@@ -97,6 +124,14 @@ if(method == "euclidean"){
           ty <- tacLat[(iNT*rowSize - rowSize + 1):(iNT*rowSize)]
         }
 
+      minXobs     <- range(ox,na.rm=T)[1] - rix
+      minYobs     <- range(oy,na.rm=T)[1] - raiy
+      maxXobs     <- range(ox,na.rm=T)[2] + rax
+      maxYobs     <- range(oy,na.rm=T)[2] + raiy
+      cont        <- ifelse(length(which(tx >= minXobs & tx <= maxXobs & ty >= minYobs & ty <= maxYobs))>0,TRUE,FALSE)
+
+      if(cont){
+
       #- Check if the length of both sets are equal or not
       if(iNO == nChunkObs | iNT == nChunkTac){
 
@@ -117,7 +152,7 @@ if(method == "euclidean"){
                                                                                     } else { retrn <- 1:length(restime) }
                                                                                     if(length(tacRows[idx[retrn]])>0){ toReturn <- cbind(tacRows[idx[retrn]],obs$GR_ID[obsRows[x]])
                                                                                     } else { toReturn <- cbind(NA,NA) }
-                                                                                    
+
                                                                                 return(toReturn)}))
 
 
@@ -132,7 +167,7 @@ if(method == "euclidean"){
                                    function(x,y){
                                       distObsTac  <- distance(ox[x],oy[x],tx[y],ty[y])
                                    return(distObsTac)})
-                                
+
        idx              <- apply(res,2,function(x){return(x <= control.euclidean$threshold)})
        idx              <- which(idx == T,arr.ind=TRUE)
        restime          <- difftime(obs$SI_DATIM[obsRows[idx[,1]]],tacsat$SI_DATIM[tacRows[idx[,2]]],units="mins")
@@ -144,7 +179,7 @@ if(method == "euclidean"){
          totRes           <- rbind(totRes,na.omit(res))
        }
       }
-      
+    }
       
     }#End iNT loop
   }#End iNO loop
