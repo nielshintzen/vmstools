@@ -46,8 +46,8 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
       gearList  <- names(which((rowSums(table(sTacsat$LE_GEAR,sTacsat$SI_SP)) - table(sTacsat$LE_GEAR,sTacsat$SI_SP)[,"0"])>40))
 
       #- Mirror the tacsat dataset and make a selection
-      tyg       <- subset(sTacsat,is.na(LE_GEAR) == F  & LE_GEAR %in% gearList); tygmr <- tyg; tygmr$SI_SP <- -1* tygmr$SI_SP; tygmr <- rbind(tyg,tygmr)
-      tng       <- subset(sTacsat,is.na(LE_GEAR) == T | !LE_GEAR %in% gearList); tngmr <- tng; tngmr$SI_SP <- -1* tngmr$SI_SP; tngmr <- rbind(tng,tngmr)
+      tyg       <- subset(sTacsat,is.na(LE_GEAR) == FALSE  & LE_GEAR %in% gearList); tygmr <- tyg; tygmr$SI_SP <- -1* tygmr$SI_SP; tygmr <- rbind(tyg,tygmr)
+      tng       <- subset(sTacsat,is.na(LE_GEAR) == TRUE | !LE_GEAR %in% gearList); tngmr <- tng; tngmr$SI_SP <- -1* tngmr$SI_SP; tngmr <- rbind(tng,tngmr)
 
       #-------------------------------------------------------------------------
       #- Get general speed pattern by gear, use analysed number of kernals LE_GEAR + GENERIC
@@ -263,8 +263,8 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
       vesselList  <- names(which((rowSums(table(sTacsat$VE_REF,sTacsat$SI_SP)) - table(sTacsat$VE_REF,sTacsat$SI_SP)[,"0"])>40))
 
       #- Mirror the tacsat dataset and make a selection
-      tyv       <- subset(sTacsat,is.na(VE_REF) == F  & VE_REF %in% vesselList); tyvmr <- tyv; tyvmr$SI_SP <- -1* tyvmr$SI_SP; tyvmr <- rbind(tyv,tyvmr)
-      tnv       <- subset(sTacsat,is.na(VE_REF) == T | !VE_REF %in% vesselList); tnvmr <- tnv; tnvmr$SI_SP <- -1* tnvmr$SI_SP; tnvmr <- rbind(tnv,tnvmr)
+      tyv       <- subset(sTacsat,is.na(VE_REF) == FALSE  & VE_REF %in% vesselList); tyvmr <- tyv; tyvmr$SI_SP <- -1* tyvmr$SI_SP; tyvmr <- rbind(tyv,tyvmr)
+      tnv       <- subset(sTacsat,is.na(VE_REF) == TRUE | !VE_REF %in% vesselList); tnvmr <- tnv; tnvmr$SI_SP <- -1* tnvmr$SI_SP; tnvmr <- rbind(tnv,tnvmr)
 
       #- Perform analyses per vessel
       if(nrow(tyv)>40)

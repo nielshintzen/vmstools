@@ -6,7 +6,7 @@ dd <- output.mat@grid
 d1 <- dd@cells.dim[1]
 d2 <- dd@cells.dim[2]
 fishing <- output.mat@data$fishing
-mat <- matrix((fishing),byrow=T,ncol=d1,nrow=d2)
+mat <- matrix((fishing),byrow=TRUE,ncol=d1,nrow=d2)
 mat <- t(mat[d2:1,])
 if(log.it) {mat <- log(mat) }
 bbox <- output.mat@bbox

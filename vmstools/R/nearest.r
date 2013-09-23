@@ -56,26 +56,3 @@ nearest <- function(x,y){
   }
   ptsOrig$ID[pts$idx]      <- ID
 return(ptsOrig)}
-
-
-#- Example
-#library(vmstools)
-#load("D:/Repository/VMStools/polygons/BathymetryNorthSea/SpatialLinesDataFrame/bath5m.rdata")
-#data(tacsat)
-#
-#y <- bath5m
-#x <- SpatialPoints(data.frame(SI_LONG=tacsat$SI_LONG,SI_LATI=tacsat$SI_LATI))
-#system.time(a <- nearest(x,y)) #37 minutes on  my machine
-#
-#tacsat$ID <- a$ID
-#tacsat$DEPTH <- y@data[ac(tacsat$ID),"LLWS_M"]
-#
-#map("worldHires",xlim=c(0,8),ylim=c(50,56),fill=T, col="darkgreen");map.axes()
-#plot(y,add=T,col="blue")
-#for(st in 1:100){
-#lines(coordinates(y@lines[[an(tacsat$ID[st])+1]])[[1]],col="red")
-#print(paste(tacsat$ID[st],y@lines[[an(tacsat$ID[st])+1]]@ID))
-#points(tacsat$SI_LONG[st],tacsat$SI_LATI[st],col="green",pch=19)
-#Sys.sleep(0.5)
-#}
-#

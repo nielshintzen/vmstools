@@ -17,7 +17,7 @@ function (statsq,midpoint=FALSE)
     if (any(is.na(lat)) | any(is.na(lon))) 
         warning("Some stat squares have not been recognised.")
         
-    if(midpoint == F){
+    if(midpoint == FALSE){
 
                         lat <- lat - 0.25
                         lon <- lon - 0.5

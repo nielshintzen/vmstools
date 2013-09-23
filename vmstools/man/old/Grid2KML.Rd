@@ -40,7 +40,7 @@ no <- 58
 #Map number of pings
 
 output.mat<-vmsGridCreate(tacsat,we=we,ea=ea,so=so,no=no,
-              nameLon = "SI_LONG", nameLat = "SI_LATI",plotMap=T,
+              nameLon = "SI_LONG", nameLat = "SI_LATI",plotMap=TRUE,
               nameVarToSum="",cellsizeX = grid.size.x,
               cellsizeY = grid.size.y,legendx='bottomright',
               numCats=9,plotPoints=F,legendncol=2,legendtitle="npings")

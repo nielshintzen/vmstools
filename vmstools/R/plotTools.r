@@ -31,7 +31,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
       eq2                   <- c.listquote(c("SI_LONG","SI_LATI"))
       
       byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",control.tacsat$clm)
-      byRect                <- byRect[which(is.na(byRect$SI_LONG)==F & is.na(byRect$SI_LATI) == F),]
+      byRect                <- byRect[which(is.na(byRect$SI_LONG)==FALSE & is.na(byRect$SI_LATI) == FALSE),]
       if(length(control.tacsat$clm)>1)  rangeRect             <- range(apply(byRect[,control.tacsat$clm],1,sum,na.rm=TRUE))
       if(length(control.tacsat$clm)==1) rangeRect             <- range(byRect[,control.tacsat$clm],na.rm=TRUE)
       rangeRect             <- c(0,rangeRect[2])
@@ -82,7 +82,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
     DT$SI_LONG            <- af(ac(DT$SI_LONG)); DT$SI_LATI <- af(ac(DT$SI_LATI))
     
     byRect                <- data.frame(DT[,eval(eq1),by=eval(eq2)]); colnames(byRect) <- c("SI_LONG","SI_LATI",control.eflalo$clm)
-    byRect                <- byRect[which(is.na(byRect$SI_LONG)==F & is.na(byRect$SI_LATI) == F),]
+    byRect                <- byRect[which(is.na(byRect$SI_LONG)==FALSE & is.na(byRect$SI_LATI) == FALSE),]
     if(length(control.eflalo$clm)>1)  rangeRect             <- range(apply(byRect[,control.eflalo$clm],1,sum,na.rm=TRUE))
     if(length(control.eflalo$clm)==1) rangeRect             <- range(byRect[,control.eflalo$clm],na.rm=TRUE)
     rangeRect             <- c(0,rangeRect[2])

@@ -55,6 +55,7 @@ The output ASCII coordinate file can be further processed using the makeshapes
 function to generate an ESRI Shapefile for MCP polygons.}
 
 \examples{
-calc_mcp(id=1, points = activities, filename="MCP_Output.txt",
+data(tacsat)
+calc_mcp(id=1, points = tacsat[1:10,c("SI_LONG","SI_LATI")], filename="MCP_Output.txt",
 verbose = FALSE, pct = 100)
 }

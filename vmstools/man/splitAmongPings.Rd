@@ -64,7 +64,7 @@ tacsatp$SI_STATE  <- 0
 tacsatp$SI_STATE[tacsatFilter$IDX] <- 1
 
 #-Add interval to tacsatp
-tacsatp           <- intervalTacsat(tacsatp,level="trip",fill.na.=T)
+tacsatp           <- intervalTacsat(tacsatp,level="trip",fill.na=TRUE)
 
 tacsatp           <- subset(tacsatp,SI_STATE == 1)
 

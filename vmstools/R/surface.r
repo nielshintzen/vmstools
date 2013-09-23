@@ -23,7 +23,7 @@ surface <- function(obj,method="Trapezoid",includeNA=TRUE,zone=NULL){  #Methods 
             areas   <- calcArea(as.PolySet(allSourcePoly, projection="LL",zone=zone))$area
             areas   <- data.frame(
                         cbind(areas,do.call(rbind,lapply(obj@polygons,function(x){return(x@labpt)})),
-                                    do.call(rbind,lapply(obj@polygons,function(x){return(x@ID)}))),stringsAsFactors=F)
+                                    do.call(rbind,lapply(obj@polygons,function(x){return(x@ID)}))),stringsAsFactors=FALSE)
             colnames(areas) <- c("areas","labptx","labpty","ID")
 
 

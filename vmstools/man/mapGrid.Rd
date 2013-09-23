@@ -62,6 +62,6 @@ mapGrid(sGDF
 \examples{
 #mapGrid(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE",
 #        cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',
-#        plotPoints=T )
+#        plotPoints=TRUE )
 }
 
