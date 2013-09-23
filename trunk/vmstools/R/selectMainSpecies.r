@@ -5,6 +5,13 @@
 
 selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
+    require(FactoMineR)   # function PCA
+    require(cluster)      # functions pam & clara
+    require(SOAR)         # function Store
+    require(amap)         # function hcluster
+    require(MASS)         # function lda
+    require(mda)          # function fda
+
     p=ncol(dat)   # Number of species
     n=nrow(dat)
       

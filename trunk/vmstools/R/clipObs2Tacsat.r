@@ -22,34 +22,34 @@ if(!"SI_DATIM" %in% colnames(obs))    obs$SI_DATIM      <- as.POSIXct(paste(obs$
 
 #- Subset tacsat that can never have match with obs because of temporal or space ranges
 if(method == "euclidean" & is.null(control.euclidean$threshold)==FALSE){
-  rix         <- km2Degree(range(obs$SI_LONG,na.rm=T)[1],range(obs$SI_LATI,na.rm=T)[1],control.euclidean$threshold)
-  minXobs     <- range(obs$SI_LONG,na.rm=T)[1] - rix
+  rix         <- km2Degree(range(obs$SI_LONG,na.rm=TRUE)[1],range(obs$SI_LATI,na.rm=TRUE)[1],control.euclidean$threshold)
+  minXobs     <- range(obs$SI_LONG,na.rm=TRUE)[1] - rix
   raiy        <- control.euclidean$threshold/111.1949
-  minYobs     <- range(obs$SI_LATI,na.rm=T)[1] - raiy
-  rax         <- km2Degree(range(obs$SI_LONG,na.rm=T)[2],range(obs$SI_LATI,na.rm=T)[2],control.euclidean$threshold)
-  maxXobs     <- range(obs$SI_LONG,na.rm=T)[2] + rax
-  maxYobs     <- range(obs$SI_LATI,na.rm=T)[2] + raiy
+  minYobs     <- range(obs$SI_LATI,na.rm=TRUE)[1] - raiy
+  rax         <- km2Degree(range(obs$SI_LONG,na.rm=TRUE)[2],range(obs$SI_LATI,na.rm=TRUE)[2],control.euclidean$threshold)
+  maxXobs     <- range(obs$SI_LONG,na.rm=TRUE)[2] + rax
+  maxYobs     <- range(obs$SI_LATI,na.rm=TRUE)[2] + raiy
   tacsat      <- subset(tacsat,SI_LONG >= minXobs & SI_LONG <= maxXobs & SI_LATI >= minYobs & SI_LATI <= maxYobs)
 }
 if(method == "grid"){
-  minXobs     <- range(obs$SI_LONG,na.rm=T)[1] - resx
-  maxXobs     <- range(obs$SI_LONG,na.rm=T)[2] + resx
-  minYobs     <- range(obs$SI_LATI,na.rm=T)[1] - resy
-  maxYobs     <- range(obs$SI_LATI,na.rm=T)[2] + resy
+  minXobs     <- range(obs$SI_LONG,na.rm=TRUE)[1] - control.grid$resx
+  maxXobs     <- range(obs$SI_LONG,na.rm=TRUE)[2] + control.grid$resx
+  minYobs     <- range(obs$SI_LATI,na.rm=TRUE)[1] - control.grid$resy
+  maxYobs     <- range(obs$SI_LATI,na.rm=TRUE)[2] + control.grid$resy
   tacsat      <- subset(tacsat,SI_LONG >= minXobs & SI_LONG <= maxXobs & SI_LATI >= minYobs & SI_LATI <= maxYobs)
 }
 
 if(is.null(temporalRange)==FALSE){
-  minTobs     <- range(obs$SI_DATIM,na.rm=T)[1] + temporalRange[1]
-  maxTobs     <- range(obs$SI_DATIM,na.rm=T)[2] + temporalRange[2]
+  minTobs     <- range(obs$SI_DATIM,na.rm=TRUE)[1] + temporalRange[1]
+  maxTobs     <- range(obs$SI_DATIM,na.rm=TRUE)[2] + temporalRange[2]
   tacsat      <- subset(tacsat,SI_DATIM >= minTobs & SI_DATIM <= maxTobs)
 }
 if(nrow(tacsat)==0) stop("Number of tacsat records that are within reach of obs dataset is zero")
 
 
 #- Gridcell wanted, but not given yet, so create one
-if(method == "grid" & is.null(control.grid$spatGrid) == T){
-  if(is.null(control.grid$resx) == T | is.null(control.grid$resy) == T) stop("Method selected needs resx and resy statements")
+if(method == "grid" & is.null(control.grid$spatGrid) == TRUE){
+  if(is.null(control.grid$resx) == TRUE | is.null(control.grid$resy) == TRUE) stop("Method selected needs resx and resy statements")
 
   xrangeO      <- range(obs$SI_LONG,na.rm=TRUE); xrangeT <- range(tacsat$SI_LONG,na.rm=TRUE)
   yrangeO      <- range(obs$SI_LATI,na.rm=TRUE); yrangeT <- range(tacsat$SI_LATI,na.rm=TRUE)
@@ -60,7 +60,7 @@ if(method == "grid" & is.null(control.grid$spatGrid) == T){
 }
 
 #- Perform calculations on gridcell
-if(method == "grid" & is.null(control.grid$spatGrid) == F){
+if(method == "grid" & is.null(control.grid$spatGrid) == FALSE){
   sPDFObs     <- SpatialPointsDataFrame(data.frame(cbind(obs$SI_LONG,obs$SI_LATI)),data=obs)
   sPDFTac     <- SpatialPointsDataFrame(data.frame(cbind(tacsat$SI_LONG,tacsat$SI_LATI)),data=tacsat)
   resObs      <- overlay(spatGrid,sPDFObs)
@@ -124,10 +124,10 @@ if(method == "euclidean"){
           ty <- tacLat[(iNT*rowSize - rowSize + 1):(iNT*rowSize)]
         }
 
-      minXobs     <- range(ox,na.rm=T)[1] - rix
-      minYobs     <- range(oy,na.rm=T)[1] - raiy
-      maxXobs     <- range(ox,na.rm=T)[2] + rax
-      maxYobs     <- range(oy,na.rm=T)[2] + raiy
+      minXobs     <- range(ox,na.rm=TRUE)[1] - rix
+      minYobs     <- range(oy,na.rm=TRUE)[1] - raiy
+      maxXobs     <- range(ox,na.rm=TRUE)[2] + rax
+      maxYobs     <- range(oy,na.rm=TRUE)[2] + raiy
       cont        <- ifelse(length(which(tx >= minXobs & tx <= maxXobs & ty >= minYobs & ty <= maxYobs))>0,TRUE,FALSE)
 
       if(cont){
@@ -169,7 +169,7 @@ if(method == "euclidean"){
                                    return(distObsTac)})
 
        idx              <- apply(res,2,function(x){return(x <= control.euclidean$threshold)})
-       idx              <- which(idx == T,arr.ind=TRUE)
+       idx              <- which(idx == TRUE,arr.ind=TRUE)
        restime          <- difftime(obs$SI_DATIM[obsRows[idx[,1]]],tacsat$SI_DATIM[tacRows[idx[,2]]],units="mins")
 
        if(is.null(temporalRange)==FALSE){ retrn       <- which(restime <= temporalRange[2] & restime >= temporalRange[1])

@@ -9,7 +9,7 @@ that all the functions that work on tacsat can work with this new, larger interp
 distribute the landings among the new pings.  The npoints argument is the optional number of pings between each real or actual ping.
 }
 \usage{
-interpolation2Tacsat(interpolation, tacsat, npoints = 10,equalDist=T)
+interpolation2Tacsat(interpolation, tacsat, npoints = 10,equalDist=TRUE)
 }
 
 \arguments{

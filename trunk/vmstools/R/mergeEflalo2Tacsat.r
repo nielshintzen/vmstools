@@ -38,7 +38,7 @@ mergeEflalo2Tacsat <- function(eflalo2,tacsat){
                               en <- apply(gtltime,1,function(x){rev(which(x>=0))[1]})
                               
                               #-Make sure that values are within the interval of departure and arrival time
-                              subse <- which(is.na(st <= en) == F & (st <= en) == T)
+                              subse <- which(is.na(st <= en) == FALSE & (st <= en) == TRUE)
                               
                               st <- st[subse]
                               en <- en[subse]

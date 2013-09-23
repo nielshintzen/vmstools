@@ -1,7 +1,8 @@
-calc_mcp <- function (id = 1, points = activities, filename = "MCP_Output.txt",
+calc_mcp <- function (id = 1, points = NULL, filename = "MCP_Output.txt",
     verbose = FALSE, pct = 100)
 {
     require(adehabitat)
+    require(gpclib)
     errorcode <- 1000
     if ((pct > 100) || (pct < 0)) {
         errorcode <- 100

@@ -115,7 +115,7 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
           }
 
           #Save the bounds
-          if(is.null(forceLowerBound)==F)
+          if(is.null(forceLowerBound)==FALSE)
             bound1 <- forceLowerBound
           if(bound2 < bound1)
             bound2 <- bound1

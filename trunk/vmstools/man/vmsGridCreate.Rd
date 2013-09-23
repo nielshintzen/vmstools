@@ -74,7 +74,7 @@ vmsGridCreate(dF
 \seealso{\code{\link{mapGrid}}}
 \examples{
 #vmsGridCreate(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE",
-# cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',plotPoints=T )
+# cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',plotPoints=TRUE )
 #get the example data
 data(tacsat)
 

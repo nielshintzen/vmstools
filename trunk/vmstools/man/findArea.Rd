@@ -35,7 +35,7 @@ resx    <- 0.25
 resy    <- 0.125
 
 #-create grid and assign value column
-grd <- createGrid(xrange,yrange,resx,resy,type="SpatialGridDataFrame",exactBorder=T)
+grd <- createGrid(xrange,yrange,resx,resy,type="SpatialGridDataFrame",exactBorder=TRUE)
 grd@data$value <- runif(nrow(coordinates(grd)),5,10)
 
 #- find gridcells with maximum surface equal or smaller to 'threshold' and return their

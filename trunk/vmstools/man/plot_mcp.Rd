@@ -55,7 +55,9 @@ Randy Bui, Ron N. Buliung, Tarmo K. Remmel
 }
 
 \examples{
-calc_mcp(id=1, points = activities, filename="MCP_Output.txt",
+data(tacsat)
+
+calc_mcp(id=1, points = tacsat[1:10,c("SI_LONG","SI_LATI")], filename="MCP_Output.txt",
 verbose = FALSE, pct = 100)
 plot_mcp(plotnew=TRUE, plotpoints=TRUE, titletxt="Title",
 xaxis= "Easting (m)", yaxis="Northing (m)")

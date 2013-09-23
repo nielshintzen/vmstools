@@ -32,16 +32,16 @@ nestedGrid <- function(tacsat,resx,resy,maxstep = 10, n = 20,control=list(clm=NU
   SPDF        <- as(SP,"SpatialPolygonsDataFrame")
 
   #- Call the column to aggregate over
-  if(is.null(control$clm)==T){
+  if(is.null(control$clm)==TRUE){
     tacsat$count <- rep(1,nrow(tacsat))
     clm          <- "count"
   } else { clm <- control$clm }
   #- Do the aggregation
   tacsat$pol      <- poly_wkt
-  if(is.null(control$FUN)==T){
-    agg             <- unlist(lapply(as.list(unique(tacsat$pol)),function(x){apply(t(tacsat[[clm]][which(tacsat$pol==x)]),1,sum,na.rm=T)}))
+  if(is.null(control$FUN)==TRUE){
+    agg             <- unlist(lapply(as.list(unique(tacsat$pol)),function(x){apply(t(tacsat[[clm]][which(tacsat$pol==x)]),1,sum,na.rm=TRUE)}))
   } else {
-    agg             <- unlist(lapply(as.list(unique(tacsat$pol)),function(x){apply(t(tacsat[[clm]][which(tacsat$pol==x)]),1,control$FUN,na.rm=T)}))
+    agg             <- unlist(lapply(as.list(unique(tacsat$pol)),function(x){apply(t(tacsat[[clm]][which(tacsat$pol==x)]),1,control$FUN,na.rm=TRUE)}))
   }
   SPDF@data       <- data.frame(agg)
   colnames(SPDF@data) <- clm

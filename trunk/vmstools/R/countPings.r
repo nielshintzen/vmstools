@@ -32,8 +32,8 @@ countPings <- function(formula,tacsat,grid=NULL,by=NULL){
                   }
                   #Add spatial notation if you want this as output
                   if(length(spatVars)>0){
-                    if("gridcell" %in% spatVars & is.null(grid) == T) stop("Grid needs to be specified to use the 'gridcell' option")
-                    if("gridcell" %in% spatVars & is.null(grid) == F){
+                    if("gridcell" %in% spatVars & is.null(grid) == TRUE) stop("Grid needs to be specified to use the 'gridcell' option")
+                    if("gridcell" %in% spatVars & is.null(grid) == FALSE){
                       #Create coordinates of tacsat data
                       coords                    <- cbind(x=tacsat$SI_LONG,y=tacsat$SI_LATI)
                       sPDF                      <- SpatialPointsDataFrame(coords,data=tacsat)

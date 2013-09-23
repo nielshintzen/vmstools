@@ -15,7 +15,7 @@
         #- Merge eflalo to pings to get number of pings per eflalo record
       byPing             <- merge(eflalo,data.frame(pings),by=vars,all=FALSE)
       byTacsat           <- merge(tacsat,byPing,by=vars,all=FALSE)
-      if(is.null(by)==F)
+      if(is.null(by)==FALSE)
         byTacsat$pings   <- byTacsat$pings / byTacsat[,by]
 
       try(print(paste("kg in eflalo",round(sum(byPing [,kgeur(colnames(byPing))])))))

@@ -77,7 +77,7 @@ Hans D. Gerritsen, Niels T. Hintzen
 \examples{
 data(tacsat)
 tacsat            <- tacsat[sample(nrow(tacsat),2500),] # to speed it up a bit
-tacsat            <- intervalTacsat(tacsat,level="vessel",fill.na=T)
+tacsat            <- intervalTacsat(tacsat,level="vessel",fill.na=TRUE)
 tacsat$INTV       <- ifelse(tacsat$INTV > 240, 240, tacsat$INTV)
 tacsat$GEAR_WIDTH <- 0.024
 tacsat$SWEPT_AREA <- tacsat$INTV / 60 * tacsat$SI_SP * tacsat$GEAR_WIDTH
@@ -94,6 +94,6 @@ SPDF@data$col     <- grey(seq(1, 0, length=length(breaks)))[i]
 
 plot(NA, xlim = c(1, 5), ylim = c(51.5,55), xlab = 'Longitude',ylab = 'Latitude'
   ,asp=1/lonLatRatio(3,53))
-plot(SP,col=SPDF@data$col,add=T,border="lightgrey"); box()
+plot(SP,col=SPDF@data$col,add=TRUE,border="lightgrey"); box()
 points(tacsat$SI_LONG,tacsat$SI_LAT,cex=0.1,col=4)
 }

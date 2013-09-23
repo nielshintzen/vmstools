@@ -1,7 +1,7 @@
 readTacsat <- function(file,sep=",",dec="."){
 
                     #Read the data
-                  res <- read.table(file, header = T,sep,dec = ".",stringsAsFactors = F)
+                  res <- read.table(file, header = TRUE,sep,dec = ".",stringsAsFactors = FALSE)
 
                     #Perform checks
                   if(any(!c("VE_REF","SI_LATI","SI_LONG","SI_DATE","SI_TIME","SI_SP","SI_HE") %in% colnames(res))) stop(paste(file,"needs correct header including",paste("VE_REF","SI_LATI","SI_LONG","SI_DATE","SI_TIME","SI_SP","SI_HE")))

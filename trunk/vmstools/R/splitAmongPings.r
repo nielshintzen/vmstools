@@ -7,12 +7,12 @@ splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TR
   #- Create extra columns with time stamps
 if(!"FT_REF" %in% colnames(tacsat)) stop("tacsat file needs FT_REF detailing trip number")
 if(!"SI_STATE" %in% colnames(tacsat)) stop("tacsat file needs SI_STATE detailing activity of vessel")
-if(level == "trip" & conserve == T) stop("conserve catches only at level = ICESrectangle or day")
+if(level == "trip" & conserve == TRUE) stop("conserve catches only at level = ICESrectangle or day")
 
 if(!"SI_DATIM" %in%   colnames(tacsat)) tacsat$SI_DATIM     <- as.POSIXct(paste(tacsat$SI_DATE,   tacsat$SI_TIME,     sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
 if(!"LE_CDATIM" %in%  colnames(eflalo)) eflalo$LE_CDATIM    <- as.POSIXct(eflalo$LE_CDAT,                                     tz="GMT", format="%d/%m/%Y")
 
-if(is.null(by)==F){
+if(is.null(by)==FALSE){
   if(any(is.na(tacsat[,by])) | any(tacsat[,by] == 0)) stop("'by' column in tacsat contains NA or zero's. Cannot execute with NA's or zeros")
 }
 
@@ -123,7 +123,7 @@ if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
 
   #- If you don't want to loose catch or value data, conserve the non-merged
   #   eflalo catches and distribute these over the tacsat records
-if(conserve == T){
+if(conserve == TRUE){
   if(dim(tacsat)[1]>0 & dim(eflaloVessel)[1] > 0){
 
     #-------------------------------------------------------------------------------

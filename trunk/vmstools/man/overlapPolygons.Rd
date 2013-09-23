@@ -58,6 +58,7 @@ pol2 <- as.PolySet(data.frame(PID=rep(1,4),POS=1:4,X=c(2,3,3,2),Y=c(54.5,54.5,55
 overlapPolygons(pol1,pol2)
 
 #- Test with multiple polygons
+data(tacsat)
 pols1 <- cbind(s1=rep(2,length(seq(49,63,2))),s2=c(seq(49,63,2)))
 pols2 <- cbind(s1=tacsat$SI_LONG[seq(2,nrow(tacsat),length.out=5)],s2=tacsat$SI_LATI[seq(2,nrow(tacsat),length.out=5)])
 resx   <- 1; resy <- 0.5

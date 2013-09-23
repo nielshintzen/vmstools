@@ -70,7 +70,7 @@ pointInHarbour <- function(lon,lat,harbours,rowSize=30, returnNames=FALSE,saveHa
         }
       }
     }
-    if(returnNames == F) store[which(store>0)] <- 1
+    if(returnNames == FALSE) store[which(store>0)] <- 1
     #Get order in tacsat back
     store[ordxys] <- store
 

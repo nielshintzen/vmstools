@@ -15,10 +15,10 @@ findArea <- function(grid,threshold=100,diagonal=TRUE){
     while(totSurf <= threshold){
       dists     <- do.call(pmin, lapply(as.list(pts), function(x) {
                     distance(coords[x, 1], coords[x, 2], coords[-pts, 1], coords[-pts,2])}))
-      if(diagonal==T) idx       <- (1:nrow(coords))[-pts][which(dists <= do.call(max, lapply(as.list(pts), function(x) {
+      if(diagonal==TRUE) idx       <- (1:nrow(coords))[-pts][which(dists <= do.call(max, lapply(as.list(pts), function(x) {
                                                 max(distance(coords[x, 1], coords[x, 2], coords[x, 1]-resx, coords[x,2]-resy),
                                                     distance(coords[x, 1], coords[x, 2], coords[x, 1]+resx, coords[x,2]+resy))})))]
-      if(diagonal==F) idx       <- (1:nrow(coords))[-pts][which(dists <= do.call(max, lapply(as.list(pts), function(x) {
+      if(diagonal==FALSE) idx       <- (1:nrow(coords))[-pts][which(dists <= do.call(max, lapply(as.list(pts), function(x) {
                                                 max(distance(coords[x, 1], coords[x, 2], coords[x, 1]-resx, coords[x,2]),
                                                     distance(coords[x, 1], coords[x, 2], coords[x, 1]+resx, coords[x,2]),
                                                     distance(coords[x, 1], coords[x, 2], coords[x, 1], coords[x,2]-resy),

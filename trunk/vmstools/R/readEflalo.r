@@ -1,7 +1,7 @@
 readEflalo <- function(file,sep=",",dec="."){
 
                     #Read the data
-                  res <- read.table(file, header = T,sep,dec = ".",stringsAsFactors = F)
+                  res <- read.table(file, header = TRUE,sep,dec = ".",stringsAsFactors = FALSE)
 
                     #Perform checks
                   if(any(!c("VE_REF","VE_FLT","VE_COU","VE_LEN","VE_KW","VE_TON","FT_REF","FT_DCOU","FT_DHAR","FT_DDAT","FT_DTIME",

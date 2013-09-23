@@ -60,7 +60,7 @@ function (x, gridcell = c(0.1, 0.1), gear = "OTB", xlim = c(-1,
     byRect$SI_LONG <- signif(anf(byRect$SI_LONG))
     byRect$SI_LATI <- signif(anf(byRect$SI_LATI))
     idx.col <- grep("KG", colnames(byRect))
-    rangeRect <- range(apply(byRect[idx.col], 1, sum, na.rm = T))
+    rangeRect <- range(apply(byRect[idx.col], 1, sum, na.rm = TRUE))
     rangeRect <- c(0, rangeRect[2])
     A.sum <- apply(byRect[, idx.col], 1, sum, na.rm = TRUE)
     A.sum2 <- apply(byRect[, idx.col], 2, sum, na.rm = TRUE)
@@ -73,7 +73,7 @@ function (x, gridcell = c(0.1, 0.1), gear = "OTB", xlim = c(-1,
     X11(7, 7)
     require(mapdata)
     map("worldHires", resolution = 1, xlim = xlim, ylim = ylim,
-        fill = T, col = "darkgreen")
+        fill = TRUE, col = "darkgreen")
     map.axes()
     box()
     for (iRect in 1:nrow(byRect)) {
@@ -93,7 +93,7 @@ function (x, gridcell = c(0.1, 0.1), gear = "OTB", xlim = c(-1,
     for (i in seq(ylim[1], ylim[2], by = gridcell[2])) abline(h = i,
         col = grey(0.9))
     map("worldHires", add = TRUE, resolution = 1, xlim = xlim,
-        ylim = ylim, fill = T, col = "darkgreen")
+        ylim = ylim, fill = TRUE, col = "darkgreen")
     map.axes()
     box()
     legend("topright", legend = gsub('LE_KG_','', names(byRect[, idx.col])), fill = acolors[1:((1 +
