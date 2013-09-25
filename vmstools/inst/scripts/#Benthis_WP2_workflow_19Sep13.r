@@ -373,6 +373,8 @@ if(FALSE){
 
     tacsatpGearVEREF$SWEPT_AREA_KM2 <- pi*(tacsatpGearVEREF$LE_GEAR_WIDTH/(2*pi))^2
 
+    tacsatIntGearVEREF <- tacsatpGearVEREF
+     
     save(tacsatIntGearVEREF, file=file.path(outPath, "interpolated",
        paste("tacsatSweptArea_",iVE_REF, "_", iGr, ".RData", sep="")))
   }
