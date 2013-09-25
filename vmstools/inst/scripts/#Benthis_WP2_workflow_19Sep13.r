@@ -572,14 +572,14 @@ if(TRUE){
     all_gears            <- sort(unique(tacsatp$LE_GEAR))
     towed_gears          <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')  # TO DO: list to be checked
     passive_gears        <- all_gears[!all_gears %in% towed_gears]
+    we <- 10; ea <- 13; no <- 59; so <- 55;
     ##------------------------
 
     # subset for relevant fisheries
-    this            <- tacsatp [tacsatp$LE_GEAR %in% towed_gears , ]
+    this            <- tacsatp [tacsatp$LE_GEAR %in% towed_gears, ]
 
     # restrict the study area 
     # (it is likely that the same bounding box should be used when stacking different layers e.g. from different countries)
-    we <- 10; ea <- 13; no <- 59; so <- 55;
     this <- this[this$SI_LONG>we & this$SI_LONG<ea & this$SI_LATI>so & this$SI_LATI<no,]
 
     # grid the data (in decimal or in UTM)
