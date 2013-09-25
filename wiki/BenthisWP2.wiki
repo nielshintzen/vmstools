@@ -714,9 +714,21 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
    ##-----------------------------------------------------------------------------
    # 
   
-  ## user selection here----
+  ## GRIDDING (IN DECIMAL DEGREES OR IN UTM COORD)
+  # using a quick gridding code at various resolution.
+
+  # For example, grid the swept area, or the number of hauls, or the fishing pressure, etc.
+  sh1 <- readShapePoly(file.path(polPath,"francois_EU")) # coastline
+
+
+
+  ### the swept area-------------------------------------------
+
+   ## user selection here----
     what                 <- "SWEPT_AREA_KM2"
     #what                <- "HL_ID"
+    #what                <- "effort_days"
+    #what                <- "effort_KWdays"
     #what                <- "pressure"
     #a_func              <- function(x) {unique(length(x))} # for HL_ID, to be tested.
     a_func               <- "sum"
@@ -724,13 +736,14 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     all_gears            <- sort(unique(tacsatp$LE_GEAR))
     towed_gears          <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')  # TO DO: list to be checked
     passive_gears        <- all_gears[!all_gears %in% towed_gears]
+    we <- 10; ea <- 13; no <- 59; so <- 55;
     ##------------------------
 
     # subset for relevant fisheries
-    this            <- tacsatp [tacsatp$LE_GEAR %in% towed_gears , ]
+    this            <- tacsatp [tacsatp$LE_GEAR %in% towed_gears, ]
 
-    # restrict the study area
-    we <- 10; ea <- 13; no <- 59; so <- 55;
+    # restrict the study area 
+    # (it is likely that the same bounding box should be used when stacking different layers e.g. from different countries)
     this <- this[this$SI_LONG>we & this$SI_LONG<ea & this$SI_LATI>so & this$SI_LATI<no,]
 
     # grid the data (in decimal or in UTM)
@@ -744,24 +757,25 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
       this <- cbind(this,
                  spTransform(SP, CRS("+proj=utm  +ellps=intl +zone=32 +towgs84=-84,-107,-120,0,0,0,0,0")))    # convert to UTM
       this            <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', 'coords.x1', 'coords.x2', what)]
-      this$round_long <- round(as.numeric(as.character(this$coords.x1))*dx*2)
+      this$round_long <- round(as.numeric(as.character(this$coords.x1))*dx)
       this$round_lat  <- round(as.numeric(as.character(this$coords.x2))*dx)
       this            <- this[, !colnames(this) %in% c('coords.x1', 'coords.x2')]
-      dd <- 100
+      this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
+      this$xs         <- (this$round_long/(dx))
+      this$ys         <- (this$round_lat/(dx))
+ 
     }  else {
-      dx <- 20
+      dx <- 20 # 0.05 degree
       this <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', what)]
-      this$round_long <- round(as.numeric(as.character(this$SI_LONG))*dx*2)
-      this$round_lat  <- round(as.numeric(as.character(this$SI_LATI))*dx)
-      dd <- 1
+      this$round_long <- round(as.numeric(as.character(this$SI_LONG))*dx*2) # 0.1
+      this$round_lat  <- round(as.numeric(as.character(this$SI_LATI))*dx)   # 0.05
+      this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
+      this$xs         <- (this$round_long/(dx*2))
+      this$ys         <- (this$round_lat/(dx))
     }
      # if the coordinates in decimal then dx=20 corresponds to grid resolution of 0.05 degrees
      # i.e. a 3´ angle = 3nm in latitude but vary in longitude (note that a finer grid will be produced if a higher value for dx is put here)
-     # if coord in UTM then 0.001 correspond to grid of 1 by 1 km (to check)
 
-    this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
-    this$xs         <- (this$round_long/(dx*2))
-    this$ys         <- (this$round_lat/(dx))
     colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')
 
 
@@ -791,7 +805,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     xs <- (as.numeric(as.character(colnames(the_points)))/(dx*2))
     ys <- (as.numeric(as.character(rownames(the_points)))/(dx))
 
-    the_breaks <-  c(0, (1:12)^3.5 )
+    the_breaks <-  c(0, (1:12)^3.5 ) # to be decided...
     graphics:::image(
      x=xs,
      y=ys,
@@ -856,7 +870,6 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
     # check the cumul on a given cell
     # head(quantity_cumul_per_cell_date[quantity_cumul_per_cell_date$cell=="C_197_2722",])
     save(quantity_cumul_per_cell_date, res_long, res_lat,  we, ea, no, so, file=file.path(outPath,"quantity_cumul_per_cell_date.RData") )
-
 
 
 
