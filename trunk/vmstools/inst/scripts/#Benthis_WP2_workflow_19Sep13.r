@@ -44,7 +44,7 @@ labellingHauls <- function(tacsat){
 
 
 
-
+ ## set up your specific paths here:
  if(.Platform$OS.type == "unix") {}
  codePath  <- file.path("~","BENTHIS")
  dataPath  <- file.path("~","BENTHIS","EflaloAndTacsat")
@@ -70,8 +70,10 @@ labellingHauls <- function(tacsat){
  dir.create(file.path(outPath, year))
  outPath   <- file.path(outPath, year)
 
-if(FALSE){
+if(TRUE){
 
+ 
+ # exemple for importing the tacsat and eflalo files:
  #tacsat <- readTacsat(file.path(dataPath,"tacsat_2012.csv"))
  #eflalo <- readEflalo(file.path(dataPath,"eflalo_2012.csv"))
  #save(tacsat, file=file.path(dataPath,"tacsat_2012.RData"))
@@ -187,8 +189,7 @@ if(FALSE){
 
  # Save the cleaned eflalo file
  save(eflalo,file=file.path(outPath,"cleanEflalo.RData"))
-
-  gc(reset=TRUE)
+ gc(reset=TRUE)
 
  # MERGING
  tacsatp           <- mergeEflalo2Tacsat(eflalo,tacsat)
@@ -255,21 +256,21 @@ if(FALSE){
 
   activity          <- activityTacsat(tacsatp,units="year",analyse.by="LE_GEAR",storeScheme,
                                 plot=FALSE, level="all")
- tacsatp$SI_STATE  <- NA
- tacsatp$SI_STATE  <- activity
+  tacsatp$SI_STATE  <- NA
+  tacsatp$SI_STATE  <- activity
 
- idx               <- which(is.na(tacsatp$SI_STATE))
- tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >= 1.5 &
-                           tacsatp$SI_SP[idx] <= 7.5)]] <- 'f'
- tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] <  1.5)]] <- 'h'
- tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >  7.5)]] <- 's'
+  idx               <- which(is.na(tacsatp$SI_STATE))
+  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >= 1.5 &
+                           tacsatp$SI_SP[idx] <= 7.5)]]   <- 'f'
+  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] <  1.5)]] <- 'h'
+  tacsatp$SI_STATE[idx[which(tacsatp$SI_SP[idx] >  7.5)]] <- 's'
 
  save(tacsatp,     file=file.path(outPath,"tacsatActivity.RData"))
 
 
 
 
-  } # end FALSE
+  } # end FALSE/TRUE
 
 
 
@@ -279,7 +280,7 @@ if(FALSE){
 
 
  # Labelling each haul (caution: to do before discarding the steaming points...)
- tacsatp   <- labellingHauls(tacsatp)    ## NOT IN THE namespace of VMSTOOLS??
+ tacsatp   <- labellingHauls(tacsatp)    ## NOT IN THE namespace of VMSTOOLS?? put in front then...
 
 
 
@@ -289,7 +290,7 @@ if(FALSE){
  towed_gears       <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')  # TO DO: list to be checked
  tacsatp           <- orderBy(~VE_REF+SI_DATIM,data=tacsatp)
 
- # KEEP ONLY fish. seq. bounded by steaming points
+ # KEEP ONLY fish. seq. bounded by steaming points (conservative assumption)
  tacsatp$SI_STATE_num <- NA
  tacsatp$SI_STATE_num[which(tacsatp$SI_STATE=="h")] <- 1
  tacsatp$SI_STATE_num[tacsatp$SI_STATE=="f"] <- 2
@@ -312,7 +313,7 @@ if(FALSE){
 
           cat(paste(iGr, " ", iVE_REF, "\n"))
 
-         #Interpolate according to the cubic-hermite spline interpolation
+         # Interpolate according to the cubic-hermite spline interpolation
           interpolationcHs <- interpolateTacsat(tacsatpGearVEREF,
                             interval=60, ## THE PING RATE IS COUNTRY-SPECIFIC ##
                             margin=10, # i.e. will make disconnected interpolations if interval out of the 50 70min range
@@ -323,8 +324,8 @@ if(FALSE){
                             fast=FALSE)
 
 
-             #Make a picture of all interpolations first
-          #Get the ranges of the total picture
+          # Make a picture of all interpolations first
+          # Get the ranges of the total picture
           if(FALSE){
            ranges <- do.call(rbind,lapply(interpolationcHs,function(x){return(apply(x[-1,],2,range))}))
            xrange <- range(ranges[,"x"])
@@ -357,7 +358,7 @@ if(FALSE){
     }
 
 
-  # passive gears
+  # for passive gears
   all_gears            <- sort(unique(tacsatp$LE_GEAR))
   passive_gears        <- all_gears[!all_gears %in% towed_gears]
 
@@ -384,7 +385,7 @@ if(FALSE){
  
  
  
-  # SWEPT AREA DATASET
+  # BUILD A SWEPT AREA DATASET
   # after having subsetted per gear per vessel (because risk of 'out of memory')
     lst <- list(NULL) ; count <- 0
     for(iGr in unique(tacsatp$LE_GEAR)){
@@ -418,7 +419,7 @@ if(FALSE){
     
 
 # compute (discrete point) effort_days and effort_KWdays
- #......
+ #......to be continued
   library(doBy)
   tacsatp                  <- orderBy(~VE_REF+SI_DATIM+FT_REF,data=tacsatp)
   tacsatp$effort_days      <- as.numeric(as.character(difftime(c(tacsatp$SI_DATIM[-1],0),tacsatp$SI_DATIM,units="days")))
@@ -549,11 +550,11 @@ if(FALSE){
 
 
 
-  ## GRIDDING (IN DECIMAL DEGREES)
+  ## GRIDDING (IN DECIMAL DEGREES OR IN UTM COORD)
   # using a quick gridding code at various resolution.
 
   # For example, grid the swept area, or the number of hauls, or the fishing pressure, etc.
-  sh1 <- readShapePoly(file.path(polPath,"francois_EU"))
+  sh1 <- readShapePoly(file.path(polPath,"francois_EU")) # coastline
 
 
 
@@ -576,7 +577,8 @@ if(FALSE){
     # subset for relevant fisheries
     this            <- tacsatp [tacsatp$LE_GEAR %in% towed_gears , ]
 
-    # restrict the study area
+    # restrict the study area 
+    # (it is likely that the same bounding box should be used when stacking different layers e.g. from different countries)
     we <- 10; ea <- 13; no <- 59; so <- 55;
     this <- this[this$SI_LONG>we & this$SI_LONG<ea & this$SI_LATI>so & this$SI_LATI<no,]
 
@@ -591,24 +593,25 @@ if(FALSE){
       this <- cbind(this,
                  spTransform(SP, CRS("+proj=utm  +ellps=intl +zone=32 +towgs84=-84,-107,-120,0,0,0,0,0")))    # convert to UTM
       this            <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', 'coords.x1', 'coords.x2', what)]
-      this$round_long <- round(as.numeric(as.character(this$coords.x1))*dx*2)
+      this$round_long <- round(as.numeric(as.character(this$coords.x1))*dx)
       this$round_lat  <- round(as.numeric(as.character(this$coords.x2))*dx)
       this            <- this[, !colnames(this) %in% c('coords.x1', 'coords.x2')]
-      dd <- 100
+      this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
+      this$xs         <- (this$round_long/(dx))
+      this$ys         <- (this$round_lat/(dx))
+ 
     }  else {
-      dx <- 20
+      dx <- 20 # 0.05 degree
       this <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', what)]
-      this$round_long <- round(as.numeric(as.character(this$SI_LONG))*dx*2)
-      this$round_lat  <- round(as.numeric(as.character(this$SI_LATI))*dx)
-      dd <- 1
+      this$round_long <- round(as.numeric(as.character(this$SI_LONG))*dx*2) # 0.1
+      this$round_lat  <- round(as.numeric(as.character(this$SI_LATI))*dx)   # 0.05
+      this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
+      this$xs         <- (this$round_long/(dx*2))
+      this$ys         <- (this$round_lat/(dx))
     }
      # if the coordinates in decimal then dx=20 corresponds to grid resolution of 0.05 degrees
      # i.e. a 3´ angle = 3nm in latitude but vary in longitude (note that a finer grid will be produced if a higher value for dx is put here)
-     # if coord in UTM then 0.001 correspond to grid of 1 by 1 km (to check)
 
-    this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
-    this$xs         <- (this$round_long/(dx*2))
-    this$ys         <- (this$round_lat/(dx))
     colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')
 
 
@@ -638,7 +641,7 @@ if(FALSE){
     xs <- (as.numeric(as.character(colnames(the_points)))/(dx*2))
     ys <- (as.numeric(as.character(rownames(the_points)))/(dx))
 
-    the_breaks <-  c(0, (1:12)^3.5 )
+    the_breaks <-  c(0, (1:12)^3.5 ) # to be decided...
     graphics:::image(
      x=xs,
      y=ys,
@@ -716,79 +719,7 @@ if(FALSE){
 
 
 
-  ## GRIDDING (IN UTM)
-
-    what <- "SWEPT_AREA_KM2"
-    #what <- "HL_ID"
-    #what <- "pressure"
-    #a_func <- function(x) {unique(length(x))} # for HL_ID, to be tested.
-    a_func <- "sum"
-    this <- tacsatp [,c('SI_LONG', 'SI_LATI', 'coords.x1', 'coords.x2', what)]
-    colnames(this) <- c('x', 'y', 'x_utm', 'y_utm', 'what')
-
-    # restrict the study area
-     we <- 10; ea <- 13; no <- 59; so <- 55;
-     this<- this[this$x>we & this$x<ea & this$y>so & this$y<no,]
-
-
-    dx <- 0.001  # 0.001 => meters to km, a finer grid will be produced if a higher value is put here
-
-    # retrieve the geo resolution in degree, for info
-    long <- seq(1,15,by=0.01)
-    res_long <- diff( long [1+which(diff(round(long*dx)/dx)!=0)] )
-    res_lat <- diff( long [1+which(diff(round(long*dx/2)/dx/2)!=0)] )
-
-
-
-     the_breaks <-  c(0,1,2,4,8,16,32,64,128, 256, 512)^0.9
-    # a quick gridding method...
-    this$round_long <- round(as.numeric(as.character(this$x_utm))*dx)
-    this$round_lat  <- round(as.numeric(as.character(this$y_utm))*dx*2)
-    background <- expand.grid(
-                              x=0,
-                              y=0,
-                              x_utm=0,
-                              y_utm=0,
-                              what=0,
-                              round_long=seq(range(this$round_long)[1], range(this$round_long)[2]),
-                              round_lat=seq(range(this$round_lat)[1], range(this$round_lat)[2])
-                              )
-    this <- rbind(this, background)
-    the_points <- tapply(this$what,
-                  list(this$round_lat, this$round_long), a_func)
-
-    xs <- (as.numeric(as.character(colnames(the_points)))/dx)
-    ys <- (as.numeric(as.character(rownames(the_points)))/(dx*2))
-    graphics:::image(
-     x=xs,
-     y=ys,
-     z= t(the_points)  ,
-     breaks=c(the_breaks),
-     col = terrain.colors(length(the_breaks)-1),
-     useRaster=FALSE,
-     xlab="",
-     ylab="",
-     axes=FALSE,
-     xlim=range(xs), ylim=range(ys),
-     add=FALSE
-     )
-    title("")
-
-    plot(sh1, add=TRUE, col=grey(0.7))
-    legend("topright", fill=terrain.colors(length(the_breaks)-1),
-             legend=round(the_breaks[-1],1), bty="n", cex=0.8, ncol=2, title="")
-    box()
-    axis(1)
-    axis(2, las=2)
-
-    mtext(side=1, "UTM Longitude", cex=1, adj=0.5, line=2)
-    mtext(side=2, "UTM Latitude", cex=1, adj=0.5, line=2)
-    #mtext(side=3, "(a)", cex=1.5, adj=0, line=1)
-
-
-    # save
-    savePlot(filename=file.path(outPath, "GriddedSweepAreaExample.jpeg"), type="jpeg")
-
+ 
 
 
 
