@@ -53,6 +53,24 @@ more advanced exploration....
 
 <code>
 
+# subset some variables
+CT  <- ind [ind$Variable.name=="Consumption_trawling", "Value"]
+kW  <- ind [ind$Variable.name=="Vessel_kW", "Value"]
+LOA <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
+DoS <- ind [ind$Variable.name=="Door_spread", "Value"]
+DoW <- ind [ind$Variable.name=="Door_weight", "Value"]
+GrW <- ind [ind$Variable.name=="Groundgear_weight", "Value"]
+sps <- ind [ind$Variable.name=="Targetspecies_single", "Value"]
+sp1 <- ind [ind$Variable.name=="Primarytarget_mixed", "Value"]
+sp2 <- ind [ind$Variable.name=="Secondarytarget_mixed", "Value"]
+sp3 <- ind [ind$Variable.name=="Thirdtarget_mixed", "Value"]
+bt  <- ind [ind$Variable.name=="Bottom_type", "Value"]
+nbt <- ind [ind$Variable.name=="Trawl_number", "Value"]
+df2 <- cbind.data.frame(CT, kW, LOA, DoS, DoW, GrW, sps, sp1, sp2, sp3, bt, nbt)
+
+# filter out
+df3 <- df2[df2$sps!="NR",]  # single target
+df4 <- df2[df2$sps=="NR",]  # mixte
 
 # intermediate calculation
 GrW <-  nbt * GrW
@@ -96,7 +114,6 @@ p <- ggplot(data=df4, aes(an(kW),an(DoS))) +
       facet_grid(. ~ sp1)
 update_labels(p, list(x = "kW", y="Door_spread"))
 savePlot(file=file.path(outPath, "plot5.png"), type="png")
-
 
 
 </code>
