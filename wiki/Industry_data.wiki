@@ -7,3 +7,40 @@
 
 = Details =
 
+<code>
+
+# paths
+dataPath  <- file.path("C:","merging", "BENTHIS", "BENTHIS_WP2_WK_oct13")
+outPath   <- file.path("C:","merging", "BENTHIS", "BENTHIS_WP2_WK_oct13")
+
+# read file
+ind <- read.table(file= file.path(dataPath, 'Only_OT_DTU Aqua_04102013.csv'), sep=",", header=TRUE )
+
+# explore
+ind [ind$Variable.name=="Trawl_model",]
+levels(ind$Variable.name)
+an <- function(x) as.numeric(as.character(x))
+
+
+# subset some variables
+CT  <- ind [ind$Variable.name=="Consumption_trawling", "Value"]
+kW  <- ind [ind$Variable.name=="Vessel_kW", "Value"]
+LOA <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
+df1 <- cbind.data.frame(CT, kW, LOA)
+
+# refactor some variables (if needed)
+df1$LOA_class <- cut(an(df1$LOA), breaks=c(0,15,100))
+
+# plot (with ggplot2)
+library(ggplot2)
+
+p <- ggplot(data=df1, aes(an(kW),an(CT))) + geom_point(aes(shape = factor(LOA_class)))
+update_labels(p, list(x = "kW", y="Consumption_trawling"))
+
+coeff_lm <- coef(lm(an(CT) ~ an(kW) , data = df1))
+p <- ggplot(data=df1, aes(an(kW),an(CT))) + geom_point(aes(size  = an(LOA))) + geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2])
+update_labels(p, list(x = "kW", y="Consumption_trawling"))
+savePlot(file=file.path(outPath, "plot1"), type="png")
+
+
+</code>
