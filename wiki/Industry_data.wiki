@@ -40,7 +40,40 @@ update_labels(p, list(x = "kW", y="Consumption_trawling"))
 coeff_lm <- coef(lm(an(CT) ~ an(kW) , data = df1))
 p <- ggplot(data=df1, aes(an(kW),an(CT))) + geom_point(aes(size  = an(LOA))) + geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2])
 update_labels(p, list(x = "kW", y="Consumption_trawling"))
-savePlot(file=file.path(outPath, "plot1"), type="png")
+savePlot(file=file.path(outPath, "plot1.png"), type="png")
 
+
+
+
+
+
+
+
+more advanced exploration....
+
+<code>
+
+
+
+# subset some variables
+CT  <- ind [ind$Variable.name=="Consumption_trawling", "Value"]
+kW  <- ind [ind$Variable.name=="Vessel_kW", "Value"]
+LOA <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
+DoS <- ind [ind$Variable.name=="Door_spread", "Value"]
+DoW <- ind [ind$Variable.name=="Door_weight", "Value"]
+GrW <- ind [ind$Variable.name=="Groundgear_weight", "Value"]
+sps <- ind [ind$Variable.name=="Targetspecies_single", "Value"]
+df2 <- cbind.data.frame(CT, kW, LOA, DoS, DoW, GrW, sps)
+
+# filter out
+df2 <- df2[df2$sps!="NR",]
+
+# plot (with ggplot2)
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
+p <- ggplot(data=df2, aes(an(kW),an(DoS))) + geom_point(aes(shape  = factor(sps), color= factor(sps))) + geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2])
+update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot2.png"), type="png")
 
 </code>
+
