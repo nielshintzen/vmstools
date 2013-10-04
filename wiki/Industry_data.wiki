@@ -43,7 +43,7 @@ update_labels(p, list(x = "kW", y="Consumption_trawling"))
 savePlot(file=file.path(outPath, "plot1.png"), type="png")
 
 
-
+</code>
 
 
 
@@ -76,4 +76,3 @@ update_labels(p, list(x = "kW", y="Door_spread"))
 savePlot(file=file.path(outPath, "plot2.png"), type="png")
 
 </code>
-
