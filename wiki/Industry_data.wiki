@@ -54,25 +54,49 @@ more advanced exploration....
 <code>
 
 
+# intermediate calculation
+GrW <-  nbt * GrW
 
-# subset some variables
-CT  <- ind [ind$Variable.name=="Consumption_trawling", "Value"]
-kW  <- ind [ind$Variable.name=="Vessel_kW", "Value"]
-LOA <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
-DoS <- ind [ind$Variable.name=="Door_spread", "Value"]
-DoW <- ind [ind$Variable.name=="Door_weight", "Value"]
-GrW <- ind [ind$Variable.name=="Groundgear_weight", "Value"]
-sps <- ind [ind$Variable.name=="Targetspecies_single", "Value"]
-df2 <- cbind.data.frame(CT, kW, LOA, DoS, DoW, GrW, sps)
-
-# filter out
-df2 <- df2[df2$sps!="NR",]
-
-# plot (with ggplot2)
+# plot DoS for single target
 library(ggplot2)
-coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
-p <- ggplot(data=df2, aes(an(kW),an(DoS))) + geom_point(aes(shape  = factor(sps), color= factor(sps))) + geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2])
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df3))
+p <- ggplot(data=df3, aes(an(kW),an(DoS))) +
+      geom_point(aes(shape  = factor(sps), color= factor(sps))) +
+      geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2])
 update_labels(p, list(x = "kW", y="Door_spread"))
 savePlot(file=file.path(outPath, "plot2.png"), type="png")
+
+# plot DoS for single target
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df3))
+p <- ggplot(data=df3, aes(an(kW),an(DoS))) +
+      geom_point() +
+      geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ sps)
+update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot3.png"), type="png")
+
+
+# plot DoS for single target and bottom type (and door spread...too much dimension here!?)
+library(ggplot2)
+coeff_lm <- coef(lm(an(GrW) ~ an(kW) , data = df3))
+p <- ggplot(data=df3, aes(an(kW),an(GrW))) +
+       geom_point(aes(shape  = factor(sps), color= factor(bt), size=an(DoS))) +
+       geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2])
+update_labels(p, list(x = "kW", y="Groundgear_weight"))
+savePlot(file=file.path(outPath, "plot4.png"), type="png")
+
+
+# plot for mixte targets
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df4))
+p <- ggplot(data=df4, aes(an(kW),an(DoS))) +
+     geom_point(aes(color= factor(sp2))) +
+     geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ sp1)
+update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot5.png"), type="png")
+
+
 
 </code>
