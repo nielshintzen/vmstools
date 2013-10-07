@@ -526,7 +526,7 @@ for(iGr in passive_gears){
 } 
 </code>
 
-=== dataset incl. swept area and effort ===
+=== Create dataset incl. swept area and effort ===
 
 As we've now calculated the swept area for both the interpolated gear types and
 the remaining ones via the buffer method, we can now combine all of them.
@@ -552,7 +552,7 @@ tacsatp <- do.call(rbind,allInts)
 save(tacsatp,file=file.path(outPath,"tacsatSweptArea.RData"))
 </code>
 
-=== link habitat map to vms ===
+=== Link habitat map to vms ===
 
 For some regions, habitat maps are available as shapefiles. If these datasets
 exist, we can read them into R and overlay the VMS points with the habitat map.
@@ -590,10 +590,20 @@ this habitat type to the tacsat file.
 
   # Use the magic 'over' function to match habitat type with VMS position
   idx <- over(spo,sp)
+  
+  #- Baltic
   tacsatp$SUBSTRATE <- habitat_map$BAL_CODE[idx]
 
-  # Make a plot of the result
+  #- North Sea
+  tacsatp$SUBSTRATE <- habitat_map$substrate[idx]
+
+  # Make a plot of the result (baltic)
   plot(habitat_map, xlim=c(11,14), ylim=c(55,56))
+  axis(1) ; axis(2, las=2) ; box()
+  points(tacsatp[, c("SI_LONG","SI_LATI")], col=tacsatp$SUBSTRATE, pch=".")
+  
+  # Make a plot of the results (North Sea)
+  plot(habitat_map, xlim=c(-4,10), ylim=c(50,60))
   axis(1) ; axis(2, las=2) ; box()
   points(tacsatp[, c("SI_LONG","SI_LATI")], col=tacsatp$SUBSTRATE, pch=".")
 
