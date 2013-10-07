@@ -603,13 +603,17 @@ this habitat type to the tacsat file.
   points(tacsatp[, c("SI_LONG","SI_LATI")], col=tacsatp$SUBSTRATE, pch=".")
   
   # Make a plot of the results (North Sea)
-  plot(habitat_map, xlim=c(-4,10), ylim=c(50,60))
-  axis(1) ; axis(2, las=2) ; box()
+  plot(1,1,col="white",xlim=c(-4,10), ylim=c(50,60),xlab="Longitude",ylab="Latitude")
+  plot(habitat_map, add=T,border="grey")
+  box()
   points(tacsatp[, c("SI_LONG","SI_LATI")], col=tacsatp$SUBSTRATE, pch=".")
 
   # Save the plot
   savePlot(filename=file.path(outPath, "VMSpingsAttachedToSedimentMap.jpeg"), type="jpeg")
 </code>
+
+The result might look something like this:<br>
+[http://vmstools.googlecode.com/svn/wiki/figures/habitatMapNorthSea.png]
 
 Here we've used shapefiles of habitat type and linked VMS points, but the habitat
 maps might be available in raster types only (already gridded files such as a TIF)
