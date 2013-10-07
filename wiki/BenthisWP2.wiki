@@ -611,9 +611,7 @@ this habitat type to the tacsat file.
   # Save the plot
   savePlot(filename=file.path(outPath, "VMSpingsAttachedToSedimentMap.jpeg"), type="jpeg")
 </code>
-
 The result might look something like this:<br>
-
 [http://vmstools.googlecode.com/svn/wiki/figures/habitatMapNorthSea.png]
 
 Here we've used shapefiles of habitat type and linked VMS points, but the habitat
