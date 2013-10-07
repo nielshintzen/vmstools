@@ -374,7 +374,29 @@ save(tacsatp,     file=file.path(outPath,"tacsatActivity.RData"))
 </code>  
 
 === Alternative activity identification: (Based on Fock 2008) ===
-TO DO
+
+We can read in a table that specifies speed ranges for vessels fishing for different
+gears. This table can either be constructed on the basis of published work by
+Fock 2008 (Fisheries in the context of marine spatial planning: Defining principal
+areas for fisheries in the German EEZ) or on a dataset created yourself.
+
+<code>
+gearSpeeds            <- read.csv(file.path(dataPath,"gearSpeeds.csv"))
+colnames(gearSpeeds)  <- c("LE_GEAR","SI_SPmin","SI_SPmax")
+#- In this example, gearSpeeds is a table with 3 columns. One column = gear code,
+#   second column is the minimum speed associatd with fishing and the third
+#   column is the maximum speed associated with fishing
+
+tacsatp$SI_STATE <- 's'
+for(iGear in sort(gearSpeeds$LE_GEAR)){
+  idxGearSpeed  <- subset(gearSpeeds,LE_GEAR == iGear)
+  idxtacsat     <- which(tacsatp$LE_GEAR == iGear &
+                         tacsatp$SI_SP >= gearSpeeds$SI_SPmin &
+                         tascatp$SI_SP <= gearSpeeds$SI_SPmax)
+  tacsatp$SI_STATE[idx] <- 'f'
+}
+</code>
+
 
 === Labelling each haul ===
 Assign an identifier (HL_ID) to each of the fishing sequences. This can especially
@@ -445,6 +467,12 @@ for(iGr in towed_gears){
 
     #- Correct for HL_ID skipping (not in use if labellingHauls() called before)
     #tacsatIntGearVEREF$HL_ID[which(diff(tacsatIntGearVEREF$HL_ID)<0)] <- tacsatIntGearVEREF$HL_ID[(which(diff(tacsatIntGearVEREF$HL_ID)<0)-1)]
+    
+    #- Add swept area (see explanation below)
+    #tacsatIntGearVEREF$SWEPT_AREA_KM2 <- NA
+    #tacsatIntGearVEREF$SWEPT_AREA_KM2 <- distance(c(tacsatIntGearVEREF$SI_LONG[-1],0),  c(tacsatIntGearVEREF$SI_LATI[-1],0),
+    #                                            tacsatIntGearVEREF$SI_LONG,           tacsatIntGearVEREF$SI_LATI) *
+    #                                          tacsatIntGearVEREF$LE_GEAR_WIDTH
 
     save(tacsatIntGearVEREF, file=file.path(outPath, "interpolated",
           paste("tacsatInt",iVE_REF, "_", iGr, ".RData", sep="")))
@@ -498,121 +526,85 @@ for(iGr in passive_gears){
 } 
 </code>
 
-=== fishing effort ===
-
-<code>
-# compute (discrete point) effort_days and effort_KWdays 
- #......
-  library(doBy)
-  tacsatp                  <- orderBy(~VE_REF+SI_DATIM+FT_REF,data=tacsatp)
-  tacsatp$effort_days      <- as.numeric(as.character(difftime(c(tacsatp$SI_DATIM[-1],0),tacsatp$SI_DATIM,units="days")))
-  tacsatp$effort_KWdays    <- tacsatp$effort_days *  as.numeric(as.character(tacsatp$VE_KW))
-  #tacsatp$effort_days   [which(diff(as.numeric(tacsatp$HL_ID))<0)]     <- 0  # correct (to do: but pble of steaming pts which have been converted to fish. pts)
-  #tacsatp$effort_KWdays [which(diff(as.numeric(tacsatp$HL_ID))<0)]     <- 0  # correct
-  ## for the time being, do:
-  tacsatp$effort_days[tacsatp$effort_days>0.014] <- 0  # correct (i.e. set at 0 if >3hours as a sign for a change of haul)
-
-</code>
-
-
 === dataset incl. swept area and effort ===
+
 As we've now calculated the swept area for both the interpolated gear types and
 the remaining ones via the buffer method, we can now combine all of them.
 
 <code>
-   lst <- list(NULL) ; count <- 0
-    for(iGr in unique(tacsatp$LE_GEAR)){
-      tacsatpGear        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==iGr,]
+allInts <- list()
+counter <- 0
+for(iGr in all_gears){
+  for(iVE_REF in sort(unique(tacsatpVE_REF))){
 
-         for(iVE_REF in sort(unique(tacsatpGear$VE_REF))){
+    dat <- try(get(load(file=file.path(outPath, "interpolated",
+                    paste("tacsatSweptArea_",iVE_REF, "_", iGr, ".RData", sep="")))))
+    #- Assign effort to dataset
+    tacsatp$effort_KWdays    <- intervalTacsat(tacsatp,level="trip",fill.na=T)$INTV * as.numeric(as.character(tacsatp$VE_KW))
 
-          cat(paste(iGr, " ", iVE_REF, "\n"))
-
-          count <- count+1
-
-          cat(paste("load ", iVE_REF, " and ", iGr, "\n", sep=""))
-          er <- try(load(file.path(outPath, "interpolated",
-                paste("tacsatSweptArea_",iVE_REF, "_", iGr, ".RData", sep=""))),
-                silent=TRUE)
-          if(class(er)=="try-error"){
-          count <- count -1
-          } else{
-          lst[[count]] <-  tacsatIntGearVEREF
-          }
-
-      }
-
+    if(class(dat) != "try-error"){
+      counter <- counter + 1
+      allInts[[counter]] <- dat
     }
-    tacsatp <- do.call("rbind", lst)
-
-    # save
-    save(tacsatp, file=file.path(outPath, paste("tacsatSweptArea.RData", sep="")))
-
-
-
+  }
+}
+tacsatp <- do.call(rbind,allInts)
+save(tacsatp,file=file.path(outPath,"tacsatSweptArea.RData"))
 </code>
-
 
 === link habitat map to vms ===
 
+For some regions, habitat maps are available as shapefiles. If these datasets
+exist, we can read them into R and overlay the VMS points with the habitat map.
+Through this overlap we can identify a habitat type with VMS ping.
 
+First we load the habitat map and load the tacsat data with swept area indication.
+Thereafter, we convert the tacsat data into a 'coordinate' dataset which we then
+can overlay with the habitat map. The result of that exercise is a vertor which
+indicates which habitat can be associated with each VMS ping. Thereafter we assign
+this habitat type to the tacsat file.
 
+* Via shapefile
 
-    * shapefile 
+<code>
+  library(maptools)
 
-<code>  
-  library(maptools) 
- 
-  # load a habitat map shape file
+  # load a habitat map shape file (Baltic)
   habitat_map           <- readShapePoly(file.path(polPath,"sediment_lat_long"),
                                          proj4string=CRS("+proj=longlat +ellps=WGS84"))
+  # load a habitat map shape file (North Sea)
+  habitat_map           <- readShapePoly(file.path(polPath,"ModelledSeabedHabitats"),
+                                         proj4string=CRS("+proj=longlat +ellps=WGS84"))
 
-  sh_coastlines            <- readShapePoly(file.path(polPath,"francois_EU"))
- 
-  
-  load(file.path(outPath, "tacsatSweptArea.RData")) # get 'tacsatp' with all data 
-  #....or load only one instance eg load(file.path(outPath, "interpolated","tacsatSweptArea_DNK000005269_OTB.RData"))
-  #tacsatp <- tacsatInt_gr_vid
-  
-  coord <-  tacsatp[, c('SI_LONG', 'SI_LATI')]
-  names(habitat_map) # return the name of the coding variable
- 
-  #Turn the polygons into spatial polygons
+  # get 'tacsatp' with all data
+  load(file.path(outPath, "tacsatSweptArea.RData"))
+
+  # Turn the habitat map into spatial polygons
   sp <- SpatialPolygons(habitat_map@polygons)
-  projection(sp) <-  CRS("+proj=longlat +ellps=WGS84")
+  proj4string(sp) <-  CRS("+proj=longlat +ellps=WGS84")
 
-  #Turn the point into a spatial point
-  spo <- SpatialPoints(coordinates(data.frame(SI_LONG=coord[,1],
-                                             SI_LATI=coord[,2])))
-  projection(spo) <-  CRS("+proj=longlat +ellps=WGS84")
+  #Turn the VMS point into a spatial points object
+  spo             <- SpatialPoints(coordinates(data.frame(SI_LONG=tacsatp$SI_LONG,
+                                                          SI_LATI=tacsatp$SI_LATI)))
+  proj4string(spo) <-  CRS("+proj=longlat +ellps=WGS84")
 
-  #Use the magic 'over' function to see in which polygon it is located
-  idx <- over(spo,sp); print(idx)
-  tacsatp$SUBSTRATE <- habitat_map$BAL_CODE[idx] 
- 
-  # plot
+  # Use the magic 'over' function to match habitat type with VMS position
+  idx <- over(spo,sp)
+  tacsatp$SUBSTRATE <- habitat_map$BAL_CODE[idx]
+
+  # Make a plot of the result
   plot(habitat_map, xlim=c(11,14), ylim=c(55,56))
   axis(1) ; axis(2, las=2) ; box()
   points(tacsatp[, c("SI_LONG","SI_LATI")], col=tacsatp$SUBSTRATE, pch=".")
-  #plot(sh_coastlines, add=TRUE)
 
-  # save
+  # Save the plot
   savePlot(filename=file.path(outPath, "VMSpingsAttachedToSedimentMap.jpeg"), type="jpeg")
-</code>  
+</code>
 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
- 
-    * raster
+Here we've used shapefiles of habitat type and linked VMS points, but the habitat
+maps might be available in raster types only (already gridded files such as a TIF)
+
+* Via raster
 
 <code>
   
