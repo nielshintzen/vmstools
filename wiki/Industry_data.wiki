@@ -115,6 +115,16 @@ update_labels(p, list(x = "kW", y="Groundgear_weight"))
 savePlot(file=file.path(outPath, "plot4.png"), type="png")
 
 
+#
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df3))
+p <- ggplot(data=df3, aes(an(kW),an(DoS))) +
+       geom_point(aes(shape  = factor(metier), color= factor(bt), size=an(GrW))) +
+       facet_grid(. ~ metier, scales="free")
+update_labels(p, list(x = "kW", y="Door_spread"))
+
+
+
 # plot for mixte targets
 library(ggplot2)
 coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df4))
