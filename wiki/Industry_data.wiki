@@ -68,6 +68,16 @@ bt  <- ind [ind$Variable.name=="Bottom_type", "Value"]
 nbt <- ind [ind$Variable.name=="Trawl_number", "Value"]
 df2 <- cbind.data.frame(CT, kW, LOA, DoS, DoW, GrW, sps, sp1, sp2, sp3, bt, nbt)
 
+
+# DCF metier coding example
+df2$metier <- as.character(df2$sps) # init
+df2[df2$metier %in% c('NEP','PRA','Nephrops'), 'metier']   <- 'OT_CRU'
+df2[df2$metier %in% c('COD','PLE','SOL', 'LEM'), 'metier'] <- 'OT_DMF'
+df2[df2$metier %in% c('SAN','SPR'), 'metier']              <- 'OT_SPF'
+df2[df2$metier %in% c('NR'), 'metier']                     <- 'OT_MIX'
+df2$metier <- as.factor(df2$metier) 
+
+
 # filter out
 df3 <- df2[df2$sps!="NR",]  # single target
 df4 <- df2[df2$sps=="NR",]  # mixte
