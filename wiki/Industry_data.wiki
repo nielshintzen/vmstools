@@ -73,7 +73,7 @@ df3 <- df2[df2$sps!="NR",]  # single target
 df4 <- df2[df2$sps=="NR",]  # mixte
 
 # intermediate calculation
-GrW <-  nbt * GrW
+GrW <-  an(nbt) * an(GrW)
 
 # plot DoS for single target
 library(ggplot2)
