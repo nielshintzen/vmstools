@@ -43,7 +43,7 @@
 #!!!!!!!!!!!!!!!!!!!!!#
 #!!!!!!!!!!!!!!!!!!!!!#
 mergeEflalo2Pings <-
-           function(eflalo, tacsat, general=list(output.path=file.path("C:"),
+           function(eflalo, tacsat, vessels=unique(eflalo$VE_REF), general=list(output.path=file.path("C:"),
                      visual.check=TRUE, detectFishing=FALSE, speed="segment", what.speed="calculated", conserve.all=TRUE,
                        ), ...){
 
@@ -121,7 +121,7 @@ mergeEflalo2Pings <-
       #!#!##!#!##!#!##!#!##!#!##!#!#
       all.vesselid     <- as.character(unique(eflalo[anf(eflalo$VE_LEN)>=0,]$VE_REF))
       all.vesselid     <- all.vesselid[!is.na(all.vesselid)] # e.g. when VE_LEN at NA exists
-      if(length(lstargs$vessels)!=0) all.vesselid <- lstargs$vessels
+      if(length(vessels)!=0) all.vesselid <- vessels
        # => IF ARG INFORMED, THEN KEEP ONLY ONE OR SEVERAL VESSELS AS NEEDED....
 
       for(a.vesselid in all.vesselid){  # PER VESSEL
