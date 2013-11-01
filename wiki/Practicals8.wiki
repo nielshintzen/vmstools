@@ -80,7 +80,7 @@ That wasn't too difficult, and you didn't notice the polygon inside polygon issu
 
 <code>
 #Create a vector with zeros representing each of the polygons
-# Note that for our point can be inside more than one polygon, therefore we have one value (zero or one) for each polygon.
+# Note that our point can be inside more than one polygon, therefore we have one value (zero or one) for each polygon.
 insidePols <- rep(0,length(habitat@polygons))
 for(i in 1:length(habitat@polygons)){
   for(j in 1:length(habitat@polygons[[i]]@Polygons)){

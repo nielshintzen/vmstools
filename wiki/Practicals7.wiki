@@ -33,8 +33,7 @@ Hereafter, as we've seen before, we need to load the logbook, VMS and harbour da
 data(eflalo)
 data(tacsat)
 data(euharbours)
-euharbours <- harbours
-</code>             
+</code>
 
 As usual, and especially necessary for your own data, format the data:
 
@@ -50,7 +49,7 @@ The code that turns the data into FishFrame data has a slightly different setup 
 <code>  
 #Find out in which harbour they are located
 tacsat$SI_HARB <- NA
-euharbours$Description <- euharbours$harbour
+harbours$Description <- harbours$harbour
 tacsat$SI_HARB <- pointInHarbour(lon=anf(tacsat$SI_LONG),
                                    lat=anf(tacsat$SI_LATI),
                                    harbours=harbours,

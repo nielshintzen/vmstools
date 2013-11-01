@@ -9,7 +9,8 @@ Here we will provide some guidance on how to clean VMS (tacsat) and logbook (efl
 Again, we start with loading / reading in the VMS data
 
 <code>
-data(tacsat)</code>
+data(tacsat)
+</code>
 
 In VMS we can distinguish roughly two types of errors, 1- those errors that are without doubt incorrect and 2- errors for which a bit of thinking is required and might be part of a discussion.
 
@@ -46,7 +47,7 @@ idx     <- pointOnLand(tacsat,pols);
 table(idx)
 
 pol     <- tacsat[which(idx==1),] #points on land
-#Overwrite the original tacsat dataset with only those points on land
+#Overwrite the original tacsat dataset with only those points not on land
 tacsat  <- tacsat[which(idx==0),] #tacsat not on land
 </code>
 
@@ -80,7 +81,7 @@ table(idx)
 tacsat <- tacsat[which(idx==0),]
 </code>
 
-All in all, 14787 points are located in harbour (that is about 15% of the total dataset!, but using the raw dataset, if you've used the 'on land' cleaned dataset, you will end up with a different value). Let's see where they really are located and if our analyses made sense.
+All in all, 5403 points are located in harbour (that is about 5% of the total dataset!(if you've used the raw dataset, instead of the cleaned one, you will end up with 14787 rows, do you know why?). Let's see where they really are located and if our analyses made sense.
 
 <code>
 library(maps);library(mapdata)
@@ -181,7 +182,12 @@ for(iSpec in idx) eflalo[which(eflalo[,iSpec] > an(specBounds[(iSpec-idx[1]+1),2
 for(i in kgeur(colnames(eflalo))) eflalo[which(is.na(eflalo[,i]) == T),i] <- 0
 </code>
 
-You have now finished cleaning the eflalo dataset, time for an exercise.
+You have now finished cleaning the eflalo dataset, first save the results for later use, and time for an exercise.
+
+<code>
+save(tacsat,file="D:/output/tacsatClean.RData")
+save(eflalo,file="D:/output/eflaloClean.RData")
+</code>
 
 === Exercise 3 ===
   # Clean the eflalo dataset (remove these records) where meshsizes are larger than 150mm, how many do you come across?

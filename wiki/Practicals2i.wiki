@@ -59,6 +59,7 @@ lanThres <- 1.5  #Maximum difference in log10-transformed sorted weights
 
 Make sure the eflalo data are clean:
 <code>  
+data(eflalo)
 idx <- which(eflalo$LE_MSZ >= msThres)
 eflalo <- eflalo[-idx,]
 </code>
@@ -106,23 +107,30 @@ eflalo <- eflalo[idx,]
 Start by attaching inbuilt datasets to R search path:
 <code>
 data(correspLevel7to5)
-data(correspMixedMetier)</code>
+data(correspMixedMetier)
+</code>
 Note: Have a look at these data to see if you can work out what they might do.
 
 <code>
-eflaloOrig <- eflalo # Good idea to 'save' the original data in case some mistake.</code>
+eflaloOrig <- eflalo # Good idea to 'save' the original data in case some mistake.
+</code>
 
 Give the analysis a name and create a directory for the output:
 
 <code>
 analysisName="Atlantis"
-dir.create(paste(outPath,analysisName,sep="")); setwd(paste(outPath,analysisName,sep="/"))</code>
+dir.create(outPath);
+setwd(outPath)
+dir.create(analysisName)
+setwd(paste(outPath,analysisName,sep="/"))
+</code>
 
 Keep only L_ID and the value columns for economy & tidiness:
 
 <code>
 eflalo <- eflalo[,c("LE_ID",grep("EURO",names(eflalo),value=T))]
-eflalo[is.na(eflalo)]=0</code>
+eflalo[is.na(eflalo)]=0
+</code>
 
 Removing any negative and null values:
 <code>
@@ -140,26 +148,30 @@ names(eflalo)[-1]=unlist(lapply(strsplit(names(eflalo[,-1]),"_"),function(x) x[[
 
 Removing 'miscellaneous' species:
 <code>
-eflalo  <- eflalo[,!names(eflalo)=="MZZ"]</code>
+eflalo  <- eflalo[,!names(eflalo)=="MZZ"]
+</code>
 
 Optional save of the cleaned eflalo data to disk if you don't want to keep doing the above!
 <code>
-save(eflalo,file=paste(outPath,"cleanEflalo.RData",sep=""))</code>
+save(eflalo,file=paste(outPath,"cleanEflalo.RData",sep=""))
+</code>
 
 
 STEP 1 - Identifying main species
 
 Exploration:
 <code>
-explo <-selectMainSpecies(eflalo,analysisName,RunHAC=TRUE,DiagFlag=FALSE
+explo <-selectMainSpecies(eflalo,analysisName,RunHAC=TRUE,DiagFlag=FALSE)
 </code>
 STEP 1- Selection of main species
 <code>
-Step1<- extractTableMainSpecies(eflalo,explo$namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)</code>
+Step1<- extractTableMainSpecies(eflalo,explo$namesMainSpeciesHAC,paramTotal=95,paramLogevent=100)
+</code>
 
 Optional save of the Explo Step 1 output
 <code>
-save(explo,Step1,file="Explo_Step1.Rdata")</code>
+save(explo,Step1,file="Explo_Step1.Rdata")
+</code>
 
 STEP 2 - Principal Components Analysis (PCA) or Not PCA
 
@@ -202,7 +214,8 @@ save(Step3,file="Step3.Rdata")
 
 Restore the data
 <code>
-eflalo <- eflaloOrig </code>
+eflalo <- eflaloOrig
+</code>
 
 ==Exercises==
 

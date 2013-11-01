@@ -195,12 +195,12 @@ head(spgDF@data)
 #Now align the VMS pings to the grid
 #We have to turn the coordinates of the tacsat dataset into spatial points first
 for(iYr in c(1800:1801)){
-subTacsat <- subset(tacsatp,year(SI_DATIM)==iYr) 
-sp <- SpatialPoints(coordinates(subTacsat[,c("SI_LONG","SI_LATI")]))
+  subTacsat <- subset(tacsatp,year(SI_DATIM)==iYr)
+  sp <- SpatialPoints(coordinates(subTacsat[,c("SI_LONG","SI_LATI")]))
 
-#The spatial grid dataframe is a long list (nrow(spgDF@data)) and the idx tells me which row number (associated with a grid cell) the VMS ping is located in.
-idx <- overlay(sg,sp)
-spgDF@data[ac(aggregate(subTacsat$TR_AREA,          by=list(idx),FUN=sum,na.rm=T)[,1]), paste("Y",iYr,sep="")]    <- aggregate(subTacsat$TR_AREA,  by=list(idx),FUN=sum,na.rm=T)[,2] 
+  #The spatial grid dataframe is a long list (nrow(spgDF@data)) and the idx tells me which row number (associated with a grid cell) the VMS ping is located in.
+  idx <- overlay(sg,sp)
+  spgDF@data[ac(aggregate(subTacsat$TR_AREA,          by=list(idx),FUN=sum,na.rm=T)[,1]), paste("Y",iYr,sep="")]    <- aggregate(subTacsat$TR_AREA,  by=list(idx),FUN=sum,na.rm=T)[,2]
 }
 
 #Have a look at some data (where Y1800 is not zero)

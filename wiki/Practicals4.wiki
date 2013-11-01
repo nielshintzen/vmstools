@@ -46,7 +46,8 @@ eflalop <- cbind(eflalo,pos)
 
 #Let's find the ICES area within of logbook records
 #We need the longitude, latitude position from the step before
-eflalop$LE_AREA <- ICESarea(eflalop,roman=T)
+data(ICESareas)
+eflalop$LE_AREA <- ICESarea(eflalop,ICESareas)
 </code>
 
 Obviously, we can do the same for the VMS data, but try that yourself! One other type of conversion available is into the spatial <b>C-square</b> notation. This notation was developed in Australia and has many handy features, ie it can be used for the entire globe.  It is now implemented as the default FishFrame spatial scale. The C-square notation is flexible since, although it is a standard 'naming convention', it can also take many different resolutions. Let's convert some VMS data into C-square notation.

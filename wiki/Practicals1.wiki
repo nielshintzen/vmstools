@@ -11,7 +11,7 @@ The practicals you will work on will consist of some guidance text, some code th
 Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are Tinn-R or R-studio. However, programs such as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is R2.14.x or higher! (How can I check...)
 <code>
 R.Version()$version.string</code>
-If this says anything below R2.14.x, please upgrade. VMStools is still in development and R is as well. Over the past months considerable changes have taken place which do no not allow backwards compatibility of VMStools with older R versions.
+If this says anything below R2.14.x, please upgrade. If this says R3.0.x, you will run into problems too. Please use up to R2.15.3 for this course. VMStools is still in development and R is as well. Over the past months considerable changes have taken place which do no not allow backwards compatibility of VMStools with older R versions. VMStools will become available for R3.0.x soon.
 
 Now start a version of your favorite editor and start R. VMStools is an add-on package to R and depends on several other packages. Hence, before we can run VMStools, we need to install these other packages too. This is how you do that: 
 
@@ -19,10 +19,7 @@ Now start a version of your favorite editor and start R. VMStools is an add-on p
 
 <code>
 vmstoolsPackages <-
-   c("amap","cluster","doBy","data.table","FactoMineR","foreign",
-   "maptools","MASS","sp","SOAR","aspace","PBSmapping","raster",
-   "shapefiles","mda","maps","fields","spam","mapdata","RColorBrewer",
-   "classInt")
+   c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp")
  
 for(i in vmstoolsPackages) try(install.packages(pkgs=i,repos=getOption("repos")))
 </code>
@@ -33,7 +30,7 @@ Now it is time to install the VMStools package, you have to download it first ho
 
 <code>
 path2VMStoolsDownload <- "C:/downloads/" #this folder is an example folder
-install.packages(paste(path2VMStoolsDownload,"vmstools_0.60.zip",sep=""))
+install.packages(paste(path2VMStoolsDownload,"vmstools_0.66.zip",sep=""))
 </code>
 
 If all went well, you have now successfully installed VMStools. Note that you only need to go over this once and that all packages are available every time you start R. 
@@ -42,7 +39,8 @@ If all went well, you have now successfully installed VMStools. Note that you on
 Once more, open your editor and R version (if it is still running, that is fine as well). To load the VMStools package, you need to type the following on the R command line:
 
 <code>
-library(vmstools)</code>
+library(vmstools)
+</code>
 
 All functions available in VMStools are loaded now and available to you. Note that a lot of messages are printed to R, make sure they do not contain errors, some warning messages are fine. 
 Getting your own data into R might be difficult right from the start, hence, we've attached some VMS and logbook data to the package itself which allows you to play with the package right away. You need to load these datasets first however. 
@@ -62,6 +60,9 @@ str(tacsat)
  $ SI_TIME: chr  "13:32:00" "15:28:00" "17:22:00" "19:18:00" ...
  $ SI_SP  : num  0 0 0 0 0 0 0 12 2 2 ...
  $ SI_HE  : num  25 25 25 25 25 25 111 292 43 294 ...
+ 
+#- We can get a summary too
+summarizeTacsat(tacsat)
 </code>
 Apparently, tacsat has class 'data.frame', has 97015 observations (rows) and 8 variables (columns). Each column name is given on a new row in the example above. The names might be a bit strange, but follow the agreed format as you can download from [http://code.google.com/p/vmstools/downloads/list Exchange_EFLALO2_v2-1.doc]. 
 
@@ -111,6 +112,9 @@ str(eflalo[,1:20])
  $ LE_STIME: chr  NA NA NA NA ...
  $ LE_ETIME: chr  NA NA NA NA ...
  $ LE_SLAT : num  NA NA NA NA NA NA NA NA NA NA ...
+
+#- Get a summary of eflalo
+summarizeEflalo(eflalo)
 </code>
 
 This dataset contains a staggering amount of columns, 189! and only 4539 rows (observations). The data are structured in such a way that each species caught get's its own column. Hence, it might be more difficult to get the right information on your screen by just typing 
