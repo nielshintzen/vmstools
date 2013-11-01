@@ -1,7 +1,7 @@
 segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=FALSE,CI=0.95,saveDir=tempdir(),forceLowerBound=NULL){
 
   require(segmented)
-  tacsat$idx <- 1:nrow(tacsat)
+  tacsat$idxFun <- 1:nrow(tacsat)
 
   #Regular checks
   if(!'SI_STATE' %in% colnames(tacsat)) tacsat$SI_STATE  <- NA
@@ -122,8 +122,8 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
           storeScheme[iRun,"lower"] <- bound1
           storeScheme[iRun,"upper"] <- bound2
 
-          tacsatOrig$SI_STATE[sTacsat$idx[which(sTacsat$SI_SP >= storeScheme[iRun,"lower"] & sTacsat$SI_SP <= storeScheme[iRun,"upper"])]] <- "f" #Fishing
-          tacsatOrig$SI_STATE[sTacsat$idx[which(sTacsat$SI_SP <  storeScheme[iRun,"lower"] | sTacsat$SI_SP >  storeScheme[iRun,"upper"])]] <- "nf" #Steaming / in harbour
+          tacsatOrig$SI_STATE[sTacsat$idxFun[which(sTacsat$SI_SP >= storeScheme[iRun,"lower"] & sTacsat$SI_SP <= storeScheme[iRun,"upper"])]] <- "f" #Fishing
+          tacsatOrig$SI_STATE[sTacsat$idxFun[which(sTacsat$SI_SP <  storeScheme[iRun,"lower"] | sTacsat$SI_SP >  storeScheme[iRun,"upper"])]] <- "nf" #Steaming / in harbour
         }
       }
     }
@@ -134,7 +134,7 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
       "Check ",file.path(saveDir,"storeScheme.csv"),"for details \n\n")
       
   cat("Note: fishing = f, no fishing = nf\n")
-return(tacsatOrig[,-grep("idx",colnames(tacsatOrig))])}
+return(tacsatOrig[,-grep("idxFun",colnames(tacsatOrig))])}
     
 #res <- segmentedTacsatSpeed(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=FALSE,CI=0.95)
     

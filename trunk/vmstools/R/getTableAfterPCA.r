@@ -41,7 +41,7 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     dev.off()
     
     X11(5,5)
-    plot.PCA(log.pca, choix = "ind", axes = 1:2, habillage = "ind", title="", new.plot=FALSE, cex=1.1, label=FALSE)
+    plot.PCA(log.pca, choix = "ind", axes = 1:2, habillage = "ind", title="", new.plot=FALSE, cex=1.1)
     savePlot(filename=paste(analysisName,'projection_of_individuals_on_the_first_two_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
     dev.off()
  
@@ -98,7 +98,7 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     plot(log.pca,choix="var",axes = c(1, 3),new.plot=FALSE,lim.cos2.var = 0.3)
     plot(log.pca,choix="var",axes = c(1, 4),new.plot=FALSE,lim.cos2.var = 0.3)
     plot(log.pca,choix="var",axes = c(2, 4),new.plot=FALSE,lim.cos2.var = 0.3)
-    plot(log.pca,choix="var",axes = c(3, 4),new.plot=FALSE,lim.cos2.var = 0.3)
+    #plot(log.pca,choix="var",axes = c(3, 4),new.plot=FALSE,lim.cos2.var = 0.3)
     par(op)
     title(main=paste("Projection of Species on first factorial axis","\n","\n",sep=""))
     dev.off()
