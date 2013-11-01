@@ -17,9 +17,9 @@ function(xrange
                     roundDigitx <- getndp(resx)
                     roundDigity <- getndp(resy)
                     xs          <- seq(xrange[1],xrange[2] +resx,resx)
-                    xborder     <- c((min(floor(xs*10^roundDigitx))/10^roundDigitx)+resx/2,(max(ceiling(xs*10^roundDigitx)) / 10^roundDigitx)-resx/2)
+                    xborder     <- c((min(floor(xs*10^roundDigitx))/10^roundDigitx)- resx/2,(max(ceiling(xs*10^roundDigitx)) / 10^roundDigitx)+resx/2)
                     ys          <- seq(yrange[1],yrange[2] +resy,resy)
-                    yborder     <- c((min(floor(ys*10^roundDigity))/10^roundDigity)+resy/2,(max(ceiling(ys*10^roundDigity)) / 10^roundDigity)-resy/2)
+                    yborder     <- c((min(floor(ys*10^roundDigity))/10^roundDigity)- resy/2,(max(ceiling(ys*10^roundDigity)) / 10^roundDigity)+resy/2)
                    }
 
                 grid        <- GridTopology(c(xborder[1],yborder[1]),c(resx,resy),c(length(seq(xborder[1],xborder[2],resx)),length(seq(yborder[1],yborder[2],resy))))
