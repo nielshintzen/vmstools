@@ -1,6 +1,6 @@
 #summary Side
   * [Introduction Introduction]
-  * VMStools ICES course (25-29th June 2012)
+  * VMStools ICES course (11-15th November 2013)
     * [Practicals1 P1: Getting the VMS and logbook data into R]
     * [Practicals2 P2: Cleaning and processing the VMS and logbook data, and accounting for potential problems]
     * [Practicals2i P2i: Metier identification]
