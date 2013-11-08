@@ -17,7 +17,7 @@ In VMStools we only distinguish between two types of interpolation:
   # Linear interpolation
   # Cubic Hermite Spline interpolation (according to Hintzen et al. 2010, Fisheries Research)
 
-Although the technicalities might be a bit too much for you, the practical way is somewhat simpler. And if you are OK not to watch underneath the hood, you're fine as well.
+Although the technicalities might be a bit too much for now, the practical way is somewhat simpler. And if you are OK not to watch underneath the hood, you're fine as well.
 
 <code>
 data(tacsat)

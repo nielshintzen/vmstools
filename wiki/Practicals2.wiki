@@ -1,7 +1,7 @@
 = Practical 2: Cleaning and processing the VMS and logbook data =
 
 == Introduction ==
-Typically VMS data contain lots of errors and many of them have a technical origin. Some are easy to detect, others a bit more tricky. There are problems with logbook data too, but most often these are caused by the fishers filling them out incorrectly rather than by the processing and storage of the data. 
+Typically VMS data contains lots of errors and many of them have a technical origin. Some are easy to detect, others a bit more tricky. There are problems with logbook data too, but most often these are caused by the fishers filling them out incorrectly rather than by the processing and storage of the data.
 
 Here we will provide some guidance on how to clean VMS (tacsat) and logbook (eflalo) data. It needs to be said, that these guidelines are not strict rules and that other rules are most likely more appropriate for your own dataset!
 
@@ -59,7 +59,7 @@ map("worldHires",res=0,fill=T,col="darkgreen",xlim=c(-4,10),ylim=c(48,62)); map.
 points(x=pol$SI_LONG,y=pol$SI_LATI,col="red",pch=19,cex=0.5)
 </code>
 
-As you can see, most of them are either on land, close to a harbour or on a river. Hence, it is important to use a detailed map to perform this calculation!
+As you can see, most of them are either on land, close to a harbour or on a river. Hence, it is important to use a detailed map to perform this calculation! You can specify your own map, you don't need to use the map supplied with VMStools.
 
 This means we are half-way through cleaning the VMS dataset. Now we must investigate those type of 'errors' which are ambiguous and need to be the subject of discussion. These are things like: VMS records associated with very high speed; points in a harbour; and 'pseudo-duplicates': points that are not exactly duplicates but may be considered as such. 
 
@@ -113,13 +113,14 @@ Note that this cleaning describes the absolute basic parts you need to screen fo
   # Check your data for these aspects and create appropriate graphs to show your result
 
 == Cleaning logbook data ===
-In cleaning the logbook data, similar issues as with cleaning the VMS data arise. Some errors are true mistakes and need to fixed / removed, others depend on interpretation by the scientist. However, the origins of logbook errors are most often human mistakes rather than technical malfunctions as we have seen with VMS data. For this reason it is advisable to have a fundamental knowledge of the fisheries data and how these sources are collected and stored.
+In cleaning the logbook data, similar issues as with cleaning the VMS data arise. Some errors are true mistakes and need to be fixed / removed, others depend on interpretation by the scientist. However, the origin of logbook errors are most often human mistakes rather than technical malfunctions as we have seen with VMS data. For this reason it is advisable to have a fundamental knowledge of the fisheries data and how these sources are collected and stored.
 
-The basic cleaning of logbook data consists of removing records where arrival date happens before departure date, duplicate records and easy to detect mistakes in the catch values recorded. Other aspects such as mesh sizes and vessel lengths or horse power being outside a 'believable' range can be dealt with as well. 
+The basic cleaning of logbook data consists of removing records where arrival date occurs before departure date, duplicate records and easy to detect mistakes in the catch values recorded. Other aspects such as mesh sizes and vessel lengths or horse power being outside a 'believable' range can be dealt with as well.
 
 <code>
 data(eflalo)
 #In principle, the LE_ID identifier should be unique, this allows for an easy solution
+#Checking for duplicates
 eflalo <- eflalo[!duplicated(eflalo$LE_ID),]
 
 #If things are a bit more difficult

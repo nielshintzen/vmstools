@@ -8,7 +8,7 @@ The practicals you will work on will consist of some guidance text, some code th
 === It is recommended to carefully read through the text that goes with each of the practicals ===
 
 == Getting VMStools installed ==
-Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are Tinn-R or R-studio. However, programs such as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is R2.14.x or higher! (How can I check...)
+Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are Tinn-R or R-studio. However, programs such as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is R2.14.x or higher (But not R3.0.x yet)! (How can I check...)
 <code>
 R.Version()$version.string</code>
 If this says anything below R2.14.x, please upgrade. If this says R3.0.x, you will run into problems too. Please use up to R2.15.3 for this course. VMStools is still in development and R is as well. Over the past months considerable changes have taken place which do no not allow backwards compatibility of VMStools with older R versions. VMStools will become available for R3.0.x soon.
@@ -26,7 +26,7 @@ for(i in vmstoolsPackages) try(install.packages(pkgs=i,repos=getOption("repos"))
 
 It will prompt you a box to select a country and place to download the packages from, choose one nearby (e.g. Denmark). 
 
-Now it is time to install the VMStools package, you have to download it first however from this website: [http://code.google.com/p/vmstools/downloads/list VMStools google repository]. Take either the vmstools_0.60.zip version if you work under Windows or Mac and the vmstools_0.60.tar.gz version if you work under Linux. Download the file to your local disk. Next up is to install the VMStools package itself. Do this manually by clicking in R the 'Packages' tab and select the option 'Install packages from local zip files' and navigate to the file download or do it as follows from the R command line:
+Now it is time to install the VMStools package, you have to download it first however from this website: [http://code.google.com/p/vmstools/downloads/list VMStools google repository]. Take either the vmstools_0.66.zip version if you work under Windows or Mac and the vmstools_0.66.tar.gz version if you work under Linux. Download the file to your local disk. Next up is to install the VMStools package itself. Do this manually by clicking in R the 'Packages' tab and select the option 'Install packages from local zip files' and navigate to the file download or do it as follows from the R command line:
 
 <code>
 path2VMStoolsDownload <- "C:/downloads/" #this folder is an example folder
