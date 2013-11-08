@@ -164,7 +164,7 @@ So far so good, you've all seen these preparation steps a number of times now, i
 
 The next step is to start calculating the area trawled for each VMS ping. It might be handy here to store the results by year in some sort of dataframe again, so you can access it later and also derive other results from it.
 
-Area trawled = duration of trawling x width of gear x speed of a vessel
+Area trawled = duration of trawling x width of gear x speed of a vessel.
 Let's work this equation out for each of the VMS pings in the dataset.
 
 <code>

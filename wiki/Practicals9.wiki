@@ -8,7 +8,7 @@ needs. See it as a template which you can use over and over, that is at least ho
 == Picture settings ==
 Setting your picture settings in advance, at the top of your script, might seem a lot of extra work.
 However, once you've spefied all your settings at once, you'll make sure that in each figure you design
-afterwards will use the exact same settings.
+afterwards you will use the exact same settings.
 
 <code>
 library(vmstools)
@@ -42,30 +42,36 @@ can easily be projected on a grid and it defines some other areas of interest.
 resx        <- 0.25
 resy        <- 0.125
 
-#-Load the data
+#-Load the data and convert your data into a 'SpatialPointsDataFrame'
 data(tacsat); data(eflalo)
 coords      <- SpatialPointsDataFrame(cbind(x=an(ac(tacsat$SI_LONG)),y=an(ac(tacsat$SI_LATI))),data=tacsat)
+</code>
+A 'SpatialPointsDataFrame' is the same as a 'SpatialPoints' object, only this one allows you to store per coordinate a lot of data inside a data.frame.
 
+<code>
 data(ICESareas)
 data(europa)
 
-#-Define the area of interest
+#-Define the area of interest and some reference area
 areaInt    <- ICESareas[grep("IV",names(ICESareas))[1:3]]
 areaRef    <- ICESareas[grep("IVb",names(ICESareas))[1]]
 
-#-Obtain outer region of
+#-Obtain outer region of my areas and VMS positions. This helps to create maps later on with the same dimensions.
 bbox        <- cbind(bbox(areaInt),bbox(areaRef))
 spatBound   <- list(xrange = c(floor(range(bbox["x",])[1]),ceiling(range(bbox["x",])[2])),
                     yrange = c(floor(range(bbox["y",])[1]),ceiling(range(bbox["y",])[2])))
 grd         <- createGrid(spatBound$x,spatBound$y,resx,resy,type="SpatialGridDataFrame",exactBorder=T)
-
+</code>
+We have loaded a file called 'europa' before, below we convert it into a SpatialPolygons object which allows easy plotting
+<code>
+#This is a bit slow though
 eurPols     <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
                         function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,SI_LATI=subset(europa,SID==x)$Y)}))
 </code>
 
 All areas are defined now. However, once we start plotting the results, quite often
 we find out that we need some colour scale to present the results at. If for example
-the data spans from 0 to 1000, some steps like 0-10,10-50,50-100,100-500,500-1000 might
+the data spans from 0 to 1000, some steps like 0-10,10-25,25-50,50-100,100-200,200-400 might
 look good. Below we define these ranges first, which makes our lives easy when plotting and
 adding legends to these plots.
 
@@ -73,7 +79,7 @@ adding legends to these plots.
 cutbreaksval  <- list(ALL = c(-1,0,10,25,50,100,200,400))
 legval        <- list(ALL = c("0","0 <= 10","10 <= 25", "25 <= 50","50 <= 100","100 <= 200","200 <= 400"))
 #- Potentially, divide your data by a certain constant and add this constant to the legend title
-valdiv        <- 1000 * 60
+valdiv        <- 1000 * 60 #combination of converting from minutes to hours and getting a legend value per 1000 hours
 unitval       <- c('x 1000 hours per year')
 </code>
 
@@ -126,6 +132,14 @@ coordGrd                      <- coordinates(grd)[an(names(table(idx))),]
 grdPols                       <- lonLat2SpatialPolygons(lst=lapply(as.list(1:nrow(coordGrd)),
                                   function(x){data.frame(SI_LONG=c(coordGrd[x,"s1"]-resx/2,rep(coordGrd[x,"s1"]+resx/2,2),coordGrd[x,"s1"]-resx/2),
                                                          SI_LATI=c(rep(coordGrd[x,"s2"]-resy/2,2),rep(coordGrd[x,"s2"]+resy/2,2)))}))
+</code>
+We have specified the binns we use for the legend and colours above, but it might be handy if you see where I got the range in values from.
+Below, you can see the 'grd@data[an(names(table(idx))),1]' piece of code. This selects only those coordinates from the data.frame that are
+associated with a value > 0. All in all, this is a simple vector and allows me to see what values it spans.
+<code>
+#Look at value ranges:
+range(grd@data[an(names(table(idx))),1])
+
 #-Here we cut the range of values up into colour binns
 cols                          <- c("white",colintens)[cut(grd@data[an(names(table(idx))),1]/valdiv,breaks=cutbreaksval$ALL)]
 plot(grdPols,col=cols,add=T,border='transparent')
@@ -163,7 +177,7 @@ writeOGR(grdPolsDF, dsn = '.', layer = 'Fishing_intensity_tacsat', driver = "ESR
 
 == Introduction ==
 Creating tables out of the VMS and Logbook data is often based on 'point in polygon' types of
-calculations where GPS positions inside a refenence area of area of interest are aggregated.
+calculations where GPS positions inside a refenence area or area of interest are aggregated.
 Here we show how you could also merge logbook records with VMS records in the same type of
 analyses.
 
@@ -177,6 +191,7 @@ tacsat          <- tacsat[which(is.na(tacsat$SI_LONG)==F & is.na(tacsat$SI_LATI)
 #Calculate the effort in an eflalo dataset
 eflalo          <- effort(eflalo,unit="mins")
 #Because some trip numbers are replicated, we take only unique trip numbers
+# (a single trip can be associated with multiple eflalo records, that means that also time out of harbour and in harbour are replicated)
 eflalo          <- eflalo[!duplicated(eflalo$FT_REF),]
 #Assign GPS positions to eflalo
 eflalo$SI_LONG  <- ICESrectangle2LonLat(eflalo$LE_RECT)$SI_LONG

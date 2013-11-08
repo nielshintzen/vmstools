@@ -97,7 +97,7 @@ print(habitat$substrate[idx])
 habitat$substrate[idx][which.max(order(habitat@plotOrder)[idx])]
 </code>
 
-The main 'engine' of most of these calculations is the point.in.polygon function which is very powerful, but the way it's code above is very inefficient for just one point!
+The main 'engine' of most of these calculations is the point.in.polygon function which is very powerful, but the way it iss coded above is very inefficient for just one point!
 
 Time to find some relationships. Let's take some beamtrawl fishers only and see what type of substrate they normally trawl. Do you have a gut-feeling already?
 

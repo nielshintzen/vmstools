@@ -29,7 +29,7 @@ head(tacsatp)
 print(length(which(tacsatp$FT_REF == 0))) #number of records not able to link
 </code>
 
-What we can observe is that another column has been added to the 'tacsatp' object; namely the 'FT_REF' column. What happened 'under the hood' is the linking of VMS and logbook data, based on vessel name+year and time stamps, such that each VMS record would fall within the time frame of the departure and arrival of a logbook trip for that same vessel. Now we know which VMS record can be associated with which eflalo record. This now allows us to do some really cool things. Note that if no linking was possible, FT_REF equals "0" and this happens in many instances, e.g. when vessels are in harbour.
+What we can observe is that another column has been added to the 'tacsatp' object; namely the 'FT_REF' column. What happened 'under the hood' is the linking of VMS and logbook data, based on vessel name+year and time stamps, such that each VMS record would fall within the time frame of the departure and arrival of a logbook trip for that same vessel. Now we know which VMS record can be associated with which eflalo record. This now allows us to do some new types of analyses. Note that if no linking was possible, FT_REF equals "0" and this happens in many instances, e.g. when vessels are in harbour.
 
 <code>
 #Move the gear type from eflalo to tacsat
@@ -55,7 +55,7 @@ subset(eflalo,FT_REF == "326494")
   # What types of gears are available in the VMS dataset, how many of each?
 
 == Explore the benefits ==
-Similar to the presentation, we will quickly look into four types of benefit
+Similar to the presentation, we will quickly look into four types of benefits
   # Distinguish fishery types
   # Define activity
   # Fine scale effort patterns
@@ -80,10 +80,12 @@ Do not close this picture immediately, it comes in handy in the next example.
 In many cases, activity can be defined based on speed. We've just made a picture of the speed profiles. Can you distinguish different behaviors by looking at these plots already? In general, there are 3 types of behavior to be distinguished (but with more information on the fishery, you could potentially indicate even more behaviors). 
   # Floating / being in harbour, associated with very low to zero speeds. 
   # Fishing, associated with intermediate speeds. 
-  # Steaming, associated with high speeds. If we now look back at the figure we just made, in the OTB panel, we can observe 2 'hills', one with mean around 3knots ranging between 2 and 6/7 knots and one with a mean around 10knots ranging between 7 and 13knots. Everything below 1 knot can be assigned to 'floating / being in harbour. All in all, this is a simple approach, but might be very time consuming. 
+  # Steaming, associated with high speeds.
+
+If we now look back at the figure we just made, in the OTB panel, we can observe 2 'hills', one with mean around 3knots ranging between 2 and 6/7 knots and one with a mean around 10knots ranging between 7 and 13knots. Everything below 1 knot can be assigned to 'floating / being in harbour. All in all, this is a simple approach, but might be very time consuming.
 
 Therefore, based on these ideas, different functionalities have been developed in VMStools. 
-  # segmentTacsatSpeed, segmented regression on speed profile and automatic detection of fishing versus no-fishing
+  # segmentedTacsatSpeed, segmented regression on speed profile and automatic detection of fishing versus no-fishing
   # activityTacsat, normal density curve fitting based on speed profile but informed by user decision
 
 I will present short examples of both methods.
@@ -122,7 +124,9 @@ tacsatp$LE_GEAR[which(is.na(tacsatp$LE_GEAR)==T)] <- "NO_GEAR"
 #Analyse a selection of the data, a window will pop-up!
 require(tcltk) #- install.packages("tcltk",repos=getOption("repos"))
 storeScheme   <- activityTacsatAnalyse(subset(tacsatp,LE_GEAR == "OTM" & year(SI_DATIM) == 1801),units="year",analyse.by="LE_GEAR")
-
+</code>
+Ok, have a look at the storeScheme first. The design is not so complicated, and especially if you have to analyse many vessels, it would pay off to create the 'storeScheme' yourself using e.g. 'expand.grid' functionality in R.
+<code>
 #If this gives an error, you need to install the package first, go to R -> packages -> install packages
 require(mixtools) #- install.packages("mixtools",repos=getOption("repos"))
 
@@ -179,6 +183,7 @@ Quite a difference, not! Having VMS and logbook data available allows you to dis
 
 === Distribution of catches / values ===
 Similar to the analyses above, we can make a picture of, for example, plaice landings on the spatial scale of VMS. Note here, however, that we are about to dispatch landings at a much finer spatial scale than at which the original data are stored (ie. the logbooks). We might hope that this is a sensible interpretation of the two data sources available, exploiting each to permit the finest possible spatial resolution. It is up to you, however, to decide if this is a wise analysis to perform!
+Make sure that the column 'LE_CDAT' in the eflalo dataset contains real dates. Also, make sure you have at least 2 columns starting with either LE_KG_ or LE_EURO_.
 
 <code>
 #This code will dispatch KG and EURO on the ping scale to VMS, we need to add activity to tacsatp however (we did this before, but let's take a quick and dirty approach here)

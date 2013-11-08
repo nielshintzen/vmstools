@@ -4,13 +4,13 @@
 Even scaling up from the 'poor' logbook spatial resolution to the more detailed VMS resolution is sometimes not enough for your type of analyses. 
 What you rather want to do is to interpolate the fishing tracks from your VMS data and create a number of 'intermediate' points, i.e. interpolated points. 
 
-Before you start to consider to do these type of analyses, you have to be aware of a number of issues. 
+Before you start to consider to do these types of analyses, you have to be aware of a number of issues.
   # You are now making up data points
   # You might associate these interpolated points with catches, keep an eye on reality
   # Most often you only want to interpolate between fishing pings, so your analyses of activity is very important!
   # Is your computer up for the test, because you will expand your dataset even more (and requires more memory too)
 
-That should be enough warnings to convince you how cool these things actually are, and please, do try this at home, but be aware of the assumptions when you present something to e.g. stakeholders or a ministry.
+That should be enough warnings to convince you how useful these things actually are, and please, do try this at home, but be aware of the assumptions when you present something to e.g. stakeholders or a ministry.
 
 == Interpolate VMS data ==
 In VMStools we only distinguish between two types of interpolation:
@@ -106,7 +106,7 @@ Obviously, we could do a bit of tuning here and there to make the performance of
 
 == From here onwards == 
 
-Once the tacsat data is interpolated some other possibilities remain. It is, for example, possible to add a certain width of a gear to the interpolation. This might be handy when you want to reconstruct trawling tracks as approximately the right scale. Or you could focus on the uncertainty associated with interpolated tracks to test if areas have remained unfished from some time. 
+Once the tacsat data is interpolated some other possibilities remain. It is, for example, possible to add a certain width of a gear to the interpolation. This might be handy when you want to reconstruct trawling tracks at approximately the right scale. Or you could focus on the uncertainty associated with interpolated tracks to test if areas have remained unfished for some time.
 
 === Adding gear width to interpolation ===
 Especially when your study area is very small (e.g. only a few kilometers), it is worth to start considering the width of the gear in fishing track pictures. One feature tested before was Google Earth pictures where by zooming in, the actual with of the gear could be visualized. As we now move into rather sophisticated tools, I do show some of the underlying tools that are used, but wrapped, inside the functions. 
@@ -189,7 +189,7 @@ It is recommended to be specific when calculating the area trawled using the 'ad
 === Calculating uncertainty of interpolation ===
 It is common to most scientists to be uncertain about assumptions and the results of an analyses. This uncertainty can however also provide interesting results  and be used in e.g. indicator calculations!
 
-Obviously, interpolation isn't without uncertainty either. Hence, tools have been developed to show this uncertainty and to allow us to calculate with it. It should be stressed however that we are talking about uncertainty in the track of the interpolation, not the VMS position itself while it is known that those 'pings' aren't without error either (but might be negligible on the scale of things). 
+Obviously, interpolation isn't without uncertainty either. Hence, tools have been developed to show / calculate this uncertainty and to allow us to do other analyses on the basis of those results. It should be stressed however that we are talking about uncertainty in the track of the interpolation, not the VMS position itself while it is known that those 'pings' aren't without error either (but might be negligible on the scale of things).
 
 From the interpolation and VMS points itself we can already distill a bit of guidance on how to construct the 'confidence interval'.   
   # Confidence at the VMS pings equals 1
@@ -216,7 +216,7 @@ interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
 xrange        <- c(2.1,2.6); yrange <- c(51.3,51.65)
 grid          <- createGrid(xrange,yrange,resx=0.001,resy=0.0005)
 
-#Do some fancy stuff and calculate the Confidence Interval (a lot of arguments to this function follow, just 'accept' that for the moment
+#Do some fancy stuff and calculate the Confidence Interval
 res           <- calculateCI(interpolation[[4]],
                              tacsat[interpolation[[4]][1,],],
                              params=list(fm=0.25,distscale=3.1,sigline=0.4,st=c(2,6)),
@@ -229,7 +229,7 @@ res <- (res[[1]] - min(res[[1]])) / (max(res[[1]]) - min(res[[1]]))
 levelplot(matrix(res,ncol=458,nrow=380)[,380:1])
 </code>
 
-That was the code to just calculate one confidence interval. But what if I want the confidence interval of a whole trip. That requires a short loop! Let's see how far we get
+That was the code to just calculate one confidence interval. But what if I want the confidence interval of a whole trip. That requires a short loop! Let's see how far we get.
 
 <code>
 data(tacsat)
@@ -277,7 +277,7 @@ for(iNt in 1:length(interpolation)){
 }#end for loop
 </code>
 
-As I am only interested in those areas where I do have trawling, I just simply only use that part where the chance of no trawling is smaller than 1. Thereafter I associate the value of the data with a color, which makes it easier to plot afterwards.
+As I am only interested in those areas where I do have trawling, I simply only use that part where the chance of no trawling is smaller than 1. Thereafter I associate the value of the data with a color, which makes it easier to plot afterwards.
 
 <code>
 #Select those areas where trawling intensity is smaller than 1
@@ -297,7 +297,7 @@ map.axes()
 color <- rev(brewer.pal(9,"YlOrRd"))
 </code>
 
-Time to plot, a for loop with polygon is not the best way to do it, but it works for now.
+Time to plot, a 'for' loop with a 'polygon' call is not the best way to do it, but it works for now.
 
 <code>
 for(i in 1:nrow(coords)){

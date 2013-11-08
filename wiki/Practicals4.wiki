@@ -44,13 +44,13 @@ We can of course do similar things with the logbook data
 pos <- ICESrectangle2LonLat(eflalo$LE_RECT,midpoint=T)
 eflalop <- cbind(eflalo,pos)
 
-#Let's find the ICES area within of logbook records
-#We need the longitude, latitude position from the step before
+#Let's find the ICES area associated with the ICES rectangle
+#We need the longitude, latitude position though from the ICES rectangle midpoint from the step before
 data(ICESareas)
 eflalop$LE_AREA <- ICESarea(eflalop,ICESareas)
 </code>
 
-Obviously, we can do the same for the VMS data, but try that yourself! One other type of conversion available is into the spatial <b>C-square</b> notation. This notation was developed in Australia and has many handy features, ie it can be used for the entire globe.  It is now implemented as the default FishFrame spatial scale. The C-square notation is flexible since, although it is a standard 'naming convention', it can also take many different resolutions. Let's convert some VMS data into C-square notation.
+Obviously, we can do the same for the VMS data, but try that yourself! One other type of conversion available is the spatial <b>C-square</b> notation. This notation was developed in Australia and has many handy features, ie it can be used for the entire globe.  It is now implemented as the default FishFrame spatial scale. The C-square notation is flexible since, although it is a standard 'naming convention', it can also take many different resolutions. Let's convert some VMS data into C-square notation.
 
 <code>
 #For this example, take the first six positions only
@@ -131,7 +131,7 @@ Grid <- createGrid(xrange,yrange,1,0.5,type="SpatialPixels") #just like an ICES 
 slotNames(Grid)
 >[1] "coords"      "grid"        "grid.index"  "bbox"        "proj4string"
 Grid@coords #is the same as...
-coordinates(Grid) #I prefer this way, works more often too!
+coordinates(Grid) #I prefer this way, works more often with other 'sp' objects too!
 
 plot(Grid); map.axes()
 </code>
@@ -148,7 +148,7 @@ overlay(Grid,SpatialPoints(coordinates(somePos)))
 #This output really means that all 6 positions in 'somePos' are located in grid cell 87 of coordinates(Grid)
 coordinates(Grid)[87,]
 
-#Now for the full tacsat dataset, and summary the result immediately
+#Now for the full tacsat dataset, and summarize the result immediately
 table(overlay(Grid,SpatialPoints(coordinates(tacsat[,c("SI_LONG","SI_LATI")]))))
 </code>
 
@@ -166,7 +166,7 @@ coordTacsat <- coordinates(tacsat[,c("SI_LONG","SI_LATI")])
 SPtacsat <- SpatialPoints(coordTacsat)
 
 #Which grid cells do match with the tacsat points?
-index <- overlay(Grid,SPtacsat)
+index <- overlay(Grid,SPtacsat) #the overlay function is being replaced by 'over', overlay still works though.
 tacsat$INDEX <- index
 
 #Do something strange for a change, and take the mean heading in a grid cell
