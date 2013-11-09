@@ -14,7 +14,7 @@ data(tacsat)
 
 In VMS we can distinguish roughly two types of errors, 1- those errors that are without doubt incorrect and 2- more ambiguous errors about which a bit of thinking may be required.
 
-Among the errors that are incorrect, no matter what, are: VMS positions that are not actually on planet Earth; records that are true duplicates; and records that either have headings outside a compass range, or are situated on land. Let's see if we can get rid of such erroneous records first.
+Among the errors that are incorrect, no matter what, are: VMS positions that are not actually on planet Earth; records that are true duplicates; and records that, either have headings outside a compass range, or are situated on land. Let's see if we can get rid of such erroneous records first.
 
 <code>
 idx <- which(abs(tacsat$SI_LATI) > 90 | abs(tacsat$SI_LONG) > 180) #points not on the globe
@@ -59,7 +59,7 @@ map("worldHires",res=0,fill=T,col="darkgreen",xlim=c(-4,10),ylim=c(48,62)); map.
 points(x=pol$SI_LONG,y=pol$SI_LATI,col="red",pch=19,cex=0.5)
 </code>
 
-As you can see, most of them are either on land, close to a harbour or on a river. Hence, it is important to use a detailed map to perform this calculation! You can specify your own map, you don't need to use the map supplied with VMStools.
+As you can see, most of them are either on land, close to a harbour or on a river. Hence, it is important to use a detailed map to do this assessment! You can specify your own map, you don't need to use the map supplied with VMStools.
 
 This means we are half-way through cleaning the VMS dataset. Now we must investigate those types of 'errors' which are ambiguous and need to be the subject of further in-depth investigation and discussion. These are things like: VMS records associated with very high speeds; points in a harbour; and 'pseudo-duplicates', ie. points that are not exactly duplicates, but may be considered as such. 
 
@@ -70,7 +70,7 @@ idx <- which(tacsat$SI_SP > spThres)
 tacsat <- tacsat[-idx,]
 </code>
 
-Very few points are associated with speeds higher than 20 knots. Let's move to the locations recorded in harbours. Obviously, these points are not true errors. Vessels are of course in harbour for large amounts of time. However, when analysing VMS data we are hardly ever interested in these points, and for that reason, we usually want to omit them. There are a large number of ports in Europe already, and checking all of them is not easy, but we will give it a try! Again, to make things simpler, a large dataset of harbour/port locations is already available as part of the VMStools package. Note, however, that this list is NOT complete, and that you might need to add additional harbours/ports (for your country) if you want to accurately perform this part. In particular the port dataset is only for the EU, and we were unable to get data for Portugal at the time.
+Very few points are associated with speeds higher than 20 knots. Let's move to the locations recorded in harbours. Obviously, these points are not true errors. Vessels are in harbour for large amounts of time. However, when analysing VMS data we are hardly ever interested in these points, and for that reason, we usually want to omit them. There are a large number of ports in Europe, checking all of them is not easy, but we will give it a try! Again, to make things simpler, a large dataset of harbour/port locations is already available as part of the VMStools package. Note, however, that this list is NOT complete, and that you might need to add additional harbours/ports (for your country) if you want to accurately perform this part. In particular the port dataset is only for the EU, and we were unable to get data for Portugal at the time.
 
 <code>
 data(euharbours)
@@ -109,8 +109,8 @@ tacsat          <- tacsatp[which(tacsatp$INTV > intThres),]
 Note that this cleaning describes the absolute basic parts you need to screen for.
 
 === Exercise 2 ===
-  # Think of two other aspects you need to screen for.
-  # Check your data for these aspects and create appropriate graphs to show your result
+  # Think of two other aspects you might need to screen for.
+  # Check your data for these aspects, and create appropriate graphs to show your result
 
 == Cleaning logbook data ===
 In cleaning the logbook data, similar issues as with cleaning the VMS data arise. Some errors are true mistakes and need to be fixed / removed, others depend on interpretation by the scientist. However, the origin of logbook errors are most often human mistakes rather than technical malfunctions as we have seen with VMS data. For this reason it is advisable to have a fundamental knowledge of the fisheries data and how these sources are collected and stored.
