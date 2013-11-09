@@ -1,9 +1,9 @@
 = Practical 6: Calculating indicators =
 
 == Introduction ==
-All of the main marine policy frameworks in Europe have adopted an ecosystem approach to  managing their anthropogenic activities and conserving their natural resources. For effective ecosystem-based management (EBM), indicators are required that describe the pressures affecting the ecosystem, the state of the ecosystem, and the response of managers. To implement EBM successfully it is also critical that we understand the links between these indicators so that the policy objectives on the state of the ecosystem can be achieved by managing human pressures through an appropriate response. 
+All of the main marine policy frameworks in Europe have adopted an ecosystem approach to  managing their anthropogenic activities and conserving their natural resources. For effective ecosystem-based management (EBM), indicators are required that describe the pressures affecting the ecosystem, the state of the ecosystem, and the response of managers. To implement EBM successfully it is also critical that we understand the links between these indicators, so that the policy objectives on the state of the ecosystem can be achieved by managing human pressures through an appropriate response. 
 
-The EU Data Collection Framework (DCF) standardizes three indicators to analyse the fishing activity. They are summarised as follow:
+The EU Data Collection Framework (DCF) standardizes three indicators to analyse fishing activity. They are summarised as follow:
 
  * DCF Indicator 5: Distribution of fishing activities. The spatial extent of fishing activity based on the total area of grids within which VMS records were obtained, each month; 
 
@@ -11,18 +11,18 @@ The EU Data Collection Framework (DCF) standardizes three indicators to analyse 
 
  * DCF Indicator 7: Areas not impacted by mobile bottom gears. The area of seabed that has not been impacted by mobile bottom fishing gears in the last year. Could be reported annually and would state the total proportion of the area by depth strata in each marine region.
 
-Although the definition of these indicators has been around for some time already, and tools are even developed to calculate these indicators, there is still room for alternative approaches to calculate the indicators.
+Although the definitions of these indicators have been around for some time already, and tools are even developed to calculate them, there is still room for alternative approaches.
 
-Within this practical we will guide you through the simplest ways to calculate the indicators and a home-made approach which allows for more flexibility.
+Within this practical we will guide you through the simplest ways to calculate the indicators, and a home-made approach which allows for more flexibility.
 
 === Some background on the indicators and their calculation === 
-These indicators aggregate the tacsat point data into a gridded data frame using the functions mapGrid and vmsGridCreate and therefore the resolution of the grid (cell size) must be defined.
+These indicators aggregate the tacsat point data into a gridded data frame using the functions mapGrid and vmsGridCreate, and therefore the resolution of the grid (cell size) must first be defined.
 
-*DCF 5* calculates the total area of a grid of cells with fishing activity which is above a minimum threshold of number of pings or number of fishing hours (if the tacsat data contains a field with time interval between two points called SI_INTV, then the threshold will be a minimal number of hours, otherwise it will be a minimal number of points). The area of each cell is calculated with the function surface either via a fast and rough method using a trapezoid  approximation (option "Trapezoid"), either via a more precise but slow method using a Universal Transverse Mercator projection (option "UTM"). The first method is fine for big grids of small cell sizes, the second one is better for large cell sizes. This total fishing area is processed by month.
+*DCF 5* calculates the total area of a grid of cells with fishing activity which is above a minimum threshold of number of pings or number of fishing hours (if the tacsat data contain a field with time interval between two points called SI_INTV, then the threshold will be a minimal number of hours, otherwise it will be a minimal number of points). The area of each cell is calculated with the function 'surface', either via a fast and rough method using a trapezoid  approximation (option "Trapezoid"), or via a more precise but slow method using a Universal Transverse Mercator projection (option "UTM"). The first method is fine for big grids of small cell sizes, the second one is better for large cell sizes. This total fishing area is processed by month.
 
-*DCF 6* also calculates the total area of a grid with fishing activity but keeps only the 90% of the points by discarding the outer 10% points (or any other specified percentage). It uses the function tacsatMCP adapted from the aspace library. This function draws a minimum convex polygon around the central points to keep. Then these points are gridded and the total area of the cells is calculated with the surface function with the same optional methods as DCF 5. This total fishing area is processed by month.
+*DCF 6* also calculates the total area of a grid with fishing activity but keeps only 90% of the points by discarding the outer 10% of points (or any other specified percentage). It uses the function 'tacsatMCP' adapted from the 'aspace' library. This function draws a minimum convex polygon around the central points to keep. These points are then gridded and the total area of the cells is calculated with the 'surface' function with the same optional methods as DCF 5. The total fishing area is processed by month.
 
-*DCF 7* calculates the total area of a specified polygon not impacted by mobile bottom gear. It therefore needs that the tacsat data has been merged with the logbooks in order to have a gear code (or others) for each vms point. The indicator needs a list of gear code to include as mobile bottom gears (if empty, all the points will be included). The specified area to be processed is a polygon shapefile. This polygon (or group of polygons) is then clipped with the Europe polygon to be sure that the indicator won't include land in its area calculation. If no shapefile is defined, the area of the bounding box containing all the vms points will be considered. The result is the area of the polygon less the area of the grid where fishing activity occurs. The vms pings are gridded with an optional threshold in either minimal of fishing hours or minimal number of points (see DCF 5). The area of each grid cell is calculated with the surface function (see DCF 5 or DCF 6).
+*DCF 7* calculates the total area of a specified polygon not impacted by mobile bottom gear. The tacsat data must, therefore, have first been merged with the logbooks in order to have a gear code (or others) for each VMS point. The indicator needs a list of gear codes to include as mobile bottom gears (if empty, all the points will be included). The specified area to be processed is a 'polygon shapefile'. This polygon (or group of polygons) is then clipped with the Europe polygon to be sure that the indicator won't include land in its area calculation. If no shapefile is defined, the area of the bounding box containing all the VMS points will be considered. The result is the area of the polygon, less the area of the grid where fishing activity occurs. The VMS pings are gridded with an optional threshold in either minimum of fishing hours or minimum number of points (see DCF 5). The area of each grid cell is calculated with the 'surface' function (see DCF 5 or DCF 6).
 
 
 == Calculating indicators the easy way ==
@@ -34,7 +34,7 @@ data(tacsat); data(eflalo)
 tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
 tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
 
-#In general, most of these indicators only make sense for bottom gear, so let's make a selection
+#In general, most of these indicators only make sense for bottom gears, so let's make a selection
 gear <- c("OTB","PTB","TBB","OTM")
 tacsatp <- subset(tacsatp,LE_GEAR %in% gear)
 
@@ -119,9 +119,9 @@ ind7 <- indicators(indicatorNum=7,
            exportGridName="")
 </code>
 
-For most I assume, these calculations are like a black box. This doesn't mean you cannot use them, Read up carefully on the help files, perhaps even look at the code. And once you want to compare indicator values across nations, whereby the assumptions on how to calculate the indicators isn't clear yet, this might serve you well. 
+For most of you these calculations will be taking place in a 'black box'. This doesn't mean you cannot use them.  Read the help files carefully and we encourange you to look at the code, which is the real beauty of R and Open Source.  If you want to compare indicator values across nations, where the assumptions on how to calculate aren't clear, this might serve you well enough. 
 
-However, if you want or need full control, you might be better of by calculating these indicators all by yourself. Find below some instructions on how to get started!
+However, if you want or need full control, you might be better off calculating these indicators by yourself. Find below some instructions on how to get started!
 
 == Calculating indicators tailor-made == 
 For a start, let's take a simple indicator to calculate ourselves. Let's define: the total surface area trawled by year. What we need to do for this exercise is:
@@ -132,7 +132,7 @@ For a start, let's take a simple indicator to calculate ourselves. Let's define:
   # define the width of the gear
   # define the grid
 
-We have the choice to interpolate the data or not, but to keep things simple, we will not do that here. Obviously, the function to add a width to a gear, seen before, could be useful. However, we take less of a true spatial approach here (for most spatial analyses, your data structure is fine as vectors rather than a grid!), whereby the 'addWidth' function would simply take too long to run.
+We have the choice to interpolate the data or not, but to keep things simple, we will not do that here. Obviously, the function to add a width to a gear, seen before, could be useful. However, we take less of a true spatial approach here (for most spatial analyses, your data structure is fine as vectors rather than as a grid!), whereby the 'addWidth' function would simply take too long to run.
 
 <code>
 data(tacsat);data(eflalo)
@@ -160,9 +160,9 @@ grd <- createGrid(xrange=c(unlist(spatBound$x)),
                    resx=0.1,resy=0.05) #Let's take a tenth of an ICES rectangle for a start
 </code>
 
-So far so good, you've all seen these preparation steps a number of times now, it's good to learn them by hart as you need to get over these time and time again (look at [Practicals2]). 
+So far so good, you've all seen these preparation steps a number of times now, but it's good to learn them by heart as you will need to go over these time and time again (look at [Practicals2]). 
 
-The next step is to start calculating the area trawled for each VMS ping. It might be handy here to store the results by year in some sort of dataframe again, so you can access it later and also derive other results from it.
+The next step is to start calculating the area trawled for each VMS ping. It might be handy here to store the results by year in some sort of data-frame again, so you can access it later, and also derive other results from it.
 
 Area trawled = duration of trawling x width of gear x speed of a vessel.
 Let's work this equation out for each of the VMS pings in the dataset.
