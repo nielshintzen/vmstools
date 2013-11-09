@@ -1,7 +1,7 @@
 = Practical 2: Cleaning and processing the VMS and logbook data =
 
 == Introduction ==
-Typically VMS data contains lots of errors and many of them have a technical origin. Some are easy to detect, others a bit more tricky. There are problems with logbook data too, but most often these are caused by the fishermen filling them out incorrectly, rather than by the processing and storage of the data.
+Typically VMS data contain lots of errors and many of them have a technical origin. Some are easy to detect, others a bit more tricky. There are problems with logbook data too, but most often these are caused by the fishermen filling them out incorrectly, rather than by the processing and storage of the data.
 
 Here we will provide some guidance on how to clean VMS (tacsat) and logbook (eflalo) data. It needs to be said, that these guidelines are not strict rules, and that other rules are most likely more appropriate for your own dataset!
 
