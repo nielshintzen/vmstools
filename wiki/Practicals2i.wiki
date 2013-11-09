@@ -6,16 +6,16 @@ The European Common Fisheries Policy (CFP) calls for the implementation of an ec
 
 A fleet segment is a group of vessels with the same length class (LOA, Length Over All) and predominant fishing gear during the year. Vessels may have different fishing activities during the reference period, but might be classified in only one fleet segment. 
 
-A métier is a group of fishing operations targeting a similar (assemblage of) species, using similar gear, during the same period of the year and/or within the same area, and which are characterized by a similar exploitation pattern. (Note: ICES (2003) used to define the term fishery as well, as being the metier practiced by a given fleet segment, but this distinction has not been maintained]. 
+A métier is a group of fishing operations targeting a similar (assemblage of) species, using similar gear, during the same period of the year and/or within the same area, and which are characterized by a similar exploitation pattern. [Note: ICES (2003) used to define the term fishery as well, as being the metier practiced by a given fleet segment, but this distinction has not been maintained]. 
 
-The analysis of catch and effort per métiers would allow more accurate estimates of fishing mortalities and so the DCF has thus defined metiers according to a hierarchical structure using six nested levels: level 1- Activity (fishing/non fishing);  
+The analysis of catch and effort per métier would allow more accurate estimates of fishing mortalities and so the DCF has thus defined metiers according to a hierarchical structure using six nested levels: level 1- Activity (fishing/non fishing);  
 level 2- Gear class (e.g., trawls, dredges, etc.);
 level 3- Gear groups (e.g., bottom trawl, pelagic trawl);
 level 4- EU level gear type (e.g., Bottom Otter trawl OTB, bottom pair trawl PTB);
 level 5- Target assemblage (e.g., Demersal fish, crustaceans);
 level 6- Selectivity feature of the gear (mesh size class and presence/absence of a selective device with its technical characteristics). 
 
-Here we define a seventh level which is not an official DCF definition but it represents the 'true' targeted species better than the rather crude DCF level 5.  To do this it is clearly necessary to establish common methods and tools for grouping logbooks data into metiers. Logbook data provide information for each trip by each vessel on the amount of the main species caught and kept on board; the catch date; the specific ICES statistical rectangle; and the type of gear used.  The information on DCF levels 1 to 4, and to some extent level 6, is straightforward because it is directly available in the logbooks. However, fishermen do not declare which species they are actually targeting when fishing, and therefore the definition of Level 5, is expected to (but may not) reflect the fishing intention, and must be inferred from the available data, and in particular the catch data. 
+Here we define a seventh level which is not an official DCF definition but it represents the 'true' targeted species better than the rather crude DCF level 5.  To do this it is clearly necessary to establish common methods and tools for grouping logbook data into metiers. Logbook data provide information for each trip by each vessel on the amount of the main species caught and kept on board; the catch date; the specific ICES statistical rectangle; and the type of gear used.  The information on DCF levels 1 to 4, and to some extent level 6, is straightforward because it is directly available in the logbooks. However, fishermen do not declare which species they are actually targeting when fishing, and therefore the definition of Level 5, is expected to (but may not) reflect the fishing intention, and must be inferred from the available data, and in particular the catch data. 
 
 The simplest approach consists of selecting the fishing trips where a certain catch proportion of selected key species is exceeded. This approach is largely based on trial & error processes, and requires often a qualitative a priori knowledge on the fisheries. Another approach consists of conducting multivariate analyses on the species composition in catch data by trip or fishing operation (referred to as catch profiles), then grouping similar catch profiles into métiers. This grouping can be performed by direct visual inspection (Biseau and Gondeaux, 1988; Laurec et al., 1991) or statistically through clustering analysis. 
 
@@ -24,7 +24,7 @@ Included in vmstools is an operational tool that: i) does sensitivity analyses o
 
 ==Preparation and cleaning==
 
-Make sure there is no crap lying around in R:
+Make sure there is no rubbish lying around in R:
 
 <code>
 rm(list=ls())
@@ -112,7 +112,7 @@ data(correspMixedMetier)
 Note: Have a look at these data to see if you can work out what they might do.
 
 <code>
-eflaloOrig <- eflalo # Good idea to 'save' the original data in case some mistake.
+eflaloOrig <- eflalo # Good idea to 'save' the original data in case of  some mistake.
 </code>
 
 Give the analysis a name and create a directory for the output:
