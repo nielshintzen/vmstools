@@ -32,7 +32,7 @@
          eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
   write.table(tacsatPartTwo, file = file.path(path2Save,"tacsatPartTwo.csv"), quote = TRUE, sep = ",",
          eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
-  </code.
+  </code>
 
   # We read both files in using the readTacsat function and thereafter combine them
   <code>
