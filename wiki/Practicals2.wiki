@@ -193,32 +193,3 @@ save(eflalo,file="D:/output/eflaloClean.RData")
 === Exercise 3 ===
   # Clean the eflalo dataset (remove these records) where meshsizes are larger than 150mm, how many do you come across?
   # There are some very large vessels (> 100meters) in the eflalo dataset. What type of gear do they use and what do they primarily catch?
-
-==== Results exercise 3 ====
-<code>
-#1:
-#Clean eflalo from mesh sizes larger than 150mm
-hist(eflalo$LE_MSZ) #Make a picture first
-
-#Select those records where meshsize > 150mm
-idx <- which(eflalo$LE_MSZ > 150)
-
-#Remove them from eflalo
-eflalo <- eflalo[-idx,]
-
-#2:
-#Make a picture of vessel length
-hist(eflalo$VE_LEN)
-
-#Which vessels are larger than 100meters
-idx <- which(eflalo$VE_LEN > 100)
-
-#Lets look at some of the characteristics of these vessels
-head(eflalo[idx,])
-
-#What do these vessels primarily catch, a new function is introduced, the 'kgeur' function, which indicates only the LE_KG and LE_EURO columns
-columnIndex <- kgeur(colnames(eflalo))
-
-#Sum catches of this selection by species ('colSums'), and sort the catches ('sort'), look at the last ones in the row, these are the ones with the highest catches
-sort(colSums(eflalo[idx,columnIndex]))
-</code>

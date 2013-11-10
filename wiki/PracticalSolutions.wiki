@@ -47,5 +47,42 @@ totalTacsat        <- rbindTacsat(tacsatPartOne,tacsatPartTwo)
 
 3. Again 97015 rows of data with 9 columns. That is similar to: {{{data(tacsat); nrow(tacsat)}}}
   
-  
+== Practical 2 ==
 
+=== Exercise 1 ===
+  # That is Helgoland harbour
+  # In total 3839. You'll get to this number by checking: {{{data(euharbours); nrow(harbours)}}}
+  # Please read the help file of 'euharbours' {{{?euharbours}}}  The range defines the radius, from the harbour midpoint, the harbour spans. I.e. every VMS point inside this 'range' is classified as being in harbour.
+
+=== Exercise 2 ===
+  # Have a look at the Nations of vessels present in your dataset. Often you can have access to VMS pings of foreign vessels but not have access to logbook data. You could also screen for artefacts in GPS positions. I've seen for example simple plots of VMS points with strange patterns popping up because a mistake was made in converting from minute to decimal notation.
+  # {{{table(tacsat$VE_COU)}}}; {{{plot(tacsat$SI_LONG,tacsat$SI_LATI,pch=".",type="p")}}}
+
+=== Exercise 3 ===
+1. This is how it's done:
+
+<code>
+#Find tacsat records with mesh size > 150mm
+idx <- which(eflaloLE_MSZ > 150)
+#Remove them from your file
+eflalo <- eflalo[-idx,]
+#count how many there were
+print(length(idx))
+</code>
+
+2. Let's make a selection of these vessels and then look at their characteristics in two ways
+<code>
+#eflaloLV = eflalo Large Vessels
+eflaloLV <- subset(eflalo,VE_LEN > 100)
+
+#What are their characteristics
+summarizeEflalo(eflaloLV)
+
+#Find the gears
+table(eflaloLV$LE_GEAR)
+
+#Find their catch
+sort(colSums(eflaloLV[,kgeur(colnames(eflaloLV))],na.rm=T))
+
+
+  
