@@ -11,6 +11,7 @@
     * [Practicals7 P7: Plotting, exporting to GIS and FishFrame]
     * [Practicals8 P8: How to link VMS data with other spatial datasets]
     * [Practicals9 P9: Making pictures and tables]
+    * [PracticalSolutions PS: Practical solution file]
   * VMStools workflow example scripts
     * [examples_coupling Coupling VMS and Logbooks]
     * [MetiersLogbook Define metiers]
