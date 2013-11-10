@@ -1,4 +1,4 @@
-= Solutions of exercises
+= Solutions of exercises =
 
 == Practical 1 ==
 
@@ -14,7 +14,7 @@
   
 === Exercise 3 ===
   # Run the {{{str(eflalo)}}} command to see if your formats are correct
-  # If columns out of your eflalo dataset are not yet in the right format, this function will convert those columns into the right format. Check before and after using the function with {{{str(eflalo}}}.
+  # If columns out of your eflalo dataset are not yet in the right format, this function will convert those columns into the right format. Check before and after using the function with {{{str(eflalo)}}}.
   # I hope so, but please consult one of the instructors if you get stuck
   
 === Exercise 4 ===
@@ -33,6 +33,7 @@
   write.table(tacsatPartTwo, file = file.path(path2Save,"tacsatPartTwo.csv"), quote = TRUE, sep = ",",
          eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
   </code.
+
   # We read both files in using the readTacsat function and thereafter combine them
   <code>
   tacsatPartOne      <- readTacsat(file.path(path2Save,"tacsatPartOne.csv"))
@@ -41,6 +42,7 @@
   #Combine the two datasets
   totalTacsat        <- rbindTacsat(tacsatPartOne,tacsatPartTwo)
   </code>
+
   # Again 97015 rows of data with 9 columns. That is similar to: {{{data(tacsat); nrow(tacsat)}}}.
   
   
