@@ -18,7 +18,8 @@
   # I hope so, but please consult one of the instructors if you get stuck
   
 === Exercise 4 ===
-  # This is a bit tricky, because the vessel names are 'characters' and therefore not numbers. R is not that picky howver but let's do it the right way here.
+  1. This is a bit tricky, because the vessel names are 'characters' and therefore not numbers. R is not that picky howver but let's do it the right way here.
+
   <code>
   #Create a new column with numeric names for the vessel ID's
   tacsat$numericName <- as.numeric(tacsat$VE_REF)
@@ -34,7 +35,8 @@
          eol = "\n", na = "NA", dec = ".", row.names = F,col.names = TRUE)
   </code>
 
-  # We read both files in using the readTacsat function and thereafter combine them
+  2. We read both files in using the readTacsat function and thereafter combine them
+
   <code>
   tacsatPartOne      <- readTacsat(file.path(path2Save,"tacsatPartOne.csv"))
   tacsatPartTwo      <- readTacsat(file.path(path2Save,"tacsatPartTwo.csv"))
@@ -43,7 +45,7 @@
   totalTacsat        <- rbindTacsat(tacsatPartOne,tacsatPartTwo)
   </code>
 
-  # Again 97015 rows of data with 9 columns. That is similar to: {{{data(tacsat); nrow(tacsat)}}}.
+  3. Again 97015 rows of data with 9 columns. That is similar to: {{{data(tacsat); nrow(tacsat)}}}
   
   
 
