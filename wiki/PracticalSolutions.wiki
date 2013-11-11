@@ -144,7 +144,7 @@ sort(table(overlay(Grid,SpatialPoints(coordinates(tacsat[,c("SI_LONG","SI_LATI")
 
 #Apparently, gridcell 94 has 7647 records associated
 coordinates(Grid)[94,] # 4-longitude by 54 latitude
-
+</code>
   
 == Practical 5 ==
 
