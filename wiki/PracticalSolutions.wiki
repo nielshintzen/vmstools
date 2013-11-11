@@ -132,6 +132,7 @@ points(tacsat$SI_LONG[idx],tacsat$SI_LATI[idx],col=2,pch=19,cex=0.3)
 tacsatEflalo$LE_SPAT <- CSquare(tacsatEflalo$SI_LONG,tacsatEflalo$SI_LATI,degrees=0.5)
 #Aggregate the COD catches
 aggregate(tacsatEflalo$LE_KG_COD,by=list(tacsatEflalo$LE_SPAT),FUN=sum,na.rm=T)
+</code>
 
 2. Have a look at Practical 9, where a template for a plotting routine is given
 
