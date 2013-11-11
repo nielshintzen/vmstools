@@ -176,3 +176,19 @@ timecHs <- difftime(VMShf$SI_DATIM[cHs[[3]][1,2]],VMShf$SI_DATIM[cHs[[3]][1,1]],
 distcHs / (as.numeric(timecHs)/60) #7.8 km/h
 distSL  / (as.numeric(timecHs)/60) #6.2 km/h
 </code>
+
+== Practical 6 ==
+
+=== Exercise 1 ===
+We take the approach as outlined above and follow these steps to get to the three questions under exercise 1.
+
+  # clean the tacsat and eflalo data
+  # merge them together
+  # perform activity analyses and take fishing activity only
+  # select bottom trawling gear only
+  # define the width of the gear
+  # define the grid
+  
+<code>
+
+  
