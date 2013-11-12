@@ -184,11 +184,79 @@ We take the approach as outlined above and follow these steps to get to the thre
 
   # clean the tacsat and eflalo data
   # merge them together
-  # perform activity analyses and take fishing activity only
   # select bottom trawling gear only
+  # perform activity analyses and take fishing activity only
   # define the width of the gear
   # define the grid
   
 <code>
+library(vmstools)
+data(tacsat); data(eflalo)
 
-  
+
+# 1) We skip cleaning the dataset here, but load our pre-saved results
+load("D:/output/tacsatClean.RData")
+load("D:/output/eflaloClean.RData")
+
+# 2) Merging eflalo and tacsat
+tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+
+# 3) Select bottom gear only
+tacsatp <- subset(tacsatp,LE_GEAR == "TBB" & year(tacsatp$SI_DATIM) == 1800)
+eflalo  <- subset(eflalo,LE_GEAR == "TBB")
+
+# 4) Perform activity
+storeScheme <- activityTacsatAnalyse(tacsatp, units = "year", analyse.by = "LE_GEAR",
+                      identify="means")
+
+res           <- activityTacsat(tacsatp,units="year",analyse.by="LE_GEAR",storeScheme,
+                                plot=TRUE,level="all")
+tacsatp$SI_STATE <- res
+# Take fishing pings only
+tacsatp     <- subset(tacsatp,SI_STATE == "f")
+
+# 5) Define with of the gear
+# Often, you have a gear width column in your dataset. In that case, the line below
+# adds the withd of a gear to the tacsat file.
+tacsatp$LE_WIDTH <- eflalo$LE_WIDTH[match(tacsatp$FT_REF,eflalo$FT_REF)]
+
+# In our case however, the eflalo dataset does not contain an LE_WIDTH column, so we have to make something up
+tacsatp$LE_WIDTH <- 2*12 #two beams of each 12m wide
+
+# 6) Define the grid
+grd <- createGrid(xrange=range(tacsatp$SI_LONG),
+                    yrange=range(tacsatp$SI_LATI),
+                    resx=0.1,resy=0.05,type="SpatialGridDataFrame") #Let's take a tenth of an ICES rectangle for a start
+                    
+# 7) Turn your tacsat points into SpatialPoints and project them on the grid
+coords <- SpatialPoints(coordinates(tacsatp[,c("SI_LONG","SI_LATI")]))
+tacsatp$grID <- over(coords,as(grd,"SpatialGrid"))
+
+#8) Calculate area trawled per grid cell via the aggregate function
+kmTrawled <- aggregate(tacsatp$INTV/60 * tacsatp$SI_SP * 1.852 * tacsatp$LE_WIDTH/1000,
+                       by=list(tacsatp$grID),FUN=sum,na.rm=T)
+colnames(kmTrawled) <- c("grID","km2")
+</code>
+1) Ok, we're there, that was a lot of work for calculation 1. The answer is: {{{sum(kmTrawled$km2)}}}
+
+2) Now on to number 2, which is a bit simpler given our preparation above.
+<code>
+#9) Put the area trawled inside the grid data.frame
+grd@data[kmTrawled$grID,1] <- kmTrawled$km2
+
+#10) Calculate the surface area of each grid cell
+grd  <- surface(grd)
+
+#11) Now we can calculate proportion of total surface trawled (by gridcell)
+grd@data$proptrawled <- grd@data$data / grd@data$cellArea
+hist(grd@data$proptrawled[grd@data$proptrawled>0],breaks=100,xlab="Proportion trawled")
+</code>
+
+3) Finally, the 3rd question is relatively easy to get out of the SpatialGridDataFrame above
+<code>
+idx <- which(grd@data$proptrawled > 1)
+print(length(idx))
+</code>
+So apparently, the anwer is 18, not a lot (given that the full grid contained nearly 11000 gridcells)
+
