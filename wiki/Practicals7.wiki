@@ -121,7 +121,7 @@ Now run the main program that does all the work. You will note pictures popping 
 <code>  
 mergeEflalo2Pings (eflalo=eflalo, tacsat=tacsat, vessels=which.boats,
                      general=list(output.path=file.path("C:","output"),
-                     visual.check=TRUE, detectFishing=TRUE, speed="segment",
+                     visual.check=TRUE, detectFishing=FALSE, speed="segment",
                      what.speed="calculated"))
 
 </code>
@@ -184,7 +184,7 @@ df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD","LE_KG_PLE","LE_KG_SOL","LE
 #Need to turn my longitude and latitude into factors here, this is tricky, and we do it for a very specific reason (another function that needs it, so don't try this at home (unless you want to copy what we do here :-))
 df1$SI_LONG <- anf(df1$SI_LONG)
 df1$SI_LATI <- anf(df1$SI_LATI)
-df1 <-   df1[ !is.na(df1$SI_LATI),]
+df1 <-   df1[ !is.na(df1$SI_LATI),];
 df1 <-   df1[ !is.na(df1$SI_LONG),]
 
 #Chose species to look at
@@ -203,6 +203,7 @@ Now convert to FishFrame format which might take some time running. By default t
 <code>
 # First bind up all the tables in c:\\output
 tmp <- bindAllMergedTables (vessels=which.boats,
+                              a.year=1800,
                               species.to.keep=character(),
                               folder = file.path("C:","output"),
                               all.in.one.table=FALSE)
