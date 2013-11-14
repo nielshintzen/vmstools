@@ -151,7 +151,7 @@ merged.10 <- merged
 
 #Sum over the plaice landings
 sum(tapply(anf(merged$LE_KG_PLE), merged$flag, sum, na.rm=TRUE))
-sum(eflalo[eflalo$VE_REF=="10","LE_KG_PLE"], na.rm=TRUE)
+sum(eflalo[eflalo$VE_REF=="10","LE_KG_PLE"], na.rm=TRUE) #These numbers should be the same.
 </code>
 
 Alternatively we can bind up all 50 vessels keeping the file sizes manageable by selecting just a few species:
@@ -178,10 +178,12 @@ graphics.off()
 Time to map the data!
 
 <code>
-# Select columns of interest
+# Select columns of interest for convenience.
+
 df1<- all.merged[, c("SI_LATI","SI_LONG","LE_KG_COD","LE_KG_PLE","LE_KG_SOL","LE_KG_DAB","LE_KG_TUR")]
 
 #Need to turn my longitude and latitude into factors here, this is tricky, and we do it for a very specific reason (another function that needs it, so don't try this at home (unless you want to copy what we do here :-))
+
 df1$SI_LONG <- anf(df1$SI_LONG)
 df1$SI_LATI <- anf(df1$SI_LATI)
 df1 <-   df1[ !is.na(df1$SI_LATI),];
@@ -189,7 +191,10 @@ df1 <-   df1[ !is.na(df1$SI_LONG),]
 
 #Chose species to look at
 what.species.to.map <- "LE_KG_PLE"
-df2<-df1[-which(is.na(df1[,what.species.to.map])),]
+
+df2<-df1[-which(is.na(df1[,what.species.to.map])),] # df2 are the data for plaice only 
+
+# Note: we use vmsGridCreate here which is being phased out and replaced by createGrid.
   
 vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", we = 3, ea = 6, so = 50, no = 54,
                 nameVarToSum = what.species.to.map,cellsizeX =0.05,
@@ -207,7 +212,8 @@ tmp <- bindAllMergedTables (vessels=which.boats,
                               species.to.keep=character(),
                               folder = file.path("C:","output"),
                               all.in.one.table=FALSE)
-#Now create FishFrame data
+#Now create FishFrame data. Have a look at the Downloads section to get an explanation of fishframe format and have a look at the file 'ff'.
+
 ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
                           a.year=1800, a.country="NLD",degree=0.05) )
 </code>
