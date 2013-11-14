@@ -4,7 +4,7 @@
 Find area surface smaller than threshold}
 \description{
 Find gridcells with maximum surface equal or smaller to 'threshold' and return their
-total value and gridcells involved
+total value and gridcells involved}
 \usage{
 findArea(grid, threshold = 100, diagonal = TRUE)
 }
@@ -27,7 +27,7 @@ data.frame with minimum surface area and gridcells selected}
 Niels T. Hintzen}
 \seealso{
 \code{\link{surface}}}
-}
+
 \examples{
 xrange  <- c(0,4)
 yrange  <- c(52,56)
@@ -49,3 +49,4 @@ plot(grd,type="p",pch=19,cex=0.5)
 map.axes()
 selec   <- which.min(res$minval)
 points(coordinates(grd)[as.numeric(unlist(strsplit(res[selec,"idxs"]," "))),],col=2,lwd=3)
+}

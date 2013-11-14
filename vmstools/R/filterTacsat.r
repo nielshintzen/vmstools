@@ -18,7 +18,7 @@ if(is.null(remDup)==FALSE){
 if(is.null(hd)==FALSE){
   warning("It is assumed that VMS data is sorted by vessel and date")
     #Calculate the difference in heading between succeeding VMS datapoints
-  diffHeading                           <- abs(VMS.$SI_HE[2:dim(VMS)[1]] - VMS.$SI_HE[1:(dim(VMS)[1]-1)])
+  diffHeading                           <- abs(VMS.$SI_HE[2:dim(VMS.)[1]] - VMS.$SI_HE[1:(dim(VMS.)[1]-1)])
     #If there is a change to a new vessel in the data, put diffHeading to NA
   diffHeading[unlist(lapply(as.list(unique(VMS.$VE_REF)),function(x){return(which(VMS.$VE_REF == x)[1])}))[-1]-1] <- NA
   VMS.$diffHeading                      <- 0
@@ -33,6 +33,6 @@ if(is.null(st)==FALSE){
   if(length(st)>2) stop("More than two speed values selected")
   VMS. <- VMS.[which(VMS.$SI_SP >= st[1] & VMS.$SI_SP <= st[2]),]
 }
-if(!"SI_DATIM" %in% colnames(VMS)) colnames(VMS.) <- c(colnames(tacsat),"SI_DATIM")
+if(!"SI_DATIM" %in% colnames(VMS.)) colnames(VMS.) <- c(colnames(tacsat),"SI_DATIM")
 return(VMS.[,-grep("SI_DATIM",colnames(VMS.))])}
 
