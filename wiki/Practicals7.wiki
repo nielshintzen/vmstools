@@ -276,6 +276,8 @@ proj4string(gd.1) <- CRS("+proj=longlat +datum=WGS84");
 vms.kml <- GE_SpatialGrid(gd.1);
 #tf <- tempfile(tmpdir=getwd())
 
+imagefile <- 'kml.png' # create name for png file.
+
 # Create a png file to load into Google Earth.
 png(file=imagefile, width=vms.kml$width, height=vms.kml$height, bg="transparent",res=576);
 par(mar=c(0,0,0,0), xaxs="i", yaxs="i",cex=.25);
