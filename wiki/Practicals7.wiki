@@ -194,10 +194,11 @@ what.species.to.map <- "LE_KG_PLE"
 
 df2<-df1[-which(is.na(df1[,what.species.to.map])),] # df2 are the data for plaice only 
 
-# Note: we use vmsGridCreate here which is being phased out and replaced by createGrid.
+# Note: we use vmsGridCreate here which is being phased out and replaced by createGrid. plotMap = TRUE 
+# will send the data to the R-graphics windows.
   
 vmsGridCreate(df2,nameLon="SI_LONG",nameLat="SI_LATI", we = 3, ea = 6, so = 50, no = 54,
-                nameVarToSum = what.species.to.map,cellsizeX =0.05,
+                nameVarToSum = what.species.to.map,cellsizeX =0.05,plotMap=TRUE.
                 cellsizeY =0.05,  legendtitle = paste(substr(what.species.to.map,7,9)," landings (kg)")
                 , plotPoints =TRUE, breaks0=c(1,4,8,16,32,64,100000))
 
@@ -226,6 +227,7 @@ Add in the arguments for a grid below:
 
 <code>
 # Set up desired grid size and range
+
 grid.size <- 0.06
 we <- -3
 ea <- 10
@@ -236,7 +238,8 @@ no <- 59
 setwd('c://output')
 outfile <- 'fishlandings.asc'
 
-#Run the function vmsGridGreate which has an option to output an ASCII grid that is in ArcView format but can also be read by other GIS programs
+#Run the function vmsGridGreate, again, which has an option to output an ASCII grid that is in ArcView format but can also be read by other GIS programs. Set plotMap = F now.
+
 output.mat<-vmsGridCreate(df2, we=we,ea=ea,so=so,no=no,nameLon = "SI_LONG", nameLat = "SI_LATI",plotMap=F,
 nameVarToSum="LE_KG_PLE",cellsizeX = grid.size, cellsizeY = grid.size,
 legendx="bottomright",numCats=9,plotPoints=F,legendncol=2,legendtitle="kgs",outGridFile=outfile)
@@ -245,10 +248,55 @@ legendx="bottomright",numCats=9,plotPoints=F,legendncol=2,legendtitle="kgs",outG
 A free and actually very good GIS system is Google Earth which you can also use easily with our vmstools library (note that GE avoids the problems of 'projections' because it is all actually done on the surface of a sphere). If Google Earth is not already installed on your machine, do so now!
 
 <code>
+
+library(nmle);library(spatstat) # Install them if you have not already.
+
 # Create an output filename
+
 fn<-'landings'
 
-# Run the function Grid2KML:
+what.quantity = 'kgs' # What quantity are we plotting ?
+
+dd <- output.mat@grid
+d1 <- dd@cells.dim[1]
+d2 <- dd@cells.dim[2]
+fishing <- output.mat@data$fishing
+mat <- matrix((fishing),byrow=TRUE,ncol=d1,nrow=d2)
+mat <- t(mat[d2:1,])
+log.it <- T # do you want to log transform your data before plotting them ? 
+
+bbox <- output.mat@bbox # Extract the bounding box
+
+xxx <- seq(bbox[1,1],bbox[1,2],length=d1) # Create a vector of longitudes for the 'image' function.
+yyy <- seq(bbox[2,1],bbox[2,2],length=d2) # Create a vector of latitudes for the 'image' function.
+rr <- range(mat[mat!='-Inf'],na.rm=T)     # Get the range of the data.
+labs<-seq(rr[1],rr[2],length=9)     
+image(xxx,yyy,mat,zlim=c(rr[1],rr[2]),xlab="",ylab="",col=rainbow(9)) # Plot to R to check things are ok.
+
+# Format the data for plotting.
+
+gd <- list(x=xxx,y=yyy,z=mat)
+gd.1 <- as.SpatialGridDataFrame.im(as.im(gd)) # create right format for GE_SpatialGrid
+proj4string(gd.1) <- CRS("+proj=longlat +datum=WGS84") 
+vms.kml <- GE_SpatialGrid(gd.1)
+#tf <- tempfile(tmpdir=getwd())
+
+# Create a png file to load into Google Earth.
+
+png(file=imagefile, width=vms.kml$width, height=vms.kml$height, bg="transparent",res=576)
+
+par(mar=c(0,0,0,0), xaxs="i", yaxs="i",cex=.25)
+image(as.image.SpatialGridDataFrame(gd.1[1]), col=heat.colors(9),xlim=vms.kml$xlim, ylim=vms.kml$ylim)
+kmlOverlay(vms.kml, kmlfile=kmlfile, imagefile=imagefile, name=what.quantity)
+
+# legend(x='bottomright', legend=as.character(round(labs)), pch = 22,
+# border =heat.colors(length(labs)), pt.bg=heat.colors(length(labs)),
+# title=what.quantity, ncol=2,bg="white",pt.cex=1 ) # This is not working properly. Perhaps 'color.legend' might work better?
+
+dev.off()
+
+# There is also a function that does this called 'Grid2KML' which is in the old part of the repository (https://vmstools.googlecode.com/svn/trunk/vmstools/R/old/Grid2KML.r). It needs updating but you can try it if you like. 
+
 Grid2KML(output.mat=output.mat,what.quantity = 'kgs',kmlfile=paste(fn,'.kml',sep=''),imagefile=paste(fn,'.png',sep=''))
 
 #  Now if you go to the directory, c:\\output, and doubleclick on the kml file there Google Earth will open automatically upon which your data will be superimposed!
