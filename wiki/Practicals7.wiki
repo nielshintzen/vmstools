@@ -270,13 +270,14 @@ image(xxx,yyy,mat,zlim=c(rr[1],rr[2]),xlab="",ylab="",col=rainbow(9)); # Plot to
 
 # Format the data for plotting in Google Earth.
 gd <- list(x=xxx,y=yyy,z=mat);
-gd.1 <- as.SpatialGridDataFrame.im(as.im(gd)); # create right format for GE_SpatialGrid
-
+gd.1 <- as.SpatialGridDataFrame.im(as.im(gd)); 
+# create right format for GE_SpatialGrid
 proj4string(gd.1) <- CRS("+proj=longlat +datum=WGS84"); 
 vms.kml <- GE_SpatialGrid(gd.1);
 #tf <- tempfile(tmpdir=getwd())
 
-imagefile <- 'kml.png' # create name for png file.
+imagefile <- 'kml.png' 
+# create name for png file.
 kmlfile   <-  paste(fn,'.kml',sep="")
 
 # Create a png file to load into Google Earth.
