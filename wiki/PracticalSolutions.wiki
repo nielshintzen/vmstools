@@ -260,3 +260,76 @@ print(length(idx))
 </code>
 So apparently, the anwer is 18, not a lot (given that the full grid contained nearly 11000 gridcells)
 
+== Practical 7 ==
+
+=== Exercise 1 ===
+
+The only part where we can supply a solution is on importing a shapefile.
+As an example you can use the code below, but you need to adapt it to your own settings.
+
+<code>
+library(PBSmapping)
+path        <- "D:/output/"
+myShapeFile <- readShapePoly(paste(path,"myShapeFile.shp",sep=""))
+plot(myShapeFile)
+</code>
+
+== Practical 8 ==
+
+=== Exercise 1 ===
+A lot of the exercise is already performed above and we only need to make a small modification.
+However, below I show the entire code workflow to arrive at the correct answer.
+
+<code>
+#Only use the VMS data in this instance
+data(tacsat)
+tacsat <- sortTacsat(tacsat)
+
+#Read in the phytoplankton data
+path2phyto <- "D:/"
+phyto <- read.table(paste(path2phyto,"a34phy040616.txt",sep=""))
+
+
+#Convert the class to matrix
+phyto <- as.matrix(phyto)
+
+
+#The data is organised in such a way that 'on land' cells get value -99, R prefers NAs
+phyto[which(phyto == -99)][] <- NA
+
+
+#The orientation is a bit off, so transpose the data and change mirror over latitude (normally you have to look at your data to see how its organised)
+phyto <- t(phyto)[,dim(phyto)[1]:1]
+
+
+#Make a little picture
+image(phyto)
+#You can see the contours of the UK and the Netherlands & Denmark and even the southern part of Norway in there. Right the area most of our VMS pings are situated as well.
+
+
+#Although missing from the phyto file, we know what grid cell resolution is associated with this data.
+dimnames(phyto) <- rev(list(lat=seq(48.3833,65.9833,1/10)+1/20,lon=seq(-4.1667,13.1667,1/6)[1:83]+1/12))
+
+
+#The phyto file is currently a matrix, but it would be easier to handle if it would be a data.frame with longitude and latitude columns.
+df <- expand.grid(SI_LONG=dimnames(phyto)[[1]],SI_LATI=dimnames(phyto)[[2]])
+df$SI_LONG <- anf(df$SI_LONG); df$SI_LATI <- anf(df$SI_LATI)
+df$PHYTO <- c(phyto)
+
+
+#Let's only save those records with data
+df <- subset(df,is.na(df$PHYTO)==F)
+
+#Adding at date-time stamp to the phytoplankton data
+df$SI_DATIM <- as.POSIXct("25-06-1800 14:00",format="%d-%m-%Y %H:%M")
+
+#Now link the phytoplankton data to the VMS pings
+original <- clipObs2Tacsat(tacsat,df,method="grid",control.grid=list(resx=0.1,resy=0.05,gridBbox="obs"),temporalRange=c(-(7*24*60),(7*24*60)),all.t=F)
+new      <- clipObs2Tacsat(tacsat,df,method="euclidean",control.euclidean=list(threshold=6),temporalRange=c(-(7*24*60),(7*24*60)),all.t=F)
+</code>
+
+2) In the original code, 21 records were returned, in the new selection, 79 records were returned.
+The difference relates to the size of the gridcell specified in the original case. Under those conditions
+each gridcell measured approx 7 by 5.5 km. Which meant that VMS pings within that 7 by 5.5km cell were 'linked' to the phytoplankton data.
+In the new situation you have selected a much larger area, which is 20km in diameter. And under those conditions, many more VMS
+pings could be linked to the phytoplankton data.

@@ -209,7 +209,7 @@ tmp <- bindAllMergedTables (vessels=which.boats,
                               all.in.one.table=FALSE)
 #Now create FishFrame data
 ff  <- pings2Fishframe (general=list(output.path=file.path("C:","output"),
-                          a.year=1800, a.country="NLD") )
+                          a.year=1800, a.country="NLD",degree=0.05) )
 </code>
 
 Note that the file of interest (FishFrame format) will be in c:\\output and is called for this run of the script, NLD1800_VD.csv. Open it in Wordpad or similar and have a look at it
