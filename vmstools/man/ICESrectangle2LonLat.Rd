@@ -21,7 +21,7 @@ logical statement if returned values need to be midpoints of rectangle or not (d
 \value{
 Returns dataframe with longitude and latitude columns}
 \references{EU Lot 2 project}
-\author{Neil Campbell}
+\author{Neil Campbell, Mark Payne}
 \seealso{
 \code{\link{ICESarea}}, \code{\link{ICESrectangle}}}
 \examples{
