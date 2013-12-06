@@ -18,7 +18,7 @@ Method only assignes a tripnumber to the tacsat data if there are vms pings that
 related trip can be found, tripnumber assigned to tacsat equals NA.
 }
 \references{EU lot 2 project }
-\author{Niels T. Hintzen}
+\author{Niels T. Hintzen, Francois Bastardie}
 \seealso{\code{\link{findEndTacsat}}, \code{\link{sortTacsat}},
                \code{\link{filterTacsat}}}
 \examples{

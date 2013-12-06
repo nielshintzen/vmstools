@@ -47,7 +47,7 @@ Note that tacsat file needs a column SI_STATE which has 0 for non-fishing and 1 
 Merged tacsat file will be returned including the splitted values over the tacsat pings where SI_STATE is not zero.
 }
 \references{EU Lot 2 project}
-\author{Niels T. Hintzen}
+\author{Niels T. Hintzen, Francois Bastardie}
 \seealso{
 \code{\link{mergeEflalo2Tacsat}}, \code{\link{mergeEflalo2Pings}}}
 \examples{
