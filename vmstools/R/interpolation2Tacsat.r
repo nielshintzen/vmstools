@@ -30,7 +30,7 @@ res <- lapply(interpolationEQ,function(x){
                                   if(timeNotation == "mins") x$SI_TIME  <- format(x$SI_DATIM,format="%H:%M")
                                   x$SI_SP                 <- mean(c(tacsat$SI_SP[idx[1]],tacsat$SI_SP[idx[2]]),na.rm=TRUE)
                                   x$SI_HE                 <- NA;
-                                  x$SI_HE[-c(1,nrow(x))]  <- bearing(x$SI_LONG[3:nrow(x)],x$SI_LATI[3:nrow(x)],x$SI_LONG[2:(nrow(x)-1)],x$SI_LATI[2:(nrow(x)-1)])
+                                  x$SI_HE[-c(1,nrow(x))]  <- bearing(x$SI_LONG[2:(nrow(x)-1)],x$SI_LATI[2:(nrow(x)-1)],x$SI_LONG[3:nrow(x)],x$SI_LATI[3:nrow(x)])
                                   x$HL_ID                 <- tacsat$HL_ID[idx[1]]
                                 return(x[-c(1,2,nrow(x)),])})
 
