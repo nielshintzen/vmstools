@@ -38,10 +38,10 @@ Finally, there is a wee trap for beginners when logging in for the first time - 
 Download the VMStools zip or rar file from the repository under the download tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in /trunk of the repository. 
 The packages VMStools depends on can easily be installed through:
 <code>vmstoolsPackages <- 
-  c("amap","cluster","doBy","data.table","FactoMineR","foreign",
-  "maptools","MASS","sp","SOAR","aspace","PBSmapping","raster",
-  "shapefiles","mda","maps","fields","spam","mapdata","RColorBrewer",
-  "classInt")
+  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp",
+    "adehabitat","amap","animation","aspace","FactoMineR","lattice","MASS","mda",
+    "mixtools","raster","segmented","shapefiles","SOAR","tcltk","ade4")
+
 
 for(i in vmstoolsPackages) try(install.packages(pkgs=i,repos=getOption("repos"))) </code>
 
