@@ -73,7 +73,8 @@ countPings <- function(formula,tacsat,grid=NULL,by=NULL){
                   eq              <- c.listquote(totVars)
 
                   res             <- DT[,sum(SUM),by=eval(eq)]
-                  colnames(res)   <- c(totVars,"pings")
+                  setnames(res,colnames(res),c(totVars,"pings"))
+                  #colnames(res)   <- c(totVars,"pings")
 
               return(data.frame(res))}
 
