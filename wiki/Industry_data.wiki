@@ -743,3 +743,44 @@ savePlot(file=file.path(outPath, "plot_estimates_for_OT_nls_TotGW_vs_LOA_or_kW_p
 
 
 </code>
+
+Hereafter, the code to incorporate the parameter table into the BENTHIS WP2 workflow:
+
+
+<code>
+
+
+ # MERGE WITH GEAR WIDTH
+ # CAUTION: the LE_MET should be consistent with those described in the below table!
+ # if not then redefine them BEFORE making this step!
+ # import the param table obtained from the industry_data R analyses
+ gear_param_per_metier       <- read.table(file=file.path(outPath, "estimates_for_gear_param_per_metier.txt"))
+
+ GearWidth                   <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_MET)), ]
+ GearWidth                   <- GearWidth[,c('VE_REF','LE_MET','VE_KW', 'VE_LEN') ]
+ GearWidth$GEAR_WIDTH        <- NA
+ GearWidth$GEAR_WIDTH_LOWER  <- NA
+ GearWidth$GEAR_WIDTH_UPPER  <- NA
+ for (i in 1:nrow(GearWidth)) { # brute force...
+    kW      <- GearWidth$VE_KW[i]
+    LOA     <- GearWidth$VE_LEN[i]
+    this    <- gear_param_per_metier[gear_param_per_metier$a_metier==GearWidth$LE_MET[i],]
+    a <- NULL ; b <- NULL
+    a       <- this[this$param=='a', 'Estimate'] 
+    b       <- this[this$param=='b', 'Estimate'] 
+    GearWidth[i,"GEAR_WIDTH"]  <-   eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
+    a       <- this[this$param=='a', 'Estimate'] +2*this[this$param=='a', 'Std..Error'] 
+    b       <- this[this$param=='b', 'Estimate'] +2*this[this$param=='b', 'Std..Error'] 
+    GearWidth[i,"GEAR_WIDTH_UPPER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
+    a       <- this[this$param=='a', 'Estimate'] -2*this[this$param=='a', 'Std..Error'] 
+    b       <- this[this$param=='b', 'Estimate'] -2*this[this$param=='b', 'Std..Error'] 
+    GearWidth[i,"GEAR_WIDTH_LOWER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km  
+ }
+ save(GearWidth, file=file.path(dataPath,"gearWidth.RData"))
+ load(file.path(dataPath, "gearWidth.RData"))
+ tacsatp                     <- merge(tacsatp, GearWidth,by=c("VE_REF","LE_MET"),
+                               all.x=T,all.y=F)
+ save(tacsatp,   file=file.path(outPath,"tacsatMergedWidth.RData"))
+
+
+</code>
