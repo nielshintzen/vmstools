@@ -2,138 +2,744 @@
 
 = Introduction =
 
-
+Example of an R code to proceed the OT gear data is given as illustration. Equivalent coding is applied for TBB, DS and DRB gear data (with some adjustments). The final product is a table of parameters defining the relationships to be used in the BENTHIS WP2 workflow. This table will be disseminated by mails to partners so that they can incorporate it to the workflow.
 
 
 = Details =
 
 <code>
 
-# paths
-dataPath  <- file.path("C:","merging", "BENTHIS", "BENTHIS_WP2_WK_oct13")
-outPath   <- file.path("C:","merging", "BENTHIS", "BENTHIS_WP2_WK_oct13")
-
-# read file
-ind <- read.table(file= file.path(dataPath, 'Only_OT_DTU Aqua_04102013.csv'), sep=",", header=TRUE )
-
-# explore
-ind [ind$Variable.name=="Trawl_model",]
-levels(ind$Variable.name)
-an <- function(x) as.numeric(as.character(x))
-
-
-# subset some variables
-CT  <- ind [ind$Variable.name=="Consumption_trawling", "Value"]
-kW  <- ind [ind$Variable.name=="Vessel_kW", "Value"]
-LOA <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
-df1 <- cbind.data.frame(CT, kW, LOA)
-
-# refactor some variables (if needed)
-df1$LOA_class <- cut(an(df1$LOA), breaks=c(0,15,100))
-
 # plot (with ggplot2)
 library(ggplot2)
 
-p <- ggplot(data=df1, aes(an(kW),an(CT))) + geom_point(aes(shape = factor(LOA_class)))
-update_labels(p, list(x = "kW", y="Consumption_trawling"))
-
-coeff_lm <- coef(lm(an(CT) ~ an(kW) , data = df1))
-p <- ggplot(data=df1, aes(an(kW),an(CT))) + geom_point(aes(size  = an(LOA))) + geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2])
-update_labels(p, list(x = "kW", y="Consumption_trawling"))
-savePlot(file=file.path(outPath, "plot1.png"), type="png")
-
-
-</code>
+# paths
+dataPath  <- file.path("C:", "BENTHIS", "data_gear_spec_questionnaire")
+outPath   <- file.path("C:", "BENTHIS", "data_gear_spec_questionnaire")
 
 
 
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-----------------OT------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+
+# read file
+ind_DK  <- read.table(file= file.path(dataPath, 'OT', 'OT_DK_31012014.csv'), sep=";", header=TRUE )
+ind_IRE <- read.table(file= file.path(dataPath, 'OT', 'OT_IRE_28012014.csv'), sep=";", header=TRUE )
+ind_SCO <- read.table(file= file.path(dataPath, 'OT', 'OT_SCO_28012014.csv'), sep=";", header=TRUE )
+ind_SWE <- read.table(file= file.path(dataPath, 'OT', 'OT_SWE_28012014.csv'), sep=";", header=TRUE )
+ind_NL  <- read.table(file= file.path(dataPath, 'OT', 'OT_NL_28012014.csv'), sep=";", header=TRUE )
+ind_TUR <- read.table(file= file.path(dataPath, 'OT', 'OT_TUR_28012014.csv'), sep=";", header=TRUE )
+ind_MED <- read.table(file= file.path(dataPath, 'OT', 'OT_MED_28012014.csv'), sep=";", header=TRUE ) # italian & spanish data
+ind_NOR <- read.table(file= file.path(dataPath, 'OT', 'OT_NOR_28012014.csv'), sep=";", header=TRUE ) 
+ind_BEL <- read.table(file= file.path(dataPath, 'OT', 'OT_BEL_28012014.csv'), sep=";", header=TRUE ) 
+ind_FRA <- read.table(file= file.path(dataPath, 'OT', 'OT_FRA_28012014.csv'), sep=";", header=TRUE ) 
+ind_GRE <- read.table(file= file.path(dataPath, 'OT', 'OT_GRE_28012014.csv'), sep=";", header=TRUE ) 
+
+# collate
+cols <- c('Anonymous.vessel_ID','Variable.name','Variable','Value')
+ind  <- rbind.data.frame (
+                          cbind(country="DK", ind_DK [, cols]),
+                          cbind(country="IRE", ind_IRE [, cols]),
+                          cbind(country="SCO", ind_SCO [, cols]),
+                          cbind(country="SWE", ind_SWE [, cols]),
+                          cbind(country="NL", ind_NL [, cols]),
+                          cbind(country="TUR", ind_TUR [, cols]),
+                          cbind(country="MED", ind_MED [, cols]),
+                          cbind(country="NOR", ind_NOR [, cols]),
+                          cbind(country="BEL", ind_BEL [, cols]),
+                          cbind(country="FRA", ind_BEL [, cols]),
+                          cbind(country="GRE", ind_GRE [, cols])
+                          )
 
 
-more advanced exploration....
+# explore
+head(ind [ind$Variable.name=="Trawl_model",])
+levels(ind$Variable.name)
+an <- function(x) as.numeric(as.character(x))
 
-<code>
-
-# subset some variables
-CT  <- ind [ind$Variable.name=="Consumption_trawling", "Value"]
-kW  <- ind [ind$Variable.name=="Vessel_kW", "Value"]
-LOA <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
-DoS <- ind [ind$Variable.name=="Door_spread", "Value"]
-DoW <- ind [ind$Variable.name=="Door_weight", "Value"]
-GrW <- ind [ind$Variable.name=="Groundgear_weight", "Value"]
-sps <- ind [ind$Variable.name=="Targetspecies_single", "Value"]
-sp1 <- ind [ind$Variable.name=="Primarytarget_mixed", "Value"]
-sp2 <- ind [ind$Variable.name=="Secondarytarget_mixed", "Value"]
-sp3 <- ind [ind$Variable.name=="Thirdtarget_mixed", "Value"]
-bt  <- ind [ind$Variable.name=="Bottom_type", "Value"]
-nbt <- ind [ind$Variable.name=="Trawl_number", "Value"]
-df2 <- cbind.data.frame(CT, kW, LOA, DoS, DoW, GrW, sps, sp1, sp2, sp3, bt, nbt)
+# check complete case for some variables (which need to be strictly informed together for a given vessel)
+vids_Clp <- unique(as.character(ind [ind$Variable.name=="Clump_weight", "Anonymous.vessel_ID"]))
+vids_DoW <- unique(as.character(ind [ind$Variable.name=="Door_weight", "Anonymous.vessel_ID"]))
+vids_to_be_removed <- vids_Clp[!(vids_Clp %in% vids_DoW)] 
+vids_to_be_removed <- c(vids_to_be_removed, vids_DoW[!(vids_DoW %in% vids_Clp)]) 
+#=> if any, then remove the concerned vessel.
+ind <- ind [!ind$Anonymous.vessel_ID %in% vids_to_be_removed, ]
 
 
-# DCF metier coding example
-df2$metier <- as.character(df2$sps) # init
-df2[df2$metier %in% c('NEP','PRA','Nephrops'), 'metier']   <- 'OT_CRU'
-df2[df2$metier %in% c('COD','PLE','SOL', 'LEM'), 'metier'] <- 'OT_DMF'
-df2[df2$metier %in% c('SAN','SPR'), 'metier']              <- 'OT_SPF'
-df2[df2$metier %in% c('NR'), 'metier']                     <- 'OT_MIX'
-df2$metier <- as.factor(df2$metier) 
 
 
-# filter out
-df3 <- df2[df2$sps!="NR",]  # single target
-df4 <- df2[df2$sps=="NR",]  # mixte
+CT   <- ind [ind$Variable.name=="Consumption_trawling", "Value"]
+CS   <- ind [ind$Variable.name=="Consumption_steaming", "Value"]
+Str  <- ind [ind$Variable.name=="Speed_trawling", "Value"]
+kW   <- ind [ind$Variable.name=="Vessel_kW", "Value"]
+LOA  <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
+DoS  <- ind [ind$Variable.name=="Door_spread", "Value"]
+DoW  <- ind [ind$Variable.name=="Door_weight", "Value"]
+DoN  <- ind [ind$Variable.name=="Door_number", "Value"]
+OcW  <- ind [ind$Variable.name=="Otherchain_weight", "Value"]
+OcN  <- ind [ind$Variable.name=="Otherchain_number", "Value"]
+TiW  <- ind [ind$Variable.name=="Ticklerchain_weight", "Value"]
+TiN  <- ind [ind$Variable.name=="Ticklerchain_number", "Value"]
+Clp  <- ind [ind$Variable.name=="Clump_weight", "Value"]
+GrW  <- ind [ind$Variable.name=="Groundgear_weight", "Value"]
+GrL  <- ind [ind$Variable.name=="Groundgear_length", "Value"]
+sps  <- ind [ind$Variable.name=="Targetspecies_single", "Value"]
+sp1  <- ind [ind$Variable.name=="Primarytarget_mixed", "Value"]
+sp2  <- ind [ind$Variable.name=="Secondarytarget_mixed", "Value"]
+sp3  <- ind [ind$Variable.name=="Thirdtarget_mixed", "Value"]
+bt   <- ind [ind$Variable.name=="Bottom_type", "Value"]
+nbt  <- ind [ind$Variable.name=="Trawl_number", "Value"]
+sptr <- ind [ind$Variable.name=="Speed_trawling", "Value"]
+spst <- ind [ind$Variable.name=="Speed_steaming", "Value"]
+ctry <- ind [ind$Variable.name=="Trawl_number", "country"]
+area <- ind [ind$Variable.name=="Fishing_area", "Value"]
+mesh <- ind [ind$Variable.name=="Codend_meshsize", "Value"]
+swee <- ind [ind$Variable.name=="Sweerp_length", "Value"]
+
 
 # intermediate calculation
-GrW <-  an(nbt) * an(GrW)
+# total gear weight
+dd    <- rbind(c(an(DoW) *  an(DoN) + an(GrW) * an(nbt)), an(Clp), c(an(OcW) * an(OcN)))
+TotGW <- apply(dd,2, sum, na.rm=TRUE) # DoW and GrW need complete cases here. 
+TotGW[is.na(dd[1,])] <- NA 
 
-# plot DoS for single target
+# then, collate:
+df1  <- cbind.data.frame(ctry,CT, CS, sptr, spst, kW, LOA, DoS, DoW, DoN, GrW, nbt, Clp, OcW, OcN, TotGW, GrL, sps, sp1, sp2, sp3, bt, area, mesh, swee)
+
+
+
+# look at a potential proxy in case the door spread is not informed....
+plot(an(df1$DoS),an(df1$swee), col=df1$ctry, pch=16)
+
+
+
+# shortcut to retrieve a given Value
+idx <- ind [ind$Variable.name=="Fishing_area", "Value"]==2.2
+dd  <- ind [ind$Variable.name=="Fishing_area", ]
+dd[idx,]
+
+idx <- ind [ind$Variable.name=="Door_spread", "Value"]==0
+dd  <- ind [ind$Variable.name=="Door_spread", ]
+dd[idx,]
+
+
+# refactor some variables (if needed)
+df1$LOA_class     <- cut(an(df1$LOA), breaks=c(0,12,18,24,40,100))
+df1$sptr          <- cut(an(df1$sptr), breaks= seq(0,10,0.75))   # trawling speed
+df1$mesh_class    <- cut(an(df1$mesh), breaks= c(0,90,220))   # codend mesh size
+df1$GrW_class     <- cut(an(df1$GrW), breaks= seq(0,1600, 200) )   # codend mesh size
+
+
+# area coding
+df1$area <- as.character(df1$area) # init
+df1[df1$area %in% c('IIIa', 'IIIan', 'IIIas', 'IIIast'), 'area'] <- 'kask'
+df1[df1$area %in% c('II','IV', 'IVa', 'IVb', 'IVbc','IVc', 'Ivb'), 'area'] <- 'nsea'
+df1[df1$area %in% c('IIIc', 'IIId', '25'), 'area'] <- 'bsea'
+df1[df1$area %in% c('VII','Vb1','VIa'), 'area'] <- 'csea'
+#df1[df1$area %in% c('2.1', '1.3', '2.2', '1.2','0','1.1',''), 'area'] <- 'msea'
+df1[df1$area %in% c('0',''), 'area'] <- 'ni'
+df1[df1$area %in% c('Black Sea, Samsun Shelf Area (SSA)'), 'area'] <- 'blsea'
+df1$area <- as.factor(df1$area) 
+
+
+
+# DCF metier coding
+df1$metier <- as.character(df1$sps) # init
+df1[df1$metier %in% c('NEP ','NEP','PRA','Nephrops','Nephrops trawl',
+                      'TGS', 'ARA','DPS' ), 'metier'] <- 'OT_CRU'
+df1[df1$metier %in% c('COD','PLE','SOL', 'LEM', 'WHG', 'WHI', 'POK', 
+                      'PDS','HAD','had','HKE','MON', 'MUT',
+                       'NOP'), 'metier'] <- 'OT_DMF'
+df1[df1$metier %in% c('SAN','SPR','CAP'), 'metier'] <- 'OT_SPF'
+df1[df1$metier %in% c('NR', "NI",'0','','ni'), 'metier'] <- 'OT_MIX'
+df1$metier <- as.factor(df1$metier) 
+
+
+
+
+ # species assemblage coding 
+df1$sp1_type <- as.character(df1$sp1) # init
+df1[df1$sp1_type=="NR" | df1$sp1_type=="ni" | df1$sp1_type=="NI" | df1$sp1_type=="" | df1$sp1_type=="0", 'sp1_type'] <- 
+     as.character(df1[df1$sp1_type=="NR"  | df1$sp1_type=="ni" | df1$sp1_type=="NI" | df1$sp1_type=="" | df1$sp1_type=="0", 'sps']) 
+df1[df1$sp1_type %in% c('PLE', 'SOL', 'LEM', 'MON'), 'sp1_type' ]        <- "Benthic"  
+df1[df1$sp1_type %in% c('NEP','NEP ',  'PRA', 'DPS',
+                        'Nephrops', 'Nephrops trawl', 
+                        'ARA',  'TGS', 'CSH'), 'sp1_type' ]              <- "Crustacean"  
+df1[df1$sp1_type %in% c('COD', 'POK', 'WHI', 'HAD', 'had', 
+                        'WHG',  'HKE', 'MUT','WHB', 'PDS'), 'sp1_type' ] <- "Benthic_Pelagic"  
+df1[df1$sp1_type %in% c('NOP',  'SAN', 'SPR','CAP'), 'sp1_type' ]        <- "Pelagic"  
+df1[df1$sp1_type=="NR" | df1$sp1_type=="ni" | df1$sp1_type=="NI" | df1$sp1_type=="" | df1$sp1_type=="0", 'sp1_type']  <- 'NI' # 
+df1$sp1_type <- as.factor(df1$sp1_type) # init
+
+
+# level 6 metier with mesh
+df1$metier2  <- as.character(df1$metier) # init
+df1[df1$metier %in% 'OT_MIX', 'metier2' ]        <- paste(df1[df1$metier %in% 'OT_MIX','metier'], df1[df1$metier %in% 'OT_MIX','mesh_class'], sep="_")  
+df1$metier2  <- as.factor(df1$metier2) 
+
+
+# look at this....
+#hist(an((df1[df1$metier=="OT_MIX", "mesh"])), nclass=50)
+meshes <- table(an((df1[df1$metier=="OT_MIX", "mesh"])))
+
+
+# level 6 metier for MIX with either area (in MED) or mesh (otherwise)
+df1$metier3  <- as.character(df1$metier) # init
+df1[df1$metier %in% 'OT_MIX' & !df1$ctry %in% 'MED', 'metier3' ]        <- 
+    paste(df1[df1$metier %in% 'OT_MIX'  & !df1$ctry %in% 'MED','metier'], df1[df1$metier %in% 'OT_MIX'  & !df1$ctry %in% 'MED','mesh_class'], sep="_")  
+df1[df1$metier %in% 'OT_MIX' & df1$ctry %in% 'MED', 'metier3' ]        <- 
+    paste(df1[df1$metier %in% 'OT_MIX'  & df1$ctry %in% 'MED','metier'], df1[df1$metier %in% 'OT_MIX' & df1$ctry %in% 'MED','area'], sep="_")  
+df1$metier3  <- as.factor(df1$metier3) 
+
+
+
+
+# deal with mixed fisheries
+df1$met    <- as.character(df1$metier) # init
+df1$metier <- as.character(df1$metier) # init
+#df1[df1$metier %in% c('OT_MIX') & sp1 %in% c('NEP ','NEP','PRA',
+#                                'Nephrops','Nephrops trawl','TGS', 
+#                                'ARA','DPS'), 'metier'] <- 'OT_MIX_CRU'
+df1[df1$metier %in% c('OT_MIX') & df1$sp1 %in% c('NEP ','NEP',
+                                'Nephrops','Nephrops trawl', 'PRA', 'CSH' 
+                                ), 'metier'] <- 'OT_MIX_NEP'
+#df1[df1$metier %in% c('OT_MIX') & df1$sp1 %in% c(), 'metier'] <- 'OT_MIX_PRA'
+df1[df1$metier %in% c('OT_MIX') & df1$sp1 %in% c('TGS') &  df1$sp2 %in% c('OCC'), 'metier'] <- 'OT_MIX_TGS_OCC'
+df1[df1$metier %in% c('OT_MIX') & df1$sp1 %in% c('TGS') &  df1$sp2 %in% c('CTC'), 'metier'] <- 'OT_MIX_TGS_CTC'
+df1[df1$metier %in% c('OT_MIX') & df1$sp1 %in% c('ARA'
+                                ), 'metier'] <- 'OT_MIX_ARA'
+df1[df1$metier %in% c('OT_MIX') & df1$sp1 %in% c('DPS'
+                                ), 'metier'] <- 'OT_MIX_DPS'
+df1[df1$metier %in% c('OT_MIX') & df1$sp1 %in% c('PLE','SOL', 'LEM', 
+                               'MON', 'MUT') & df1$sp1_type=="Benthic", 'metier'] <- 'OT_MIX_DEM_Benthic'
+df1[df1$metier %in% c('OT_MIX') & df1$sp1 %in% c('COD','PLE','SOL', 'LEM', 
+                               'WHG', 'WHI', 'POK', 'PDS','HAD','had','HKE',
+                               'MON', 'MUT', 'NOP')& df1$sp1_type=="Benthic_Pelagic", 'metier'] <- 'OT_MIX_DEM_Benthic_Pelagic'
+
+df1[df1$metier %in% c('OT_MIX') & df1$sp1 %in% c('SAN',
+                                'SPR'), 'metier'] <- 'OT_MIX_SPF'
+df1$met    <- as.factor(df1$met) 
+df1$metier <- as.factor(df1$metier) 
+
+
+
+
+
+# bottom type coding
+df1$bt <- as.character(df1$bt) # init
+df1[df1$bt %in% c('hard', 'mud','Hard', 'Hard/sand', 'hard bottom. gravel. sand', 
+                   'hard clay. mud','bedrock, hard bottom.  mud', 
+                    'hard bottom. mud',
+                    'hard bottom with empty mussel and calcareous. mud',
+                    'hard bottom with empty mussel and calcareous. mud. sand',
+                    ' hard bottom with empty mussel and calcareous, mud',
+                    'bedrock. hard bottom.  mud', 
+                    'Hard/send', 'Hard/Sand', 'bedrock.','bedrock. hard bottom mud',  'hard bottom.' ), 'bt']                                        <- 'coarse'
+df1[df1$bt %in% c("sandy","Sand", "sand. mud", 'Sandy', '3', 'Sand, gravel', 'sand', 
+                    'sand. clay. mud', 'Sand/Clay' ), 'bt'] <- 'sand'
+df1[df1$bt %in% c("Clay/mud ", 'Clay/mud', 'Sand/clay', 'Sandy Clay', 'Mud','Sand/mud', 
+                  'Clay/mud','clay, mud', 'Clay', '5', 
+                  'sand. hard clay. mud', 'muddy', 'mud', 'mud ', 'mud'), 'bt']        <- 'mud'
+df1[df1$bt %in% c("mixed", "combination","hard bottom. sand.  clay. mud","gravel. sand. clay. mud", 
+                  "gravel. hard bottom. sand. clay. mud", 'sand. clay. mud',
+                   'hard bottom. sand', 'sand. hard. mud',  "hard bottom. gravel. sand. hard clay. mud", "hard. mud",
+                   'hard bottom. sand. mud', 'ni', 'NI'), 'bt']                             <- 'mixed'
+df1$bt <- as.factor(df1$bt) 
+
+ 
+ 
+# nb of observations per country
+ table(df1$ctry)
+
+# nb of observations per metier 
+ table(df1$metier)
+
+# nb of observations per country per metier 
+ table(df1$ctry,df1$metier)
+
+# nb of observations per country per metier 
+ table(df1$ctry,df1$metier3)
+
+##-------------------------------------------------
+##-------------------------------------------------
+## Door spread vs. kW 
+##-------------------------------------------------
+##-------------------------------------------------
+
+# look at the representativity....
+df1$informedDoS <- ifelse(is.na(an(df1$DoS)) | an(df1$DoS)==0,0,1)
+table(df1$ctry, df1$informedDoS)
+
+# look at the representativity....
+df1$informedarea <- ifelse(as.character(df1$area)=='0',0,1)
+table(df1$ctry, df1$informedarea)
+
+
+# look at the representativity....
+table(df1$ctry, df1$metier, df1$informedDoS)
+
+# filter out the 0
+df1_DoS <- df1[!is.na(df1$DoS) & df1$DoS!=0,]
+
+# plot DoS 
+windows(16, 5)
 library(ggplot2)
-coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df3))
-p <- ggplot(data=df3, aes(an(kW),an(DoS))) +
-      geom_point(aes(shape  = factor(sps), color= factor(sps))) +
-      geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2])
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1_DoS))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS), color= factor(metier))) +
+      geom_point(aes(shape  = factor(metier), color= factor(metier))) +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) + 
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=1,cc=1))
+      #stat_smooth( method="glm", family="poisson", formula='DoS~kW+metier')
+      # stat_smooth(method="lm")
 update_labels(p, list(x = "kW", y="Door_spread"))
-savePlot(file=file.path(outPath, "plot2.png"), type="png")
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_metier.png"), type="png")
 
-# plot DoS for single target
+# plot DoS nls fit with area and ctry
 library(ggplot2)
-coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df3))
-p <- ggplot(data=df3, aes(an(kW),an(DoS))) +
-      geom_point() +
-      geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
-      facet_grid(. ~ sps)
+#levels(df1_DoS$area) <- 0:length(df1_DoS$area)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS))) +
+       scale_shape_manual(values = 1:length(levels(df1_DoS$area))) +
+       geom_point(aes(shape  = factor(area), color= factor(ctry)), size=2) +
+      #stat_smooth(method="lm") +
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
 update_labels(p, list(x = "kW", y="Door_spread"))
-savePlot(file=file.path(outPath, "plot3.png"), type="png")
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_area_ctry.png"), type="png")
 
-
-# plot DoS for single target and bottom type (and door spread...too much dimension here!?)
+# plot DoS  nls fit with bottom type and ctry
 library(ggplot2)
-coeff_lm <- coef(lm(an(GrW) ~ an(kW) , data = df3))
-p <- ggplot(data=df3, aes(an(kW),an(GrW))) +
-       geom_point(aes(shape  = factor(sps), color= factor(bt), size=an(DoS))) +
-       geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2])
-update_labels(p, list(x = "kW", y="Groundgear_weight"))
-savePlot(file=file.path(outPath, "plot4.png"), type="png")
-
-
-#
-library(ggplot2)
-coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df3))
-p <- ggplot(data=df3, aes(an(kW),an(DoS))) +
-       geom_point(aes(shape  = factor(metier), color= factor(bt), size=an(GrW))) +
-       facet_grid(. ~ metier, scales="free")
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS))) +
+      geom_point(aes(shape  = factor(bt), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1), control=nls.control(maxiter = 300))
 update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_bt_ctry.png"), type="png")
 
 
-
-# plot for mixte targets
+# plot DoS  nls fit with sp1_type and ctry
 library(ggplot2)
-coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df4))
-p <- ggplot(data=df4, aes(an(kW),an(DoS))) +
-     geom_point(aes(color= factor(sp2))) +
-     geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
-      facet_grid(. ~ sp1)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS))) +
+      geom_point(aes(shape  = factor(sp1_type), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
 update_labels(p, list(x = "kW", y="Door_spread"))
-savePlot(file=file.path(outPath, "plot5.png"), type="png")
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_sp1_type_ctry.png"), type="png")
+
+
+# plot DoS  nls fit with nb of trawls and ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS))) +
+      geom_point(aes(shape  = factor(nbt), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_nbtrawls_ctry.png"), type="png")
+
+# plot DoS  nls fit with trawling speed and ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS))) +
+      geom_point(aes(shape  = factor(sptr), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_speedtr_ctry.png"), type="png")
+
+
+# plot DoS  nls fit with mesh and ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS))) +
+      geom_point(aes(shape  = factor(mesh), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+      #stat_smooth( method="nls", formula='y~k*sqrt(x)', se=FALSE, start=list(k=50))
+update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_mesh_ctry.png"), type="png")
+
+# plot DoS  nls fit with metier level6 and metier and  ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS))) +
+       scale_shape_manual(values = 1:length(levels(df1_DoS$metier))) +
+      geom_point(aes(shape  = factor(metier), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier2, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+      #stat_smooth( method="nls", formula='y~k*sqrt(x)', se=FALSE, start=list(k=50))
+update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_mesh_ctry.png"), type="png")
+
+# plot DoS  nls fit with metier-area or metier-mesh and metier-target and  ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS))) +
+       scale_shape_manual(values = 1:length(levels(df1_DoS$metier))) +
+      geom_point(aes(shape  = factor(metier), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier3, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+      #stat_smooth( method="nls", formula='y~k*sqrt(x)', se=FALSE, start=list(k=50))
+update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_mesh_ctry.png"), type="png")
+
+# plot DoS  nls fit with metier-area or metier-mesh and metier-target and  ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(kW) , data = df1_DoS))
+p <- ggplot(data=df1_DoS, aes(x=an(kW),y=an(DoS))) +
+       scale_shape_manual(values = 1:length(levels(df1_DoS$metier))) +
+      geom_point(aes(shape  = factor(metier), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ met, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+      #stat_smooth( method="nls", formula='y~k*sqrt(x)', se=FALSE, start=list(k=50))
+update_labels(p, list(x = "kW", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_kW_per_simple_met_ctry.png"), type="png")
+
+
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+##  Door spread vs. LOA
+##-------------------------------------------------
+##-------------------------------------------------
+
+# look at the representativity....
+df1$informedDoS <- ifelse(is.na(an(df1$DoS)) | an(df1$DoS)==0,0,1)
+table(df1$ctry, df1$informedDoS)
+
+# look at the representativity....
+df1$informedarea <- ifelse(as.character(df1$area)=='0',0,1)
+table(df1$ctry, df1$informedarea)
+
+
+# look at the representativity....
+table(df1$ctry, df1$metier, df1$informedDoS)
+
+# filter out the 0
+df1_DoS <- df1[!is.na(df1$DoS) & df1$DoS!=0,]
+
+# plot DoS vs. LOA per area
+library(ggplot2)
+coeff_lm <- coef(lm(an(DoS) ~ an(LOA) , data = df1))
+p <- ggplot(data=df1_DoS, aes(x=an(LOA),y=an(DoS))) +
+     scale_shape_manual(values = 1:length(levels(df1_DoS$area))) +
+        geom_point(aes(shape  = factor(area), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      #stat_smooth( method="nls", formula='y~a*(x^b)', se=FALSE, start=list(a=50,b=1), data=subset(df1_DoS, metier=="OT_CRU"))
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+update_labels(p, list(x = "LOA", y="Door_spread"))
+savePlot(file=file.path(outPath, "plot_OT_nls_DoS_vs_LOA_per_area_ctry.png"), type="png")
+
+
+
+##-----------------------------------------
+##-----------------------------------------
+## Export a table of parameters 
+## for the Benthis vmstools R workflow
+## after having made a choice of the most relevant
+## categorisation
+##-----------------------------------------
+##-----------------------------------------
+
+# get the coeffs for DoS~ LOA or kW
+coeffs_DoS <- NULL
+df1_DoS$DoS     <-  an(df1_DoS$DoS)
+df1_DoS$LOA     <-  an(df1_DoS$LOA)
+df1_DoS$kW      <-  an(df1_DoS$kW)
+df1_DoS_c       <- df1_DoS[!is.na(df1_DoS$LOA) & !is.na(df1_DoS$kW),]  # caution: keep complete cases for a true model comparison...
+for (a_metier in c("OT_CRU", "OT_DMF", "OT_MIX", "OT_MIX_ARA", "OT_MIX_DEM_Benthic", "OT_MIX_DEM_Benthic_Pelagic", "OT_MIX_DPS", "OT_MIX_NEP","OT_MIX_TGS_CTC", "OT_MIX_TGS_OCC", "OT_SPF")){
+   a_nls_kW        <- nls(DoS~a*(kW^b), start=list(a=1,b=1),data=df1_DoS_c[df1_DoS_c$metier==a_metier,])  
+   a_lm_kW         <- nls(DoS~a*kW+b, start=list(a=1,b=1),data=df1_DoS_c[df1_DoS_c$metier==a_metier,]) 
+   a_nls_LOA       <- nls(DoS~a*(LOA^b), start=list(a=50,b=1),data=df1_DoS_c[df1_DoS_c$metier==a_metier,])  
+   a_lm_LOA        <- nls(DoS~a*LOA+b, start=list(a=50,b=1),data=df1_DoS_c[df1_DoS_c$metier==a_metier,]) 
+
+   #compare goodness of fit
+   residualSum    <- anova (a_nls_LOA, a_lm_LOA, a_nls_kW, a_lm_kW)
+   what_is_chosen <- c('a_nls_LOA','a_lm_LOA','a_nls_kW','a_lm_kW') [which.min(residualSum[,2])] 
+   print(what_is_chosen)
+   
+   nb_records      <- nrow(df1_DoS[df1_DoS$metier==a_metier,])
+  
+   # then choose the best model....
+   # (and re-run on the full dataset)  
+   if(what_is_chosen=="a_nls_LOA") {
+       a_nls_LOA      <- nls(DoS~a*(LOA^b), start=list(a=50,b=1), data=df1_DoS[df1_DoS$metier==a_metier,])  # redo with all the available data
+       coeffs_DoS     <- rbind.data.frame (coeffs_DoS,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_LOA)$coeff, equ="DoS=a*(LOA^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_LOA"){
+       a_lm_LOA        <- nls(DoS~a*LOA+b, start=list(a=50,b=1),data=df1_DoS[df1_DoS$metier==a_metier,]) 
+       coeffs_DoS      <- rbind.data.frame (coeffs_DoS,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_LOA)$coeff, equ="DoS=(a*LOA)+b", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_nls_kW"){
+       a_nls_kW        <- nls(DoS~a*(kW^b), start=list(a=1,b=1),data=df1_DoS[df1_DoS$metier==a_metier,])  
+       coeffs_DoS      <- rbind.data.frame (coeffs_DoS,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_kW)$coeff, equ="DoS=a*(kW^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_kW"){
+      a_lm_kW         <- nls(DoS~a*kW+b, start=list(a=1,b=1),data=df1_DoS[df1_DoS$metier==a_metier,]) 
+      coeffs_DoS      <- rbind.data.frame (coeffs_DoS,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_kW)$coeff, equ="DoS=(a*kW)+b", nb_records= nb_records))
+     }
+   }
+rownames(coeffs_DoS) <- NULL
+
+   
+# export
+write.table(coeffs_DoS, file=file.path(outPath, "estimates_for_OT_nls_DoS_vs_LOA_or_kW_per_metier.txt"))
+# => for using this table in the workflow, partners should link each logbooks records to the metier categories found in that table...
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## do the correponding plot
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+#png(filename = file.path(outPath, paste("plot_estimates_for_OT_nls_DoS_vs_LOA_or_kW_per_metier.png",sep="")),
+#                                   width = 1100, height = 2400, 
+#                                   units = "px", pointsize = 12,  res=300)   # high resolution plot
+windows(7,10)
+par(mfrow=c(4,3))
+par(oma=c(6,4,1,1))
+par(mar=c(4,0,2,1))
+df1_DoS$the_colors   <- df1_DoS$ctry
+#library(RColorBrewer)
+#the_colors <- brewer.pal(11, "Paired") 
+#levels(df1_DoS$the_colors) <- the_colors[1:length(unique(df1_DoS$the_colors))]
+rgb.palette <- colorRampPalette(c("green", "red", "blue"),
+                                space = "Lab")
+levels(df1_DoS$the_colors) <- rgb.palette (length(unique(df1_DoS$the_colors)))
+df1_DoS$the_colors <- as.character(df1_DoS$the_colors)
+
+
+count <-1
+for(met in c("OT_CRU", "OT_DMF", "OT_MIX", "OT_MIX_ARA", "OT_MIX_DEM_Benthic", "OT_MIX_DEM_Benthic_Pelagic", "OT_MIX_DPS", "OT_MIX_NEP","OT_MIX_TGS_CTC", "OT_MIX_TGS_OCC", "OT_SPF")){
+   a           <- coeffs_DoS[coeffs_DoS$a_metier==met & coeffs_DoS$param=='a', 'Estimate']
+   b           <- coeffs_DoS[coeffs_DoS$a_metier==met  & coeffs_DoS$param=='b', 'Estimate']
+   an_equation <- as.character(coeffs_DoS[coeffs_DoS$a_metier==met,][1,'equ'])
+   if(length(grep('LOA' , an_equation))>0){
+      range_LOA <- range(df1_DoS[df1_DoS$metier==met, "LOA",], na.rm=TRUE)
+      LOA       <- seq(range_LOA[1], range_LOA[2], by=1)
+      plot(df1_DoS[df1_DoS$metier==met, "LOA",], df1_DoS[df1_DoS$metier==met, "DoS"], pch=16, col=df1_DoS[df1_DoS$metier==met, "the_colors"], xlab="LOA (metre)", ylab="Door spread (metre)", axes=FALSE, ylim=c(0,300))
+      lines(LOA, eval(parse(text= an_equation)))
+      }
+   if(length(grep('kW' , an_equation))>0){
+      range_kW <- range(df1_DoS[df1_DoS$metier==met, "kW",], na.rm=TRUE)
+      kW       <- seq(range_kW[1], range_kW[2], by=1)
+      plot(df1_DoS[df1_DoS$metier==met, "kW",], df1_DoS[df1_DoS$metier==met, "DoS"], pch=16, col=df1_DoS[df1_DoS$metier==met, "the_colors"], xlab="kW", ylab="Door spread (metre)", axes=FALSE, ylim=c(0,300))
+      lines(kW, eval(parse(text= an_equation)))
+      }
+ axis(1) 
+ if(count==1) axis(2, las=2) 
+  box()    
+ title(met, cex=0.7)
+ count <- count+1
+}
+plot(0,0,type="n", axes=FALSE, xlab="", ylab="")
+legend("topright", legend=unique(df1_DoS$ctry), fill=unique(df1_DoS$the_colors), bty="n", cex=1.2, ncol=2)
+
+mtext(side=2, text="Door spread (metre)", line=1, outer=TRUE)
+savePlot(file=file.path(outPath, "plot_estimates_for_OT_nls_DoS_vs_LOA_or_kW_per_metier.png"), type="png")
+
+# dev.off()
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## Gear weight vs. explanatory variables includ. kW 
+##-------------------------------------------------
+##-------------------------------------------------
+ # look at the representativity....
+df1$informedGrW <- ifelse(is.na(an(df1$GrW)) | an(df1$GrW)==0,0,1)
+table(df1$ctry, df1$informedGrW)
+
+ # look at the representativity....
+df1$informedDoW <- ifelse(is.na(an(df1$DoW)) | an(df1$DoW)==0,0,1)
+table(df1$ctry, df1$informedDoW)
+
+ # look at the representativity....
+df1$informedClp <- ifelse(is.na(an(df1$Clp)) | an(df1$Clp)==0,0,1)
+table(df1$ctry, df1$informedClp)
+
+ # look at the representativity....
+df1$informedTotGW <- ifelse(is.na(an(df1$TotGW)) | an(df1$TotGW)==0,0,1)
+table(df1$ctry, df1$informedTotGW)
+
+# look at the representativity....
+df1$informedarea <- ifelse(as.character(df1$area)=='0',0,1)
+table(df1$ctry, df1$informedarea)
+
+ # look at the representativity....
+df1$informedTotGW <- ifelse(is.na(an(df1$TotGW)) | an(df1$TotGW)==0,0,1)
+table(df1$metier, df1$informedTotGW)
+
+
+# filter out the 0
+df1_TotGW <- df1[!is.na(df1$TotGW) & df1$TotGW!=0,]
+
+
+
+
+# plot TotGW fit with met and  ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(TotGW) ~ an(kW) , data = df1_TotGW))
+p <- ggplot(data=df1_TotGW, aes(x=an(kW),y=an(TotGW))) +
+       scale_shape_manual(values = 1:length(levels(df1_TotGW$bt))) +
+      geom_point(aes(shape  = factor(bt), color= factor(ctry))) +
+      stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier, scales="free") #+
+      #stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=500,cc=1))
+      #stat_smooth( method="nls", formula='y~k*sqrt(x)', se=FALSE, start=list(k=50))
+update_labels(p, list(x = "kW", y="Total gear weight"))
+savePlot(file=file.path(outPath, "plot_OT_TotGW_vs_kW_per_simple_met_ctry.png"), type="png")
+
+
+
+##-----------------------------------------
+##-----------------------------------------
+## Export a table of parameters 
+## for the Benthis vmstools R workflow
+## after having made a choice of the most relevant
+## categorisation
+##-----------------------------------------
+##-----------------------------------------
+
+# get the coeffs for TotGW~ LOA or kW 
+coeffs_TotGW <- NULL
+df1_TotGW$TotGW   <-  an(df1_TotGW$TotGW)
+df1_TotGW$LOA     <-  an(df1_TotGW$LOA)
+df1_TotGW$kW      <-  an(df1_TotGW$kW)
+df1_TotGW_c       <- df1_TotGW[!is.na(df1_TotGW$LOA) & !is.na(df1_TotGW$kW),]  # caution: keep complete cases for a true model comparison...
+#for (a_metier in c("OT_CRU", "OT_DMF", "OT_MIX", "OT_MIX_ARA", "OT_MIX_DEM_Benthic", "OT_MIX_DEM_Benthic_Pelagic", "OT_MIX_DPS", "OT_MIX_NEP","OT_MIX_TGS_CTC", "OT_MIX_TGS_OCC", "OT_SPF")){
+for (a_metier in c("OT_CRU", "OT_DMF",  "OT_MIX_ARA", "OT_MIX_DEM_Benthic", "OT_MIX_DEM_Benthic_Pelagic", "OT_MIX_DPS", "OT_MIX_NEP","OT_MIX_TGS_CTC",  "OT_SPF")){
+   a_nls_kW        <- nls(TotGW~a*(kW^b), start=list(a=1,b=1),data=df1_TotGW_c[df1_TotGW_c$metier==a_metier,])  
+   a_lm_kW         <- nls(TotGW~a*kW+b, start=list(a=1,b=1),data=df1_TotGW_c[df1_TotGW_c$metier==a_metier,]) 
+   a_nls_LOA       <- nls(TotGW~a*(LOA^b), start=list(a=50,b=1),data=df1_TotGW_c[df1_TotGW_c$metier==a_metier,])  
+   a_lm_LOA        <- nls(TotGW~a*LOA+b, start=list(a=50,b=1),data=df1_TotGW_c[df1_TotGW_c$metier==a_metier,]) 
+
+   #compare goodness of fit
+   residualSum    <- anova (a_nls_LOA, a_lm_LOA, a_nls_kW, a_lm_kW)
+   what_is_chosen <- c('a_nls_LOA','a_lm_LOA','a_nls_kW','a_lm_kW') [which.min(residualSum[,2])] 
+   print(what_is_chosen)
+   
+   nb_records      <- nrow(df1_TotGW[df1_TotGW$metier==a_metier,])
+  
+   # then choose the best model....
+   # (and re-run on the full dataset)  
+   if(what_is_chosen=="a_nls_LOA") {
+       a_nls_LOA      <- nls(TotGW~a*(LOA^b), start=list(a=50,b=1), data=df1_TotGW[df1_TotGW$metier==a_metier,])  # redo with all the available data
+       coeffs_TotGW     <- rbind.data.frame (coeffs_TotGW,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_LOA)$coeff, equ="TotGW=a*(LOA^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_LOA"){
+       a_lm_LOA        <- nls(TotGW~a*LOA+b, start=list(a=50,b=1),data=df1_TotGW[df1_TotGW$metier==a_metier,]) 
+       coeffs_TotGW      <- rbind.data.frame (coeffs_TotGW,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_LOA)$coeff, equ="TotGW=(a*LOA)+b", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_nls_kW"){
+       a_nls_kW        <- nls(TotGW~a*(kW^b), start=list(a=1,b=1),data=df1_TotGW[df1_TotGW$metier==a_metier,])  
+       coeffs_TotGW      <- rbind.data.frame (coeffs_TotGW,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_kW)$coeff, equ="TotGW=a*(kW^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_kW"){
+      a_lm_kW         <- nls(TotGW~a*kW+b, start=list(a=1,b=1),data=df1_TotGW[df1_TotGW$metier==a_metier,]) 
+      coeffs_TotGW      <- rbind.data.frame (coeffs_TotGW,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_kW)$coeff, equ="TotGW=(a*kW)+b", nb_records= nb_records))
+     }
+   }
+rownames(coeffs_TotGW) <- NULL
+
+   
+# export
+write.table(coeffs_TotGW, file=file.path(outPath, "estimates_for_OT_nls_TotGW_vs_LOA_or_kW_per_metier.txt"))
+# => for using this table in the workflow, partners should link each logbooks records to the metier categories found in that table...
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## do the correponding plot
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+#png(filename = file.path(outPath, paste("plot_estimates_for_OT_nls_TotGW_vs_LOA_or_kW_per_metier.png",sep="")),
+#                                   width = 1100, height = 2400, 
+#                                   units = "px", pointsize = 12,  res=300)   # high resolution plot
+windows(7,10)
+par(mfrow=c(4,3))
+par(oma=c(6,4,1,1))
+par(mar=c(4,0,2,1))
+df1_TotGW$the_colors   <- df1_TotGW$ctry
+#library(RColorBrewer)
+#the_colors <- brewer.pal(11, "Paired") 
+#levels(df1_DoS$the_colors) <- the_colors[1:length(unique(df1_DoS$the_colors))]
+rgb.palette <- colorRampPalette(c("green", "red", "blue"),
+                                space = "Lab")
+levels(df1_TotGW$the_colors) <- rgb.palette (length(levels(df1_TotGW$the_colors)))
+df1_TotGW$the_colors <- as.character(df1_TotGW$the_colors)
+
+
+count <-1
+#for(met in c("OT_CRU", "OT_DMF", "OT_MIX", "OT_MIX_ARA", "OT_MIX_DEM_Benthic", "OT_MIX_DEM_Benthic_Pelagic", "OT_MIX_DPS", "OT_MIX_NEP","OT_MIX_TGS_CTC", "OT_MIX_TGS_OCC", "OT_SPF")){
+for(met in c("OT_CRU", "OT_DMF",  "OT_MIX_ARA", "OT_MIX_DEM_Benthic", "OT_MIX_DEM_Benthic_Pelagic", "OT_MIX_DPS", "OT_MIX_NEP","OT_MIX_TGS_CTC",  "OT_SPF")){
+   a           <- coeffs_TotGW[coeffs_TotGW$a_metier==met & coeffs_TotGW$param=='a', 'Estimate']
+   b           <- coeffs_TotGW[coeffs_TotGW$a_metier==met  & coeffs_TotGW$param=='b', 'Estimate']
+   an_equation <- as.character(coeffs_TotGW[coeffs_TotGW$a_metier==met,][1,'equ'])
+   if(length(grep('LOA' , an_equation))>0){
+      range_LOA <- range(df1_TotGW[df1_TotGW$metier==met, "LOA",], na.rm=TRUE)
+      LOA       <- seq(range_LOA[1], range_LOA[2], by=1)
+      plot(df1_TotGW[df1_TotGW$metier==met, "LOA",], df1_TotGW[df1_TotGW$metier==met, "TotGW"], pch=16, col=df1_TotGW[df1_TotGW$metier==met, "the_colors"], xlab="LOA (metre)", ylab="Total gear weight (kg)", axes=FALSE, ylim=c(0,5300))
+      lines(LOA, eval(parse(text= an_equation)))
+      }
+   if(length(grep('kW' , an_equation))>0){
+      range_kW <- range(df1_TotGW[df1_TotGW$metier==met, "kW",], na.rm=TRUE)
+      kW       <- seq(range_kW[1], range_kW[2], by=1)
+      plot(df1_TotGW[df1_TotGW$metier==met, "kW",], df1_TotGW[df1_TotGW$metier==met, "TotGW"], pch=16, col=df1_TotGW[df1_TotGW$metier==met, "the_colors"], xlab="kW", ylab="Total gear weight (kg)", axes=FALSE, ylim=c(0,5300))
+      lines(kW, eval(parse(text= an_equation)))
+      }
+ axis(1) 
+ if(count==1) axis(2, las=2) 
+  box()    
+ title(met, cex=0.7)
+ count <- count+1
+}
+plot(0,0,type="n", axes=FALSE, xlab="", ylab="")
+legend("topright", legend=unique(df1_TotGW$ctry), fill=unique(df1_TotGW$the_colors), bty="n", cex=1.2, ncol=2)
+
+mtext(side=2, text="Total gear weight (kg)", line=1, outer=TRUE)
+savePlot(file=file.path(outPath, "plot_estimates_for_OT_nls_TotGW_vs_LOA_or_kW_per_metier.png"), type="png")
+
+# dev.off()
+
 
 
 </code>
