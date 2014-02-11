@@ -1436,7 +1436,7 @@ table(df1$ctry, df1$informedTotGW)
 
 </code>
 
-For the seine gear:
+For the demersal seine gear, the length of the rope are related either to vessel kW or LOA. The calculation of the  swept area require further assumption related to the shape of the netting and the haul duration. These assumptions are within the BENTHIS WP2 workflow when it comes to compute the swept area from the length of the rope (in brief it has been assumed that the average duration of a fishing event is 3 hours and the shape is a circle area centered on the fishing ping, no difference between Danish and Scottish seiners which is an approximation).  
 
 <code>
 
