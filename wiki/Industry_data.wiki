@@ -20,14 +20,17 @@ Hereafter, the code to incorporate the parameter table into the BENTHIS WP2 work
  # import the param table obtained from the industry_data R analyses
  gear_param_per_metier       <- read.table(file=file.path(outPath, "estimates_for_gear_param_per_metier.txt"))
 
- GearWidth                   <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_MET)), ]
+  GearWidth                   <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_MET)), ]
  GearWidth                   <- GearWidth[,c('VE_REF','LE_MET','VE_KW', 'VE_LEN') ]
  GearWidth$GEAR_WIDTH        <- NA
  GearWidth$GEAR_WIDTH_LOWER  <- NA
  GearWidth$GEAR_WIDTH_UPPER  <- NA
  for (i in 1:nrow(GearWidth)) { # brute force...
+
     kW      <- GearWidth$VE_KW[i]
+
     LOA     <- GearWidth$VE_LEN[i]
+
     this    <- gear_param_per_metier[gear_param_per_metier$a_metier==GearWidth$LE_MET[i],]
     a <- NULL ; b <- NULL
     a       <- this[this$param=='a', 'Estimate'] 
@@ -1741,6 +1744,4 @@ savePlot(file=file.path(outPath, "plot_DS_GrW_vs_kW_per_metier.png"), type="png"
 
 
 </code>
-
-
 
