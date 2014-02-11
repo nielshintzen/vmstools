@@ -7,6 +7,50 @@ Example of an R code to proceed the OT gear data is given as illustration. Equiv
 
 = Details =
 
+
+Hereafter, the code to incorporate the parameter table into the BENTHIS WP2 workflow:
+
+
+<code>
+
+
+ # MERGE WITH GEAR WIDTH
+ # CAUTION: the LE_MET should be consistent with those described in the below table!
+ # if not then redefine them BEFORE making this step!
+ # import the param table obtained from the industry_data R analyses
+ gear_param_per_metier       <- read.table(file=file.path(outPath, "estimates_for_gear_param_per_metier.txt"))
+
+ GearWidth                   <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_MET)), ]
+ GearWidth                   <- GearWidth[,c('VE_REF','LE_MET','VE_KW', 'VE_LEN') ]
+ GearWidth$GEAR_WIDTH        <- NA
+ GearWidth$GEAR_WIDTH_LOWER  <- NA
+ GearWidth$GEAR_WIDTH_UPPER  <- NA
+ for (i in 1:nrow(GearWidth)) { # brute force...
+    kW      <- GearWidth$VE_KW[i]
+    LOA     <- GearWidth$VE_LEN[i]
+    this    <- gear_param_per_metier[gear_param_per_metier$a_metier==GearWidth$LE_MET[i],]
+    a <- NULL ; b <- NULL
+    a       <- this[this$param=='a', 'Estimate'] 
+    b       <- this[this$param=='b', 'Estimate'] 
+    GearWidth[i,"GEAR_WIDTH"]  <-   eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
+    a       <- this[this$param=='a', 'Estimate'] +2*this[this$param=='a', 'Std..Error'] 
+    b       <- this[this$param=='b', 'Estimate'] +2*this[this$param=='b', 'Std..Error'] 
+    GearWidth[i,"GEAR_WIDTH_UPPER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
+    a       <- this[this$param=='a', 'Estimate'] -2*this[this$param=='a', 'Std..Error'] 
+    b       <- this[this$param=='b', 'Estimate'] -2*this[this$param=='b', 'Std..Error'] 
+    GearWidth[i,"GEAR_WIDTH_LOWER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km  
+ }
+ save(GearWidth, file=file.path(dataPath,"gearWidth.RData"))
+ load(file.path(dataPath, "gearWidth.RData"))
+ tacsatp                     <- merge(tacsatp, GearWidth,by=c("VE_REF","LE_MET"),
+                               all.x=T,all.y=F)
+ save(tacsatp,   file=file.path(outPath,"tacsatMergedWidth.RData"))
+
+
+</code>
+
+The table of parameters (relationships to predict the gear width per BENTHIS metier from the kW or LOA) has been built from the following R code, after collating the outcomes of the analysis split by OT, TBB, DRB and DS for Otter trawl, beam trawl, dredge and seine respectively.
+
 <code>
 
 # plot (with ggplot2)
@@ -744,43 +788,961 @@ savePlot(file=file.path(outPath, "plot_estimates_for_OT_nls_TotGW_vs_LOA_or_kW_p
 
 </code>
 
-Hereafter, the code to incorporate the parameter table into the BENTHIS WP2 workflow:
 
 
 <code>
 
 
- # MERGE WITH GEAR WIDTH
- # CAUTION: the LE_MET should be consistent with those described in the below table!
- # if not then redefine them BEFORE making this step!
- # import the param table obtained from the industry_data R analyses
- gear_param_per_metier       <- read.table(file=file.path(outPath, "estimates_for_gear_param_per_metier.txt"))
+# plot (with ggplot2)
+library(ggplot2)
 
- GearWidth                   <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_MET)), ]
- GearWidth                   <- GearWidth[,c('VE_REF','LE_MET','VE_KW', 'VE_LEN') ]
- GearWidth$GEAR_WIDTH        <- NA
- GearWidth$GEAR_WIDTH_LOWER  <- NA
- GearWidth$GEAR_WIDTH_UPPER  <- NA
- for (i in 1:nrow(GearWidth)) { # brute force...
-    kW      <- GearWidth$VE_KW[i]
-    LOA     <- GearWidth$VE_LEN[i]
-    this    <- gear_param_per_metier[gear_param_per_metier$a_metier==GearWidth$LE_MET[i],]
-    a <- NULL ; b <- NULL
-    a       <- this[this$param=='a', 'Estimate'] 
-    b       <- this[this$param=='b', 'Estimate'] 
-    GearWidth[i,"GEAR_WIDTH"]  <-   eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
-    a       <- this[this$param=='a', 'Estimate'] +2*this[this$param=='a', 'Std..Error'] 
-    b       <- this[this$param=='b', 'Estimate'] +2*this[this$param=='b', 'Std..Error'] 
-    GearWidth[i,"GEAR_WIDTH_UPPER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
-    a       <- this[this$param=='a', 'Estimate'] -2*this[this$param=='a', 'Std..Error'] 
-    b       <- this[this$param=='b', 'Estimate'] -2*this[this$param=='b', 'Std..Error'] 
-    GearWidth[i,"GEAR_WIDTH_LOWER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km  
- }
- save(GearWidth, file=file.path(dataPath,"gearWidth.RData"))
- load(file.path(dataPath, "gearWidth.RData"))
- tacsatp                     <- merge(tacsatp, GearWidth,by=c("VE_REF","LE_MET"),
-                               all.x=T,all.y=F)
- save(tacsatp,   file=file.path(outPath,"tacsatMergedWidth.RData"))
+# paths
+dataPath  <- file.path("C:", "BENTHIS", "data_gear_spec_questionnaire")
+outPath   <- file.path("C:", "BENTHIS", "data_gear_spec_questionnaire")
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+## TBB
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+
+
+# read file
+ind_DK  <- read.table(file= file.path(dataPath, 'TBB', 'TBB_DK_28012014.csv'), sep=";", header=TRUE )
+ind_NL  <- read.table(file= file.path(dataPath, 'TBB', 'TBB_NL_28012014.csv'), sep=";", header=TRUE )
+ind_TUR <- read.table(file= file.path(dataPath, 'TBB', 'TBB_TUR_28012014.csv'), sep=";", header=TRUE )
+ind_BEL <- read.table(file= file.path(dataPath, 'TBB', 'TBB_BEL_28012014.csv'), sep=";", header=TRUE )
+ind_IT  <- read.table(file= file.path(dataPath, 'TBB', 'TBB_IT_28012014.csv'), sep=";", header=TRUE )
+
+# collate
+cols <- c('Anonymous.vessel_ID','Variable.name','Variable','Value')
+ind  <- rbind.data.frame (
+                          cbind(country="DK", ind_DK [, cols]),
+                          cbind(country="NL", ind_NL [, cols]),
+                          cbind(country="TUR", ind_TUR [, cols]),
+                          cbind(country="BEL", ind_BEL [, cols]),
+                          cbind(country="IT", ind_IT [, cols])
+                          )
+
+
+# explore
+head(ind [ind$Variable.name=="Trawl_model",])
+levels(ind$Variable.name)
+an <- function(x) as.numeric(as.character(x))
+
+
+CT  <- ind [ind$Variable.name=="Consumption_trawling", "Value"]
+CS  <- ind [ind$Variable.name=="Consumption_steaming", "Value"]
+Str  <- ind [ind$Variable.name=="Speed_trawling", "Value"]
+kW  <- ind [ind$Variable.name=="Vessel_kW", "Value"]
+LOA <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
+beamw <- ind [ind$Variable.name=="Beam width", "Value"]
+GrW <- ind [ind$Variable.name=="Groundgear_weight", "Value"]
+SuW <- ind [ind$Variable.name=="Sumwingnose_weight", "Value"]
+TiW <- ind [ind$Variable.name=="Ticklerchain_weight", "Value"]
+TiN <- ind [ind$Variable.name=="Ticklerchain_numbers", "Value"]
+GrL <- ind [ind$Variable.name=="Groundgear_length", "Value"]
+sps <- ind [ind$Variable.name=="Targetspecies_single", "Value"]
+sp1 <- ind [ind$Variable.name=="Primarytarget_mixed", "Value"]
+sp2 <- ind [ind$Variable.name=="Secondarytarget_mixed", "Value"]
+sp3 <- ind [ind$Variable.name=="Thirdtarget_mixed", "Value"]
+bt  <- ind [ind$Variable.name=="Bottom_type", "Value"]
+nbt <- ind [ind$Variable.name=="Trawl_number", "Value"]
+sptr <- ind [ind$Variable.name=="Speed_trawling", "Value"]
+spst <- ind [ind$Variable.name=="Speed_steaming", "Value"]
+ctry <- ind [ind$Variable.name=="Trawl_number", "country"]
+area <- ind [ind$Variable.name=="Fishing_area", "Value"]
+mesh <- ind [ind$Variable.name=="Codend_meshsize", "Value"]
+
+# intermediate calculations
+dd    <- rbind(an(GrW) * an(nbt), an(SuW), c(an(TiW) * an(TiN)))
+TotGW <- apply(dd,2, sum, na.rm=TRUE) # DoW and GrW need complete cases here.
+TotGW[is.na(dd[1,])] <- NA
+
+beamw <- an(nbt) * an(beamw)
+
+
+# then, collate:
+df1  <- cbind.data.frame(ctry,CT, CS, sptr, spst, kW, beamw, LOA, GrW, nbt, TotGW, GrL, sps, sp1, sp2, sp3, bt, area, mesh)
+
+
+
+
+# refactor some variables (if needed)
+df1$LOA_class <- cut(an(df1$LOA), breaks=c(0,15,100))
+df1$sptr      <- cut(an(df1$sptr), breaks= seq(0,10,0.75))   # trawling speed
+df1$mesh      <- cut(an(df1$mesh), breaks= seq(0,140,30))   # codend mesh size
+
+
+# DCF metier coding
+df1$metier <- as.character(df1$sps) # init
+df1[df1$metier %in% c('NEP ','NEP','PRA','Nephrops','Nephrops trawl',
+                      'TGS', 'ARA','DPS', 'CRN' ), 'metier'] <- 'TBB_CRU'
+df1[df1$metier %in% c('RPW' ), 'metier'] <- 'TBB_MOL'
+df1[df1$metier %in% c('COD','PLE','SOL', 'LEM', 'WHG', 'WHI', 'POK',
+                      'PDS','HAD','had','HKE','MON', 'MUT',
+                       'NOP'), 'metier'] <- 'TBB_DMF'
+df1[df1$metier %in% c('SAN','SPR','CAP'), 'metier'] <- 'TBB_SPF'
+df1[df1$metier %in% c('NR', "NI",'0','','ni'), 'metier'] <- 'TBB_MIX'
+df1$metier <- as.factor(df1$metier)
+
+
+
+
+# area coding
+df1$area <- as.character(df1$area) # init
+df1[df1$area %in% c('IIIa', 'IIIan', 'IIIas', 'IIIast'), 'area'] <- 'kask'
+df1[df1$area %in% c('II','IV', 'IVa', 'IVb', 'IVbc','IVc', 'Ivb', 'IV/VII/VIII', 'IV/VII'), 'area'] <- 'nsea'
+df1[df1$area %in% c('IIIc', 'IIId', '25'), 'area'] <- 'bsea'
+df1[df1$area %in% c('VII','Vb1','VIa', "VIII"), 'area'] <- 'csea'
+#df1[df1$area %in% c('2.1', '1.3', '2.2', '1.2','0','1.1',''), 'area'] <- 'msea'
+df1[df1$area %in% c('0',''), 'area'] <- 'ni'
+df1[df1$area %in% c('Black Sea, Samsun Shelf Area (SSA)'), 'area'] <- 'blsea'
+df1$area <- as.factor(df1$area)
+
+
+
+# nb of observations per country
+ table(df1$ctry)
+
+# nb of observations per metier
+ table(df1$metier)
+
+# nb of observations per country per metier
+ table(df1$ctry,df1$metier)
+
+
+##-----------------------------------------
+##-----------------------------------------
+## trawling vs. steaming consumption in l/h
+##-----------------------------------------
+##-----------------------------------------
+
+ p <- ggplot(data=df1, aes(factor(metier), an(CT)/an(CS))) + geom_boxplot()  + geom_point()
+update_labels(p, list(x ="metier" , y="trawling/steaming l/h"))
+savePlot(file=file.path(outPath, "plot_ratio_consumption_TBB.png"), type="png")
+
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## beam width vs. kW
+##-------------------------------------------------
+##-------------------------------------------------
+
+# look at the representativity....
+df1$informedbeamw <- ifelse(is.na(an(df1$beamw)) | an(df1$beamw)==0,0,1)
+table(df1$ctry, df1$informedbeamw)
+
+# look at the representativity....
+df1$informedarea <- ifelse(as.character(df1$area)=='0',0,1)
+table(df1$ctry, df1$informedarea)
+
+
+# look at the representativity....
+table(df1$ctry, df1$metier, df1$informedbeamw)
+
+# filter out the 0
+df1_beamw <- df1[!is.na(df1$beamw) & df1$beamw!=0 & an(df1$beamw)<1000,]
+
+# plot beamw
+library(ggplot2)
+coeff_lm <- coef(lm(an(beamw) ~ an(kW) , data = df1_beamw))
+p <- ggplot(data=df1_beamw, aes(x=an(kW),y=an(beamw), color= factor(metier))) +
+      geom_point(aes(shape  = factor(metier), color= factor(metier))) +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=1,cc=1))
+      #stat_smooth( method="glm", family="poisson", formula='DoS~kW+metier')
+      # stat_smooth(method="lm")
+update_labels(p, list(x = "kW", y="Beam_width"))
+savePlot(file=file.path(outPath, "plot_TBB_nls_beamw_vs_kW_per_metier.png"), type="png")
+
+
+# plot beamw  nls fit with LOA and ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(beamw) ~ an(kW) , data = df1_beamw))
+p <- ggplot(data=df1_beamw, aes(x=an(kW),y=an(beamw))) +
+      geom_point(aes(shape  = factor(LOA_class), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+update_labels(p, list(x = "kW", y="Beam_width"))
+savePlot(file=file.path(outPath, "plot_TBB_nls_beamw_vs_kW_per_LOA_ctry.png"), type="png")
+
+
+##-----------------------------------------
+##-----------------------------------------
+## Export a table of parameters
+## for the Benthis vmstools R workflow
+## after having made a choice of the most relevant
+## categorisation
+##-----------------------------------------
+##-----------------------------------------
+
+# get the coeffs for TotGW~ LOA or kW
+coeffs_beamw <- NULL
+df1_beamw$beamw   <-  an(df1_beamw$beamw)
+df1_beamw$LOA     <-  an(df1_beamw$LOA)
+df1_beamw$kW      <-  an(df1_beamw$kW)
+df1_beamw_c       <- df1_beamw[!is.na(df1_beamw$LOA) & !is.na(df1_beamw$kW),]  # caution: keep complete cases for a true model comparison...
+for (a_metier in c("TBB_CRU", "TBB_DMF", "TBB_MIX", "TBB_MOL")){
+   a_nls_kW        <- nls(beamw~a*(kW^b), start=list(a=1,b=1),data=df1_beamw_c[df1_beamw_c$metier==a_metier,])
+   a_lm_kW         <- nls(beamw~a*kW+b, start=list(a=1,b=1),data=df1_beamw_c[df1_beamw_c$metier==a_metier,])
+   a_nls_LOA       <- nls(beamw~a*(LOA^b), start=list(a=1,b=1),data=df1_beamw_c[df1_beamw_c$metier==a_metier,])
+   a_lm_LOA        <- nls(beamw~a*LOA+b, start=list(a=1,b=1),data=df1_beamw_c[df1_beamw_c$metier==a_metier,])
+
+   #compare goodness of fit
+   residualSum    <- anova (a_nls_LOA, a_lm_LOA, a_nls_kW, a_lm_kW)
+   what_is_chosen <- c('a_nls_LOA','a_lm_LOA','a_nls_kW','a_lm_kW') [which.min(residualSum[,2])]
+   print(what_is_chosen)
+
+   nb_records      <- nrow(df1_beamw[df1_beamw$metier==a_metier,])
+
+   # then choose the best model....
+   # (and re-run on the full dataset)
+   if(what_is_chosen=="a_nls_LOA") {
+       a_nls_LOA      <- nls(beamw~a*(LOA^b), start=list(a=1,b=1), data=df1_beamw[df1_beamw$metier==a_metier,])  # redo with all the available data
+       coeffs_beamw     <- rbind.data.frame (coeffs_beamw,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_LOA)$coeff, equ="beamw=a*(LOA^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_LOA"){
+       a_lm_LOA        <- nls(beamw~a*LOA+b, start=list(a=1,b=1),data=df1_beamw[df1_beamw$metier==a_metier,])
+       coeffs_beamw      <- rbind.data.frame (coeffs_beamw,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_LOA)$coeff, equ="beamw=(a*LOA)+b", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_nls_kW"){
+       a_nls_kW        <- nls(beamw~a*(kW^b), start=list(a=1,b=1),data=df1_beamw[df1_beamw$metier==a_metier,])
+       coeffs_beamw      <- rbind.data.frame (coeffs_beamw,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_kW)$coeff, equ="beamw=a*(kW^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_kW"){
+      a_lm_kW         <- nls(beamw~a*kW+b, start=list(a=1,b=1),data=df1_beamw[df1_beamw$metier==a_metier,])
+      coeffs_beamw      <- rbind.data.frame (coeffs_beamw,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_kW)$coeff, equ="beamw=(a*kW)+b", nb_records= nb_records))
+     }
+   }
+rownames(coeffs_beamw) <- NULL
+
+
+# export
+write.table(coeffs_beamw, file=file.path(outPath, "estimates_for_TBB_nls_beamw_vs_LOA_or_kW_per_metier.txt"))
+# => for using this table in the workflow, partners should link each logbooks records to the metier categories found in that table...
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## do the correponding plot
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+#png(filename = file.path(outPath, paste("plot_estimates_for_TBB_nls_TotGW_vs_LOA_or_kW_per_metier.png",sep="")),
+#                                   width = 1100, height = 2400,
+#                                   units = "px", pointsize = 12,  res=300)   # high resolution plot
+windows(10,5)
+par(mfrow=c(1,5))
+par(oma=c(6,4,1,1))
+par(mar=c(4,0,2,1))
+df1_beamw$the_colors   <- df1_beamw$ctry
+#library(RColorBrewer)
+#the_colors <- brewer.pal(11, "Paired")
+#levels(df1_beamw$the_colors) <- the_colors[1:length(unique(df1_beamw$the_colors))]
+rgb.palette <- colorRampPalette(c("green", "red", "blue"),
+                                space = "Lab")
+levels(df1_beamw$the_colors) <- rgb.palette (length(levels(df1_beamw$the_colors)))
+df1_beamw$the_colors <- as.character(df1_beamw$the_colors)
+
+
+count <-1
+for (met in c("TBB_CRU", "TBB_DMF", "TBB_MIX", "TBB_MOL")){
+   a           <- coeffs_beamw[coeffs_beamw$a_metier==met & coeffs_beamw$param=='a', 'Estimate']
+   b           <- coeffs_beamw[coeffs_beamw$a_metier==met  & coeffs_beamw$param=='b', 'Estimate']
+   an_equation <- as.character(coeffs_beamw[coeffs_beamw$a_metier==met,][1,'equ'])
+   if(length(grep('LOA' , an_equation))>0){
+      range_LOA <- range(df1_beamw[df1_beamw$metier==met, "LOA",], na.rm=TRUE)
+      LOA       <- seq(range_LOA[1], range_LOA[2], by=1)
+      plot(df1_beamw[df1_beamw$metier==met, "LOA",], df1_beamw[df1_beamw$metier==met, "beamw"], pch=16, col=df1_beamw[df1_beamw$metier==met, "the_colors"], xlab="LOA (metre)", ylab="Total gear weight (kg)", axes=FALSE, ylim=c(0,30))
+      lines(LOA, eval(parse(text= an_equation)))
+      }
+   if(length(grep('kW' , an_equation))>0){
+      range_kW <- range(df1_beamw[df1_beamw$metier==met, "kW",], na.rm=TRUE)
+      kW       <- seq(range_kW[1], range_kW[2], by=1)
+      plot(df1_beamw[df1_beamw$metier==met, "kW",], df1_beamw[df1_beamw$metier==met, "beamw"], pch=16, col=df1_beamw[df1_beamw$metier==met, "the_colors"], xlab="kW", ylab="Total gear weight (kg)", axes=FALSE, ylim=c(0,30))
+      lines(kW, eval(parse(text= an_equation)))
+      }
+ axis(1)
+ if(count==1) axis(2, las=2)
+  box()
+ title(met, cex=0.7)
+ count <- count+1
+}
+plot(0,0,type="n", axes=FALSE, xlab="", ylab="")
+legend("topright", legend=unique(df1_beamw$ctry), fill=unique(df1_beamw$the_colors), bty="n", cex=1.2, ncol=2)
+
+mtext(side=2, text="Beam width * nb. of trawls (metre)", line=2.5, outer=TRUE)
+savePlot(file=file.path(outPath, "plot_estimates_for_TBB_nls_beamw_vs_LOA_or_kW_per_metier.png"), type="png")
+
+# dev.off()
+
+
+
+
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## total gear weight vs. kW
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+# look at the representativity....
+df1$informedTotGW<- ifelse(is.na(an(df1$TotGW)) | an(df1$TotGW)==0,0,1)
+table(df1$ctry, df1$informedTotGW)
+
+# look at the representativity....
+df1$informedarea <- ifelse(as.character(df1$area)=='0',0,1)
+table(df1$ctry, df1$informedarea)
+
+
+
+# filter out the 0
+df1_TotGW <- df1[!is.na(df1$TotGW) & df1$TotGW!=0,]
+
+# plot beamw
+library(ggplot2)
+coeff_lm <- coef(lm(an(TotGW) ~ an(kW) , data = df1_TotGW))
+p <- ggplot(data=df1_TotGW, aes(x=an(kW),y=an(TotGW), color= factor(metier))) +
+      geom_point(aes(shape  = factor(metier), color= factor(metier))) +
+      stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      #stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=1,cc=1))
+      #stat_smooth( method="glm", family="poisson", formula='DoS~kW+metier')
+      # stat_smooth(method="lm")
+      facet_grid(. ~ metier, scales="free")
+
+update_labels(p, list(x = "kW", y="TotGW"))
+savePlot(file=file.path(outPath, "plot_TBB_TotGW_vs_kW_per_metier.png"), type="png")
+
+
+
+
+
 
 
 </code>
+
+For the DRB gear:
+
+<code>
+
+
+
+# plot (with ggplot2)
+library(ggplot2)
+
+# paths
+dataPath  <- file.path("C:", "BENTHIS", "data_gear_spec_questionnaire")
+outPath   <- file.path("C:", "BENTHIS", "data_gear_spec_questionnaire")
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+## DRB
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+
+
+# read file
+ind_IRE <- read.table(file= file.path(dataPath, 'DRB', 'DRB_IRE_28012014.csv'), sep=";", header=TRUE )
+
+# collate
+cols <- c('Anonymous.vessel_ID','Variable.name','Variable','Value')
+ind  <- rbind.data.frame (
+                          cbind(country="IRE", ind_IRE [, cols])
+                          )
+
+
+# explore
+head(ind [ind$Variable.name=="Dredge_model",])
+levels(ind$Variable.name)
+an <- function(x) as.numeric(as.character(x))
+
+
+CT  <- ind [ind$Variable.name=="Consumption_dredging", "Value"]
+CS  <- ind [ind$Variable.name=="Consumption_steaming", "Value"]
+kW  <- ind [ind$Variable.name=="Vessel_kW", "Value"]
+LOA <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
+dredgew <- ind [ind$Variable.name=="Dredge_width", "Value"]
+GrW <- ind [ind$Variable.name=="Dredge_weight", "Value"]
+sps <- ind [ind$Variable.name=="Targetspecies_single", "Value"]
+sp1 <- ind [ind$Variable.name=="Primarytarget_mixed", "Value"]
+sp2 <- ind [ind$Variable.name=="Secondarytarget_mixed", "Value"]
+sp3 <- ind [ind$Variable.name=="Thirdtarget_mixed", "Value"]
+bt  <- ind [ind$Variable.name=="Bottom_type", "Value"]
+nbt <- ind [ind$Variable.name=="Dredge_number", "Value"]
+sptr <- ind [ind$Variable.name=="Speed_dredging", "Value"]
+spst <- ind [ind$Variable.name=="Speed_steaming", "Value"]
+ctry <- ind [ind$Variable.name=="Dredge_number", "country"]
+area <- ind [ind$Variable.name=="Fishing_area", "Value"]
+
+# intermediate calculations
+TotGW   <- an(GrW) * an(nbt)
+TotGW[is.na(TotGW[1])] <- NA
+dredgew <- an(nbt) * an(dredgew)
+
+
+# then, collate:
+df1  <- cbind.data.frame(ctry,CT, CS, sptr, spst, kW, dredgew, LOA, GrW, nbt, TotGW, sps, sp1, sp2, sp3, bt, area)
+
+
+
+
+# refactor some variables (if needed)
+df1$LOA_class <- cut(an(df1$LOA), breaks=c(0,15,100))
+df1$sptr      <- cut(an(df1$sptr), breaks= seq(0,10,0.75))   # trawling speed
+
+
+# DCF metier coding
+df1$metier <- as.character(df1$sps) # init
+df1[df1$metier %in% c('SCE'), 'metier'] <- 'DRB_MOL'
+df1$metier <- as.factor(df1$metier)
+
+
+
+
+# area coding
+df1$area <- as.character(df1$area) # init
+df1$area <- as.factor(df1$area)
+
+
+
+# nb of observations per country
+ table(df1$ctry)
+
+# nb of observations per metier
+ table(df1$metier)
+
+# nb of observations per country per metier
+ table(df1$ctry,df1$metier)
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## dredge width vs. kW
+##-------------------------------------------------
+##-------------------------------------------------
+
+# look at the representativity....
+df1$informeddredgew <- ifelse(is.na(an(df1$dredgew)) | an(df1$dredgew)==0,0,1)
+table(df1$ctry, df1$informeddredgew)
+
+# look at the representativity....
+df1$informedarea <- ifelse(as.character(df1$area)=='0',0,1)
+table(df1$ctry, df1$informedarea)
+
+
+# look at the representativity....
+table(df1$ctry, df1$metier, df1$informeddredgew)
+
+# filter out the 0
+df1_dredgew <- df1[!is.na(df1$dredgew) & df1$dredgew!=0,]
+
+# plot dredgew
+library(ggplot2)
+coeff_lm <- coef(lm(an(dredgew) ~ an(kW) , data = df1_dredgew))
+p <- ggplot(data=df1_dredgew, aes(x=an(kW),y=an(dredgew), color= factor(metier))) +
+      geom_point(aes(shape  = factor(metier), color= factor(metier))) +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=1,cc=1))
+      #stat_smooth( method="glm", family="poisson", formula='DoS~kW+metier')
+      # stat_smooth(method="lm")
+update_labels(p, list(x = "kW", y="Dredge_width"))
+savePlot(file=file.path(outPath, "plot_TBB_nls_dredgew_vs_kW_per_metier.png"), type="png")
+
+
+# plot dredgew  nls fit with LOA and ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(dredgew) ~ an(kW) , data = df1_dredgew))
+p <- ggplot(data=df1_dredgew, aes(x=an(kW),y=an(dredgew))) +
+      geom_point(aes(shape  = factor(LOA_class), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+update_labels(p, list(x = "kW", y="Dredge_width"))
+savePlot(file=file.path(outPath, "plot_TBB_nls_dredgew_vs_kW_per_LOA_ctry.png"), type="png")
+
+
+##-----------------------------------------
+##-----------------------------------------
+## Export a table of parameters
+## for the Benthis vmstools R workflow
+## after having made a choice of the most relevant
+## categorisation
+##-----------------------------------------
+##-----------------------------------------
+
+# get the coeffs for TotGW~ LOA or kW
+coeffs_dredgew <- NULL
+df1_dredgew$dredgew   <-  an(df1_dredgewdredgew)
+df1_dredgew$LOA     <-  an(df1_dredgew$LOA)
+df1_dredgew$kW      <-  an(df1_dredgew$kW)
+df1_dredgew_c       <- df1_dredgew[!is.na(df1_dredgew$LOA) & !is.na(df1_dredgew$kW),]  # caution: keep complete cases for a true model comparison...
+for (a_metier in c("DRB_MOL")){
+   a_nls_kW        <- nls(dredgew~a*(kW^b), start=list(a=1,b=1),data=df1_dredgew_c[df1_dredgew_c$metier==a_metier,])
+   a_lm_kW         <- nls(dredgew~a*kW+b, start=list(a=1,b=1),data=df1_dredgew_c[df1_dredgew_c$metier==a_metier,])
+   a_nls_LOA       <- nls(dredgew~a*(LOA^b), start=list(a=1,b=1),data=df1_dredgew_c[df1_dredgew_c$metier==a_metier,])
+   a_lm_LOA        <- nls(dredgew~a*LOA+b, start=list(a=1,b=1),data=df1_dredgew_c[df1_dredgew_c$metier==a_metier,])
+
+   #compare goodness of fit
+   residualSum    <- anova (a_nls_LOA, a_lm_LOA, a_nls_kW, a_lm_kW)
+   what_is_chosen <- c('a_nls_LOA','a_lm_LOA','a_nls_kW','a_lm_kW') [which.min(residualSum[,2])]
+   print(what_is_chosen)
+
+   nb_records      <- nrow(df1_dredgew[df1_dredgew$metier==a_metier,])
+
+   # then choose the best model....
+   # (and re-run on the full dataset)
+   if(what_is_chosen=="a_nls_LOA") {
+       a_nls_LOA      <- nls(dredgew~a*(LOA^b), start=list(a=1,b=1), data=df1_dredgew[df1_dredgew$metier==a_metier,])  # redo with all the available data
+       coeffs_dredgew     <- rbind.data.frame (coeffs_dredgew,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_LOA)$coeff, equ="dredgew=a*(LOA^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_LOA"){
+       a_lm_LOA        <- nls(dredgew~a*LOA+b, start=list(a=1,b=1),data=df1_dredgew[df1_dredgew$metier==a_metier,])
+       coeffs_dredgew      <- rbind.data.frame (coeffs_dredgew,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_LOA)$coeff, equ="dredgew=(a*LOA)+b", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_nls_kW"){
+       a_nls_kW        <- nls(dredgew~a*(kW^b), start=list(a=1,b=1),data=df1_dredgew[df1_dredgew$metier==a_metier,])
+       coeffs_dredgew      <- rbind.data.frame (coeffs_dredgew,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_kW)$coeff, equ="dredgew=a*(kW^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_kW"){
+      a_lm_kW         <- nls(dredgew~a*kW+b, start=list(a=1,b=1),data=df1_dredgew[df1_dredgew$metier==a_metier,])
+      coeffs_dredgew      <- rbind.data.frame (coeffs_dredgew,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_kW)$coeff, equ="dredgew=(a*kW)+b", nb_records= nb_records))
+     }
+   }
+rownames(coeffs_dredgew) <- NULL
+
+
+# export
+write.table(coeffs_dredgew, file=file.path(outPath, "estimates_for_DRB_nls_dredgew_vs_LOA_or_kW_per_metier.txt"))
+# => for using this table in the workflow, partners should link each logbooks records to the metier categories found in that table...
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## do the correponding plot
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+#png(filename = file.path(outPath, paste("plot_estimates_for_DRB_nls_TotGW_vs_LOA_or_kW_per_metier.png",sep="")),
+#                                   width = 1100, height = 2400,
+#                                   units = "px", pointsize = 12,  res=300)   # high resolution plot
+windows(10,5)
+par(mfrow=c(1,2))
+par(oma=c(6,4,1,1))
+par(mar=c(4,0,2,1))
+df1_dredgew$the_colors   <- df1_dredgew$ctry
+#library(RColorBrewer)
+#the_colors <- brewer.pal(11, "Paired")
+#levels(df1_dredgew$the_colors) <- the_colors[1:length(unique(df1_dredgew$the_colors))]
+rgb.palette <- colorRampPalette(c("green", "red", "blue"),
+                                space = "Lab")
+levels(df1_dredgew$the_colors) <- rgb.palette (length(levels(df1_dredgew$the_colors)))
+df1_dredgew$the_colors <- as.character(df1_dredgew$the_colors)
+
+
+count <-1
+for (met in c("DRB_MOL")){
+   a           <- coeffs_dredgew[coeffs_dredgew$a_metier==met & coeffs_dredgew$param=='a', 'Estimate']
+   b           <- coeffs_dredgew[coeffs_dredgew$a_metier==met  & coeffs_dredgew$param=='b', 'Estimate']
+   an_equation <- as.character(coeffs_dredgew[coeffs_dredgew$a_metier==met,][1,'equ'])
+   if(length(grep('LOA' , an_equation))>0){
+      range_LOA <- range(df1_dredgew[df1_dredgew$metier==met, "LOA",], na.rm=TRUE)
+      LOA       <- seq(range_LOA[1], range_LOA[2], by=1)
+      plot(df1_dredgew[df1_dredgew$metier==met, "LOA",], df1_dredgew[df1_dredgew$metier==met, "dredgew"], pch=16, col=df1_dredgew[df1_dredgew$metier==met, "the_colors"], xlab="LOA (metre)", ylab="Total gear weight (kg)", axes=FALSE, ylim=c(0,30))
+      lines(LOA, eval(parse(text= an_equation)))
+      }
+   if(length(grep('kW' , an_equation))>0){
+      range_kW <- range(df1_dredgew[df1_dredgew$metier==met, "kW",], na.rm=TRUE)
+      kW       <- seq(range_kW[1], range_kW[2], by=1)
+      plot(df1_dredgew[df1_dredgew$metier==met, "kW",], df1_dredgew[df1_dredgew$metier==met, "dredgew"], pch=16, col=df1_dredgew[df1_dredgew$metier==met, "the_colors"], xlab="kW", ylab="Total gear weight (kg)", axes=FALSE, ylim=c(0,30))
+      lines(kW, eval(parse(text= an_equation)))
+      }
+ axis(1)
+ if(count==1) axis(2, las=2)
+  box()
+ title(met, cex=0.7)
+ count <- count+1
+}
+plot(0,0,type="n", axes=FALSE, xlab="", ylab="")
+legend("topright", legend=unique(df1_dredgew$ctry), fill=unique(df1_dredgew$the_colors), bty="n", cex=1.2, ncol=2)
+
+mtext(side=2, text="Dredge width * nb. of trawls (metre)", line=2.5, outer=TRUE)
+savePlot(file=file.path(outPath, "plot_estimates_for_DRB_nls_dredgew_vs_LOA_or_kW_per_metier.png"), type="png")
+
+# dev.off()
+
+
+
+
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## total gear weight vs. kW
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+# look at the representativity....
+df1$informedTotGW<- ifelse(is.na(an(df1$TotGW)) | an(df1$TotGW)==0,0,1)
+table(df1$ctry, df1$informedTotGW)
+
+#=> GEAR WEIGHT NOT INFORMED! USE LITTERATURE INSTEAD.............
+
+
+
+
+</code>
+
+For the seine gear:
+
+<code>
+
+
+
+# plot (with ggplot2)
+library(ggplot2)
+
+# paths
+dataPath  <- file.path("C:", "BENTHIS", "data_gear_spec_questionnaire")
+outPath   <- file.path("C:", "BENTHIS", "data_gear_spec_questionnaire")
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+## DS
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+
+
+# read file
+ind_DK  <- read.table(file= file.path(dataPath, 'DS', 'DS_DK_04022014.csv'), sep=";", header=TRUE )
+ind_NOR  <- read.table(file= file.path(dataPath, 'DS', 'DS_NOR_29012014.csv'), sep=";", header=TRUE )
+
+# collate
+cols <- c('Anonymous.vessel_ID','Variable.name','Variable','Value')
+ind  <- rbind.data.frame (
+                          cbind(country="DK", ind_DK [, cols]),
+                          cbind(country="NOR", ind_NOR [, cols])
+                          )
+
+
+# explore
+head(ind [ind$Variable.name=="Seine_model",])
+levels(ind$Variable.name)
+an <- function(x) as.numeric(as.character(x))
+
+
+CT  <- ind [ind$Variable.name=="Consumption_fishing", "Value"]
+CS  <- ind [ind$Variable.name=="Consumption_steaming", "Value"]
+kW  <- ind [ind$Variable.name=="Vessel_kW", "Value"]
+LOA <- ind [ind$Variable.name=="Vessel_LOA", "Value"]
+seineropel <- ind [ind$Variable.name=="Seinerope_length", "Value"]
+GrW <- ind [ind$Variable.name=="Groundgear_weight", "Value"]
+GrL <- ind [ind$Variable.name=="Groundgear_length", "Value"]
+sps <- ind [ind$Variable.name=="Targetspecies_single", "Value"]
+sp1 <- ind [ind$Variable.name=="Primarytarget_mixed", "Value"]
+sp2 <- ind [ind$Variable.name=="Secondarytarget_mixed", "Value"]
+sp3 <- ind [ind$Variable.name=="Thirdtarget_mixed", "Value"]
+bt  <- ind [ind$Variable.name=="Bottom_type", "Value"]
+spst <- ind [ind$Variable.name=="Speed_steaming", "Value"]
+area <- ind [ind$Variable.name=="Fishing_area", "Value"]
+ctry <- ind [ind$Variable.name=="Seinerope_length", "country"]
+mesh <- ind [ind$Variable.name=="Codend_meshsize", "Value"]
+gear <-  ind [ind$Variable.name=="Seine_model", "Value"]
+
+# then, collate:
+df1  <- cbind.data.frame(ctry,CT, CS, spst, kW, seineropel, LOA, GrW, GrL, sps, sp1, sp2, sp3, area, mesh, gear)
+
+
+
+
+# refactor some variables (if needed)
+df1$LOA_class <- cut(an(df1$LOA), breaks=c(0,15,100))
+df1$mesh      <- cut(an(df1$mesh), breaks= seq(0,140,30))   # codend mesh size
+
+
+# DCF metier coding
+df1$metier <- as.character(df1$gear) # init
+df1[df1$metier %in% c('Danish'), 'metier'] <- 'SDN_DEM'
+df1[df1$metier %in% c('Scottish'), 'metier'] <- 'SSC_DEM'
+df1$metier <- as.factor(df1$metier)
+
+
+
+
+# area coding
+df1$area <- as.character(df1$area) # init
+df1[df1$area %in% c('IIIa', 'IIIan', 'IIIas', 'IIIast'), 'area'] <- 'kask'
+df1[df1$area %in% c('II','IV', 'IVa', 'IVb', 'IVbc','IVc', 'Ivb', 'IV/VII/VIII', 'IV/VII'), 'area'] <- 'nsea'
+df1[df1$area %in% c('IIIc', 'IIId', '25'), 'area'] <- 'bsea'
+df1[df1$area %in% c('VII','Vb1','VIa', "VIII"), 'area'] <- 'csea'
+#df1[df1$area %in% c('2.1', '1.3', '2.2', '1.2','0','1.1',''), 'area'] <- 'msea'
+df1[df1$area %in% c('0',''), 'area'] <- 'ni'
+df1[df1$area %in% c('Black Sea, Samsun Shelf Area (SSA)'), 'area'] <- 'blsea'
+df1[df1$area %in% c('Barentshave'), 'area'] <- 'barsea'
+df1$area <- as.factor(df1$area)
+
+
+
+# nb of observations per country
+ table(df1$ctry)
+
+# nb of observations per metier
+ table(df1$metier)
+
+# nb of observations per country per metier
+ table(df1$ctry,df1$metier)
+
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## beam width vs. kW
+##-------------------------------------------------
+##-------------------------------------------------
+
+# look at the representativity....
+df1$informedseineropel <- ifelse(is.na(an(df1$seineropel)) | an(df1$seineropel)==0,0,1)
+table(df1$ctry, df1$informedseineropel)
+
+# look at the representativity....
+df1$informedarea <- ifelse(as.character(df1$area)=='0',0,1)
+table(df1$ctry, df1$informedarea)
+
+
+# look at the representativity....
+table(df1$ctry, df1$metier, df1$informedseineropel)
+
+# filter out the 0
+df1_seineropel <- df1[!is.na(df1$seineropel) & df1$seineropel!=0,]
+
+
+# plot seineropel  nls fit with LOA and ctry
+library(ggplot2)
+coeff_lm <- coef(lm(an(seineropel) ~ an(kW) , data = df1_seineropel))
+p <- ggplot(data=df1_seineropel, aes(x=an(kW),y=an(seineropel))) +
+      geom_point(aes(shape  = factor(LOA_class), color= factor(ctry))) +
+      #stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      facet_grid(. ~ metier, scales="free") +
+      stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=50,cc=1))
+update_labels(p, list(x = "kW", y="Seine rope length"))
+savePlot(file=file.path(outPath, "plot_DS_nls_seineropel_vs_kW_per_LOA_ctry.png"), type="png")
+
+
+##-----------------------------------------
+##-----------------------------------------
+## Export a table of parameters
+## for the Benthis vmstools R workflow
+## after having made a choice of the most relevant
+## categorisation
+##-----------------------------------------
+##-----------------------------------------
+
+# get the coeffs for GrW~ LOA or kW
+coeffs_seineropel <- NULL
+df1_seineropel$seineropel   <-  an(df1_seineropel$seineropel)
+df1_seineropel$LOA     <-  an(df1_seineropel$LOA)
+df1_seineropel$kW      <-  an(df1_seineropel$kW)
+df1_seineropel_c       <- df1_seineropel[!is.na(df1_seineropel$LOA) & !is.na(df1_seineropel$kW),]  # caution: keep complete cases for a true model comparison...
+for (a_metier in c("SDN_DEM", "SSC_DEM")){
+   a_nls_kW        <- nls(seineropel~a*(kW^b), start=list(a=100,b=1),data=df1_seineropel_c[df1_seineropel_c$metier==a_metier,])
+   a_lm_kW         <- nls(seineropel~a*kW+b, start=list(a=100,b=1),data=df1_seineropel_c[df1_seineropel_c$metier==a_metier,])
+   a_nls_LOA       <- nls(seineropel~a*(LOA^b), start=list(a=100,b=1),data=df1_seineropel_c[df1_seineropel_c$metier==a_metier,])
+   a_lm_LOA        <- nls(seineropel~a*LOA+b, start=list(a=100,b=1),data=df1_seineropel_c[df1_seineropel_c$metier==a_metier,])
+
+   #compare goodness of fit
+   residualSum    <- anova (a_nls_LOA, a_lm_LOA, a_nls_kW, a_lm_kW)
+   what_is_chosen <- c('a_nls_LOA','a_lm_LOA','a_nls_kW','a_lm_kW') [which.min(residualSum[,2])]
+   print(what_is_chosen)
+
+   nb_records      <- nrow(df1_seineropel[df1_seineropel$metier==a_metier,])
+
+   # then choose the best model....
+   # (and re-run on the full dataset)
+   if(what_is_chosen=="a_nls_LOA") {
+       a_nls_LOA      <- nls(seineropel~a*(LOA^b), start=list(a=100,b=1), data=df1_seineropel[df1_seineropel$metier==a_metier,])  # redo with all the available data
+       coeffs_seineropel     <- rbind.data.frame (coeffs_seineropel,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_LOA)$coeff, equ="seineropel=a*(LOA^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_LOA"){
+       a_lm_LOA        <- nls(seineropel~a*LOA+b, start=list(a=100,b=1),data=df1_seineropel[df1_seineropel$metier==a_metier,])
+       coeffs_seineropel      <- rbind.data.frame (coeffs_seineropel,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_LOA)$coeff, equ="seineropel=(a*LOA)+b", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_nls_kW"){
+       a_nls_kW        <- nls(seineropel~a*(kW^b), start=list(a=1,b=1),data=df1_seineropel[df1_seineropel$metier==a_metier,])
+       coeffs_seineropel      <- rbind.data.frame (coeffs_seineropel,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_nls_kW)$coeff, equ="seineropel=a*(kW^b)", nb_records= nb_records))
+       }
+   if(what_is_chosen=="a_lm_kW"){
+      a_lm_kW         <- nls(seineropel~a*kW+b, start=list(a=1,b=1),data=df1_seineropel[df1_seineropel$metier==a_metier,])
+      coeffs_seineropel      <- rbind.data.frame (coeffs_seineropel,  cbind.data.frame(a_metier, param=c('a','b'), summary(a_lm_kW)$coeff, equ="seineropel=(a*kW)+b", nb_records= nb_records))
+     }
+   }
+rownames(coeffs_seineropel) <- NULL
+
+
+# export
+write.table(coeffs_seineropel, file=file.path(outPath, "estimates_for_DS_nls_seineropel_vs_LOA_or_kW_per_metier.txt"))
+# => for using this table in the workflow, partners should link each logbooks records to the metier categories found in that table...
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## do the correponding plot
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+#png(filename = file.path(outPath, paste("plot_estimates_for_DS_nls_GrW_vs_LOA_or_kW_per_metier.png",sep="")),
+#                                   width = 1100, height = 2400,
+#                                   units = "px", pointsize = 12,  res=300)   # high resolution plot
+windows(10,5)
+par(mfrow=c(1,3))
+par(oma=c(6,4,1,1))
+par(mar=c(4,2.8,2,1))
+df1_seineropel$the_colors   <- df1_seineropel$ctry
+#library(RColorBrewer)
+#the_colors <- brewer.pal(11, "Paired")
+#levels(df1_seineropel$the_colors) <- the_colors[1:length(unique(df1_seineropel$the_colors))]
+rgb.palette <- colorRampPalette(c("green", "red", "blue"),
+                                space = "Lab")
+levels(df1_seineropel$the_colors) <- rgb.palette (length(levels(df1_seineropel$the_colors)))
+df1_seineropel$the_colors <- as.character(df1_seineropel$the_colors)
+
+
+count <-1
+for (a_metier in c("SDN_DEM", "SSC_DEM")){
+   a           <- coeffs_seineropel[coeffs_seineropel$a_metier==a_metier & coeffs_seineropel$param=='a', 'Estimate']
+   b           <- coeffs_seineropel[coeffs_seineropel$a_metier==a_metier  & coeffs_seineropel$param=='b', 'Estimate']
+   an_equation <- as.character(coeffs_seineropel[coeffs_seineropel$a_metier==a_metier,][1,'equ'])
+   if(length(grep('LOA' , an_equation))>0){
+      range_LOA <- range(df1_seineropel[df1_seineropel$metier==a_metier, "LOA",], na.rm=TRUE)
+      LOA       <- seq(range_LOA[1], range_LOA[2], by=1)
+      plot(df1_seineropel[df1_seineropel$metier==a_metier, "LOA",], df1_seineropel[df1_seineropel$metier==a_metier, "seineropel"], pch=16, col=df1_seineropel[df1_seineropel$metier==a_metier, "the_colors"], xlab="LOA (metre)", ylab="Seine rope length (m)", axes=FALSE, ylim=c(0,7000))
+      lines(LOA, eval(parse(text= an_equation)))
+      }
+   if(length(grep('kW' , an_equation))>0){
+      range_kW <- range(df1_seineropel[df1_seineropel$metier==a_metier, "kW",], na.rm=TRUE)
+      kW       <- seq(range_kW[1], range_kW[2], by=1)
+      plot(df1_seineropel[df1_seineropel$metier==a_metier, "kW",], df1_seineropel[df1_seineropel$metier==a_metier, "seineropel"], pch=16, col=df1_seineropel[df1_seineropel$metier==a_metier, "the_colors"], xlab="kW", ylab="Seine rope length (m)", axes=FALSE, ylim=c(0,7000))
+      lines(kW, eval(parse(text= an_equation)))
+      }
+ axis(1)
+ if(count==1) axis(2, las=2)
+  box()
+ title(a_metier, cex=0.7)
+ count <- count+1
+}
+plot(0,0,type="n", axes=FALSE, xlab="", ylab="")
+legend("topright", legend=unique(df1_seineropel$ctry), fill=unique(df1_seineropel$the_colors), bty="n", cex=1.2, ncol=2)
+
+mtext(side=2, text="Seine rope length (metre)", line=2.5, outer=TRUE)
+savePlot(file=file.path(outPath, "plot_estimates_for_DS_nls_seineropel_vs_LOA_or_kW_per_metier.png"), type="png")
+
+# dev.off()
+
+
+
+
+
+
+
+##-------------------------------------------------
+##-------------------------------------------------
+## total gear weight vs. kW
+##-------------------------------------------------
+##-------------------------------------------------
+
+
+# look at the representativity....
+df1$informedGrW<- ifelse(is.na(an(df1$GrW)) | an(df1$GrW)==0,0,1)
+table(df1$ctry, df1$informedGrW)
+
+# look at the representativity....
+df1$informedarea <- ifelse(as.character(df1$area)=='0',0,1)
+table(df1$ctry, df1$informedarea)
+
+
+
+# filter out the 0
+df1_GrW <- df1[!is.na(df1$GrW) & df1$GrW!=0,]
+
+# plot seineropel
+library(ggplot2)
+coeff_lm <- coef(lm(an(GrW) ~ an(kW) , data = df1_GrW))
+p <- ggplot(data=df1_GrW, aes(x=an(kW),y=an(GrW), color= factor(metier))) +
+      geom_point(aes(shape  = factor(metier), color= factor(metier))) +
+      stat_smooth(method="lm") +
+      #geom_abline(intercept = coeff_lm[1], slope = coeff_lm[2]) +
+      #stat_smooth( method="nls", formula='y~b*(x^cc)', se=FALSE, start=list(b=1,cc=1))
+      #stat_smooth( method="glm", family="poisson", formula='DoS~kW+metier')
+      # stat_smooth(method="lm")
+      facet_grid(. ~ metier, scales="free")
+
+update_labels(p, list(x = "kW", y="GrW"))
+savePlot(file=file.path(outPath, "plot_DS_GrW_vs_kW_per_metier.png"), type="png")
+
+
+
+
+
+
+
+</code>
+
+
+
+
+
