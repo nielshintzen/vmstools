@@ -2,7 +2,7 @@
 
 = Introduction =
 
-Example of an R code to proceed the OT gear data is given as illustration. Equivalent coding is applied for TBB, DS and DRB gear data (with some adjustments). The final product is a table of parameters defining the relationships to be used in the BENTHIS WP2 workflow. This table will be disseminated by mails to partners so that they can incorporate it to the workflow.
+The R code to proceed the gear data obtained from the questionnaire survey is given as illustration. Equivalent coding is applied for OT, TBB, DS and DRB gear data (with some specifics for each of them). The final product is a table of parameters defining the relationships to be used in the BENTHIS WP2 workflow. This table will be disseminated by mails to partners so that they can incorporate it to the workflow. Note that some BENTHIS metier are defined on the way which suppose that each EFLALO metier should be linked to them in advance of using the table in the workflow. It is basically one line of code that each partner should incorporate in their own workflow to convert the eflalo metier to the BENTHIS metier categorization, like for example levels(eflalo$LE_MET) <- c('OT_CRU', 'OT_DEM', 'OT_MIX', etc.)
 
 
 = Details =
@@ -1741,8 +1741,6 @@ savePlot(file=file.path(outPath, "plot_DS_GrW_vs_kW_per_metier.png"), type="png"
 
 
 </code>
-
-
 
 
 
