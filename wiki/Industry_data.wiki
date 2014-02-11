@@ -107,7 +107,7 @@ ind  <- rbind.data.frame (
                           cbind(country="MED", ind_MED [, cols]),
                           cbind(country="NOR", ind_NOR [, cols]),
                           cbind(country="BEL", ind_BEL [, cols]),
-                          cbind(country="FRA", ind_BEL [, cols]),
+                          cbind(country="FRA", ind_FRA [, cols]),
                           cbind(country="GRE", ind_GRE [, cols])
                           )
 
