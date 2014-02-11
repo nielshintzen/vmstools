@@ -2,7 +2,11 @@
 
 = Introduction =
 
-The R code to proceed the gear data obtained from the questionnaire survey is given as illustration. Equivalent coding is applied for OT, TBB, DS and DRB gear data (with some specifics for each of them). The final product is a table of parameters (estimates_for_gear_param_per_metier.txt) defining the relationships to be used in the BENTHIS WP2 workflow. This table will be disseminated by mails to partners so that they can incorporate it to the BENTHIS WP2 workflow. Note that some BENTHIS metiers (e.g. OT_CRU, etc.) are defined on the way which suppose that each EFLALO metier (e.g. OTB_CRU_70-89_2_35) should be linked to them in advance of using the table in the BENTHIS WP2 workflow. To proceed, it is basically one line of code that each partner should incorporate in their own workflow to convert the eflalo metier into the BENTHIS metier categorization. This could be for example levels(tacsatp$LE_MET) <- c('OT_CRU', 'OT_DEM', 'OT_MIX', etc.).
+The R code to proceed the gear data obtained from the questionnaire survey is given as illustration. Equivalent coding is applied for OT, TBB, DS and DRB gear data (with some specifics for each of them). The final product is a table of parameters (estimates_for_gear_param_per_metier.txt) defining the relationships to be used in the BENTHIS WP2 workflow.
+
+This table will be disseminated by mails to partners so that they can incorporate it to the BENTHIS WP2 workflow. 
+
+Note that some BENTHIS metiers (e.g. OT_CRU, etc.) are defined on the way which suppose that each EFLALO metier (e.g. OTB_CRU_70-89_2_35) should be linked to them in advance of using the table in the BENTHIS WP2 workflow. To proceed, it is basically one line of code that each partner should incorporate in their own workflow to convert the eflalo metier into the BENTHIS metier categorization. This could be for example levels(tacsatp$LE_MET) <- c('OT_CRU', 'OT_DEM', 'OT_MIX', etc.).
 
 
 = Details =
@@ -1436,7 +1440,9 @@ table(df1$ctry, df1$informedTotGW)
 
 </code>
 
-For the demersal seine gear, the length of the rope are related either to vessel kW or LOA. The calculation of the  swept area require further assumption related to the shape of the netting and the haul duration. These assumptions are within the BENTHIS WP2 workflow when it comes to compute the swept area from the length of the rope (in brief it has been assumed that the average duration of a fishing event is 3 hours and the shape is a circle area centered on the fishing ping, no difference between Danish and Scottish seiners which is an approximation).  
+For the demersal seine gear, the length of the rope is related either to vessel kW or LOA. The calculation of the swept area of a given fishing event require further assumptions related to the shape of the fishing gear deployment and the duration of the fishing event. These assumptions are incorporated within the BENTHIS WP2 workflow when it comes to compute the swept area from the length of the rope
+
+(in brief it has been assumed that the average duration of a fishing event is 3 hours and the shape is a circle area centered on the fishing ping, no difference between Danish and Scottish seiners which is an approximation).  
 
 <code>
 
