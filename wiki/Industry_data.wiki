@@ -2,13 +2,13 @@
 
 = Introduction =
 
-The R code to proceed the gear data obtained from the questionnaire survey is given as illustration. Equivalent coding is applied for OT, TBB, DS and DRB gear data (with some specifics for each of them). The final product is a table of parameters defining the relationships to be used in the BENTHIS WP2 workflow. This table will be disseminated by mails to partners so that they can incorporate it to the workflow. Note that some BENTHIS metier are defined on the way which suppose that each EFLALO metier should be linked to them in advance of using the table in the workflow. It is basically one line of code that each partner should incorporate in their own workflow to convert the eflalo metier to the BENTHIS metier categorization, like for example levels(eflalo$LE_MET) <- c('OT_CRU', 'OT_DEM', 'OT_MIX', etc.)
+The R code to proceed the gear data obtained from the questionnaire survey is given as illustration. Equivalent coding is applied for OT, TBB, DS and DRB gear data (with some specifics for each of them). The final product is a table of parameters (estimates_for_gear_param_per_metier.txt) defining the relationships to be used in the BENTHIS WP2 workflow. This table will be disseminated by mails to partners so that they can incorporate it to the BENTHIS WP2 workflow. Note that some BENTHIS metiers (e.g. OT_CRU, etc.) are defined on the way which suppose that each EFLALO metier (e.g. OTB_CRU_70-89_2_35) should be linked to them in advance of using the table in the BENTHIS WP2 workflow. To proceed, it is basically one line of code that each partner should incorporate in their own workflow to convert the eflalo metier into the BENTHIS metier categorization. This could be for example levels(eflalo$LE_MET) <- c('OT_CRU', 'OT_DEM', 'OT_MIX', etc.).
 
 
 = Details =
 
 
-Hereafter, the code to incorporate the parameter table into the BENTHIS WP2 workflow:
+Hereafter, the R code to incorporate the parameter table (estimates_for_gear_param_per_metier.txt) into the BENTHIS WP2 workflow which assign a gear width to each metier of each vessel recorded in the tacsatp merged data, further accounting for uncertainties by defining a lower and upper estimates of the gear width (or length of the rope for seiners):
 
 
 <code>
@@ -1744,4 +1744,3 @@ savePlot(file=file.path(outPath, "plot_DS_GrW_vs_kW_per_metier.png"), type="png"
 
 
 </code>
-
