@@ -723,6 +723,10 @@ maps might be available in raster types only (already gridded files such as a TI
 
   * severity of activity: read in a look-up table (from interviews / experimental studies)
 
+This should make use of the info we know about sub-component of the gears. Look at the Table 6.1 in the Deliverable 1.1b, the four gear types are described and broken down into individual components. The gear-seabed contact by component is conceptualized in “gear footprints” of each gear. These footprints form the basis of an industry questionnaire designed to deliver information of the dimensions of the individual gear components for those gears currently in use in European and Turkish fisheries.
+
+This table is about to be produced, but for the time being hereafter a fake example below:
+
 
 <code>  
   ## by gear/metier by habitat
