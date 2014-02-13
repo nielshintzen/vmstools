@@ -62,7 +62,9 @@ Make sure that the fishing activities / metier (the 'LE_MET' column in eflalo) i
 
 === Country specific variables ===
 
+<code>  
 VMS_ping_rate_in_hour <- 2 
+</code>  
  
 === load VMStools additional datasets ===
 <code>  
