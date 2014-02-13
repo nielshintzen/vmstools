@@ -283,6 +283,8 @@ read into the workflow.
 
 This is making use of a table of parameters specifying the relationships linking gear widths (dorr spread or beam witdh or dregge width or length of the seine rope) to vessel specifications (KW or LOA). Please remember that before making this step you first need to link your metier definition to the BENTHIS metier classification includedc in this table.
 
+<code>
+
 # import the param table obtained from the industry_data R analyses
  gear_param_per_metier       <- read.table(file=file.path(outPath, "estimates_for_gear_param_per_metier.txt"))
 
@@ -312,7 +314,7 @@ This is making use of a table of parameters specifying the relationships linking
                                all.x=T,all.y=F)
  save(tacsatp,   file=file.path(outPath,"tacsatMergedWidth.RData"))
 
-
+</code> 
 
 === Separate tacsat that is not merged ===
 <code>  
