@@ -395,11 +395,13 @@ if(TRUE){
          #- Correct for HL_ID skipping
          #tacsatIntGearVEREF$HL_ID[which(diff(as.numeric(tacsatIntGearVEREF$HL_ID))<0)] <- tacsatIntGearVEREF$HL_ID[(which(diff(as.numeric(tacsatIntGearVEREF$HL_ID))<0)-1)]
 
-         #  the swept area (note that could work oustide the loop area as well....)
+        #  the swept area (note that could work oustide the loop area as well....)
          tacsatIntGearVEREF$SWEPT_AREA_KM2 <- NA
-         tacsatIntGearVEREF$SWEPT_AREA_KM2 <- distance(c(tacsatIntGearVEREF$SI_LONG[-1],0),  c(tacsatIntGearVEREF$SI_LATI[-1],0),
-                                                tacsatIntGearVEREF$SI_LONG,           tacsatIntGearVEREF$SI_LATI) *
-                                              tacsatIntGearVEREF$GEAR_WIDTH
+         a_dist <- distance(c(tacsatIntGearVEREF$SI_LONG[-1],0),  c(tacsatIntGearVEREF$SI_LATI[-1],0),
+                                                tacsatIntGearVEREF$SI_LONG, tacsatIntGearVEREF$SI_LATI) 
+         tacsatIntGearVEREF$SWEPT_AREA_KM2 <- a_dist * tacsatIntGearVEREF$GEAR_WIDTH
+         tacsatIntGearVEREF$SWEPT_AREA_KM2_LOWER <- a_dist * tacsatIntGearVEREF$GEAR_WIDTH_LOWER
+         tacsatIntGearVEREF$SWEPT_AREA_KM2_UPPER <- a_dist * tacsatIntGearVEREF$GEAR_WIDTH_UPPER
 
          save(tacsatIntGearVEREF, file=file.path(outPath, "interpolated",
           paste("tacsatSweptArea_",iVE_REF, "_", iGr, ".RData", sep="")))
@@ -408,7 +410,7 @@ if(TRUE){
     }
 
 
-  # for seiners 
+ # for seiners 
   all_gears            <- sort(unique(tacsatp$LE_GEAR))
   seine_gears          <- c('SDN', 'SSC') 
 
@@ -423,10 +425,17 @@ if(TRUE){
 
 
     tacsatpGearVEREF$SWEPT_AREA_KM2         <- pi*(tacsatpGearVEREF$GEAR_WIDTH/(2*pi))^2
+    tacsatpGearVEREF$SWEPT_AREA_KM2_LOWER   <- pi*(tacsatpGearVEREF$GEAR_WIDTH_LOWER/(2*pi))^2
+    tacsatpGearVEREF$SWEPT_AREA_KM2_UPPER   <- pi*(tacsatpGearVEREF$GEAR_WIDTH_UPPER/(2*pi))^2
+
     haul_duration                           <- 3 # assumption of a mean duration based from questionnaires to seiners
     tacsatpGearVEREF$SWEPT_AREA_KM2         <- tacsatpGearVEREF$SWEPT_AREA_KM2 * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
+    tacsatpGearVEREF$SWEPT_AREA_KM2_LOWER         <- tacsatpGearVEREF$SWEPT_AREA_KM2_LOWER * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
+    tacsatpGearVEREF$SWEPT_AREA_KM2_UPPER         <- tacsatpGearVEREF$SWEPT_AREA_KM2_UPPER * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
     idx                                     <- grep('SSC', as.character(tacsatpGearVEREF$LE_GEAR))
     tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] <- tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] *1.5 # ad hoc correction to account for the SSC specificities
+    tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2_LOWER'] <- tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2_LOWER'] *1.5 # ad hoc correction to account for the SSC specificities
+    tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2_UPPER'] <- tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2_UPPER'] *1.5 # ad hoc correction to account for the SSC specificities
 
     tacsatIntGearVEREF <- tacsatpGearVEREF
      
@@ -434,6 +443,7 @@ if(TRUE){
        paste("tacsatSweptArea_",iVE_REF, "_", iGr, ".RData", sep="")))
   }
  }
+ 
  
  
  
