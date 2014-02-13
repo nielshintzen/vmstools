@@ -10,8 +10,7 @@ Please note that at this stage (May 2013), VMStools will only operate on R-2.15.
 
 ==workflow==
 
-Please find below an example workflow to treat VMS and Logbook in a systematic manner to create swept area maps.
-
+Please find below an example workflow to treat VMS and Logbook in a systematic manner to create pressure maps (swept area and severity). The workflow should ultimately produce a dataset with VMS positions coupled to an estimate of swept area per VMS ping for each country, further combined across countries. Swept areas are further broken-down to each of the sub-components of the gear and these sub-components are assigned a specific severity of impact.
 
 === Installing VMStools ===
   * The VMStools software is available [http://code.google.com/p/vmstools/downloads/list here]
