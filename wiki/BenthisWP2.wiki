@@ -476,7 +476,7 @@ for(iGr in towed_gears){
 
     #- Interpolate according to the cubic-hermite spline interpolation
     interpolationcHs <- interpolateTacsat(tacsatpGearVEREF,
-                          interval=120, # note that the ping rate is likely to be specific to the country
+                          interval=120, # ADAPT TO YOUR COUNTRY (in MINUTES) because note that the ping rate is likely to be specific to the country
                           margin=10, # i.e. will make disconnected interpolations if interval out of the 110 130 min range
                           res=100,
                           method="cHs",
@@ -525,11 +525,15 @@ For those vessels where we cannot interpolate (because it doesn't make sense,
 we can apply a certain buffer area, representing some sort of circle around a
 VMS ping. To derive the swept area from that circle we apply simple mathematics.
 
+This step is concerning Danish and Scottish seines where the swept area is deduced from the total length of the rope (stored in the (confusing for this case) LE_GEAR_WIDTH field). 
+
+Note that all passive gears such as gillnets, pots, etc. have been previously removed from the workflow because considered irrelevant for bottom impact assessment in WP2.
+ 
 We do that here for those gear types that were not in our towed_gear list.
 
 <code>
 all_gears            <- sort(unique(tacsatp$LE_GEAR))
-passive_gears        <- all_gears[!all_gears %in% towed_gears] # Scottish and Danish seiners here (all other passisve gear should have been removed before because irrelevant for bottom impact).
+passive_gears        <- all_gears[!all_gears %in% towed_gears] # Scottish and Danish seiners here (all other passive gears should have been removed earlier because irrelevant for bottom impact).
 for(iGr in passive_gears){
   tacsatpGear        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==iGr,]
 
@@ -539,7 +543,7 @@ for(iGr in passive_gears){
   
     tacsatpGearVEREF$SWEPT_AREA_KM2 <- pi*(tacsatpGearVEREF$LE_GEAR_WIDTH/(2*pi))^2
 
-  ping_rate                               <- 1 #!!CAUTION: ADAPT TO YOUR COUNTRY (UNIT IN HOUR)!!# 
+   ping_rate                               <- 1 #!!CAUTION: ADAPT TO YOUR COUNTRY (UNIT IN HOUR)!!# 
     haul_duration                           <- 3 # assumption of a mean duration based from questionnaires to seiners
     tacsatpGearVEREF$SWEPT_AREA_KM2         <- tacsatpGearVEREF$SWEPT_AREA_KM2 * ping_rate / haul_duration # correction to avoid counting the same circle are several time.
     idx                                     <- grep('SSC', as.character(tacsatpGearVEREF$LE_GEAR))
