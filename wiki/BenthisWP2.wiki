@@ -541,7 +541,7 @@ and the width of the gear.
 tacsatIntGearVEREF$SWEPT_AREA_KM2 <- NA
 tacsatIntGearVEREF$SWEPT_AREA_KM2 <- distance(c(tacsatIntGearVEREF$SI_LONG[-1],0),  c(tacsatIntGearVEREF$SI_LATI[-1],0),
                                                 tacsatIntGearVEREF$SI_LONG,           tacsatIntGearVEREF$SI_LATI) *
-                                              tacsatIntGearVEREF$GEAR_WIDTH
+                                         tacsatIntGearVEREF$GEAR_WIDTH
 </code>
 
 === Buffer area ===
@@ -572,8 +572,8 @@ for(iGr in seine_gears){
 
     haul_duration                           <- 3 # assumption of a mean duration based from questionnaires to seiners
     tacsatpGearVEREF$SWEPT_AREA_KM2         <- tacsatpGearVEREF$SWEPT_AREA_KM2 * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
-    tacsatpGearVEREF$SWEPT_AREA_LOWER         <- tacsatpGearVEREF$SWEPT_AREA_KM2_LOWER * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
-    tacsatpGearVEREF$SWEPT_AREA_UPPER         <- tacsatpGearVEREF$SWEPT_AREA_KM2_UPPER * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
+    tacsatpGearVEREF$SWEPT_AREA_KM2_LOWER         <- tacsatpGearVEREF$SWEPT_AREA_KM2_LOWER * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
+    tacsatpGearVEREF$SWEPT_AREA_KM2_UPPER         <- tacsatpGearVEREF$SWEPT_AREA_KM2_UPPER * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
     idx                                     <- grep('SSC', as.character(tacsatpGearVEREF$LE_GEAR))
     tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] <- tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] *1.5 # ad hoc correction to account for the SSC specificities
     tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2_LOWER'] <- tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2_LOWER'] *1.5 # ad hoc correction to account for the SSC specificities
