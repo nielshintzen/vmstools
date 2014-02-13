@@ -263,7 +263,7 @@ if(TRUE){
  }
  save(GearWidth, file=file.path(dataPath,"gearWidth.RData"))
  load(file.path(dataPath, "gearWidth.RData"))
- tacsatp                     <- merge(tacsatp, fakeGearWidth,by=c("VE_REF","LE_MET"),
+ tacsatp                     <- merge(tacsatp, GearWidth,by=c("VE_REF","LE_MET"),
                                all.x=T,all.y=F)
  save(tacsatp,   file=file.path(outPath,"tacsatMergedWidth.RData"))
 
