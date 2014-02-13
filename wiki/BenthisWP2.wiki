@@ -202,7 +202,7 @@ remrecsEflalo["impossible time",] <- c(nrow(eflalo),100+round((nrow(eflalo) -
                   an(remrecsEflalo["total",1]))/an(remrecsEflalo["total",1])*100,2))
 </code>
   
-  * Remove trip starting befor 1st Jan
+  * Remove trip starting before 1st Jan
 <code>
 year              <- min(year(eflalo$FT_DDATIM))
 eflalo            <- eflalo[eflalo$FT_DDATIM>=strptime(paste(year,"-01-01 00:00:00",sep=''),
@@ -289,16 +289,18 @@ read into the workflow.
 
 This is making use of a table of parameters specifying the relationships linking gear widths (door spread, beam width, dredge width, or length of the seine rope) to vessel specifications (KW or LOA). 
 
-Please remember that before making this step you first need to link your metier definition to the BENTHIS metier classification included in this table. This can be done by using the useful levels()<- R function.
+Please remember that before making this step you first need to link  your metier definition in tacsatp$LE_MET to the BENTHIS metier classification included in this table. This can be done by renaming by using the very useful 'levels()<-' R function.
 
 <code>
 # a fake example for illustration
-dd<- data.frame(metier=c("OTB_DEM_>120mm", "OTM_SPF_>16mm"), data=c(1,1))
-print(levels(dd$metier))
-levels(dd$metier) <- c('OT_DMF', 'OT_SPF') # renaming
+dd<- data.frame(LE_MET=c("OTB_DEM_>120mm", "OTM_SPF_>16mm"), data=c(1,1))
+print(levels(dd$LE_MET))
+levels(dd$LE_MET) <- c('OT_DMF', 'OT_SPF') # renaming the levels
+print(dd)
+#=> in your true case, replace 'dd' by 'tacsatp' and adapt for renaming your list of metiers.
 </code>
 
-This table is the outcome of the [https://code.google.com/p/vmstools/wiki/Industry_data questionnaire survey analysis] and will be circulated by mail to partners.
+The table of parameters is the outcome of the [https://code.google.com/p/vmstools/wiki/Industry_data questionnaire survey analysis] and will be circulated by mail to partners.
  
 Only the length of the rope is predicted for seiners at this stage of the work flow. The swept area for the seiners (computed from the length of the rope) is addressed further below in the workflow.
 
