@@ -287,7 +287,16 @@ relationships between vessel HP or length to gear size.
 A table specifying all these gear - width combinations should be put together and
 read into the workflow.
 
-This is making use of a table of parameters specifying the relationships linking gear widths (door spread, beam width, dredge width, or length of the seine rope) to vessel specifications (KW or LOA). Please remember that before making this step you first need to link your metier definition to the BENTHIS metier classification included in this table.
+This is making use of a table of parameters specifying the relationships linking gear widths (door spread, beam width, dredge width, or length of the seine rope) to vessel specifications (KW or LOA). 
+
+Please remember that before making this step you first need to link your metier definition to the BENTHIS metier classification included in this table. This can be done by using the useful levels()<- R function.
+
+<code>
+# a fake example for illustration
+dd<- data.frame(metier=c("OTB_DEM_>120mm", "OTM_SPF_>16mm"), data=c(1,1))
+print(levels(dd$metier))
+levels(dd$metier) <- c('OT_DMF', 'OT_SPF') # renaming
+</code>
 
 This table is the outcome of the [https://code.google.com/p/vmstools/wiki/Industry_data questionnaire survey analysis] and will be circulated by mail to partners.
  
