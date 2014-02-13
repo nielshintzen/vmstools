@@ -17,7 +17,7 @@ Please find below an example workflow to treat VMS and Logbook in a systematic m
   * The procedure for installing the VMStools library under R is described [http://code.google.com/p/vmstools/wiki/Introduction?tm=6 here]
   
 === Loading the required libraries into the R console ===
-We load three different libraries, to start with the VMStools one, followed by two packages that help us to create maps. If you have not installed them, please use {{{install.packages("maps",repos=getOption("repos")}}} and select the correct packages.
+We load three different libraries, to start with the VMStools one, followed by two packages that help us to create maps. If you have not installed them, please use {{{install.packages("maps",repos=getOption("repos"))}}} and select the correct packages.
 <code>  
 rm(list=ls())
 library(vmstools)
