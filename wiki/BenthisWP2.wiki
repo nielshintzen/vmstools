@@ -304,8 +304,11 @@ Only the length of the rope is predicted for seiners at this stage of the work f
  GearWidth$GEAR_WIDTH_LOWER  <- NA
  GearWidth$GEAR_WIDTH_UPPER  <- NA
  for (i in 1:nrow(GearWidth)) { # brute force...
+    
     kW      <- GearWidth$VE_KW[i]
+    
     LOA     <- GearWidth$VE_LEN[i]
+    
     this    <- gear_param_per_metier[gear_param_per_metier$a_metier==GearWidth$LE_MET[i],]
     a <- NULL ; b <- NULL
     a       <- this[this$param=='a', 'Estimate'] 
