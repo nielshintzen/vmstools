@@ -59,6 +59,10 @@ eflalo <- readEflalo(file.path(dataPath,"eflalo.csv"))
 </code>
 
 Make sure that the fishing activities / metier (the 'LE_MET' column in eflalo) is present and complete.
+
+=== Country specific variables ===
+
+VMS_ping_rate_in_hour <- 2 
  
 === load VMStools additional datasets ===
 <code>  
@@ -476,7 +480,7 @@ for(iGr in towed_gears){
 
     #- Interpolate according to the cubic-hermite spline interpolation
     interpolationcHs <- interpolateTacsat(tacsatpGearVEREF,
-                          interval=120, # ADAPT TO YOUR COUNTRY (in MINUTES) because note that the ping rate is likely to be specific to the country
+                          interval=VMS_ping_rate_in_hour*60,
                           margin=10, # i.e. will make disconnected interpolations if interval out of the 110 130 min range
                           res=100,
                           method="cHs",
@@ -543,9 +547,8 @@ for(iGr in passive_gears){
   
     tacsatpGearVEREF$SWEPT_AREA_KM2 <- pi*(tacsatpGearVEREF$LE_GEAR_WIDTH/(2*pi))^2
 
-   ping_rate                               <- 1 #!!CAUTION: ADAPT TO YOUR COUNTRY (UNIT IN HOUR)!!# 
     haul_duration                           <- 3 # assumption of a mean duration based from questionnaires to seiners
-    tacsatpGearVEREF$SWEPT_AREA_KM2         <- tacsatpGearVEREF$SWEPT_AREA_KM2 * ping_rate / haul_duration # correction to avoid counting the same circle are several time.
+    tacsatpGearVEREF$SWEPT_AREA_KM2         <- tacsatpGearVEREF$SWEPT_AREA_KM2 * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
     idx                                     <- grep('SSC', as.character(tacsatpGearVEREF$LE_GEAR))
     tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] <- tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] *1.5 # ad hoc correction to account for the SSC specificities
 
