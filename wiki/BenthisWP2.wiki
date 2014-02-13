@@ -553,8 +553,8 @@ We do that here for those gear types that were not in our towed_gear list.
 
 <code>
 all_gears            <- sort(unique(tacsatp$LE_GEAR))
-passive_gears        <- all_gears[!all_gears %in% towed_gears] # Scottish and Danish seiners here (all other passive gears should have been removed earlier because irrelevant for bottom impact).
-for(iGr in passive_gears){
+seine_gears          <- c('SDN', 'SSC')  # Danish and Scottish seiners (all other gears should not be included because irrelevant for bottom impact).
+for(iGr in seine_gears){
   tacsatpGear        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==iGr,]
 
   for(iVE_REF in sort(unique(tacsatpGear$VE_REF)){
