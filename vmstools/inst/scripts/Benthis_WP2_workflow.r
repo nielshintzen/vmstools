@@ -80,19 +80,18 @@ if(TRUE){
  #save(tacsat, file=file.path(dataPath,"tacsat_2012.RData"))
  #save(eflalo, file=file.path(dataPath,"eflalo_2012.RData"))
 
- # German data
- # eflalo <- readEflalo(file.path("C:","merging","EflaloAndTacsat","GermanEflaloTacsat","ger_eflalo2012.csv"))
- # tacsat <- readTacsat(file.path("C:","merging","EflaloAndTacsat","GermanEflaloTacsat","TACSAT2_GER_2012.csv"), sep=";")
-
-
-
-
+ 
 
  load(file.path(dataPath,paste("tacsat_", a_year,".RData", sep=''))); # get the tacsat object
  load(file.path(dataPath,paste("eflalo_", a_year,".RData", sep=''))); # get the eflalo object
  tacsat <- formatTacsat(tacsat) # format each of the columns to the specified class
  eflalo <- formatEflalo(eflalo) # format each of the columns to the specified class
 
+ 
+ # country-specific
+ VMS_ping_rate_in_hour <- 1 # e.g. for Denmark
+
+ 
  data(euharbours)
  data(ICESareas)
  data(europa)
@@ -338,7 +337,7 @@ if(TRUE){
 
  # INTERPOLATION (OF THE FISHING SEQUENCES ONLY)
  dir.create(file.path(outPath, "interpolated"))
- towed_gears       <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')  # TO DO: list to be checked
+ towed_gears       <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB') 
  tacsatp           <- orderBy(~VE_REF+SI_DATIM,data=tacsatp)
 
  # KEEP ONLY fish. seq. bounded by steaming points
@@ -366,7 +365,7 @@ if(TRUE){
 
          #Interpolate according to the cubic-hermite spline interpolation
           interpolationcHs <- interpolateTacsat(tacsatpGearVEREF,
-                            interval=60, ## THE PING RATE IS COUNTRY-SPECIFIC ##
+                            interval=VMS_ping_rate_in_hour*60, ## THE PING RATE IS COUNTRY-SPECIFIC ##
                             margin=10, # i.e. will make disconnected interpolations if interval out of the 50 70min range
                             res=100,
                             method="cHs",
@@ -409,11 +408,11 @@ if(TRUE){
     }
 
 
-  # passive gears
+  # for seiners 
   all_gears            <- sort(unique(tacsatp$LE_GEAR))
-  passive_gears        <- all_gears[!all_gears %in% towed_gears]
+  seine_gears          <- c('SDN', 'SSC') 
 
-  for(iGr in passive_gears){
+  for(iGr in seine_gears){
 
     tacsatpGear        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==iGr,]
 
@@ -424,9 +423,8 @@ if(TRUE){
 
 
     tacsatpGearVEREF$SWEPT_AREA_KM2         <- pi*(tacsatpGearVEREF$GEAR_WIDTH/(2*pi))^2
-    ping_rate                               <- 1 #!!CAUTION: ADAPT TO YOUR COUNTRY (IN HOUR)!!# 
     haul_duration                           <- 3 # assumption of a mean duration based from questionnaires to seiners
-    tacsatpGearVEREF$SWEPT_AREA_KM2         <- tacsatpGearVEREF$SWEPT_AREA_KM2 * ping_rate / haul_duration # correction to avoid counting the same circle are several time.
+    tacsatpGearVEREF$SWEPT_AREA_KM2         <- tacsatpGearVEREF$SWEPT_AREA_KM2 * VMS_ping_rate_in_hour / haul_duration # correction to avoid counting the same circle are several time.
     idx                                     <- grep('SSC', as.character(tacsatpGearVEREF$LE_GEAR))
     tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] <- tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] *1.5 # ad hoc correction to account for the SSC specificities
 
@@ -439,7 +437,7 @@ if(TRUE){
  
  
  
- } # end FALSE
+ } # end TRUE/FALSE
 
  
   # SWEPT AREA DATASET
