@@ -283,8 +283,10 @@ read into the workflow.
 
 This is making use of a table of parameters specifying the relationships linking gear widths (door spread, beam width, dredge width, or length of the seine rope) to vessel specifications (KW or LOA). Please remember that before making this step you first need to link your metier definition to the BENTHIS metier classification included in this table.
 
-This table is the outcome of the questionnaire survey analysis [https://code.google.com/p/vmstools/wiki/Industry_data questionnaire survey analysis] and will be circulated by mail to partners.
+This table is the outcome of the [https://code.google.com/p/vmstools/wiki/Industry_data questionnaire survey analysis] and will be circulated by mail to partners.
  
+Only the length of the rope is predicted for seiners at this stage of the work flow. The swept area for the seiners (computed from the length of the rope) is addressed further below in the workflow.
+
 <code>
 
 # import the param table obtained from the industry_data R analyses
@@ -527,8 +529,7 @@ We do that here for those gear types that were not in our towed_gear list.
 
 <code>
 all_gears            <- sort(unique(tacsatp$LE_GEAR))
-passive_gears        <- all_gears[!all_gears %in% towed_gears]
-
+passive_gears        <- all_gears[!all_gears %in% towed_gears] # Scottish and Danish seiners here (all other passisve gear should have been removed before because irrelevant for bottom impact).
 for(iGr in passive_gears){
   tacsatpGear        <- tacsatp[!is.na(tacsatp$LE_GEAR) & tacsatp$LE_GEAR==iGr,]
 
@@ -538,8 +539,14 @@ for(iGr in passive_gears){
   
     tacsatpGearVEREF$SWEPT_AREA_KM2 <- pi*(tacsatpGearVEREF$LE_GEAR_WIDTH/(2*pi))^2
 
+  ping_rate                               <- 1 #!!CAUTION: ADAPT TO YOUR COUNTRY (UNIT IN HOUR)!!# 
+    haul_duration                           <- 3 # assumption of a mean duration based from questionnaires to seiners
+    tacsatpGearVEREF$SWEPT_AREA_KM2         <- tacsatpGearVEREF$SWEPT_AREA_KM2 * ping_rate / haul_duration # correction to avoid counting the same circle are several time.
+    idx                                     <- grep('SSC', as.character(tacsatpGearVEREF$LE_GEAR))
+    tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] <- tacsatpGearVEREF[idx, 'SWEPT_AREA_KM2'] *1.5 # ad hoc correction to account for the SSC specificities
+
     tacsatIntGearVEREF <- tacsatpGearVEREF
-   
+  
     save(tacsatIntGearVEREF, file=file.path(outPath, "interpolated",
        paste("tacsatSweptArea_",iVE_REF, "_", iGr, ".RData", sep="")))
   }
