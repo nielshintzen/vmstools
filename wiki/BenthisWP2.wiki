@@ -281,21 +281,37 @@ relationships between vessel HP or length to gear size.
 A table specifying all these gear - width combinations should be put together and
 read into the workflow.
 
-Here we create a fake gearwidth table as an example and merge it to the tacsat
-dataset.
-<code>  
-vesselGear            <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_GEAR)), ]
-fakeGearWidth         <- vesselGear[,c('VE_REF', 'LE_GEAR')]
-fakeGearWidth         <- fakeGearWidth[-which(is.na(fakeGearWidth$VE_REF) | is.na(fakeGearWidth$LE_GEAR)),]
-fakeGearWidth$LE_GEAR_WIDTH <- 0.5 # in km
-save(fakeGearWidth, file=paste(dataPath,"gearWidth.RData",   sep=""))
-  
-load(file.path(dataPath, "gearWidth.RData"))
-tacsatp               <- merge(tacsatp, fakeGearWidth,by=c("VE_REF","LE_GEAR"),
+This is making use of a table of parameters specifying the relationships linking gear widths (dorr spread or beam witdh or dregge width or length of the seine rope) to vessel specifications (KW or LOA). Please remember that before making this step you first need to link your metier definition to the BENTHIS metier classification includedc in this table.
+
+# import the param table obtained from the industry_data R analyses
+ gear_param_per_metier       <- read.table(file=file.path(outPath, "estimates_for_gear_param_per_metier.txt"))
+
+ GearWidth                   <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_MET)), ]
+ GearWidth                   <- GearWidth[,c('VE_REF','LE_MET','VE_KW', 'VE_LEN') ]
+ GearWidth$GEAR_WIDTH        <- NA
+ GearWidth$GEAR_WIDTH_LOWER  <- NA
+ GearWidth$GEAR_WIDTH_UPPER  <- NA
+ for (i in 1:nrow(GearWidth)) { # brute force...
+    kW      <- GearWidth$VE_KW[i]
+    LOA     <- GearWidth$VE_LEN[i]
+    this    <- gear_param_per_metier[gear_param_per_metier$a_metier==GearWidth$LE_MET[i],]
+    a <- NULL ; b <- NULL
+    a       <- this[this$param=='a', 'Estimate'] 
+    b       <- this[this$param=='b', 'Estimate'] 
+    GearWidth[i,"GEAR_WIDTH"]  <-   eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
+    a       <- this[this$param=='a', 'Estimate'] +2*this[this$param=='a', 'Std..Error'] 
+    b       <- this[this$param=='b', 'Estimate'] +2*this[this$param=='b', 'Std..Error'] 
+    GearWidth[i,"GEAR_WIDTH_UPPER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
+    a       <- this[this$param=='a', 'Estimate'] -2*this[this$param=='a', 'Std..Error'] 
+    b       <- this[this$param=='b', 'Estimate'] -2*this[this$param=='b', 'Std..Error'] 
+    GearWidth[i,"GEAR_WIDTH_LOWER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km  
+ }
+ save(GearWidth, file=file.path(dataPath,"gearWidth.RData"))
+ load(file.path(dataPath, "gearWidth.RData"))
+ tacsatp                     <- merge(tacsatp, fakeGearWidth,by=c("VE_REF","LE_MET"),
                                all.x=T,all.y=F)
-    
-save(tacsatp,   file=paste(outPath,"tacsatMergedWidth.RData",   sep=""))
-</code>  
+ save(tacsatp,   file=file.path(outPath,"tacsatMergedWidth.RData"))
+
 
 
 === Separate tacsat that is not merged ===
@@ -779,7 +795,7 @@ tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
       this$ys         <- (this$round_lat/(dx))
     }
      # if the coordinates in decimal then dx=20 corresponds to grid resolution of 0.05 degrees
-     # i.e. a 3´ angle = 3nm in latitude but vary in longitude (note that a finer grid will be produced if a higher value for dx is put here)
+     # i.e. a 3ï¿½ angle = 3nm in latitude but vary in longitude (note that a finer grid will be produced if a higher value for dx is put here)
 
     colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')
 
