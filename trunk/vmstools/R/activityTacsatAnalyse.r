@@ -40,6 +40,8 @@ activityTacsatAnalyse <- function(tacsat,units="year",analyse.by="LE_GEAR",ident
 
         if(identify=="means"){
           valPeaks <- callPeakValue(pks)
+          if(substr(valPeaks,1,1)==" ")
+            valPeaks <- substr(valPeaks,2,nchar(valPeaks))
           storeScheme[which(storeScheme$years == yr & storeScheme$months    == mth &
                           storeScheme$weeks == wk & storeScheme$analyse.by== iBy),"means"] <- valPeaks
 
