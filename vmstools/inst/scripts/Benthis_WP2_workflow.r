@@ -217,8 +217,14 @@ if(TRUE){
   #-----------------------------------------------------------------------------
 
   #- Make selection for gears where you already have gear width and which not
-  tacsatpWithWidth      <- subset(tacsatp, LE_GEAR %in% c("DRB","TBB"))
-  tacsatpNonWidth       <- subset(tacsatp,!LE_GEAR %in% c("DRB","TBB"))
+  ctry <- "XXX"
+  if(ctry=="NLD"){
+     tacsatpWithWidth      <- subset(tacsatp, LE_GEAR %in% c("DRB","TBB"))
+     tacsatpNonWidth       <- subset(tacsatp,!LE_GEAR %in% c("DRB","TBB"))
+  } else{
+     tacsatpWithWidth      <- NULL
+     tacsatpNonWidth       <- tacsatp
+  }
   
   # MERGE WITH GEAR WIDTH
   # CAUTION: the LE_MET should be consistent with those described in the below table!
