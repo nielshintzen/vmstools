@@ -264,10 +264,10 @@ if(TRUE){
     a       <- this[this$param=='a', 'Estimate']
     b       <- this[this$param=='b', 'Estimate']
     GearWidth[i,"GEAR_WIDTH"]  <-   eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
-    a       <- this[this$param=='a', 'Estimate'] +2*this[this$param=='a', 'Std..Error']
+    a       <- this[this$param=='a', 'Estimate']
     b       <- this[this$param=='b', 'Estimate'] +2*this[this$param=='b', 'Std..Error']
     GearWidth[i,"GEAR_WIDTH_UPPER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
-    a       <- this[this$param=='a', 'Estimate'] -2*this[this$param=='a', 'Std..Error']
+    a       <- this[this$param=='a', 'Estimate'] 
     b       <- this[this$param=='b', 'Estimate'] -2*this[this$param=='b', 'Std..Error']
     GearWidth[i,"GEAR_WIDTH_LOWER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
   }
