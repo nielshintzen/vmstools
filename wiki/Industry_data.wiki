@@ -18,40 +18,55 @@ Hereafter, the R code to incorporate the parameter table (estimates_for_gear_par
 <code>
 
 
- # MERGE WITH GEAR WIDTH
- # CAUTION: the LE_MET should be consistent with those described in the below table!
- # if not then redefine them BEFORE making this step!
- # import the param table obtained from the industry_data R analyses
- gear_param_per_metier       <- read.table(file=file.path(outPath, "estimates_for_gear_param_per_metier.txt"))
+ #- Make selection for gears where you already have gear width and which not
+  ctry <- "XXX"
+  if(ctry=="NLD"){
+     tacsatpWithWidth      <- subset(tacsatp, LE_GEAR %in% c("DRB","TBB"))
+     tacsatpNonWidth       <- subset(tacsatp,!LE_GEAR %in% c("DRB","TBB"))
+  } else{
+     tacsatpWithWidth      <- NULL
+     tacsatpNonWidth       <- tacsatp
+  }
+  
+  # MERGE WITH GEAR WIDTH
+  # CAUTION: the LE_MET should be consistent with those described in the below table!
+  # if not then redefine them BEFORE making this step!
+  # import the param table obtained from the industry_data R analyses
+  gear_param_per_metier       <- read.table(file=file.path(dataPath, "estimates_for_gear_param_per_metier.txt"))
 
-  GearWidth                   <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_MET)), ]
- GearWidth                   <- GearWidth[,c('VE_REF','LE_MET','VE_KW', 'VE_LEN') ]
- GearWidth$GEAR_WIDTH        <- NA
- GearWidth$GEAR_WIDTH_LOWER  <- NA
- GearWidth$GEAR_WIDTH_UPPER  <- NA
- for (i in 1:nrow(GearWidth)) { # brute force...
-
+  GearWidth                   <- tacsatpNonWidth[!duplicated(data.frame(tacsatpNonWidth$VE_REF,tacsatpNonWidth$LE_MET)), ]
+  GearWidth                   <- GearWidth[,c('VE_REF','LE_MET','VE_KW', 'VE_LEN') ]
+  GearWidth$GEAR_WIDTH        <- NA
+  GearWidth$GEAR_WIDTH_LOWER  <- NA
+  GearWidth$GEAR_WIDTH_UPPER  <- NA
+  for (i in 1:nrow(GearWidth)) { # brute force...
     kW      <- GearWidth$VE_KW[i]
-
     LOA     <- GearWidth$VE_LEN[i]
-
     this    <- gear_param_per_metier[gear_param_per_metier$a_metier==GearWidth$LE_MET[i],]
     a <- NULL ; b <- NULL
-    a       <- this[this$param=='a', 'Estimate'] 
-    b       <- this[this$param=='b', 'Estimate'] 
+    a       <- this[this$param=='a', 'Estimate']
+    b       <- this[this$param=='b', 'Estimate']
     GearWidth[i,"GEAR_WIDTH"]  <-   eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
-    a       <- this[this$param=='a', 'Estimate'] +2*this[this$param=='a', 'Std..Error'] 
-    b       <- this[this$param=='b', 'Estimate'] +2*this[this$param=='b', 'Std..Error'] 
+    a       <- this[this$param=='a', 'Estimate'] +2*this[this$param=='a', 'Std..Error']
+    b       <- this[this$param=='b', 'Estimate'] +2*this[this$param=='b', 'Std..Error']
     GearWidth[i,"GEAR_WIDTH_UPPER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
-    a       <- this[this$param=='a', 'Estimate'] -2*this[this$param=='a', 'Std..Error'] 
-    b       <- this[this$param=='b', 'Estimate'] -2*this[this$param=='b', 'Std..Error'] 
-    GearWidth[i,"GEAR_WIDTH_LOWER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km  
- }
- save(GearWidth, file=file.path(dataPath,"gearWidth.RData"))
- load(file.path(dataPath, "gearWidth.RData"))
- tacsatp                     <- merge(tacsatp, GearWidth,by=c("VE_REF","LE_MET"),
-                               all.x=T,all.y=F)
- save(tacsatp,   file=file.path(outPath,"tacsatMergedWidth.RData"))
+    a       <- this[this$param=='a', 'Estimate'] -2*this[this$param=='a', 'Std..Error']
+    b       <- this[this$param=='b', 'Estimate'] -2*this[this$param=='b', 'Std..Error']
+    GearWidth[i,"GEAR_WIDTH_LOWER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
+  }
+  save(GearWidth, file=file.path(outPath,a_year,"gearWidth.RData"))
+  load(file.path(outPath,a_year,"gearWidth.RData"))
+  tacsatpNonWidth                    <- merge(tacsatpNonWidth, GearWidth,by=c("VE_REF","LE_MET","VE_KW","VE_LEN"),
+                                              all.x=T,all.y=F)
+                                              
+  #- Combine tacsat with NonWidth and With
+  tacsatpWithWidth                   <- cbind(tacsatpWithWidth,
+                                              cbind(GEAR_WIDTH        = tacsatpWithWidth$LE_WIDTH / 1000,
+                                                    GEAR_WIDTH_LOWER  = tacsatpWithWidth$LE_WIDTH / 1000,
+                                                    GEAR_WIDTH_UPPER  = tacsatpWithWidth$LE_WIDTH / 1000))
+                                              
+  tacsatp                            <- rbindTacsat(tacsatpWithWidth,tacsatpNonWidth)
+  save(tacsatp,   file=file.path(outPath,a_year,"tacsatMergedWidth.RData"))
 
 
 </code>
