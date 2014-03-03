@@ -19,7 +19,7 @@ if(.Platform$OS.type == "unix") {}
  dataPath  <- file.path("~","BENTHIS","EflaloAndTacsat")
  outPath   <- file.path("~","BENTHIS", "outputs")
  polPath   <- file.path("~","BENTHIS", "BalanceMaps")
- }
+ 
  
 if(.Platform$OS.type == "windows") {
  codePath  <- "C:/merging/BENTHIS/"
@@ -34,7 +34,6 @@ a_year      <- 2010
 #a_year      <- 2012
 dir.create(file.path(outPath))
 dir.create(file.path(outPath, a_year))
-outPath     <- file.path(outPath, a_year)
 
 if(TRUE){
 
@@ -50,6 +49,8 @@ if(TRUE){
   eflalo                <- eflalo[,-idx]
 
   # country-specific
+  ctry   <- "DNK"
+  eflalo <- eflalo[ grep(ctry, as.character(eflalo$VE_REF)),]  # keep the national vessels only.
   #VMS_ping_rate_in_hour <- 115/60 # Dutch data (rev(sort(table(intervalTacsat(sortTacsat(tacsat),level="vessel")$INTV))[1])
   VMS_ping_rate_in_hour <- 1 # e.g. 1 hour for Denmark (rev(sort(table(intervalTacsat(sortTacsat(tacsat),level="vessel")$INTV))[1])
   
@@ -102,7 +103,7 @@ if(TRUE){
   # Remove points in harbour 
   idx             <- pointInHarbour(tacsat$SI_LONG,tacsat$SI_LATI,harbours)
   pih             <- tacsat[which(idx == 1),]
-  save(pih,file=paste(outPath,"pointInHarbour.RData",sep=""))
+  save(pih,file=paste(outPath, a_year, "pointInHarbour.RData",sep=""))
   tacsat          <- tacsat[which(idx == 0),]
   remrecsTacsat["harbour",] <- c(nrow(tacsat),100+round((nrow(tacsat) -
                   an(remrecsTacsat["total",1]))/an(remrecsTacsat["total",1])*100,2))
@@ -230,8 +231,35 @@ if(TRUE){
   nb_records=c(124,124,39,39,94,94,271,271,48,48,190,190,45,45,53,53,24,24,12,12,19,19,7,7,42,42,22,22,33,33,47,47,8,8)
   )
   
+ 
+ 
   
+  #-----------------------------------------------------------------------------
+  # transform into WP2 BENTHIS metier - ADAPT TO YOUR OWN METIER LIST!!!
+  #-----------------------------------------------------------------------------
+   ctry <- 'DNK'
+   if(ctry=="DNK"){
+   tacsatp$LE_MET_init    <- tacsatp$LE_MET
+   tacsatp$LE_MET         <- factor(tacsatp$LE_MET)            
+   print(levels(tacsatp$LE_MET))
+   if(a_year=="2010") levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
+     "DRB_MOL", "NA",  "OT_CRU","OT_CRU", "OT_CRU",   "OT_CRU",  "OT_CRU",  
+     "OT_CRU",  "OT_SPF",     "OT_DMF", "OT_DMF", "OT_DMF",   "OT_DMF", "OT_SPF",  
+     "OT_MIX_DMF_PEL",   "OT_DMF",  "OT_DMF",   "OT_DMF",  "OT_DMF",  "OT_SPF",  "OT_SPF",  
+     "OT_SPF",  "OT_SPF",   "OT_SPF",   "OT_SPF",   "OT_CRU",  "OT_SPF",     "OT_DMF",
+     "OT_DMF",   "OT_DMF",  "OT_SPF",   "OT_SPF",  "OT_SPF",   "OT_SPF",   "SDN_DEM",
+     "SDN_DEM",   "SDN_DEM", "SDN_DEM",  "SSC_DEM",   "SSC_DEM",  "TBB_CRU",   "TBB_DMF")  
+   tacsatp$LE_MET         <- as.character(tacsatp$LE_MET)
+   } else{
+    stop('adapt the BENTHIS metier for this year')
+    }
+  initVersusBenthisMetiers <-  tacsatp [!duplicated(data.frame(tacsatp$LE_MET_init, tacsatp$LE_MET)), 
+                                    c('LE_MET_init', 'LE_MET')]
+  save(initVersusBenthisMetiers, file=file.path(outPath,a_year,"initVersusBenthisMetiers.RData"))
 
+
+
+  
   #-----------------------------------------------------------------------------
   # Add gear width to tacsat
   #-----------------------------------------------------------------------------
@@ -250,7 +278,7 @@ if(TRUE){
   # CAUTION: the LE_MET should be consistent with those described in the below table!
   # if not then redefine them BEFORE making this step!
   # import the param table obtained from the industry_data R analyses
-  
+ 
   GearWidth                   <- tacsatpNonWidth[!duplicated(data.frame(tacsatpNonWidth$VE_REF,tacsatpNonWidth$LE_MET)), ]
   GearWidth                   <- GearWidth[,c('VE_REF','LE_MET','VE_KW', 'VE_LEN') ]
   GearWidth$GEAR_WIDTH        <- NA
@@ -264,7 +292,7 @@ if(TRUE){
     a       <- this[this$param=='a', 'Estimate']
     b       <- this[this$param=='b', 'Estimate']
     GearWidth[i,"GEAR_WIDTH"]  <-   eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
-    a       <- this[this$param=='a', 'Estimate']
+    a       <- this[this$param=='a', 'Estimate'] 
     b       <- this[this$param=='b', 'Estimate'] +2*this[this$param=='b', 'Std..Error']
     GearWidth[i,"GEAR_WIDTH_UPPER"]  <-  eval(parse(text= as.character(this[1, 'equ']))) / 1000 # converted in km
     a       <- this[this$param=='a', 'Estimate'] 
@@ -293,13 +321,15 @@ if(TRUE){
                              is.na(tacsatp$SI_DATIM) == T |  is.na(tacsatp$SI_SP) == T)
   if(length(idx)>0) tacsatp         <- tacsatp[-idx,]
 
-  if(.Platform$OS.type == "windows" & TRUE) {
+  if(.Platform$OS.type == "windows" && TRUE) {
     storeScheme       <- activityTacsatAnalyse(tacsatp, units = "year", analyse.by = "LE_GEAR",identify="means")
     storeScheme       <- storeScheme[which(is.na(storeScheme$analyse.by)==F),]
 
     storeScheme$years <- as.numeric(as.character(storeScheme$years))
     storeScheme       <- storeScheme[storeScheme$years==a_year,]
     save(storeScheme, file=file.path(outPath,a_year,"storeScheme.RData"))
+  }  else{
+    load(file.path(outPath,a_year,"storeScheme.RData"))
   }
 
   tacsatp$year      <- format(tacsatp$SI_DATIM, "%Y")
@@ -490,7 +520,7 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
   sh_coastlines            <- readShapePoly(file.path(polPath,"francois_EU"))
 
 
-  load(file.path(outPath, "tacsatSweptArea.RData")) # get 'tacsatp' with all data
+  load(file.path(outPath, a_year, "tacsatSweptArea.RData")) # get 'tacsatp' with all data
   #....or load only one instance eg load(file.path(outPath, "interpolated","tacsatSweptArea_DNK000005269_OTB.RData"))
   #tacsatp <- tacsatInt_gr_vid
 
@@ -533,7 +563,7 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
 
   load(file.path(polPath, "landscapes_proj.RData"))
 
-  load(file.path(outPath, "tacsatSweptArea.RData")) # get 'tacsatp' with all data
+  load(file.path(outPath, a_year, "tacsatSweptArea.RData")) # get 'tacsatp' with all data
   #....or load only one instance eg load("C:\\merging\\BENTHIS\\outputs\\interpolated\\tacsatSweptArea_DNK000005269_OTB.RData"))
   #tacsatp <- tacsatpGearVEREF
 
