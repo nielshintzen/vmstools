@@ -22,10 +22,10 @@ if(.Platform$OS.type == "unix") {}
  
  
 if(.Platform$OS.type == "windows") {
- codePath  <- "C:/merging/BENTHIS/"
- dataPath  <- "C:/merging/EflaloAndTacsat/"
- outPath   <- "C:/merging/BENTHIS/outputs/"
- polPath   <- "C:/merging/BalanceMaps"
+ codePath  <- "C:/BENTHIS/"
+ dataPath  <- "C:/BENTHIS/EflaloAndTacsat/"
+ outPath   <- "C:/BENTHIS/outputs/"
+ polPath   <- "C:/BENTHIS/BalanceMaps"
  }
 
 
@@ -509,12 +509,15 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
 
 
 
+ #-----------------------------------------------------------------------------
+ # LINK TO HABITAT MAPS
+ #-----------------------------------------------------------------------------
 
-  ## LINK TO HABITAT MAPS
-  ##
+
   # SHAPEFILE--------
   library(maptools)
-
+  library(rgdal)
+  
   # load a habitat map shape file
   habitat_map           <- readShapePoly(file.path(polPath,"sediment_lat_long"),
                                          proj4string=CRS("+proj=longlat +ellps=WGS84"))
@@ -523,29 +526,26 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
 
 
   load(file.path(outPath, a_year, "tacsatSweptArea.RData")) # get 'tacsatp' with all data
-  #....or load only one instance eg load(file.path(outPath, "interpolated","tacsatSweptArea_DNK000005269_OTB.RData"))
-  #tacsatp <- tacsatInt_gr_vid
+  #....or load only one instance eg load(file.path(outPath, a_year, "interpolated","tacsatSweptArea_DNK000001744_OTB.RData"))
+  #tacsatSweptArea <- tacsatIntGearVEREF
 
-  coord <-  tacsatp[, c('SI_LONG', 'SI_LATI')]
+  coord <-  tacsatSweptArea[, c('SI_LONG', 'SI_LATI')]
   names(habitat_map) # return the name of the coding variable
 
   #Turn the polygons into spatial polygons
-  sp <- SpatialPolygons(habitat_map@polygons)
-  projection(sp) <-  CRS("+proj=longlat +ellps=WGS84")
-
+  sp <- SpatialPolygons(habitat_map@polygons, proj4string=CRS("+proj=longlat +ellps=WGS84"))
+ 
   #Turn the point into a spatial point
-  spo <- SpatialPoints(coordinates(data.frame(SI_LONG=coord[,1],
-                                             SI_LATI=coord[,2])))
-  projection(spo) <-  CRS("+proj=longlat +ellps=WGS84")
-
+  spo <- SpatialPoints(data.frame(SI_LONG=coord[,1], SI_LATI=coord[,2]), proj4string=CRS("+proj=longlat +ellps=WGS84"))         
+ 
   #Use the magic 'over' function to see in which polygon it is located
   idx <- over(spo,sp); print(idx)
-  tacsatp$SUBSTRATE <- habitat_map$BAL_CODE[idx]
+  tacsatSweptArea$SUBSTRATE <- habitat_map$BAL_CODE[idx]
 
   # plot
   plot(habitat_map, xlim=c(11,14), ylim=c(55,56))
   axis(1) ; axis(2, las=2) ; box()
-  points(tacsatp[, c("SI_LONG","SI_LATI")], col=tacsatp$SUBSTRATE, pch=".")
+  points(tacsatSweptArea[, c("SI_LONG","SI_LATI")], col=tacsatSweptArea$SUBSTRATE, pch=".")
   #plot(sh_coastlines, add=TRUE)
 
   # save
