@@ -480,8 +480,10 @@ if(TRUE){
 fls <- dir(file.path(outPath,a_year,"interpolated"))
 
 lst <- list(); count <- 0
-cols2keep <- c("SI_LATI"," SI_LONG","LE_GEAR","LE_MET","SWEPT_AREA_KM2","SWEPT_AREA_KM2_LOWER","SWEPT_AREA_KM2_UPPER")
+cols2keep <- c("SI_LATI","SI_LONG","LE_GEAR","LE_MET","SWEPT_AREA_KM2","SWEPT_AREA_KM2_LOWER","SWEPT_AREA_KM2_UPPER")
 for(iFile in fls){
+  cat(paste(iFile, "\n"))
+  count <- count+1
   load(file.path(outPath,a_year,"interpolated",iFile))
   lst[[count]] <- tacsatIntGearVEREF[,cols2keep]
 }
