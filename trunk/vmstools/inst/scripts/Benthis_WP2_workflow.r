@@ -242,7 +242,8 @@ if(TRUE){
    tacsatp$LE_MET_init    <- tacsatp$LE_MET
    tacsatp$LE_MET         <- factor(tacsatp$LE_MET)            
    print(levels(tacsatp$LE_MET))
-   if(a_year=="2010") levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
+   if(a_year=="2010"){
+     levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
      "DRB_MOL", "NA",  "OT_CRU","OT_CRU", "OT_CRU",   "OT_CRU",  "OT_CRU",  
      "OT_CRU",  "OT_SPF",     "OT_DMF", "OT_DMF", "OT_DMF",   "OT_DMF", "OT_SPF",  
      "OT_MIX_DMF_PEL",   "OT_DMF",  "OT_DMF",   "OT_DMF",  "OT_DMF",  "OT_SPF",  "OT_SPF",  
@@ -251,8 +252,21 @@ if(TRUE){
      "SDN_DEM",   "SDN_DEM", "SDN_DEM",  "SSC_DEM",   "SSC_DEM",  "TBB_CRU",   "TBB_DMF")  
    tacsatp$LE_MET         <- as.character(tacsatp$LE_MET)
    } else{
-    stop('adapt the BENTHIS metier for this year')
+    if(a_year=="2011"){
+     levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
+      "DRB_MOL",      "NA",   "OT_CRU", "OT_CRU",   "OT_CRU",  "OT_SPF", "OT_DEM", "OT_SPF",  
+      "OT_SPF",   "OT_DEM",  "OT_MIX_NEP",   "OT_MIX_NEP", "OT_MIX_NEP",   "OT_MIX_NEP",  "OT_SPF",  "OT_SPF",  
+      "OT_SPF",   "OT_SPF",   "OT_SPF",   "OT_CRU",  "OT_SPF",     "OT_DEM", "OT_SPF",   "OT_MIX_NEP",  
+      "OT_MIX_NEP",  "OT_SPF",   "OT_SPF",  "OT_SPF",   "OT_SPF",   "SDN_DEM", "SDN_DEM",   "SDN_DEM",
+      "SDN_DEM",  "SSC_DEM", "SSC_DEM",   "TBB_CRU",   "TBB_DEM",     "TBB_DEM")  
+    }else{
+     if(a_year=="2012") {
+      stop('adapt the BENTHIS metiers for this year')
+    } else{
+    stop('adapt the BENTHIS metiers for this year')
     }
+   }
+  }  
   initVersusBenthisMetiers <-  tacsatp [!duplicated(data.frame(tacsatp$LE_MET_init, tacsatp$LE_MET)), 
                                     c('LE_MET_init', 'LE_MET')]
   save(initVersusBenthisMetiers, file=file.path(outPath,a_year,"initVersusBenthisMetiers.RData"))
