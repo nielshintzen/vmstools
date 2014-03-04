@@ -267,6 +267,7 @@ if(TRUE){
     }
    }
   }  
+  }
   initVersusBenthisMetiers <-  tacsatp [!duplicated(data.frame(tacsatp$LE_MET_init, tacsatp$LE_MET)), 
                                     c('LE_MET_init', 'LE_MET')]
   save(initVersusBenthisMetiers, file=file.path(outPath,a_year,"initVersusBenthisMetiers.RData"))
