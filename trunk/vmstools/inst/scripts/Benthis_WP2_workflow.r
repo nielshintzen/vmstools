@@ -254,11 +254,11 @@ if(TRUE){
    } else{
     if(a_year=="2011"){
      levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
-      "DRB_MOL",      "NA",   "OT_CRU", "OT_CRU",   "OT_CRU",  "OT_SPF", "OT_DEM", "OT_SPF",  
-      "OT_SPF",   "OT_DEM",  "OT_MIX_NEP",   "OT_MIX_NEP", "OT_MIX_NEP",   "OT_MIX_NEP",  "OT_SPF",  "OT_SPF",  
-      "OT_SPF",   "OT_SPF",   "OT_SPF",   "OT_CRU",  "OT_SPF",     "OT_DEM", "OT_SPF",   "OT_MIX_NEP",  
+      "DRB_MOL",      "NA",   "OT_CRU", "OT_CRU",   "OT_CRU",  "OT_SPF", "OT_DMF", "OT_SPF",  
+      "OT_SPF",   "OT_DMF",  "OT_MIX_NEP",   "OT_MIX_NEP", "OT_MIX_NEP",   "OT_MIX_NEP",  "OT_SPF",  "OT_SPF",  
+      "OT_SPF",   "OT_SPF",   "OT_SPF",   "OT_CRU",  "OT_SPF",     "OT_DMF", "OT_SPF",   "OT_MIX_NEP",  
       "OT_MIX_NEP",  "OT_SPF",   "OT_SPF",  "OT_SPF",   "OT_SPF",   "SDN_DEM", "SDN_DEM",   "SDN_DEM",
-      "SDN_DEM",  "SSC_DEM", "SSC_DEM",   "TBB_CRU",   "TBB_DEM",     "TBB_DEM")  
+      "SDN_DEM",  "SSC_DEM", "SSC_DEM",   "TBB_CRU",   "TBB_DMF",     "TBB_DMF")  
     }else{
      if(a_year=="2012") {
       stop('adapt the BENTHIS metiers for this year')
@@ -302,7 +302,7 @@ if(TRUE){
   for (i in 1:nrow(GearWidth)) { # brute force...
     kW      <- GearWidth$VE_KW[i]
     LOA     <- GearWidth$VE_LEN[i]
-    this    <- gear_param_per_metier[gear_param_per_metier$a_metier==GearWidth$LE_MET[i],]
+    this    <- gear_param_per_metier[gear_param_per_metier$a_metier==as.character(GearWidth$LE_MET[i]),]
     a <- NULL ; b <- NULL
     a       <- this[this$param=='a', 'Estimate']
     b       <- this[this$param=='b', 'Estimate']
