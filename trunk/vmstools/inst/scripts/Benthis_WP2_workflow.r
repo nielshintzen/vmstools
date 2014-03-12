@@ -29,9 +29,9 @@ if(.Platform$OS.type == "windows") {
  }
 
 
-a_year      <- 2010
+#a_year      <- 2010
 #a_year      <- 2011
-#a_year      <- 2012
+a_year      <- 2012
 dir.create(file.path(outPath))
 dir.create(file.path(outPath, a_year))
 
@@ -261,7 +261,11 @@ if(TRUE){
       "SDN_DEM",  "SSC_DEM", "SSC_DEM",   "TBB_CRU",   "TBB_DMF",     "TBB_DMF")  
     }else{
      if(a_year=="2012") {
-      stop('adapt the BENTHIS metiers for this year')
+       levels(tacsatp$LE_MET) <-   c("DRB_MOL", "NA", "OTB_CRU", "OTB_CRU", "OTB_CRU",  "OTB_DMF", "OTB_DMF", "OTB_DMF",
+        "OTB_DMF", "OTB_DMF", "OTB_MIX_NEP", "OTB_MIX_NEP",  "OTB_MIX_NEP", "OTB_MIX_NEP",
+        "OTB_SPF", "OTB_SPF", "OTB_SPF", "OTB_SPF", "OTB_SPF", "OTB_DMF", "OTB_MIX_NEP",
+        "OTB_MIX_NEP",  "OTB_SPF", "OTB_SPF", "OTB_SPF", "OTB_SPF", 
+        "SDN_DEM", "SDN_DEM",   "SDN_DEM", "SDN_DEM", "SSC_DEM", "SSC_DEM", "TBB_CRU", "TBB_DMF")
     } else{
     stop('adapt the BENTHIS metiers for this year')
     }
