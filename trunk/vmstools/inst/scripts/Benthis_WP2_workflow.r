@@ -31,7 +31,8 @@ if(.Platform$OS.type == "windows") {
 
 #a_year      <- 2010
 #a_year      <- 2011
-a_year      <- 2012
+#a_year      <- 2012
+a_year      <- 2013
 dir.create(file.path(outPath))
 dir.create(file.path(outPath, a_year))
 
@@ -261,16 +262,24 @@ if(TRUE){
       "SDN_DEM",  "SSC_DEM", "SSC_DEM",   "TBB_CRU",   "TBB_DMF",     "TBB_DMF")  
     }else{
      if(a_year=="2012") {
-       levels(tacsatp$LE_MET) <-   c("DRB_MOL", "NA", "OTB_CRU", "OTB_CRU", "OTB_CRU",  "OTB_DMF", "OTB_DMF", "OTB_DMF",
-        "OTB_DMF", "OTB_DMF", "OTB_MIX_NEP", "OTB_MIX_NEP",  "OTB_MIX_NEP", "OTB_MIX_NEP",
-        "OTB_SPF", "OTB_SPF", "OTB_SPF", "OTB_SPF", "OTB_SPF", "OTB_DMF", "OTB_MIX_NEP",
-        "OTB_MIX_NEP",  "OTB_SPF", "OTB_SPF", "OTB_SPF", "OTB_SPF", 
+       levels(tacsatp$LE_MET) <-   c("DRB_MOL", "NA", "OT_CRU", "OT_CRU", "OT_CRU",  "OT_DMF", "OT_DMF", "OT_DMF",
+        "OT_DMF", "OT_DMF", "OT_MIX_NEP", "OT_MIX_NEP",  "OT_MIX_NEP", "OT_MIX_NEP",
+        "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "OT_DMF", "OT_MIX_NEP",
+        "OT_MIX_NEP",  "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", 
         "SDN_DEM", "SDN_DEM",   "SDN_DEM", "SDN_DEM", "SSC_DEM", "SSC_DEM", "TBB_CRU", "TBB_DMF")
+    } else{
+      if(a_year=="2013") {
+       levels(tacsatp$LE_MET) <-   c("DRB_MOL", "NA", "OT_CRU", "OT_DMF", "OT_DMF", "OT_DMF", "OT_DMF", "OT_DMF", 
+       "OT_MIX_NEP", "OT_MIX_NEP", "OT_MIX_NEP", "OT_MIX_NEP", "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "OT_DMF",
+       "OT_DMF", "OT_MIX_NEP", "OT_SPF", "OT_SPF", "OT_DMF",  "OT_SPF",  "SDN_DEM", "SDN_DEM", "SDN_DEM", "SDN_DEM",
+       "SSC_DEM", "SSC_DEM",   "TBB_CRU")
+       
     } else{
     stop('adapt the BENTHIS metiers for this year')
     }
    }
   }  
+  }
   }
   initVersusBenthisMetiers <-  tacsatp [!duplicated(data.frame(tacsatp$LE_MET_init, tacsatp$LE_MET)), 
                                     c('LE_MET_init', 'LE_MET')]
@@ -499,7 +508,7 @@ if(TRUE){
 fls <- dir(file.path(outPath,a_year,"interpolated"))
 
 lst <- list(); count <- 0
-cols2keep <- c("SI_LATI","SI_LONG","LE_GEAR","LE_MET","SWEPT_AREA_KM2","SWEPT_AREA_KM2_LOWER","SWEPT_AREA_KM2_UPPER")
+cols2keep <- c("SI_LATI","SI_LONG","SI_DATE","LE_GEAR","LE_MET","SWEPT_AREA_KM2","SWEPT_AREA_KM2_LOWER","SWEPT_AREA_KM2_UPPER")
 for(iFile in fls){
   cat(paste(iFile, "\n"))
   count <- count+1
@@ -513,8 +522,11 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
 
 
 
-
+#-----------------------------------------------------------------------------
 # compute (discrete point) effort_days and effort_KWdays
+#-----------------------------------------------------------------------------
+
+# 
  #......
   library(doBy)
   tacsatp                  <- orderBy(~VE_REF+SI_DATIM+FT_REF,data=tacsatp)
@@ -656,6 +668,8 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
 
   ### the swept area-------------------------------------------
 
+  tacsatp <- tacsatSweptArea 
+
    ## user selection here----
     what                 <- "SWEPT_AREA_KM2"
     #what                <- "HL_ID"
@@ -668,13 +682,13 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
     all_gears            <- sort(unique(tacsatp$LE_GEAR))
     towedGears          <- c('OTB', 'TBB', 'PTB', 'PTM', 'DRB')  # TO DO: list to be checked
     passive_gears        <- all_gears[!all_gears %in% towedGears]
+    we <- 10; ea <- 13; no <- 59; so <- 55;
     ##------------------------
 
     # subset for relevant fisheries
     this            <- tacsatp [tacsatp$LE_GEAR %in% towedGears , ]
 
     # restrict the study area
-    we <- 10; ea <- 13; no <- 59; so <- 55;
     this <- this[this$SI_LONG>we & this$SI_LONG<ea & this$SI_LATI>so & this$SI_LATI<no,]
 
     # grid the data (in decimal or in UTM)
