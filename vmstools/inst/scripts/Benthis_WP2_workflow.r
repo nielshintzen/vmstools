@@ -591,7 +591,8 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
                                    so=52.5,
                                    no=59,
                                    the_breaks =c(0, (1:12)^2.5 ),
-                                   output_file_name='GriddedSweepAreaExample'
+                                   output_file_name='GriddedSweepAreaExample',
+                                   export_cumul=FALSE # because time consuming....
                                )
                        ){
                    
@@ -603,7 +604,8 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
 
     # grid the data (in decimal or in UTM)
     if(general$is_utm){
-      dx <- 0.0002 # 5km x 5km
+      dx <- 0.0002 # 5km 
+      dx <- 0.001 # 1km 
       # convert to UTM
       library(sp)
       library(rgdal)
@@ -612,30 +614,35 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
       this <- cbind(this,
                  spTransform(SP, CRS(paste("+proj=utm  +ellps=intl +zone=",utm_zone," +towgs84=-84,-107,-120,0,0,0,0,0", sep=''))))    # convert to UTM
       this            <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', 'coords.x1', 'coords.x2', what)]
-      this$round_long <- round(as.numeric(as.character(this$coords.x1))*dx*2)
+      this$round_long <- round(as.numeric(as.character(this$coords.x1))*dx)
       this$round_lat  <- round(as.numeric(as.character(this$coords.x2))*dx)
       this            <- this[, !colnames(this) %in% c('coords.x1', 'coords.x2')]
+      this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
+      this$xs         <- (this$round_long/(dx))
+      this$ys         <- (this$round_lat/(dx))
+      colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')  
+      # retrieve the geo resolution, for info
+      # unique(this$ys)
+      # unique(this$xs)
     }  else {
       dx <- 20
       this <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', what)]
       this$round_long <- round(as.numeric(as.character(this$SI_LONG))*dx*2)
       this$round_lat  <- round(as.numeric(as.character(this$SI_LATI))*dx)
-    }
+      this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
+      this$xs         <- (this$round_long/(dx*2))
+      this$ys         <- (this$round_lat/(dx))
+      colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')  
+      # retrieve the geo resolution in degree, for info
+      #long <- seq(1,15,by=0.01)
+      #res_long <- diff( long [1+which(diff(round(long*dx)/dx/2)!=0)] )
+      #res_lat <- diff( long [1+which(diff(round(long*dx/2)/dx)!=0)] )
+      #print(res_long) ; print(res_lat)
+      }
      # if the coordinates in decimal then dx=20 corresponds to grid resolution of 0.05 degrees
      # i.e. a 3´ angle = 3nm in latitude but vary in longitude (note that a finer grid will be produced if a higher value for dx is put here)
      # if coord in UTM then 0.001 correspond to grid of 1 by 1 km (to check)
 
-    this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
-    this$xs         <- (this$round_long/(dx*2))
-    this$ys         <- (this$round_lat/(dx))
-    colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')  
-   
-
-    # retrieve the geo resolution in degree, for info
-    #long <- seq(1,15,by=0.01)
-    #res_long <- diff( long [1+which(diff(round(long*dx)/dx/2)!=0)] )
-    #res_lat <- diff( long [1+which(diff(round(long*dx/2)/dx)!=0)] )
-    #print(res_long) ; print(res_lat)
 
 
     # a quick gridding method...
@@ -654,7 +661,8 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
     the_points <- tapply(this$what,
                   list(this$round_lat, this$round_long), general$a_func, na.rm=TRUE)
 
-    xs <- (as.numeric(as.character(colnames(the_points)))/(dx*2))
+    if(!is_utm) xs <- (as.numeric(as.character(colnames(the_points)))/(dx*2))
+    if(is_utm) xs <- (as.numeric(as.character(colnames(the_points)))/(dx))
     ys <- (as.numeric(as.character(rownames(the_points)))/(dx))
 
    
@@ -678,8 +686,8 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
     if(is_utm) sh1 <- spTransform(sh1, CRS(paste("+proj=utm  +ellps=intl +zone=",general$utm_zone," +towgs84=-84,-107,-120,0,0,0,0,0", sep='')))
     plot(sh1, add=TRUE, col=grey(0.7))
 
-    legend("topright", fill=terrain.colors(length(general$the_breaks)-1),
-             legend=round(general$the_breaks[-1],1), bty="n", cex=0.8, ncol=2, title="")
+    legend("topright", fill=terrain.colors(length(general$the_breaks)-1), title=paste(what, " 1 x 1km cell"),
+             legend=round(general$the_breaks[-1],1), bty="n", cex=0.8, ncol=2)
     box()
     axis(1)
     axis(2, las=2)
@@ -713,6 +721,7 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
 
 
     # export the cumul per cell and date
+    if(general$export_cumul){
     quantity_per_cell_date <- orderBy(~date, data=quantity_per_cell_date)
     quantity_cumul_per_cell_date <- do.call("rbind", lapply(
       split(quantity_per_cell_date, f=quantity_per_cell_date$cell),
@@ -723,7 +732,7 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
     # check the cumul on a given cell
     # head(quantity_cumul_per_cell_date[quantity_cumul_per_cell_date$cell=="C_197_2722",])               
     save(quantity_cumul_per_cell_date, res_long, res_lat,  general, file=file.path(outPath,a_year, paste(general$output_file_name,"_quantity_cumul_per_cell_date.RData",sep='')) )
-
+    }
 
   cat(paste("Please find the saved map and export files in ",file.path(outPath,a_year), "\n"))
  return() 
@@ -744,8 +753,9 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
                                    ea=15,
                                    so=52.5,
                                    no=59,
-                                   the_breaks =c(0, (1:12)^2.5 ),
-                                   output_file_name='GriddedSweepAreaExample_allmet'
+                                   the_breaks =c(0, (1:12)^1.5 ),
+                                   output_file_name='GriddedSweepAreaExample_allmet',
+                                   export_cumul=FALSE
                                ))
  
  
@@ -759,11 +769,25 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
                                    so=52.5,
                                    no=59,
                                    the_breaks =c(0, (1:12)^2.5 ),
-                                   output_file_name='GriddedSweepAreaExample_seinersonly'
+                                   output_file_name='GriddedSweepAreaExample_seinersonly',
+                                   export_cumul=FALSE
                                ))
  
  
- 
+   gridding(tacsatp=tacsatp,   general=list(what="SWEPT_AREA_KM2", 
+                                   a_func="sum",      #a_func  <- function(x) {unique(length(x))} # for HL_ID, to be tested.
+                                   is_utm=TRUE,
+                                   utm_zone=32,
+                                   BENTHISmetiers=c('DRB_MOL', 'NA', 'OT_CRU', 'OT_SPF', 'OT_DMF', 'OT_MIX_NEP', 'SDN_DEM', 'SSC_DEM', 'TBB_CRU', 'TBB_DMF'),
+                                   we=1,
+                                   ea=15,
+                                   so=52.5,
+                                   no=63,
+                                   the_breaks =c(0, (1:12)^1.5 ),
+                                   output_file_name='GriddedSweepAreaExample_allmet_largerarea',
+                                   export_cumul=FALSE
+                               ))
+
 
 
  #-----------------------------------------------------------------------------
