@@ -535,11 +535,17 @@ for(iFile in fls){
   tacsatIntGearVEREF <- compute_swept_area (tacsatIntGearVEREF, gear_param_per_metier, towedGears, seineGears, VMS_ping_rate_in_hour, already_informed_width_for=NULL)
   }
   
+  if(nrow(tacsatIntGearVEREF[is.na(tacsatIntGearVEREF$SWEPT_AREA_KM2),])!=0 ) print('check for NAs')
+  # NAs are acceptable if the metier was not informed (e.g. No_Matrix6)...
+  print(unique(tacsatIntGearVEREF[is.na(tacsatIntGearVEREF$SWEPT_AREA_KM2),"LE_MET_init"]))
  
   lst[[count]] <- tacsatIntGearVEREF[,cols2keep]
 
 }
 tacsatSweptArea   <- do.call(rbind,lst)
+
+# check NAs (approx. 2% of the records)
+nrow(tacsatSweptArea[is.na(tacsatSweptArea$SWEPT_AREA_KM2),])
 
 # save
 save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RData", sep="")),compress=T)
@@ -711,7 +717,7 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
     a_func               <- "sum"
     is_utm               <- FALSE
     all_gears            <- sort(unique(tacsatp$LE_GEAR))
-    BENTHISmetiers       <- c('DRB_MOL', 'NA' 'OT_CRU', 'OT_SPF', 'OT_DMF', 'OT_MIX_NEP', 'SDN_DEM', 'SSC_DEM', 'TBB_CRU', 'TBB_DMF') 
+    BENTHISmetiers       <- c('DRB_MOL', 'NA', 'OT_CRU', 'OT_SPF', 'OT_DMF', 'OT_MIX_NEP', 'SDN_DEM', 'SSC_DEM', 'TBB_CRU', 'TBB_DMF') 
     we <- 10; ea <- 13; no <- 59; so <- 55;
     ##------------------------
 
