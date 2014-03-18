@@ -568,506 +568,68 @@ save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RDat
 
 
 
-
-
 #-----------------------------------------------------------------------------
-# GRIDDING (IN DECIMAL DEGREES OR UTM COORD)
+# Create the aggregated swept area dataset 
+# (TO BE DELIVERED BY EACH PARTNER TO THE WP2 COORDINATOR)
 #-----------------------------------------------------------------------------
-  # using a quick gridding code at various resolution.
 
+# once you have your three years ready....
+
+
+#- Combine tacsatSweptArea files from 2010-2012
+for(iYr in 2010:2012){
+  #- read data for this year
+  load(file.path(outPath, iYr, "tacsatSweptArea.RData")) 
   
-  # For example, grid the swept area, or the number of hauls, or the fishing pressure, etc.
-  sh1 <<- readShapePoly(file.path(polPath,"francois_EU"))
-
-
-  gridding <- function(tacsatp, 
-                      general=list(what="SWEPT_AREA_KM2", 
-                                   a_func="sum",      #a_func  <- function(x) {unique(length(x))} # for HL_ID, to be tested.
-                                   is_utm=TRUE,
-                                   utm_zone=32,
-                                   BENTHISmetiers=c('DRB_MOL', 'NA', 'OT_CRU', 'OT_SPF', 'OT_DMF', 'OT_MIX_NEP', 'SDN_DEM', 'SSC_DEM', 'TBB_CRU', 'TBB_DMF'),
-                                   we=10,
-                                   ea=15,
-                                   so=52.5,
-                                   no=59,
-                                   the_breaks =c(0, (1:12)^2.5 ),
-                                   output_file_name='GriddedSweepAreaExample',
-                                   export_cumul=FALSE # because time consuming....
-                               )
-                       ){
-                   
-    # subset for relevant fisheries
-    this            <- tacsatp [tacsatp$LE_MET %in% general$BENTHISmetiers, ]
-
-    # restrict the study area
-    this <- this[this$SI_LONG>general$we & this$SI_LONG<general$ea & this$SI_LATI>general$so & this$SI_LATI<general$no,]
-
-    # grid the data (in decimal or in UTM)
-    if(general$is_utm){
-      dx <- 0.0002 # 5km 
-      dx <- 0.001 # 1km 
-      # convert to UTM
-      library(sp)
-      library(rgdal)
-      SP <- SpatialPoints(cbind(as.numeric(as.character(this$SI_LONG)), as.numeric(as.character(this$SI_LATI))),
-                       proj4string=CRS("+proj=longlat +datum=WGS84"))
-      this <- cbind(this,
-                 spTransform(SP, CRS(paste("+proj=utm  +ellps=intl +zone=",general$utm_zone," +towgs84=-84,-107,-120,0,0,0,0,0", sep=''))))    # convert to UTM
-      this            <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', 'coords.x1', 'coords.x2', general$what)]
-      this$round_long <- round(as.numeric(as.character(this$coords.x1))*dx)
-      this$round_lat  <- round(as.numeric(as.character(this$coords.x2))*dx)
-      this            <- this[, !colnames(this) %in% c('coords.x1', 'coords.x2')]
-      this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
-      this$xs         <- (this$round_long/(dx))
-      this$ys         <- (this$round_lat/(dx))
-      colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')  
-      # retrieve the geo resolution, for info
-      # unique(this$ys)
-      # unique(this$xs)
-    }  else {
-      dx <- 20
-      this <- this [, c('SI_LONG', 'SI_LATI', 'SI_DATE', general$what)]
-      this$round_long <- round(as.numeric(as.character(this$SI_LONG))*dx*2)
-      this$round_lat  <- round(as.numeric(as.character(this$SI_LATI))*dx)
-      this$cell       <- paste("C_",this$round_long,"_", this$round_lat, sep='')
-      this$xs         <- (this$round_long/(dx*2))
-      this$ys         <- (this$round_lat/(dx))
-      colnames(this) <- c('x', 'y', 'date', 'what', 'round_long', 'round_lat', 'cell', 'xs', 'ys')  
-      # retrieve the geo resolution in degree, for info
-      #long <- seq(1,15,by=0.01)
-      #res_long <- diff( long [1+which(diff(round(long*dx)/dx/2)!=0)] )
-      #res_lat <- diff( long [1+which(diff(round(long*dx/2)/dx)!=0)] )
-      #print(res_long) ; print(res_lat)
-      }
-     # if the coordinates in decimal then dx=20 corresponds to grid resolution of 0.05 degrees
-     # i.e. a 3´ angle = 3nm in latitude but vary in longitude (note that a finer grid will be produced if a higher value for dx is put here)
-     # if coord in UTM then 0.001 correspond to grid of 1 by 1 km 
-
-
-
-    # a quick gridding method...
-    background <- expand.grid(
-                              x=0,
-                              y=0,
-                              date=this$date[1],  
-                              what=0,
-                              round_long=seq(range(this$round_long)[1], range(this$round_long)[2], by=1),
-                              round_lat=seq(range(this$round_lat)[1], range(this$round_lat)[2], by=1),
-                              cell=0,
-                              xs=0,
-                              ys=0
-                              )
-    this <- rbind(this, background)
-    the_points <- tapply(this$what,
-                  list(this$round_long, this$round_lat), general$a_func, na.rm=TRUE)
-
-    if(!general$is_utm) xs <- (as.numeric(as.character(rownames(the_points)))/(dx*2))
-    if(general$is_utm) xs <- (as.numeric(as.character(rownames(the_points)))/(dx))
-    ys <- (as.numeric(as.character(colnames(the_points)))/(dx))
-
-   
-    graphics:::image(
-     x=xs,
-     y=ys,
-     z= the_points  ,
-     breaks=c(general$the_breaks),
-     col = terrain.colors(length(general$the_breaks)-1),
-     useRaster=FALSE,
-     xlab="",
-     ylab="",
-     axes=FALSE,
-     xlim=range(xs), ylim=range(ys),
-     add=FALSE
-     )
-    title("")
-
-    # land
-    sh1 <- readShapePoly(file.path(polPath,"francois_EU"),  proj4string=CRS("+proj=longlat +datum=WGS84"))
-    if(general$is_utm) sh1 <- spTransform(sh1, CRS(paste("+proj=utm  +ellps=intl +zone=",general$utm_zone," +towgs84=-84,-107,-120,0,0,0,0,0", sep='')))
-    plot(sh1, add=TRUE, col=grey(0.7))
-
-    legend("topright", fill=terrain.colors(length(general$the_breaks)-1), title=paste(general$what, " 1 x 1km cell"),
-             legend=round(general$the_breaks[-1],1), bty="n", cex=0.8, ncol=2)
-    box()
-    axis(1)
-    axis(2, las=2)
-
-    if(general$is_utm){
-      mtext(side=1, "Eastings", cex=1, adj=0.5, line=2)
-      mtext(side=2, "Northings", cex=1, adj=0.5, line=2)
-    } else{
-      mtext(side=1, "Longitude", cex=1, adj=0.5, line=2)
-      mtext(side=2, "Latitude", cex=1, adj=0.5, line=2)
-      #points (tacsatp [,c('SI_LONG', 'SI_LATI')], pch=".", col="white")
-    }
-
-
-    # save
-    savePlot(filename=file.path(outPath,a_year, paste(general$output_file_name,".jpeg", sep='')), type="jpeg")
- 
-  
-
-    # export the quantity per cell and date
-    library(data.table)
-    DT                <-  data.table(this)
-    qu                <-  quote(list(sum(what, na.rm=TRUE)))
-    quantity_per_cell <- DT[,eval(qu), by=list(cell, xs,ys)]
-    quantity_per_date <- DT[,eval(qu), by=list(date, xs,ys)]
-    quantity_per_cell_date <- DT[,eval(qu), by=list(cell,date, xs,ys)]
-    quantity_per_cell_date <- as.data.frame(quantity_per_cell_date)
-    colnames(quantity_per_cell_date)   <- c('cell','date', 'xs','ys', 'quantity')
-    rm(DT) ; gc(reset=TRUE)
-    save(quantity_per_cell_date, res_long, res_lat,  general, file=file.path(outPath,a_year, paste(general$output_file_name,"PerCellDate.RData", sep='')) )
-
-
-    # export the cumul per cell and date
-    if(general$export_cumul){
-    quantity_per_cell_date$quantity <- replace(quantity_per_cell_date$quantity, is.na(quantity_per_cell_date$quantity), 0)
-    quantity_per_cell_date <- orderBy(~date, data=quantity_per_cell_date)
-    quantity_cumul_per_cell_date <- do.call("rbind", lapply(
-      split(quantity_per_cell_date, f=quantity_per_cell_date$cell),
-               function(x){
-               x$quantity <- cumsum(x$quantity)
-               x
-               })  )
-    # check the cumul on a given cell
-    # head(quantity_cumul_per_cell_date[quantity_cumul_per_cell_date$cell=="C_197_2722",])               
-    save(quantity_cumul_per_cell_date, res_long, res_lat,  general, file=file.path(outPath,a_year, paste(general$output_file_name,"CumulPerCellDate.RData",sep='')) )
-    }
-
-  cat(paste("Please find the saved map and export files in ",file.path(outPath,a_year), "\n"))
- return() 
- }
- 
- #-------------------------------------
- # CALLS for mapping and exporting-----
-  load(file.path(outPath, a_year, "tacsatSweptArea.RData")) # get 'tacsatSweptArea' with all data
-  tacsatp         <- tacsatSweptArea 
-  tacsatp$SI_DATE <- as.POSIXct(paste(tacsatp$SI_DATE,    sep=" "), tz="GMT", format="%d/%m/%Y")
-  graphics.off()
-  
-  # SHOULD BE DELIVERED BY ALL THE PARTNERS:
-  gridding(tacsatp=tacsatp,   general=list(what="SWEPT_AREA_KM2", 
-                                   a_func="sum",     
-                                   is_utm=TRUE,
-                                   utm_zone=32,
-                                   BENTHISmetiers=c('DRB_MOL', 'NA', 'OT_CRU', 'OT_SPF', 'OT_DMF','OT_MIX', 'OT_MIX_NEP', 'SDN_DEM', 'SSC_DEM', 'TBB_CRU', 'TBB_DMF'),
-                                   we=10,
-                                   ea=15,
-                                   so=52.5,
-                                   no=59,
-                                   the_breaks =c(0, (1:12)^1.5 ),
-                                   output_file_name='DenGriddedSweptArea',
-                                   export_cumul=TRUE
-                               ))
- 
-  gridding(tacsatp=tacsatp,   general=list(what="SWEPT_AREA_KM2_LOWER", 
-                                   a_func="sum",     
-                                   is_utm=TRUE,
-                                   utm_zone=32,
-                                   BENTHISmetiers=c('DRB_MOL', 'NA', 'OT_CRU', 'OT_SPF', 'OT_DMF', 'OT_MIX', 'OT_MIX_NEP', 'SDN_DEM', 'SSC_DEM', 'TBB_CRU', 'TBB_DMF'),
-                                   we=10,
-                                   ea=15,
-                                   so=52.5,
-                                   no=59,
-                                   the_breaks =c(0, (1:12)^1.5 ),
-                                   output_file_name='DenGriddedSweptAreaLower',
-                                   export_cumul=TRUE
-                               ))
-
-  gridding(tacsatp=tacsatp,   general=list(what="SWEPT_AREA_KM2_UPPER", 
-                                   a_func="sum",     
-                                   is_utm=TRUE,
-                                   utm_zone=32,
-                                   BENTHISmetiers=c('DRB_MOL', 'NA', 'OT_CRU', 'OT_SPF', 'OT_DMF','OT_MIX', 'OT_MIX_NEP', 'SDN_DEM', 'SSC_DEM', 'TBB_CRU', 'TBB_DMF'),
-                                   we=10,
-                                   ea=15,
-                                   so=52.5,
-                                   no=59,
-                                   the_breaks =c(0, (1:12)^1.5 ),
-                                   output_file_name='DenGriddedSweptAreaUpper',
-                                   export_cumul=TRUE
-                               ))
- 
-  # subset for some metiers...
-  gridding(tacsatp=tacsatp,   general=list(what="SWEPT_AREA_KM2", 
-                                   a_func="sum",     
-                                   is_utm=TRUE,
-                                   utm_zone=32,
-                                   BENTHISmetiers=c('SDN_DEM', 'SSC_DEM'),
-                                   we=10,
-                                   ea=15,
-                                   so=52.5,
-                                   no=59,
-                                   the_breaks =c(0, (1:12)^2.5 ),
-                                   output_file_name='DenGriddedSweptAreaSeinersOnly',
-                                   export_cumul=FALSE
-                               ))
- 
-  gridding(tacsatp=tacsatp,   general=list(what="SWEPT_AREA_KM2", 
-                                   a_func="sum",      
-                                   is_utm=TRUE,
-                                   utm_zone=32,
-                                   BENTHISmetiers=c('TBB_CRU', 'TBB_DMF'),
-                                   we=1,
-                                   ea=15,
-                                   so=52.5,
-                                   no=63,
-                                    the_breaks =c(0, (1:12)^1.5 ),
-                                   output_file_name='DenGriddedSweptAreaTbbOnly',
-                                   export_cumul=FALSE
-                               ))
-
-  gridding(tacsatp=tacsatp,   general=list(what="SWEPT_AREA_KM2", 
-                                   a_func="sum",    
-                                   is_utm=TRUE,
-                                   utm_zone=32,
-                                   BENTHISmetiers=c('DRB_MOL', 'NA', 'OT_CRU', 'OT_SPF', 'OT_DMF', 'OT_MIX_NEP', 'SDN_DEM', 'SSC_DEM', 'TBB_CRU', 'TBB_DMF'),
-                                   we=1,
-                                   ea=15,
-                                   so=52.5,
-                                   no=63,
-                                   the_breaks =c(0, (1:12)^1.5 ),
-                                   output_file_name='DenGriddedSweptAreaAllmetLargerArea',
-                                   export_cumul=FALSE
-                               ))
-
-
-  ## note that the gridding() function produce a quantity_per_cell_date object that can be use at any time afterward
-  ## (see for example an application to produce an animation of the daily pressure...)
-  ## and is the format to be used for stacking layers from different countries. 
-
-
-
- #-----------------------------------------------------------------------------
- # PRODUCE DAILY MAPS TO BUILD A MOVIE FROM PNG FILES
- #-----------------------------------------------------------------------------
- plot_the_utm_grid <- function (quantity_per_cell_date, 
-                                name_output_file, 
-                                the_xlims, 
-                                the_ylims, 
-                                the_title,
-                                the_breaks =c(0, seq(0.1,1.0,by=0.05)^1.5, 1000 )
-                               ){
-
-   
-  polPath   <- "C:/BENTHIS/BalanceMaps"
-
-  library(maptools)
-  library(rgdal)
-  sh1 <- readShapePoly(file.path(polPath,"francois_EU"),  proj4string=CRS("+proj=longlat +datum=WGS84"))
-
-
-
- 
-   xs <- quantity_per_cell_date$xs
-   ys <- quantity_per_cell_date$ys
-
-   the_points <- tapply(quantity_per_cell_date$quantity,
-                  list(quantity_per_cell_date$xs, quantity_per_cell_date$ys), sum, na.rm=TRUE)
-
-
-   xs <- (as.numeric(as.character(rownames(the_points))))
-   ys <- (as.numeric(as.character(colnames(the_points))))
-
-   par(bg="white")
-
-  png(filename = name_output_file,
-                 width = 1600, height = 1600, 
-                 units = "px", pointsize = 12,  res=300)
-
-   graphics:::image(
-     x=xs,
-     y=ys,
-     z= the_points,
-     breaks=c(the_breaks),
-     col = rev(heat.colors(length(the_breaks)-1)),
-     useRaster=FALSE,
-     xlab="",
-     ylab="",
-     axes=FALSE,
-     xlim=the_xlims, ylim=the_ylims,
-     add=FALSE
-     )
-    title("")
-
-   sh1 <- spTransform(sh1, CRS(paste("+proj=utm  +ellps=intl +zone=",32," +towgs84=-84,-107,-120,0,0,0,0,0", sep='')))
-   plot(sh1, add=TRUE, col=grey(0.7))
-
-   legend("topright", fill=rev(heat.colors(length(the_breaks)-1)), title=paste("Swept area (km2)", " 1 x 1km cell"),
-             legend=round(the_breaks[-1],4), bty="n", cex=0.8, ncol=2)
-   box()
-   #axis(1)
-   #axis(2, las=2)
-
-   mtext(side=1, "Eastings", cex=1, adj=0.5, line=2)
-   mtext(side=2, "Northings", cex=1, adj=0.5, line=2)
-   title(the_title)
-   
-   dev.off()
-
-  return()
-  }
-
-  #---------------
-  
-  
-  #---------------------------
-  # calls to create daily maps
-  cumul <- TRUE
-  if(!cumul){
-   load(file.path(outPath, a_year, 'DenGriddedSweptAreaPerCellDate.RData')) # e.g. for Denmark 
-   the_breaks <- c(0, seq(0.1,1.0,by=0.05)^1.5, 10000) 
-   }
-   
-  # or if we want to map the cumul:
-  if(cumul){
-    load(file.path(outPath, a_year, 'DenGriddedSweptAreaCumulPerCellDate.RData')) # e.g. for Denmark 
-    quantity_per_cell_date <- quantity_cumul_per_cell_date
-    the_breaks  <- c(0, seq(0.1,1.2,by=0.1)^4.8, 10000) 
-    }
-    
-  dir.create(file.path(outPath, a_year, 'png_'))
-  png.names     <- sprintf("%05d", 1:length(quantity_per_cell_date$date))
-  
-  quantity_per_cell_date$xs <- factor(quantity_per_cell_date$xs) # tricky here: need factor to let the apply() work correctly in plot_the_utm_grid()
-  quantity_per_cell_date$ys <- factor(quantity_per_cell_date$ys)
-  quantity_per_cell_date    <- quantity_per_cell_date[quantity_per_cell_date$ys!=0,]
-  quantity_per_cell_date    <- quantity_per_cell_date[quantity_per_cell_date$xs!=0,]
-  quantity_per_cell_date    <- orderBy(~date, data=quantity_per_cell_date)
- 
-  count <- 0
-  ordered_dates <- as.character(unique(quantity_per_cell_date$date))[ order(as.character(unique(quantity_per_cell_date$date))) ]
-  for(a_date in ordered_dates){
-     count <- count+1
-     if(!cumul){ quant <- quantity_per_cell_date[as.character(quantity_per_cell_date$date)==a_date,]} # a snapshot
-     if(cumul) {
-       quant <- quantity_per_cell_date[as.character(quantity_per_cell_date$date)<=a_date,]  
-       quant <- quant[!duplicated(data.frame(quant$cell), fromLast = TRUE),]  # keep the most recent cumul
-       }  # if cumul
-     plot_the_utm_grid(
-                      quant, 
-                      name_output_file= file.path(outPath, a_year, 'png_', paste("tstep_",png.names[count],".png",sep="")),
-                      the_xlims=range(as.numeric(as.character(quantity_per_cell_date$xs))),
-                      the_ylims=range(as.numeric(as.character(quantity_per_cell_date$ys))),
-                      the_title=as.character(a_date),
-                      the_breaks=the_breaks
-                      )
-     } 
-
-
-
- #-----------------------------------------------------------------------------
- # LINK TO HABITAT MAPS
- #-----------------------------------------------------------------------------
-
-
-  #------------------
-  # SHAPEFILE--------
-  #------------------
-  library(maptools)
-  library(rgdal)
-  
-  # load a habitat map shape file
-  habitat_map           <- readShapePoly(file.path(polPath,"sediment_lat_long"),
-                                         proj4string=CRS("+proj=longlat +ellps=WGS84"))
-
-  sh_coastlines            <- readShapePoly(file.path(polPath,"francois_EU"))
-
-
-  load(file.path(outPath, a_year, "tacsatSweptArea.RData")) # get 'tacsatSweptArea' with all data
-  #....or load only one instance eg load(file.path(outPath, a_year, "interpolated","tacsatSweptArea_DNK000001744_OTB.RData"))
-  #tacsatSweptArea <- tacsatIntGearVEREF
-
-  coord <-  tacsatSweptArea[, c('SI_LONG', 'SI_LATI')]
-  names(habitat_map) # return the name of the coding variable
-
-  #Turn the polygons into spatial polygons
-  sp <- SpatialPolygons(habitat_map@polygons, proj4string=CRS("+proj=longlat +ellps=WGS84"))
- 
-  #Turn the point into a spatial point
-  spo <- SpatialPoints(data.frame(SI_LONG=coord[,1], SI_LATI=coord[,2]), proj4string=CRS("+proj=longlat +ellps=WGS84"))         
- 
-  #Use the magic 'over' function to see in which polygon it is located
-  idx <- over(spo,sp); print(idx)
-  tacsatSweptArea$SUBSTRATE <- habitat_map$BAL_CODE[idx]
-
-  # plot
-  plot(habitat_map, xlim=c(11,14), ylim=c(55,56))
-  axis(1) ; axis(2, las=2) ; box()
-  points(tacsatSweptArea[, c("SI_LONG","SI_LATI")], col=tacsatSweptArea$SUBSTRATE, pch=".")
-  #plot(sh_coastlines, add=TRUE)
-
-  # save
-  savePlot(filename=file.path(outPath,a_year,"VMSpingsAttachedToSedimentMap.jpeg"), type="jpeg")
-
-
-  #------------------
-  # RASTER-----------
-  #------------------
-  sh_coastlines            <- readShapePoly(file.path(polPath,"francois_EU"))
-
-  ## use point-raster overlay.......
-  library(raster)
-  landscapes       <- raster(file.path(polPath, "landscapes.tif"))    # probably need an update of rgdal here....
-  newproj          <- "+proj=longlat +datum=WGS84"
-  landscapes_proj  <- projectRaster(landscapes, crs=newproj)
-
-  save(landscapes_proj, file=file.path(polPath,a_year, "landscapes_proj.RData"))
-
-  load(file.path(polPath, "landscapes_proj.RData"))
-
-  load(file.path(outPath, a_year, "tacsatSweptArea.RData")) # get 'tacsatp' with all data
-  #....or load only one instance eg load("C:\\merging\\BENTHIS\\outputs\\interpolated\\tacsatSweptArea_DNK000005269_OTB.RData"))
-  #tacsatp <- tacsatpGearVEREF
-
-
-  coord <- cbind(x=anf(tacsatp$SI_LONG), y=anf(tacsatp$SI_LATI))
-
-  dd <- extract (landscapes_proj, coord[,1:2]) # get the landscape on the coord points!
-
-  coord <- cbind(coord,  landscapes_code=cut(dd, breaks=c(0,100,200,300,400,500,600)))
-
-  tacsatp <- cbind(tacsatp, landscapes_code= coord[,'landscapes_code'])
-
-  # plot and save...
-  plot(landscapes_proj, xlim=c(10,14), ylim=c(54.5,56.5))
-  plot(sh_coastlines,  xlim=c(10,14), ylim=c(54.5,56.5), add=TRUE)  # better for plotting the western baltic sea coastline!
-  points(coord[,"x"], coord[,"y"], col=coord[,"landscapes_code"], pch=".", cex=1)
-
-  # save
-  savePlot(filename=file.path(outPath,a_year, "VMSpingsAttachedToLandscapeMap.jpeg"), type="jpeg")
-
-
-
- #-----------------------------------------------------------------------------
- #  SEVERITY OF IMPACT
- #-----------------------------------------------------------------------------
-
-  # create a fake input file to show the required format
-  dd <- tacsatp[!duplicated(data.frame(tacsatp$VE_REF,tacsatp$LE_GEAR, tacsatp$LE_MET)), ]
-  fake_gear_metier_habitat_severity_table <- dd[,c('VE_REF', 'LE_GEAR', 'LE_MET')]
-  fake_gear_metier_habitat_severity_table <- cbind(fake_gear_metier_habitat_severity_table, HAB_SEVERITY=1)
-  gear_metier_habitat_severity_table  <- fake_gear_metier_habitat_severity_table
-  gear_metier_habitat_severity_table  <-   gear_metier_habitat_severity_table[complete.cases( gear_metier_habitat_severity_table),]
-  save(gear_metier_habitat_severity_table,   file=paste(dataPath,a_year,"gear_metier_habitat_severity_table.RData",   sep=""))
-
-  # load a table for HAB_SEVERITY per vid LE_REF per gr LE_GEAR per met LE_MET
-  load(file.path(dataPath, "gear_metier_habitat_severity_table.RData"))
-  tacsatp <- merge(tacsatp, gear_metier_habitat_severity_table)
-  save(tacsatp,   file=paste(outPath,a_year,"tacsatMergedHabSeverity.RData",   sep=""))
-
-  # pressure: weigh the swept area by the severity
-  tacsatp$pressure <- tacsatp$HAB_SEVERITY * tacsatp$SWEPT_AREA_KM2
-
-
-
-
-
-
-
-
-
+  #- collate
+  if(iYr == 2010) tacsatSweptAreaTot <- cbind(tacsatSweptArea,SI_YEAR=iYr)
+  if(iYr != 2010) tacsatSweptAreaTot <- rbind(tacsatSweptAreaTot,cbind(tacsatSweptArea,SI_YEAR=iYr))
+}
+tacsatSweptArea <- tacsatSweptAreaTot; rm(tacsatSweptAreaTot)
+
+
+#- Get outer ranges of latitude and longitude in dataset
+xrange  <- range(tacsatSweptArea$SI_LONG,na.rm=T)
+yrange  <- range(tacsatSweptArea$SI_LATI,na.rm=T)
+xrange  <- c(floor(xrange[1]),ceiling(xrange[2]))
+yrange  <- c(floor(yrange[1]),ceiling(yrange[2]))
+print(xrange); print(yrange)
+
+#- If xrange and yrange are inappropriate, set your own (rounded) xrange and yrange
+if(FALSE){
+  xrange  <- c(-10,20) # DEN
+  yrange  <- c(50,66) # DEN
+  # xrange  <- c(0,9)  # NLD
+  # yrange  <- c(51,57) # NLD
+  xrange[1] <- floor(xrange[1]); xrange[2] <- ceiling(xrange[2])
+  yrange[1] <- floor(yrange[1]); yrange[2] <- ceiling(yrange[2])
+}
+                             
+#- Set grid
+resx    <- 1/60 #1 minute
+resy    <- 1/60 #1 minute
+grd     <- createGrid(xrange,yrange,resx=1/60,resy=1/60,type="SpatialGrid",exactBorder=T)
+
+#- Grid all tacsatSweptArea data
+#  Convert all tacsat poins first to SpatialPoints
+coords                <- SpatialPoints(cbind(SI_LONG=tacsatSweptArea$SI_LONG,SI_LATI=tacsatSweptArea$SI_LATI))
+idx                   <- over(coords,grd)
+tacsatSweptArea$grID  <- idx
+
+#- Remove records that are not in the study area 
+tacsatSweptArea       <- subset(tacsatSweptArea,is.na(grID)==F)
+
+#- Aggregate the results by metier and grid ID (aggregate() can be slow: be patient)
+aggTacsatSweptArea    <- aggregate(tacsatSweptArea[,c("SWEPT_AREA_KM2",
+                                                      "SWEPT_AREA_KM2_LOWER",
+                                                      "SWEPT_AREA_KM2_UPPER")],
+                                   by=list(tacsatSweptArea$LE_MET,tacsatSweptArea$grID,tacsatSweptArea$SI_YEAR),sum,na.rm=T)
+colnames(aggTacsatSweptArea)[1:3] <- c("LE_MET","grID", "Year")
+
+#- Add midpoint of gridcell to dataset
+aggResult             <- cbind(aggTacsatSweptArea,CELL_LONG=coordinates(grd)[aggTacsatSweptArea$grID,1],
+                                                  CELL_LATI=coordinates(grd)[aggTacsatSweptArea$grID,2])
+save(aggResult,file=file.path(outPath,"AggregatedSweptArea.RData"))
 
 
 
