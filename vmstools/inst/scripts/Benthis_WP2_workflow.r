@@ -567,69 +567,169 @@ nrow(tacsatSweptArea[is.na(tacsatSweptArea$SWEPT_AREA_KM2),])
 save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RData", sep="")),compress=T)
 
 
-
 #-----------------------------------------------------------------------------
-# Create the aggregated swept area dataset 
+# Create the aggregated swept area dataset
 # (TO BE DELIVERED BY EACH PARTNER TO THE WP2 COORDINATOR)
 #-----------------------------------------------------------------------------
 
 # once you have your three years ready....
+outPath   <- "C:/BENTHIS/outputs/"  # PLEASE ADAPT.
 
+library(vmstools)
 
 #- Combine tacsatSweptArea files from 2010-2012
 for(iYr in 2010:2012){
-  #- read data for this year
-  load(file.path(outPath, iYr, "tacsatSweptArea.RData")) 
-  
-  #- collate
-  if(iYr == 2010) tacsatSweptAreaTot <- cbind(tacsatSweptArea,SI_YEAR=iYr)
-  if(iYr != 2010) tacsatSweptAreaTot <- rbind(tacsatSweptAreaTot,cbind(tacsatSweptArea,SI_YEAR=iYr))
+#- read data for this year
+load(file.path(outPath, iYr, "tacsatSweptArea.RData"))
+
+#- collate
+if(iYr == 2010) tacsatSweptAreaTot <- cbind(tacsatSweptArea,SI_YEAR=iYr)
+if(iYr != 2010) tacsatSweptAreaTot <- rbind(tacsatSweptAreaTot,cbind(tacsatSweptArea,SI_YEAR=iYr))
 }
 tacsatSweptArea <- tacsatSweptAreaTot; rm(tacsatSweptAreaTot)
 
+#- add months and days
+tacsatSweptArea$SI_DATE <- as.POSIXct(paste(tacsatSweptArea$SI_DATE,    sep=" "), tz="GMT", format="%d/%m/%Y")
+tacsatSweptArea$MONTH   <- format(tacsatSweptArea$SI_DATE, "%m") 
+tacsatSweptArea$DAY     <- format(tacsatSweptArea$SI_DATE, "%j")  
 
 #- Get outer ranges of latitude and longitude in dataset
-xrange  <- range(tacsatSweptArea$SI_LONG,na.rm=T)
-yrange  <- range(tacsatSweptArea$SI_LATI,na.rm=T)
-xrange  <- c(floor(xrange[1]),ceiling(xrange[2]))
-yrange  <- c(floor(yrange[1]),ceiling(yrange[2]))
+xrange <- range(tacsatSweptArea$SI_LONG,na.rm=T)
+yrange <- range(tacsatSweptArea$SI_LATI,na.rm=T)
+xrange <- c(floor(xrange[1]),ceiling(xrange[2]))
+yrange <- c(floor(yrange[1]),ceiling(yrange[2]))
 print(xrange); print(yrange)
 
 #- If xrange and yrange are inappropriate, set your own (rounded) xrange and yrange
 if(FALSE){
-  xrange  <- c(-10,20) # DEN
-  yrange  <- c(50,66) # DEN
-  # xrange  <- c(0,9)  # NLD
-  # yrange  <- c(51,57) # NLD
-  xrange[1] <- floor(xrange[1]); xrange[2] <- ceiling(xrange[2])
-  yrange[1] <- floor(yrange[1]); yrange[2] <- ceiling(yrange[2])
+xrange <- c(-10,20) # DEN
+yrange <- c(50,66) # DEN
+# xrange <- c(0,9) # NLD
+# yrange <- c(51,57) # NLD
+xrange[1] <- floor(xrange[1]); xrange[2] <- ceiling(xrange[2])
+yrange[1] <- floor(yrange[1]); yrange[2] <- ceiling(yrange[2])
 }
-                             
+
 #- Set grid
-resx    <- 1/60 #1 minute
-resy    <- 1/60 #1 minute
-grd     <- createGrid(xrange,yrange,resx=1/60,resy=1/60,type="SpatialGrid",exactBorder=T)
+resx <- 1/60 #1 minute
+resy <- 1/60 #1 minute
+grd <- createGrid(xrange,yrange,resx=1/60,resy=1/60,type="SpatialGrid",exactBorder=T)
 
 #- Grid all tacsatSweptArea data
-#  Convert all tacsat poins first to SpatialPoints
-coords                <- SpatialPoints(cbind(SI_LONG=tacsatSweptArea$SI_LONG,SI_LATI=tacsatSweptArea$SI_LATI))
-idx                   <- over(coords,grd)
-tacsatSweptArea$grID  <- idx
+# Convert all tacsat poins first to SpatialPoints
+coords <- SpatialPoints(cbind(SI_LONG=tacsatSweptArea$SI_LONG,SI_LATI=tacsatSweptArea$SI_LATI))
+idx <- over(coords,grd)
+tacsatSweptArea$grID <- idx
 
-#- Remove records that are not in the study area 
-tacsatSweptArea       <- subset(tacsatSweptArea,is.na(grID)==F)
+#- Remove records that are not in the study area
+tacsatSweptArea <- subset(tacsatSweptArea,is.na(grID)==F)
 
-#- Aggregate the results by metier and grid ID (aggregate() can be slow: be patient)
-aggTacsatSweptArea    <- aggregate(tacsatSweptArea[,c("SWEPT_AREA_KM2",
-                                                      "SWEPT_AREA_KM2_LOWER",
-                                                      "SWEPT_AREA_KM2_UPPER")],
-                                   by=list(tacsatSweptArea$LE_MET,tacsatSweptArea$grID,tacsatSweptArea$SI_YEAR),sum,na.rm=T)
+#-1 Aggregate the results by metier and grid ID (aggregate() can be slow: be patient)
+aggTacsatSweptArea <- aggregate(tacsatSweptArea[,c("SWEPT_AREA_KM2",
+"SWEPT_AREA_KM2_LOWER",
+"SWEPT_AREA_KM2_UPPER")],
+by=list(tacsatSweptArea$LE_MET,tacsatSweptArea$grID,tacsatSweptArea$SI_YEAR),sum,na.rm=T)
 colnames(aggTacsatSweptArea)[1:3] <- c("LE_MET","grID", "Year")
 
 #- Add midpoint of gridcell to dataset
-aggResult             <- cbind(aggTacsatSweptArea,CELL_LONG=coordinates(grd)[aggTacsatSweptArea$grID,1],
-                                                  CELL_LATI=coordinates(grd)[aggTacsatSweptArea$grID,2])
+aggResult <- cbind(aggTacsatSweptArea,CELL_LONG=coordinates(grd)[aggTacsatSweptArea$grID,1],
+CELL_LATI=coordinates(grd)[aggTacsatSweptArea$grID,2])
 save(aggResult,file=file.path(outPath,"AggregatedSweptArea.RData"))
+
+
+#-2 Aggregate the results by metier and grid ID and BY MONTH(aggregate() can be slow: be patient)
+aggTacsatSweptArea2 <- aggregate(tacsatSweptArea[,c("SWEPT_AREA_KM2",
+"SWEPT_AREA_KM2_LOWER", "SWEPT_AREA_KM2_UPPER")],
+by=list(tacsatSweptArea$LE_MET,tacsatSweptArea$MONTH,tacsatSweptArea$grID,tacsatSweptArea$SI_YEAR),sum,na.rm=T)
+colnames(aggTacsatSweptArea2)[1:4] <- c("LE_MET","MONTH", "grID", "Year")
+
+#- Add midpoint of gridcell to dataset
+aggResult <- cbind(aggTacsatSweptArea2,CELL_LONG=coordinates(grd)[aggTacsatSweptArea2$grID,1],
+CELL_LATI=coordinates(grd)[aggTacsatSweptArea2$grID,2])
+save(aggResult,file=file.path(outPath,"AggregatedSweptAreaMonth.RData"))
+
+
+#-3 Aggregate the results by metier and grid ID and BY DAY(aggregate() can be slow: be patient)
+aggTacsatSweptArea3 <- aggregate(tacsatSweptArea[,c("SWEPT_AREA_KM2",
+"SWEPT_AREA_KM2_LOWER", "SWEPT_AREA_KM2_UPPER")],
+by=list(tacsatSweptArea$LE_MET, tacsatSweptArea$DAY, tacsatSweptArea$grID,tacsatSweptArea$SI_YEAR),sum,na.rm=T)
+colnames(aggTacsatSweptArea3)[1:4] <- c("LE_MET","DAY", "grID", "Year")
+
+#- Add midpoint of gridcell to dataset
+aggResult <- cbind(aggTacsatSweptArea3, CELL_LONG=coordinates(grd)[aggTacsatSweptArea3$grID,1],
+CELL_LATI=coordinates(grd)[aggTacsatSweptArea3$grID,2])
+save(aggResult,file=file.path(outPath,"AggregatedSweptAreaDay.RData"))
+
+
+#-----------------------------------------------------------------------------
+# Create the "missing effort" dataset
+# (TO BE DELIVERED BY EACH PARTNER TO THE WP2 COORDINATOR)
+#-----------------------------------------------------------------------------
+
+#- Code to get the missing effort in percentages per ICES rectangle
+# i.e. the total effort in eflalo compared to the total effort in eflalo from
+# VMS-equipped vessels
+
+library(vmstools)
+
+# once you have your three years ready....
+dataPath  <- "C:/BENTHIS/EflaloAndTacsat/"
+
+
+aggResult <- NULL
+
+#- load eflalo 2010-2012
+for(iYr in 2010:2012){
+  #- read data for this year
+  load(file.path(outPath,iYr,"cleanEflalo.RData"))
+  load(file.path(outPath,iYr,"tacsatSweptArea.RData"))
+
+  #- Load the datasets
+  #data(europa)
+
+  #- Convert time stamps to posixct formats
+  eflalo$LE_CDATIM  <- as.POSIXct(eflalo$LE_CDAT,format="%d/%m/%Y",tz="GMT")
+
+  #- Calculate the effort (INTVDAY) in eflalo
+  eflalo$INTV       <- c(difftime(eflalo$FT_LDATIM,eflalo$FT_DDATIM,units="mins"))
+  eflalo$dummy      <- 1
+  eflalo            <- merge(eflalo,aggregate(eflalo$dummy,by=list(eflalo$FT_REF,eflalo$LE_CDATIM),FUN=sum,na.rm=T),by.x=c("FT_REF","LE_CDATIM"),by.y=c("Group.1","Group.2"),all.x=T)
+  colnames(eflalo)[length(colnames(eflalo))] <- "NR_FT_REF"
+  eflalo$INTVDAY    <- eflalo$INTV / eflalo$NR_FT_REF
+
+  # - we need to retrieve the BENTHIS metiers if not already informed in eflalo.
+  # this following object is in the workflow line 347, so partners should have it.
+  # if not, then they should apply the same procedure you did to assign BENTHIS metier
+  ctry <- DEN
+  if(ctry==DEN){
+    load(file=file.path(outPath,iYr,"initVersusBenthisMetiers.RData"))
+    eflalo$LE_MET_BENTHIS <- initVersusBenthisMetiers[match(eflalo$LE_MET, initVersusBenthisMetiers$LE_MET_init),'LE_MET']
+  }
+
+  # note that the metiers at NAs correspond to all the metiers which are not BENTHIS e.g., gillnets, pots, etc.
+
+  
+  # - partner might adapt here if needed (the goal is to subset eflalo for the VMS-equipped vessels only)
+  fls          <- dir(file.path(outPath,iYr,"interpolated"))
+  vms_equipped <- unique(sapply(fls, function (x) unlist(strsplit(x, "_"))[2]))  
+  eflalo_vms   <- eflalo[eflalo$VE_REF %in%  vms_equipped,]
+
+   
+  # - do the aggregation
+  aggResult_vms<- aggregate(eflalo_vms$INTVDAY, list(eflalo_vms$LE_RECT, eflalo_vms$LE_MET_BENTHIS), sum, na.rm=TRUE)
+  colnames(aggResult_vms) <- c('LE_RECT', 'LE_MET', 'INTVDAY')
+  aggResult_tot<- aggregate(eflalo$INTVDAY, list(eflalo$LE_RECT,  eflalo$LE_MET_BENTHIS), sum, na.rm=TRUE)
+  colnames(aggResult_tot) <- c('LE_RECT', 'LE_MET', 'INTVDAY_TOT')
+  aggResult    <- rbind.data.frame(aggResult, cbind.data.frame(merge(aggResult_vms, aggResult_tot), SI_YEAR=iYr))
+}
+
+
+
+
+save(aggResult,file=file.path(outPath,paste("missingEffortTable.RData", sep='')))
+
+
+
 
 
 
