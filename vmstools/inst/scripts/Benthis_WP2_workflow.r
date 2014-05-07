@@ -666,7 +666,7 @@ save(aggResult,file=file.path(outPath,"AggregatedSweptAreaDay.RData"))
 # (TO BE DELIVERED BY EACH PARTNER TO THE WP2 COORDINATOR)
 #-----------------------------------------------------------------------------
 
-#- Code to get the missing effort in percentages per ICES rectangle
+#- Code to get the missing effort per ICES rectangle
 # i.e. the total effort in eflalo compared to the total effort in eflalo from
 # VMS-equipped vessels
 
@@ -685,7 +685,7 @@ for(iYr in 2010:2012){
   load(file.path(outPath,iYr,"tacsatSweptArea.RData"))
 
   #- Load the datasets
-  #data(europa)
+  #data(europa) # for test
 
   #- Convert time stamps to posixct formats
   eflalo$LE_CDATIM  <- as.POSIXct(eflalo$LE_CDAT,format="%d/%m/%Y",tz="GMT")
@@ -700,8 +700,8 @@ for(iYr in 2010:2012){
   # - we need to retrieve the BENTHIS metiers if not already informed in eflalo.
   # this following object is in the workflow line 347, so partners should have it.
   # if not, then they should apply the same procedure you did to assign BENTHIS metier
-  ctry <- DEN
-  if(ctry==DEN){
+  ctry <- "DEN"
+  if(ctry=="DEN"){
     load(file=file.path(outPath,iYr,"initVersusBenthisMetiers.RData"))
     eflalo$LE_MET_BENTHIS <- initVersusBenthisMetiers[match(eflalo$LE_MET, initVersusBenthisMetiers$LE_MET_init),'LE_MET']
   }
