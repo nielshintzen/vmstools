@@ -693,7 +693,7 @@ for(iYr in 2010:2012){
   #- Calculate the effort (INTVDAY) in eflalo
   eflalo$INTV       <- c(difftime(eflalo$FT_LDATIM,eflalo$FT_DDATIM,units="mins"))
   eflalo$dummy      <- 1
-  eflalo            <- merge(eflalo,aggregate(eflalo$dummy,by=list(eflalo$FT_REF,eflalo$LE_CDATIM),FUN=sum,na.rm=T),by.x=c("FT_REF","LE_CDATIM"),by.y=c("Group.1","Group.2"),all.x=T)
+  eflalo            <- merge(eflalo,aggregate(eflalo$dummy,by=list(eflalo$FT_REF),FUN=sum,na.rm=T),by.x=c("FT_REF"),by.y=c("Group.1"),all.x=T)
   colnames(eflalo)[length(colnames(eflalo))] <- "NR_FT_REF"
   eflalo$INTVDAY    <- eflalo$INTV / eflalo$NR_FT_REF
 
