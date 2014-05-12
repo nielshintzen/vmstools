@@ -720,7 +720,7 @@ for(iYr in 2010:2012){
   colnames(aggResult_vms) <- c('LE_RECT', 'LE_MET', 'INTVDAY')
   aggResult_tot<- aggregate(eflalo$INTVDAY, list(eflalo$LE_RECT,  eflalo$LE_MET_BENTHIS), sum, na.rm=TRUE)
   colnames(aggResult_tot) <- c('LE_RECT', 'LE_MET', 'INTVDAY_TOT')
-  aggResult    <- rbind.data.frame(aggResult, cbind.data.frame(merge(aggResult_vms, aggResult_tot), SI_YEAR=iYr))
+  aggResult    <- rbind.data.frame(aggResult, cbind.data.frame(merge(x=aggResult_vms, y=aggResult_tot, all=TRUE), SI_YEAR=iYr))
 }
 
 
