@@ -16,7 +16,7 @@ maxRangeCI <- function(x,y,Time,speed){
   #Calculate a and b as in Mills et al. 2006 paper
     warn<- 0
   if(d >= dmax){
-    warning(paste("Distance too far to reach with current speed estimate ",round(lon,3)," ",round(lat,3),"\n"))
+    warning(paste("Distance too far to reach with current speed estimate ",round(x,3)," ",round(y,3),"\n"))
     dmax <- d
     warn <- 1
   }

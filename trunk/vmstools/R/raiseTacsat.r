@@ -71,11 +71,15 @@ raiseTacsat <- function(tacsat,eflalo,by=c("LE_GEAR","VE_REF","SI_DAY","LE_RECT"
                           ifelse(c(difftime(as.Date(eflalo$FT_LDATIM),as.Date(eflalo$LE_CDATIM),units="hours")==0),
                             c(difftime(eflalo$FT_LDATIM,eflalo$LE_CDATIM,units="mins")),
                             1440)))
+  # Here there is still a problem because INTVDAY is calculated for catch days only, so you miss some effort of a whole trip
   eflalo$dummy     <- 1
-  eflalo           <- merge(eflalo,aggregate(eflalo$dummy,by=list(eflalo$FT_REF),FUN=sum,na.rm=T),by.x="FT_REF",by.y="Group.1",all.x=T)
+  eflalo           <- merge(eflalo,aggregate(eflalo$dummy,by=list(eflalo$FT_REF,eflalo$LE_CDATIM),FUN=sum,na.rm=T),by.x=c("FT_REF","LE_CDATIM"),by.y=c("Group.1","Group.2"),all.x=T)
   colnames(eflalo)[length(colnames(eflalo))] <- "NR_FT_REF"
-  #eflalo$INTVDAY   <- (eflalo$FT_DURDAY / eflalo$NR_FT_REF)
-  eflalo$INTVDAY   <- eflalo$FT_DURDAY
+  if("SI_DAY" %in% by){
+    eflalo$INTVDAY   <- eflalo$FT_DURDAY / eflalo$NR_FT_REF
+  } else {
+    eflalo$INTVDAY   <- eflalo$INTV / eflalo$NR_FT_REF
+    }
   eflalo           <- eflalo[,-grep("dummy",colnames(eflalo))]
   eflalo           <- eflalo[,-grep("FT_DURDAY",colnames(eflalo))]
   eflalo           <- eflalo[,-grep("NR_FT_REF",colnames(eflalo))]
@@ -99,11 +103,15 @@ raiseTacsat <- function(tacsat,eflalo,by=c("LE_GEAR","VE_REF","SI_DAY","LE_RECT"
   cat("Start minutes tacsat",sum(tacsat$INTV,na.rm=T),"\n")
 
   #- Order elements by uniqueness
-  if(sortBy)
-    by          <- names(sort(apply(eflalo[,by],2,function(x){length(unique(x))})))
+  if(sortBy){
+    if(length(by)>1)
+      by          <- names(sort(apply(eflalo[,by],2,function(x){length(unique(x))})))
+  }
 
   #- Drop element by element and merge
   byOrig    <- by
+  INTVR     <- numeric(nrow(tacsat))
+  INTVDAY   <- eflalo$INTVDAY
   for(j in 0:(length(by)-1)){
     if(j != 0)
       by  <- rev(rev(byOrig)[-c(1:j)])
@@ -115,11 +123,13 @@ raiseTacsat <- function(tacsat,eflalo,by=c("LE_GEAR","VE_REF","SI_DAY","LE_RECT"
       idxT <- which(pTa %in% unEf[i])
       idxE <- which(pEf %in% unEf[i])
       if(length(idxT)>0 & length(idxE)>0){
-        tacsat$INTVR[idxT]   <- sum(eflalo$INTVDAY[idxE] * eflalo$PropFish[idxE],na.rm=T)/sum(tacsat$INTV[idxT],na.rm=T) * tacsat$INTV[idxT] + tacsat$INTVR[idxT]
-        eflalo$INTVDAY[idxE] <- 0
+        INTVR[idxT]   <- sum(INTVDAY[idxE] * eflalo$PropFish[idxE],na.rm=T)/sum(tacsat$INTV[idxT],na.rm=T) * tacsat$INTV[idxT] + INTVR[idxT]
+        INTVDAY[idxE] <- 0
       }
     }
   }
+  tacsat$INTVR        <- INTVR
+  eflalo$INTVDAY      <- INTVDAY
 
   cat("Final minutes tacsat",sum(tacsat$INTVR,na.rm=T),"\n")
   cat("final remaing minutes eflalo",sum(eflalo$INTVDAY,na.rm=T),"\n")

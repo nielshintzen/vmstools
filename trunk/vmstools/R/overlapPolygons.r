@@ -27,7 +27,7 @@ overlapPolygons <- function(pol1=NULL,pol2=NULL,projection="LL",zone=NULL){
      pols1 <- numeric()
      counter       <- 0
      for(iPol1 in 1:length(pol1@polygons)){
-       for(iPol2 in 1:length(pol1@polygons[[iPol1]])){
+       for(iPol2 in 1:length(pol1@polygons[[iPol1]]@Polygons)){
          counter   <- counter + 1
          sourcePoly <- data.frame(cbind(1,1:nrow(pol1@polygons[[iPol1]]@Polygons[[iPol2]]@coords),
                                   pol1@polygons[[iPol1]]@Polygons[[iPol2]]@coords[,1],pol1@polygons[[iPol1]]@Polygons[[iPol2]]@coords[,2]))
@@ -45,7 +45,7 @@ overlapPolygons <- function(pol1=NULL,pol2=NULL,projection="LL",zone=NULL){
      pols2 <- numeric()
      counter       <- 0
      for(iPol1 in 1:length(pol2@polygons)){
-       for(iPol2 in 1:length(pol2@polygons[[iPol1]])){
+       for(iPol2 in 1:length(pol2@polygons[[iPol1]]@Polygons)){
          counter   <- counter + 1
          sourcePoly <- data.frame(cbind(1,1:nrow(pol2@polygons[[iPol1]]@Polygons[[iPol2]]@coords),
                                   pol2@polygons[[iPol1]]@Polygons[[iPol2]]@coords[,1],pol2@polygons[[iPol1]]@Polygons[[iPol2]]@coords[,2]))
@@ -60,8 +60,8 @@ overlapPolygons <- function(pol1=NULL,pol2=NULL,projection="LL",zone=NULL){
    }
 
 
-  jpoly  <- joinPolys(pol1,pol2)
-  if (!is.null(jpoly)){
+  jpoly  <- try(joinPolys(pol1,pol2))
+  if (!is.null(jpoly) & class(jpoly)!= "try-error"){
     ar <- calcArea(jpoly)
     jarea  <- aggregate(ar['area'],by=list(PID=ar$PID),FUN=sum)
   }else{
