@@ -74,10 +74,16 @@ estimatePropFishing <- function(tacsat,eflalo,by=c("LE_GEAR","VE_REF")){
                           ifelse(c(difftime(as.Date(eflalo$FT_LDATIM),as.Date(eflalo$LE_CDATIM),units="hours")==0),
                             c(difftime(eflalo$FT_LDATIM,eflalo$LE_CDATIM,units="mins")),
                             1440)))
+
+  # Here there is still a problem because INTVDAY is calculated for catch days only, so you miss some effort of a whole trip
   eflalo$dummy     <- 1
-  eflalo           <- merge(eflalo,aggregate(eflalo$dummy,by=list(eflalo$FT_REF),FUN=sum,na.rm=T),by.x="FT_REF",by.y="Group.1",all.x=T)
+  eflalo           <- merge(eflalo,aggregate(eflalo$dummy,by=list(eflalo$FT_REF,eflalo$LE_CDATIM),FUN=sum,na.rm=T),by.x=c("FT_REF","LE_CDATIM"),by.y=c("Group.1","Group.2"),all.x=T)
   colnames(eflalo)[length(colnames(eflalo))] <- "NR_FT_REF"
-  eflalo$INTVDAY   <- eflalo$FT_DURDAY
+  if("SI_DAY" %in% by){
+    eflalo$INTVDAY   <- eflalo$FT_DURDAY / eflalo$NR_FT_REF
+  } else {
+    eflalo$INTVDAY   <- eflalo$INTV / eflalo$NR_FT_REF
+    }
   eflalo           <- eflalo[,-grep("dummy",colnames(eflalo))]
   eflalo           <- eflalo[,-grep("FT_DURDAY",colnames(eflalo))]
   eflalo           <- eflalo[,-grep("NR_FT_REF",colnames(eflalo))]

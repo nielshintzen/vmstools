@@ -11,8 +11,13 @@ if(equalDist){
 } else {
   interpolationEQ <- lapply(interpolation,function(x){idx <- round(seq(2,nrow(x),length.out=npoints)); return(x[c(1,idx),])})
 }
+lenEQ <- length(interpolationEQ)
 res <- lapply(interpolationEQ,function(x){
-                                  idx                     <- unlist(x[1,1:2]@.Data); x <- data.frame(x)
+                                  idx                     <- unlist(x[1,1:2]@.Data);
+                                  if(lenEQ==1)
+                                    idx                   <- 1:2
+                                  if(idx > nrow(tacsat)) warnings("row identifier in interpolation (first row) is larger than nrows specified for tacsat")
+                                  x <- data.frame(x)
                                   colnames(x)             <- c("SI_LONG","SI_LATI")
                                   cls                     <- which(apply(tacsat[c(idx),],2,function(y){return(length(unique(y)))})==1)
                                   for(i in cls){
