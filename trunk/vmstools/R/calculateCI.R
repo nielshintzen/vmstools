@@ -26,11 +26,24 @@ calculateCI <- function(    int
   if(yrange[1] > yrg[1]) yrange[1] <- yrg[1] - diff(yrg)*0.1
   if(yrange[2] < yrg[2]) yrange[2] <- yrg[2] - diff(yrg)*0.1
 
-  grid      <- createGrid(c((xrange[1] - grid@cellcentre.offset[1])                   %/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1],
-                            (xrange[2] - grid@cellcentre.offset[1] + grid@cellsize[1])%/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1]),
-                          c((yrange[1] - grid@cellcentre.offset[2])                   %/%grid@cellsize[2] * grid@cellsize[2] + grid@cellcentre.offset[2],
-                            (yrange[2] - grid@cellcentre.offset[2] + grid@cellsize[2])%/%grid@cellsize[2] * grid@cellsize[2] + grid@cellcentre.offset[2]),
-                          grid@cellsize[1],grid@cellsize[2],type="SpatialGridDataFrame")
+  newxrange <- c((xrange[1] - grid@cellcentre.offset[1])                   %/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1],
+                            (xrange[2] - grid@cellcentre.offset[1] + grid@cellsize[1])%/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1])
+  newyrange <- c((yrange[1] - grid@cellcentre.offset[2])                   %/%grid@cellsize[2] * grid@cellsize[2] + grid@cellcentre.offset[2],
+                            (yrange[2] - grid@cellcentre.offset[2] + grid@cellsize[2])%/%grid@cellsize[2] * grid@cellsize[2] + grid@cellcentre.offset[2])
+
+  origxs    <- seq(grid@cellcentre.offset[1],grid@cellcentre.offset[1] + grid@cellsize[1] * (grid@cells.dim[1]-1),by= grid@cellsize[1])
+  origys    <- seq(grid@cellcentre.offset[2],grid@cellcentre.offset[2] + grid@cellsize[2] * (grid@cells.dim[2]-1),by= grid@cellsize[2])
+
+  subxs     <- apply(abs(outer(origxs,newxrange,"-")),2,which.min)
+  subys     <- apply(abs(outer(origys,newyrange,"-")),2,which.min)
+
+  grid      <- SpatialGrid(grid)[sort(grid@cells.dim[2]-seq(subys[1],subys[2])+1),seq(subxs[1],subxs[2])]
+  grid      <- as(grid,"SpatialGridDataFrame")
+#  grid      <- createGrid(c((xrange[1] - grid@cellcentre.offset[1])                   %/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1],
+#                            (xrange[2] - grid@cellcentre.offset[1] + grid@cellsize[1])%/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1]),
+#                          c((yrange[1] - grid@cellcentre.offset[2])                   %/%grid@cellsize[2] * grid@cellsize[2] + grid@cellcentre.offset[2],
+#                            (yrange[2] - grid@cellcentre.offset[2] + grid@cellsize[2])%/%grid@cellsize[2] * grid@cellsize[2] + grid@cellcentre.offset[2]),
+#                          grid@cellsize[1],grid@cellsize[2],type="SpatialGridDataFrame")
   coords    <- coordinates(grid)
 
   # Distance to begin or end point
@@ -49,7 +62,7 @@ calculateCI <- function(    int
   if(max(CI,na.rm=TRUE) < 0.1) warning("Prediction max(CI) is very small")
 
   if(plot){ image(t(matrix(CI,ncol=grid@grid@cells.dim[1],nrow=grid@grid@cells.dim[2],byrow=TRUE)[grid@grid@cells.dim[2]:1,]),col=rev(heat.colors(12))); box()}
-
+  grid@data      <- data.frame(data=rep(0,nrow(coords)))
   grid@data$data <- CI
 return(grid)}
                                
