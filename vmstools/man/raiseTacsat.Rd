@@ -34,7 +34,6 @@ will be used}
 Niels T. Hintzen}
 \seealso{
 \code{\link{splitAmongPings}}, \code{\link{estimatePropFishing}}}
-}
 \examples{
 data(tacsat)
 data(eflalo)

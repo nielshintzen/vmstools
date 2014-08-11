@@ -1,297 +1,33 @@
 \name{estimatePropFishing}
 \alias{estimatePropFishing}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{
-%%  ~~function to do ... ~~
+Estimate the proportion fishing per fishing trip
 }
 \description{
-%%  ~~ A concise (1-5 lines) description of what the function does. ~~
+Estimate what proportion of time a fishing vessel is fishing when outside of harbour
 }
 \usage{
 estimatePropFishing(tacsat, eflalo, by = c("LE_GEAR", "VE_REF"))
 }
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{tacsat}{
-%%     ~~Describe \code{tacsat} here~~
+tacsat dataset, including FT_REF column
 }
   \item{eflalo}{
-%%     ~~Describe \code{eflalo} here~~
+eflalo dataset
 }
   \item{by}{
-%%     ~~Describe \code{by} here~~
+column names to calculate the estimation over
+(e.g. LE_GEAR to estimate proportion fishing by gear or VE_REF to estimate
+proportion fishing by vessel ID)
 }
-}
-\details{
-%%  ~~ If necessary, more details than the description above ~~
 }
 \value{
-%%  ~Describe the value returned
-%%  If it is a LIST, use
-%%  \item{comp1 }{Description of 'comp1'}
-%%  \item{comp2 }{Description of 'comp2'}
-%% ...
-}
-\references{
-%% ~put references to the literature/web site here ~
-}
+Returns the eflalo dataset including a new column 'propFish' which provides the
+estimated proportion fishing for each entry}
 \author{
-%%  ~~who you are~~
-}
-\note{
-%%  ~~further notes~~
-}
-
-%% ~Make other sections like Warning with \section{Warning }{....} ~
+Niels T. Hintzen}
 
 \seealso{
-%% ~~objects to See Also as \code{\link{help}}, ~~~
+\code{\link{raiseTacsat}}
 }
-\examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function (tacsat, eflalo, by = c("LE_GEAR", "VE_REF")) 
-{
-    if (!"SI_STATE" \%in\% colnames(tacsat)) 
-        stop("Provide 'SI_STATE' column in tacsat dataset")
-    if (!"SI_DATIM" \%in\% colnames(tacsat)) 
-        tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME, 
-            sep = " "), tz = "GMT", format = "\%d/\%m/\%Y  \%H:\%M")
-    if (!"FT_DDATIM" \%in\% colnames(eflalo)) 
-        eflalo$FT_DDATIM <- as.POSIXct(paste(eflalo$FT_DDAT, 
-            eflalo$FT_DTIME), format = "\%d/\%m/\%Y \%H:\%M", tz = "GMT")
-    if (!"FT_LDATIM" \%in\% colnames(eflalo)) 
-        eflalo$FT_LDATIM <- as.POSIXct(paste(eflalo$FT_LDAT, 
-            eflalo$FT_LTIME), format = "\%d/\%m/\%Y \%H:\%M", tz = "GMT")
-    if (!"INTV" \%in\% colnames(tacsat)) 
-        stop("Specify time interval column in tacsat (e.g. use intervalTacsat)")
-    if ("SI_DAY" \%in\% unique(c(by))) {
-        eflalo$SI_DAY <- yday(as.POSIXct(eflalo$LE_CDAT, format = "\%d/\%m/\%Y"))
-        tacsat$SI_DAY <- yday(tacsat$SI_DATIM)
-    }
-    if ("SI_YEAR" \%in\% unique(c(by))) {
-        eflalo$SI_YEAR <- year(as.POSIXct(eflalo$LE_CDAT, format = "\%d/\%m/\%Y"))
-        tacsat$SI_YEAR <- year(tacsat$SI_DATIM)
-    }
-    if ("SI_MONTH" \%in\% unique(c(by))) {
-        eflalo$SI_MONTH <- month(as.POSIXct(eflalo$LE_CDAT, format = "\%d/\%m/\%Y"))
-        tacsat$SI_MONTH <- month(tacsat$SI_DATIM)
-    }
-    if ("SI_WEEK" \%in\% unique(c(by))) {
-        eflalo$SI_WEEK <- week(as.POSIXct(eflalo$LE_CDAT, format = "\%d/\%m/\%Y"))
-        tacsat$SI_WEEK <- week(tacsat$SI_DATIM)
-    }
-    if ("SI_QUARTER" \%in\% unique(c(by))) {
-        eflalo$SI_QUARTER <- quarter(as.POSIXct(eflalo$LE_CDAT, 
-            format = "\%d/\%m/\%Y"))
-        tacsat$SI_QUARTER <- quarter(tacsat$SI_DATIM)
-    }
-    timePos <- c("SI_DAY", "SI_WEEK", "SI_MONTH", "SI_QUARTER", 
-        "SI_YEAR")
-    byTime <- by[which(by \%in\% timePos)]
-    byTime <- timePos[which(timePos \%in\% byTime)]
-    if ("LE_RECT" \%in\% by) 
-        tacsat$LE_RECT <- ICESrectangle(tacsat)
-    if ("LE_ICESAREA" \%in\% by) {
-        data(ICESareas)
-        tacsat$LE_AREA <- ICESarea(tacsat, ICESareas)
-        tacsat$LE_AREA[which(is.na(tacsat$LE_AREA) == T)] <- "OTHER"
-        eflonlat <- ICESrectangle2LonLat(eflalo$LE_RECT)
-        eflalo$LE_AREA <- ICESarea(eflonlat, ICESareas)
-        eflalo$LE_AREA[which(is.na(eflalo$LE_AREA) == T)] <- "OTHER"
-    }
-    areaPos <- c("LE_RECT", "LE_ICESAREA")
-    byArea <- by[which(by \%in\% areaPos)]
-    byArea <- areaPos[which(areaPos \%in\% byArea)]
-    eflalo$LE_CDATIM <- as.POSIXct(eflalo$LE_CDAT, format = "\%d/\%m/\%Y", 
-        tz = "GMT")
-    eflalo$INTV <- c(difftime(eflalo$FT_LDATIM, eflalo$FT_DDATIM, 
-        units = "mins"))
-    eflalo$FT_DURDAY <- ifelse(c(difftime(as.Date(eflalo$FT_LDATIM), 
-        as.Date(eflalo$FT_DDATIM), units = "hours") == 0), c(difftime(eflalo$FT_LDATIM, 
-        eflalo$FT_DDATIM, units = "mins")), ifelse(c(difftime(as.Date(eflalo$FT_DDATIM), 
-        as.Date(eflalo$LE_CDATIM), units = "hours") == 0), c(difftime(eflalo$LE_CDATIM + 
-        (60 * 60 * 24), eflalo$FT_DDATIM, units = "mins")), ifelse(c(difftime(as.Date(eflalo$FT_LDATIM), 
-        as.Date(eflalo$LE_CDATIM), units = "hours") == 0), c(difftime(eflalo$FT_LDATIM, 
-        eflalo$LE_CDATIM, units = "mins")), 1440)))
-    eflalo$dummy <- 1
-    eflalo <- merge(eflalo, aggregate(eflalo$dummy, by = list(eflalo$FT_REF), 
-        FUN = sum, na.rm = T), by.x = "FT_REF", by.y = "Group.1", 
-        all.x = T)
-    colnames(eflalo)[length(colnames(eflalo))] <- "NR_FT_REF"
-    eflalo$INTVDAY <- eflalo$FT_DURDAY
-    eflalo <- eflalo[, -grep("dummy", colnames(eflalo))]
-    eflalo <- eflalo[, -grep("FT_DURDAY", colnames(eflalo))]
-    eflalo <- eflalo[, -grep("NR_FT_REF", colnames(eflalo))]
-    if (length(which(!by \%in\% colnames(tacsat) | !by \%in\% colnames(eflalo))) > 
-        0) 
-        stop("elements specified in 'by' are not available as columns in either tacsat or eflalo")
-    subTacsat <- subset(tacsat, SI_STATE != 0 & FT_REF != 0)
-    subEflalo <- eflalo
-    if ("SI_DAY" \%in\% by) {
-        subEflalo$INTVTRIP <- subEflalo$INTV
-        subEflalo$INTV <- subEflalo$INTVDAY
-    }
-    else {
-        subEflalo <- subEflalo[!duplicated(subEflalo$FT_REF), 
-            ]
-    }
-    if ("LE_GEAR" \%in\% by & !"LE_GEAR" \%in\% colnames(subTacsat)) 
-        subTacsat$LE_GEAR <- subEflalo$LE_GEAR[match(subTacsat$FT_REF, 
-            subEflalo$FT_REF)]
-    if (!"FT_REF" \%in\% colnames(subTacsat)) 
-        stop("FT_REF column missing from tacsat")
-    if (!"FT_REF" \%in\% by) {
-        by <- c(by, "FT_REF")
-        warning("FT_REF has been added to 'by' statement")
-    }
-    byOrig <- by
-    idxE <- 1:nrow(eflalo)
-    idxEs <- 1:nrow(subEflalo)
-    idxTs <- 1:nrow(subTacsat)
-    if (length(by) > 1) {
-        estEffTacsat <- aggregate(subTacsat$INTV[idxTs], by = as.list(subTacsat[idxTs, 
-            by]), FUN = sum, na.rm = T)
-        estEffEflalo <- aggregate(subEflalo$INTV[idxEs], by = as.list(subEflalo[idxEs, 
-            by]), FUN = sum, na.rm = T)
-    }
-    else {
-        estEffTacsat <- aggregate(subTacsat$INTV[idxTs], by = list(subTacsat[idxTs, 
-            by]), FUN = sum, na.rm = T)
-        estEffEflalo <- aggregate(subEflalo$INTV[idxEs], by = list(subEflalo[idxEs, 
-            by]), FUN = sum, na.rm = T)
-    }
-    colnames(estEffTacsat) <- c(by, "INTV")
-    colnames(estEffEflalo) <- c(by, "INTV")
-    mestEff <- merge(estEffTacsat, estEffEflalo, by = c(by))
-    allGZero <- which(mestEff$INTV.x > 0 & mestEff$INTV.y > 0)
-    by <- by[-grep("FT_REF", by)]
-    if (length(by) > 1) {
-        estimFish <- aggregate(log(mestEff$INTV.x[allGZero]/mestEff$INTV.y[allGZero]), 
-            by = as.list(mestEff[allGZero, by]), FUN = mean, 
-            na.rm = T)
-    }
-    else {
-        estimFish <- aggregate(log(mestEff$INTV.x[allGZero]/mestEff$INTV.y[allGZero]), 
-            by = list(mestEff[allGZero, by]), FUN = mean, na.rm = T)
-    }
-    estimFish$x <- exp(estimFish$x)
-    colnames(estimFish) <- c(by, "x")
-    allGZero <- which(mestEff$INTV.x > 0 & mestEff$INTV.y > 0)
-    allMean <- exp(mean(log(mestEff$INTV.x[allGZero]/mestEff$INTV.y[allGZero])))
-    eflalo$x[idxE] <- merge(eflalo[idxE, ], estimFish, by = by, 
-        all.x = T)$x
-    subEflalo$x[idxEs] <- merge(subEflalo[idxEs, ], estimFish, 
-        by = by, all.x = T)$x
-    idxE <- which(is.na(eflalo$x) == T)
-    idxEs <- which(is.na(subEflalo$x) == T)
-    idxTs <- which(!apply(t(t(subTacsat[, by])), 1, paste, collapse = "_") \%in\% 
-        apply(t(t(eflalo[which(is.na(eflalo$x) == F), by])), 
-            1, paste, collapse = "_"))
-    if (length(idxTs) > 0 & length(idxEs) > 0) {
-        if (length(by) > 1) {
-            for (i in 1:(length(by) - 1)) {
-                by <- rev(rev(byOrig[-grep("FT_REF", byOrig)])[-c(1:i)])
-                by <- c(by, "FT_REF")
-                if (!"SI_DAY" \%in\% by) {
-                  subEflalo <- subEflalo[!duplicated(subEflalo$FT_REF), 
-                    ]
-                  subEflalo$INTV <- subEflalo$INTVTRIP
-                }
-                if (length(by) > 1) {
-                  estEffTacsat <- aggregate(subTacsat$INTV[idxTs], 
-                    by = as.list(subTacsat[idxTs, by]), FUN = sum, 
-                    na.rm = T)
-                  estEffEflalo <- aggregate(subEflalo$INTV[idxEs], 
-                    by = as.list(subEflalo[idxEs, by]), FUN = sum, 
-                    na.rm = T)
-                }
-                else {
-                  estEffTacsat <- aggregate(subTacsat$INTV[idxTs], 
-                    by = list(subTacsat[idxTs, by]), FUN = sum, 
-                    na.rm = T)
-                  estEffEflalo <- aggregate(subEflalo$INTV[idxEs], 
-                    by = list(subEflalo[idxEs, by]), FUN = sum, 
-                    na.rm = T)
-                }
-                colnames(estEffEflalo) <- c(by, "INTV")
-                colnames(estEffTacsat) <- c(by, "INTV")
-                mestEff <- merge(estEffTacsat[, colnames(estEffEflalo)], 
-                  estEffEflalo, by = c(by))
-                allGZero <- which(mestEff$INTV.x > 0 & mestEff$INTV.y > 
-                  0)
-                by <- by[-grep("FT_REF", by)]
-                if (length(by) > 1) {
-                  estimFish <- aggregate(log(mestEff$INTV.x[allGZero]/mestEff$INTV.y[allGZero]), 
-                    by = as.list(mestEff[allGZero, by]), FUN = mean, 
-                    na.rm = T)
-                }
-                else {
-                  estimFish <- aggregate(log(mestEff$INTV.x[allGZero]/mestEff$INTV.y[allGZero]), 
-                    by = list(mestEff[allGZero, by]), FUN = mean, 
-                    na.rm = T)
-                }
-                estimFish$x <- exp(estimFish$x)
-                colnames(estimFish) <- c(by, "x")
-                eflalo$x[idxE] <- merge(eflalo[idxE, -grep("x", 
-                  colnames(eflalo))], estimFish, by = by, all.x = T)$x
-                subEflalo$x[idxEs] <- merge(subEflalo[idxEs, 
-                  -grep("x", colnames(subEflalo))], estimFish, 
-                  by = by, all.x = T)$x
-                idxE <- which(is.na(eflalo$x) == T)
-                idxEs <- which(is.na(subEflalo$x) == T)
-                idxTs <- which(!apply(t(t(subTacsat[, by])), 
-                  1, paste, collapse = "_") \%in\% apply(t(t(eflalo[which(is.na(eflalo$x) == 
-                  F), by])), 1, paste, collapse = "_"))
-            }
-        }
-    }
-    if (length(idxEs) > 0 & length(idxTs) > 0) {
-        if (!"SI_DAY" \%in\% by) {
-            subEflalo <- subEflalo[!duplicated(subEflalo$FT_REF), 
-                ]
-            subEflalo$INTV <- subEflalo$INTVTRIP
-        }
-        estEffTacsat <- aggregate(subTacsat$INTV[idxTs], by = list(subTacsat[idxTs, 
-            "FT_REF"]), FUN = sum, na.rm = T)
-        estEffEflalo <- aggregate(subEflalo$INTV[idxEs], by = list(subEflalo[idxEs, 
-            "FT_REF"]), FUN = sum, na.rm = T)
-        colnames(estEffEflalo) <- c("FT_REF", "INTV")
-        colnames(estEffTacsat) <- c("FT_REF", "INTV")
-        mestEff <- merge(estEffTacsat[, colnames(estEffEflalo)], 
-            estEffEflalo, by = c("FT_REF"))
-        allGZero <- which(mestEff$INTV.x > 0 & mestEff$INTV.y > 
-            0)
-        estimFish <- aggregate(log(mestEff$INTV.x[allGZero]/mestEff$INTV.y[allGZero]), 
-            by = list(mestEff[allGZero, "FT_REF"]), FUN = mean, 
-            na.rm = T)
-        estimFish$x <- exp(estimFish$x)
-        colnames(estimFish) <- c("FT_REF", "x")
-        eflalo$x[idxE] <- merge(eflalo[idxE, -grep("x", colnames(eflalo))], 
-            estimFish, by = "FT_REF", all.x = T)$x
-        subEflalo$x[idxEs] <- merge(subEflalo[idxEs, -grep("x", 
-            colnames(subEflalo))], estimFish, by = "FT_REF", 
-            all.x = T)$x
-        idxE <- which(is.na(eflalo$x) == T)
-        idxEs <- which(is.na(subEflalo$x) == T)
-        idxTs <- which(!apply(t(t(subTacsat[, by])), 1, paste, 
-            collapse = "_") \%in\% apply(t(t(eflalo[which(is.na(eflalo$x) == 
-            F), by])), 1, paste, collapse = "_"))
-    }
-    if (length(idxEs) > 0) {
-        subEflalo$x[idxEs] <- allMean
-        eflalo$x[idxE] <- allMean
-        colnames(subEflalo)[length(colnames(subEflalo))] <- "PropFish"
-        colnames(eflalo)[length(colnames(eflalo))] <- "PropFish"
-    }
-    colnames(eflalo)[length(colnames(eflalo))] <- "PropFish"
-    return(eflalo)
-  }
-}
-% Add one or more standard keywords, see file 'KEYWORDS' in the
-% R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
