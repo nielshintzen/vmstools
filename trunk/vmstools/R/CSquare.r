@@ -1,6 +1,6 @@
 CSquare <- function(lon,lat,degrees){
 
-              if(length(lon) != length(lon)) stop("length of longitude not equal to length of latitude")
+              if(length(lon) != length(lat)) stop("length of longitude not equal to length of latitude")
               if(!degrees %in% c(10,5,1,0.5,0.1,0.05,0.01)) stop("degrees specified not in range: c(10,5,1,0.5,0.1,0.05,0.01)")
 
               dims <- length(lon)
