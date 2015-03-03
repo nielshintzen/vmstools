@@ -29,6 +29,11 @@ if(.Platform$OS.type == "windows") {
  }
 
 
+#a_year      <- 2005
+#a_year      <- 2006
+#a_year      <- 2007
+#a_year      <- 2008
+#a_year      <- 2009
 #a_year      <- 2010
 #a_year      <- 2011
 #a_year      <- 2012
@@ -126,6 +131,9 @@ if(TRUE){
         tacsatIntGearVEREF$SWEPT_AREA_KM2 <- a_dist * tacsatIntGearVEREF$GEAR_WIDTH
         tacsatIntGearVEREF$SWEPT_AREA_KM2_LOWER <- a_dist * tacsatIntGearVEREF$GEAR_WIDTH_LOWER
         tacsatIntGearVEREF$SWEPT_AREA_KM2_UPPER <- a_dist * tacsatIntGearVEREF$GEAR_WIDTH_UPPER
+        # correct the transition between sequential fishing events
+        idx <- which(diff(tacsatIntGearVEREF$SI_DATIM)/60 > 15)   # if interval > 15 min then points belong to a different fishing event
+        tacsatIntGearVEREF[ idx, c('SWEPT_AREA_KM2', 'SWEPT_AREA_KM2_LOWER', 'SWEPT_AREA_KM2_UPPER')] <- NA
   }
 
   # for the seiners...
@@ -304,43 +312,93 @@ if(TRUE){
    tacsatp$LE_MET_init    <- tacsatp$LE_MET
    tacsatp$LE_MET         <- factor(tacsatp$LE_MET)            
    print(levels(tacsatp$LE_MET))
+     if(a_year=="2005"){
+     levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
+     "DRB_MOL", "OT_DMF", "NA", "OT_CRU",  "OT_CRU",  "OT_CRU", "OT_CRU",  "OT_CRU", "OT_CRU",  "OT_CRU",
+     "OT_MIX_DMF_PEL", "OT_DMF", "OT_DMF", "OT_DMF", "OT_MIX_DMF_PEL",   "OT_MIX_DMF_PEL",  "OT_DMF", "OT_DMF",  "OT_DMF", "OT_DMF", 
+     "OT_SPF",  "OT_SPF",  "OT_SPF",  "OT_SPF",  "OT_SPF",  "OT_CRU",  "OT_MIX_DMF_PEL",  "OT_DMF", "OT_DMF", "OT_DMF",
+     "OT_MIX_DMF_PEL",  "OT_DMF", "OT_SPF",  "OT_SPF",  "OT_SPF", "OT_SPF",  "OT_SPF",   "SDN_DEM", "SDN_DEM",  "SDN_DEM",
+     "SDN_DEM",  "SSC_DEM",   "SSC_DEM","SSC_DEM",   "TBB_CRU",   "TBB_DMF", "TBB_DMF")  
+   } else{ 
+      if(a_year=="2006"){
+     levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
+      "DRB_MOL", "NA",  "OT_CRU", "OT_CRU",    "OT_CRU", "OT_CRU", "OT_CRU","OT_CRU","OT_CRU",  "OT_CRU", 
+      "OT_MIX_DMF_PEL",     "OT_DMF", "OT_DMF",   "OT_DMF", "OT_MIX_DMF_PEL", "OT_MIX_DMF_PEL",  "OT_DMF","OT_DMF", "OT_DMF", "OT_DMF", 
+      "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF",  "OT_CRU",  "OT_CRU", "OT_MIX_DMF_PEL", "OT_DMF",
+      "OT_DMF", "OT_DMF", "OT_MIX_DMF_PEL", "OT_MIX_DMF_PEL",  "OT_DMF",  "OT_SPF","OT_SPF","OT_SPF", "OT_SPF", "OT_SPF",  
+      "OT_SPF",  "SDN_DEM", "SDN_DEM", "SDN_DEM", "SDN_DEM",  "SSC_DEM", "SSC_DEM", "SSC_DEM", "SSC_DEM", "SSC_DEM", 
+      "TBB_CRU",   "TBB_DMF",   "TBB_DMF", "TBB_DMF")  
+
+   } else{ 
+   if(a_year=="2007"){
+     levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
+     "DRB_MOL", "NA", "OT_CRU", "OT_CRU", "OT_CRU", "OT_CRU","OT_CRU","OT_CRU",  "OT_MIX_DMF_PEL",  "OT_DMF",
+     "OT_DMF",   "OT_DMF", "OT_MIX_DMF_PEL",   "OT_MIX_DMF_PEL",   "OT_DMF",   "OT_DMF",  "OT_DMF",  "OT_SPF", "OT_SPF", "OT_SPF", 
+     "OT_SPF",   "OT_SPF", "OT_CRU",  "OT_MIX_DMF_PEL", "OT_DMF",  "OT_DMF",  "OT_MIX_DMF_PEL",   "OT_DMF",   "OT_DMF",   "OT_DMF",
+     "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF",   "SDN_DEM",  "SDN_DEM",  "SDN_DEM",  "SDN_DEM",   "SSC_DEM", "SSC_DEM",  
+     "SSC_DEM", "SSC_DEM", "SSC_DEM",  "TBB_CRU",   "TBB_DMF", "TBB_DMF")  
+
+   } else{ 
+   if(a_year=="2008"){
+     levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
+     "DRB_MOL", "OT_DMF", "NA", "OT_CRU", "OT_CRU", "OT_CRU", "OT_CRU", "OT_CRU", "OT_CRU",  "OT_MIX_DMF_PEL",    
+     "OT_DMF", "OT_DMF", "OT_DMF", "OT_MIX_DMF_PEL", "OT_MIX_DMF_PEL", "OT_DMF", "OT_DMF",  "OT_DMF", "OT_DMF",  "OT_SPF",  
+     "OT_SPF", "OT_SPF", "OT_SPF",  "OT_CRU",  "OT_MIX_DMF_PEL", "OT_DMF", "OT_DMF", "OT_DMF", "OT_DMF",  "OT_SPF", 
+     "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "SDN_DEM", "SDN_DEM", "SDN_DEM","SDN_DEM",  "SSC_DEM", "SSC_DEM",  
+     "SSC_DEM", "SSC_DEM",  "TBB_CRU",  "TBB_DMF")
+   tacsatp$LE_MET         <- as.character(tacsatp$LE_MET)
+   } else{ 
+   if(a_year=="2009"){
+     levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
+     "DRB_MOL", "NA", "OT_CRU", "OT_CRU", "OT_CRU", "OT_CRU", "OT_CRU", "OT_CRU", "OT_MIX_DMF_PEL", "OT_DMF", "OT_DMF",
+     "OT_DMF", "OT_MIX_DMF_PEL", "OT_MIX_DMF_PEL", "OT_DMF", "OT_DMF", "OTB_DMF", "OT_SPF", "OT_SPF", "OT_SPF", 
+     "OT_SPF", "OT_SPF", "OT_CRU", "OT_MIX_DMF_PEL", "OT_DMF", "OT_DMF", "OT_MIX_DMF_PEL", "OT_DMF", "OT_SPF", "OT_SPF", 
+     "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "SDN_DEM", "SDN_DEM", "SDN_DEM", "SDN_DEM",  "SSC_DEM", "SSC_DEM",  
+     "SSC_DEM", "SSC_DEM", "TBB_CRU", "TBB_DMF")  
+   tacsatp$LE_MET         <- as.character(tacsatp$LE_MET)
+   } else{
    if(a_year=="2010"){
      levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
      "DRB_MOL", "NA",  "OT_CRU","OT_CRU", "OT_CRU",   "OT_CRU",  "OT_CRU",  
-     "OT_CRU",  "OT_SPF",     "OT_DMF", "OT_DMF", "OT_DMF",   "OT_DMF", "OT_SPF",  
+     "OT_CRU",  "OT_MIX_DMF_PEL",     "OT_DMF", "OT_DMF", "OT_DMF",   "OT_DMF", "OT_MIX_DMF_PEL",  
      "OT_MIX_DMF_PEL",   "OT_DMF",  "OT_DMF",   "OT_DMF",  "OT_DMF",  "OT_SPF",  "OT_SPF",  
-     "OT_SPF",  "OT_SPF",   "OT_SPF",   "OT_SPF",   "OT_CRU",  "OT_SPF",     "OT_DMF",
+     "OT_SPF",  "OT_SPF",   "OT_SPF",   "OT_MIX_DMF_PEL",   "OT_CRU",  "OT_MIX_DMF_PEL",     "OT_DMF",
      "OT_DMF",   "OT_DMF",  "OT_SPF",   "OT_SPF",  "OT_SPF",   "OT_SPF",   "SDN_DEM",
      "SDN_DEM",   "SDN_DEM", "SDN_DEM",  "SSC_DEM",   "SSC_DEM",  "TBB_CRU",   "TBB_DMF")  
    tacsatp$LE_MET         <- as.character(tacsatp$LE_MET)
    } else{
     if(a_year=="2011"){
      levels(tacsatp$LE_MET) <-   c(  ## REPLACE LEVELS WITH CAUTION ## adapt to your own list!!
-      "DRB_MOL",      "NA",   "OT_CRU", "OT_CRU",   "OT_CRU",  "OT_SPF", "OT_DMF", "OT_SPF",  
-      "OT_SPF",   "OT_DMF",  "OT_MIX_NEP",   "OT_MIX_NEP", "OT_MIX_NEP",   "OT_MIX_NEP",  "OT_SPF",  "OT_SPF",  
-      "OT_SPF",   "OT_SPF",   "OT_SPF",   "OT_CRU",  "OT_SPF",     "OT_DMF", "OT_SPF",   "OT_MIX_NEP",  
+      "DRB_MOL",      "NA",   "OT_CRU", "OT_CRU",   "OT_CRU",  "OT_MIX_DMF_PEL", "OT_DMF", "OT_MIX_DMF_PEL",  
+      "OT_MIX_DMF_PEL",   "OT_DMF",  "OT_MIX_NEP",   "OT_MIX_NEP", "OT_MIX_NEP",   "OT_MIX_NEP",  "OT_SPF",  "OT_SPF",  
+      "OT_SPF",   "OT_MIX_DMF_PEL",   "OT_SPF",   "OT_CRU",  "OT_MIX_DMF_PEL",     "OT_DMF", "OT_MIX_DMF_PEL",   "OT_MIX_NEP",  
       "OT_MIX_NEP",  "OT_SPF",   "OT_SPF",  "OT_SPF",   "OT_SPF",   "SDN_DEM", "SDN_DEM",   "SDN_DEM",
       "SDN_DEM",  "SSC_DEM", "SSC_DEM",   "TBB_CRU",   "TBB_DMF",     "TBB_DMF")  
+   
     }else{
      if(a_year=="2012") {
-       levels(tacsatp$LE_MET) <-   c("DRB_MOL", "NA", "OT_CRU", "OT_CRU", "OT_CRU",  "OT_DMF", "OT_DMF", "OT_DMF",
-        "OT_DMF", "OT_DMF", "OT_MIX_NEP", "OT_MIX_NEP",  "OT_MIX_NEP", "OT_MIX_NEP",
-        "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "OT_DMF", "OT_MIX_NEP",
+       levels(tacsatp$LE_MET) <-   c("DRB_MOL", "NA", "OT_CRU", "OT_CRU", "OT_CRU",  "OT_DMF", "OT_DMF", "OT_MIX_DMF_PEL",
+        "OT_MIX_DMF_PEL", "OT_DMF", "OT_MIX_NEP", "OT_MIX_NEP",  "OT_MIX_NEP", "OT_MIX_NEP",
+        "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "OT_MIX_DMF_PEL", "OT_DMF", "OT_MIX_NEP",
         "OT_MIX_NEP",  "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", 
         "SDN_DEM", "SDN_DEM",   "SDN_DEM", "SDN_DEM", "SSC_DEM", "SSC_DEM", "TBB_CRU", "TBB_DMF")
     } else{
       if(a_year=="2013") {
-       levels(tacsatp$LE_MET) <-   c("DRB_MOL", "NA", "OT_CRU", "OT_DMF", "OT_DMF", "OT_DMF", "OT_DMF", "OT_DMF", 
-       "OT_MIX_NEP", "OT_MIX_NEP", "OT_MIX_NEP", "OT_MIX_NEP", "OT_SPF", "OT_SPF", "OT_SPF", "OT_SPF", "OT_DMF",
-       "OT_DMF", "OT_MIX_NEP", "OT_SPF", "OT_SPF", "OT_DMF",  "OT_SPF",  "SDN_DEM", "SDN_DEM", "SDN_DEM", "SDN_DEM",
-       "SSC_DEM", "SSC_DEM",   "TBB_CRU")
-       
+       levels(tacsatp$LE_MET) <-   c(
+        "DRB_MOL","NA", "OT_CRU", "OT_CRU",
+        "OT_CRU", "OT_DMF" ,"OT_DMF","OT_MIX_DMF_PEL",  
+        "OT_MIX_DMF_PEL", "OT_DMF", "OT_MIX_NEP","OT_MIX_NEP","OT_MIX_NEP", "OTB_MIX_NEP",
+        "OT_SPF","OT_SPF" , "OT_SPF",   "OT_MIX_DMF_PEL",     "OT_SPF",   "OT_MIX_DMF_PEL",    
+        "OT_DMF", "OT_MIX_DMF_PEL",   "OT_MIX_NEP",   "OT_SPF",
+        "OT_SPF",   "OT_SPF",  "OT_MIX_DMF_PEL",   "OT_SPF",   "OT_SPF",  
+        "SDN_DEM", "SDN_DEM",   "SDN_DEM",
+        "SDN_DEM",  "SSC_DEM", "SSC_DEM",   "TBB_CRU",   "TBB_DMF")  
+     
     } else{
     stop('adapt the BENTHIS metiers for this year')
     }
    }
-  }  
-  }
+  }}}}}}}
   }
   initVersusBenthisMetiers <-  tacsatp [!duplicated(data.frame(tacsatp$LE_MET_init, tacsatp$LE_MET)), 
                                     c('LE_MET_init', 'LE_MET')]
@@ -366,11 +424,12 @@ if(TRUE){
     save(storeScheme, file=file.path(outPath,a_year,"storeScheme.RData"))
   }  else{
     load(file.path(outPath,a_year,"storeScheme.RData"))
+    storeScheme$years <- a_year  
   }
 
   tacsatp$year      <- format(tacsatp$SI_DATIM, "%Y")
   require(mixtools)
-  activity          <- activityTacsat(tacsatp,units="year",analyse.by="LE_GEAR",storeScheme,
+  activity          <- activityTacsat(tacsatp,units="year",analyse.by="LE_GEAR", storeScheme,
                               plot=FALSE, level="all")
   tacsatp$SI_STATE  <- NA
   tacsatp$SI_STATE  <- activity
@@ -434,6 +493,7 @@ if(TRUE){
         cat(paste(iGr, " ", iVE_REF, "\n"))
 
         #Interpolate according to the cubic-hermite spline interpolation
+        try({
         interpolationcHs    <- interpolateTacsat(tacsatpGearVEREF,
                                                  interval= VMS_ping_rate_in_hour*60,   # THE PING RATE IS COUNTRY-SPECIFIC ##
                                                  margin  = round(VMS_ping_rate_in_hour*60*0.1), # i.e. will make disconnected interpolations if interval out of the 50 70min range
@@ -443,6 +503,7 @@ if(TRUE){
                                                  headingAdjustment=0,
                                                  fast    = FALSE)
 
+      
         # Get the ranges of the total picture
         if(FALSE){
           ranges <- do.call(rbind,lapply(interpolationcHs,function(x){return(apply(x[-1,],2,range))}))
@@ -465,6 +526,8 @@ if(TRUE){
   
         save(tacsatIntGearVEREF, file=file.path(outPath,a_year,"interpolated",
                                                 paste("tacsatSweptArea_",iVE_REF, "_", iGr, ".RData", sep="")),compress=T)
+        }, silent=TRUE)
+        if(class(interpolationcHs)=="try-error") print('error for this interpolation')
       }
     }
   }
@@ -530,9 +593,15 @@ if(TRUE){
 #-----------------------------------------------------------------------------
 # Create one swept area dataset
 #-----------------------------------------------------------------------------
-fls <- dir(file.path(outPath,a_year,"interpolated"))
+
+#for(a_year in c(2005:2013)) {
+#print(a_year)
+
+fls <- dir(file.path(outPath, a_year,"interpolated"))
+fls <- fls[grep("tacsatSweptArea_", fls)]
 
 lst <- list(); count <- 0
+vid_with_errors <- NA
 cols2keep <- c("SI_LATI","SI_LONG","SI_DATE","LE_GEAR","LE_MET","SWEPT_AREA_KM2","SWEPT_AREA_KM2_LOWER","SWEPT_AREA_KM2_UPPER")
 for(iFile in fls){
   cat(paste(iFile, "\n"))
@@ -551,6 +620,13 @@ for(iFile in fls){
   tacsatIntGearVEREF <- compute_swept_area (tacsatIntGearVEREF, gear_param_per_metier, towedGears, seineGears, VMS_ping_rate_in_hour, already_informed_width_for=NULL)
   }
   
+  if(any(tacsatIntGearVEREF$SWEPT_AREA_KM2>100, na.rm = TRUE) ) {
+    print(paste('check for lat long at 0!! for ', iFile))
+    vid_with_errors <- c(vid_with_errors, iFile)
+    tacsatIntGearVEREF[!is.na(tacsatIntGearVEREF$SWEPT_AREA_KM2) & tacsatIntGearVEREF$SWEPT_AREA_KM2>100, c("SWEPT_AREA_KM2", "SWEPT_AREA_KM2_LOWER", "SWEPT_AREA_KM2_UPPER")] <- NA
+    }
+    
+  
   if(nrow(tacsatIntGearVEREF[is.na(tacsatIntGearVEREF$SWEPT_AREA_KM2),])!=0 ) print('check for NAs')
   # NAs are acceptable if the metier was not informed (e.g. No_Matrix6)...
   print(unique(tacsatIntGearVEREF[is.na(tacsatIntGearVEREF$SWEPT_AREA_KM2),"LE_MET_init"]))
@@ -565,6 +641,8 @@ nrow(tacsatSweptArea[is.na(tacsatSweptArea$SWEPT_AREA_KM2),])
 
 # save
 save(tacsatSweptArea, file=file.path(outPath,a_year, paste("tacsatSweptArea.RData", sep="")),compress=T)
+
+#}
 
 
 #-----------------------------------------------------------------------------
@@ -666,7 +744,7 @@ save(aggResult,file=file.path(outPath,"AggregatedSweptAreaDay.RData"))
 # (TO BE DELIVERED BY EACH PARTNER TO THE WP2 COORDINATOR)
 #-----------------------------------------------------------------------------
 
-#- Code to get the missing effort per ICES rectangle
+#- Code to get the missing effort in percentages per ICES rectangle
 # i.e. the total effort in eflalo compared to the total effort in eflalo from
 # VMS-equipped vessels
 
@@ -685,7 +763,7 @@ for(iYr in 2010:2012){
   load(file.path(outPath,iYr,"tacsatSweptArea.RData"))
 
   #- Load the datasets
-  #data(europa) # for test
+  #data(europa)
 
   #- Convert time stamps to posixct formats
   eflalo$LE_CDATIM  <- as.POSIXct(eflalo$LE_CDAT,format="%d/%m/%Y",tz="GMT")
@@ -693,7 +771,7 @@ for(iYr in 2010:2012){
   #- Calculate the effort (INTVDAY) in eflalo
   eflalo$INTV       <- c(difftime(eflalo$FT_LDATIM,eflalo$FT_DDATIM,units="mins"))
   eflalo$dummy      <- 1
-  eflalo            <- merge(eflalo,aggregate(eflalo$dummy,by=list(eflalo$FT_REF),FUN=sum,na.rm=T),by.x=c("FT_REF"),by.y=c("Group.1"),all.x=T)
+  eflalo            <- merge(eflalo,aggregate(eflalo$dummy,by=list(eflalo$FT_REF,eflalo$LE_CDATIM),FUN=sum,na.rm=T),by.x=c("FT_REF","LE_CDATIM"),by.y=c("Group.1","Group.2"),all.x=T)
   colnames(eflalo)[length(colnames(eflalo))] <- "NR_FT_REF"
   eflalo$INTVDAY    <- eflalo$INTV / eflalo$NR_FT_REF
 
@@ -720,30 +798,12 @@ for(iYr in 2010:2012){
   colnames(aggResult_vms) <- c('LE_RECT', 'LE_MET', 'INTVDAY')
   aggResult_tot<- aggregate(eflalo$INTVDAY, list(eflalo$LE_RECT,  eflalo$LE_MET_BENTHIS), sum, na.rm=TRUE)
   colnames(aggResult_tot) <- c('LE_RECT', 'LE_MET', 'INTVDAY_TOT')
-  aggResult    <- rbind.data.frame(aggResult, cbind.data.frame(merge(x=aggResult_vms, y=aggResult_tot, all=TRUE), SI_YEAR=iYr))
+  aggResult    <- rbind.data.frame(aggResult, cbind.data.frame(merge(aggResult_vms, aggResult_tot), SI_YEAR=iYr))
 }
 
 
 
 
 save(aggResult,file=file.path(outPath,paste("missingEffortTable.RData", sep='')))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
