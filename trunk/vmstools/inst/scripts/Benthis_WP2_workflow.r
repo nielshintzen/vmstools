@@ -474,12 +474,12 @@ if(TRUE){
   tacsatp           <- tacsatp[,-grep("SI_STATE_num",colnames(tacsatp))]
   tacsatp$SI_STATE  <- "f"
   
-  #- Gear specific fm parameters (parameters tuned with st=c(4,8))
+  #- Gear specific fm parameters (parameters tuned with st=c(2,6))
   #- (should be informed for all below towedGears)
-  fm        <- list(TBB=0.4575222,
-                    OTB=0.4217848,
-                    OTT=0.4217848,
-                    PTB=0.4217848,
+  fm        <- list(TBB=0.13,
+                    OTB=0.13, # DNK close to straight line (fm at 0)
+                    OTT=0.13,
+                    PTB=0.13,
                     HMD=0,
                     DRB=0)
 
@@ -497,9 +497,9 @@ if(TRUE){
         interpolationcHs    <- interpolateTacsat(tacsatpGearVEREF,
                                                  interval= VMS_ping_rate_in_hour*60,   # THE PING RATE IS COUNTRY-SPECIFIC ##
                                                  margin  = round(VMS_ping_rate_in_hour*60*0.1), # i.e. will make disconnected interpolations if interval out of the 50 70min range
-                                                 res     = round(VMS_ping_rate_in_hour*(100/2)),
+                                                 res     = 100,
                                                  method  = "cHs",
-                                                 params  = list(fm=fm[[iGr]],distscale=0,sigline=0,st=c(4,8)),   # rmenber that st not in use....
+                                                 params  = list(fm=fm[[iGr]],distscale=0,sigline=0,st=c(2,6)),   # rmenber that st not in use....
                                                  headingAdjustment=0,
                                                  fast    = FALSE)
 
