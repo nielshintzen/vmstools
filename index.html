@@ -55,6 +55,10 @@
 <li>Link other spatial data to VMS and logbook data</li>
 </ul>
 
+<a id="wiki" class="anchor" href="#details" aria-hidden="true"><span class="octicon octicon-link"></span></a>Wiki</h3>
+We've written many wiki's to help new users find their way around in VMStools. In addition, all functions embedded in VMStools also have a help-page that can be accessed from within R.
+You can find the wiki pages <a href="https://github.com/nielshintzen/vmstools/wiki">here</a>.
+
 <h2>
 <a id="system-requirements" class="anchor" href="#system-requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>System Requirements</h2>
 
@@ -80,13 +84,12 @@
 
 <p>We'll assume you can handle 1 and 2. yourself, but number 3. is a bit trickier, and is of course dependent on your SVN client. There are a number of good resources available e.g. for windows</p>
 
-<p>Firstly there are two different ways to checkout the code, depending on whether you want to commit the changes back to the repository or not. If you checkout the repository from <a href="https://github.com/nielshintzen/vmstools/tree/master/vmstools/">https://github.com/nielshintzen/vmstools/tree/master/vmstools/</a> it will not be possible to commit your changes back - however, the benefit is that anyone can get access to the repository, without the need for a google account.
-Alternatively, you can check out the code from <a href="https://github.com/nielshintzen/vmstools/tree/master/vmstools/R/">https://github.com/nielshintzen/vmstools/tree/master/vmstools/R/</a>. 
+<p>To download the source code, checkout the repository from <a href="https://github.com/nielshintzen/vmstools/tree/master/vmstools/">https://github.com/nielshintzen/vmstools/tree/master/vmstools/</a>. It will not be possible to commit your changes - however, contact us if you'd like to commit changes too.
 
 <h2>
 <a id="installing-the-vmstools-package" class="anchor" href="#installing-the-vmstools-package" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing the VMStools package</h2>
 
-<p>Download the VMStools zip or rar file from the repository under the download tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in vmstools/ of the repository.
+<p>Download the VMStools zip or rar file from the repository under the release tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in vmstools/ of the repository.
 The packages VMStools depends on can easily be installed through:</p>
 
 <pre><code>vmstoolsPackages &lt;-  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp")
