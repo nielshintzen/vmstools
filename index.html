@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Vmstools : VMStools R package page to analyse VMS and Logbook data">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Vmstools</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/nielshintzen/vmstools">View on GitHub</a>
+
+          <h1 id="project_title">Vmstools</h1>
+          <h2 id="project_tagline">VMStools R package page to analyse VMS and Logbook data</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/nielshintzen/vmstools/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/nielshintzen/vmstools/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="what-vmstools-can-do-for-you" class="anchor" href="#what-vmstools-can-do-for-you" aria-hidden="true"><span class="octicon octicon-link"></span></a>What VMStools can do for you</h1>
+
+<h2>
+<a id="introduction" class="anchor" href="#introduction" aria-hidden="true"><span class="octicon octicon-link"></span></a>Introduction</h2>
+
+<p>Vmstools is an open-source software package build in R. It is specifically developed to process, analyse and visualize logbooks and VMS data.</p>
+
+<h3>
+<a id="details" class="anchor" href="#details" aria-hidden="true"><span class="octicon octicon-link"></span></a>Details</h3>
+
+<p>Some of its functionality:</p>
+
+<ul>
+<li>Analyses use standardised data formats for logbook (EFLALO) and VMS (TACSAT)</li>
+<li>Handles erroneous data point detection and removal</li>
+<li>Métier identification through the use of clustering techniques</li>
+<li>Link logbook and VMS data together in order to distinguish fishing from other activities</li>
+<li>Provide high-resolution maps of both fishing effort and -landings, interpolate vessel tracks</li>
+<li>Calculate indicators of fishing impact as listed under the Data Collection Framework at different spatio-temporal scales.</li>
+<li>Prepare data for FishFrame submission</li>
+<li>Link other spatial data to VMS and logbook data</li>
+</ul>
+
+<h2>
+<a id="system-requirements" class="anchor" href="#system-requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>System Requirements</h2>
+
+<p>You will need the following software to use the VMStools software and repository.</p>
+
+<ul>
+<li>R (version 2.14.x or 2.15.x) for your system. Available <a href="http://www.r-project.org">here</a>.</li>
+<li>The VMStools package itself, available for download <a href="http://code.google.com/p/vmstools/downloads/">here</a>
+</li>
+<li>For very enthusiastic users / developers: An SVN (subversion) client. For Windows users, we recommend TortoiseSVN. Linux users will typically have access to such a client through their package distribution system.</li>
+<li>Some way to write and edit R code. For Windows, try RStudio or Tinn-R. For Linux, you almost certaintly already have Vi</li>
+</ul>
+
+<h2>
+<a id="getting-the-code-for-enthusiastic-users--developers" class="anchor" href="#getting-the-code-for-enthusiastic-users--developers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Getting the Code for enthusiastic users / developers</h2>
+
+<p>Once you've got all the necessary bits and pieces, the next step is to fetch a "working copy" of the VMStools repository from the server. The SVN client that you have installed takes care of this. The general process is client specific, but generally involves two steps</p>
+
+<ol>
+<li>Create a directory for your working copy (e.g. Desktop/VMStools) and</li>
+<li>"Checking out" the repository.</li>
+</ol>
+
+<p>We'll assume you can handle 1 and 2. yourself, but number 3. is a bit trickier, and is of course dependent on your SVN client. There are a number of good resources available e.g. for windows</p>
+
+<p>Firstly there are two different ways to checkout the code, depending on whether you want to commit the changes back to the repository or not. If you checkout the repository from <a href="http://vmstools.googlecode.com/svn/trunk/">http://vmstools.googlecode.com/svn/trunk/</a> it will not be possible to commit your changes back - however, the benefit is that anyone can get access to the repository, without the need for a google account.
+Alternatively, you can check out the code from <a href="https://vmstools.googlecode.com/svn/trunk/">https://vmstools.googlecode.com/svn/trunk/</a> (note the https, rather than http), in which case you will be able to commit your changes back. The disadvantage is that this requires a google account (e.g. gmail.com).
+Finally, there is a wee trap for beginners when logging in for the first time - make sure that you use the password for the project that googlecode supplies you - not your login password to google itself (slightly counter-intuitive, I know)!</p>
+
+<h2>
+<a id="installing-the-vmstools-package" class="anchor" href="#installing-the-vmstools-package" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing the VMStools package</h2>
+
+<p>Download the VMStools zip or rar file from the repository under the download tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in /trunk of the repository.
+The packages VMStools depends on can easily be installed through:</p>
+
+<pre><code>vmstoolsPackages &lt;-  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp")
+
+for(i in vmstoolsPackages)       try(install.packages(pkgs=i,repos=getOption("repos")))```
+
+Once you've installed all secondary packages install VMStools using ```
+install.packages("yourPath/vmstools.zip")```
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Vmstools maintained by <a href="https://github.com/nielshintzen">nielshintzen</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
