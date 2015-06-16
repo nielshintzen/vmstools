@@ -61,10 +61,10 @@
 <p>You will need the following software to use the VMStools software and repository.</p>
 
 <ul>
-<li>R (version 2.14.x or 2.15.x) for your system. Available <a href="http://www.r-project.org">here</a>.</li>
-<li>The VMStools package itself, available for download <a href="http://code.google.com/p/vmstools/downloads/">here</a>
+<li>R (version 3.x.x) for your system (still support for R2.14.x as well). Available <a href="http://www.r-project.org">here</a>.</li>
+<li>The VMStools package itself, available for download <a href="https://github.com/nielshintzen/vmstools/releases/">here</a>
 </li>
-<li>For very enthusiastic users / developers: An SVN (subversion) client. For Windows users, we recommend TortoiseSVN. Linux users will typically have access to such a client through their package distribution system.</li>
+<li>For very enthusiastic users / developers: For Windows users, we recommend TortoiseGit. Linux users will typically have access to such a client through their package distribution system.</li>
 <li>Some way to write and edit R code. For Windows, try RStudio or Tinn-R. For Linux, you almost certaintly already have Vi</li>
 </ul>
 
@@ -81,13 +81,12 @@
 <p>We'll assume you can handle 1 and 2. yourself, but number 3. is a bit trickier, and is of course dependent on your SVN client. There are a number of good resources available e.g. for windows</p>
 
 <p>Firstly there are two different ways to checkout the code, depending on whether you want to commit the changes back to the repository or not. If you checkout the repository from <a href="http://vmstools.googlecode.com/svn/trunk/">http://vmstools.googlecode.com/svn/trunk/</a> it will not be possible to commit your changes back - however, the benefit is that anyone can get access to the repository, without the need for a google account.
-Alternatively, you can check out the code from <a href="https://vmstools.googlecode.com/svn/trunk/">https://vmstools.googlecode.com/svn/trunk/</a> (note the https, rather than http), in which case you will be able to commit your changes back. The disadvantage is that this requires a google account (e.g. gmail.com).
-Finally, there is a wee trap for beginners when logging in for the first time - make sure that you use the password for the project that googlecode supplies you - not your login password to google itself (slightly counter-intuitive, I know)!</p>
+Alternatively, you can check out the code from <a href="https://github.com/nielshintzen/vmstools/tree/master/vmstools/R/">https://github.com/nielshintzen/vmstools/tree/master/vmstools/R/</a>. 
 
 <h2>
 <a id="installing-the-vmstools-package" class="anchor" href="#installing-the-vmstools-package" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing the VMStools package</h2>
 
-<p>Download the VMStools zip or rar file from the repository under the download tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in /trunk of the repository.
+<p>Download the VMStools zip or rar file from the repository under the download tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in vmstools/ of the repository.
 The packages VMStools depends on can easily be installed through:</p>
 
 <pre><code>vmstoolsPackages &lt;-  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp")
