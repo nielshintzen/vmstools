@@ -62,6 +62,25 @@
 You can find the wiki pages <a href="https://github.com/nielshintzen/vmstools/wiki">here</a>.</p> 
 
 <h2>
+<a id="downloads" class="anchor" href="#downloads" aria-hidden="true"><span class="octicon octicon-link"></span></a>Downloads</h2>
+
+<p>You may download the pre-compiled VMStools package (and other useful information <a href="https://github.com/nielshintzen/vmstools/releases/">here</a></p>
+
+<h2>
+<a id="installing-the-vmstools-package" class="anchor" href="#installing-the-vmstools-package" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing the VMStools package</h2>
+
+<p>Download the VMStools zip or rar file from the repository under the release tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in vmstools/ of the repository.
+The packages VMStools depends on can easily be installed through:</p>
+
+<pre><code>vmstoolsPackages &lt;-  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp")
+
+for(i in vmstoolsPackages)       try(install.packages(pkgs=i,repos=getOption("repos")))```
+
+Once you've installed all secondary packages install VMStools using ```
+install.packages("yourPath/vmstools.zip")```
+</code></pre>
+
+<h2>
 <a id="system-requirements" class="anchor" href="#system-requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>System Requirements</h2>
 
 <p>You will need the following software to use the VMStools software and repository.</p>
@@ -88,19 +107,7 @@ You can find the wiki pages <a href="https://github.com/nielshintzen/vmstools/wi
 
 <p>To download the source code, checkout the repository from <a href="https://github.com/nielshintzen/vmstools/tree/master/vmstools/">https://github.com/nielshintzen/vmstools/tree/master/vmstools/</a>. It will not be possible to commit your changes - however, contact us if you'd like to commit changes too.
 
-<h2>
-<a id="installing-the-vmstools-package" class="anchor" href="#installing-the-vmstools-package" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installing the VMStools package</h2>
 
-<p>Download the VMStools zip or rar file from the repository under the release tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in vmstools/ of the repository.
-The packages VMStools depends on can easily be installed through:</p>
-
-<pre><code>vmstoolsPackages &lt;-  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp")
-
-for(i in vmstoolsPackages)       try(install.packages(pkgs=i,repos=getOption("repos")))```
-
-Once you've installed all secondary packages install VMStools using ```
-install.packages("yourPath/vmstools.zip")```
-</code></pre>
       </section>
     </div>
 
