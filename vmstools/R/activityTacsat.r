@@ -162,8 +162,10 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
             if(class(shipFit[[iShip]])!= "try-error"){
 
               #- Analyse the fit and turn it into a result of fishing - no fishing
-              mu                <- sort.int(shipFit[[iShip]]$mu,index.return=TRUE)
-              sds               <- shipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
+              #mu                <- sort.int(shipFit[[iShip]]$mu,index.return=TRUE)
+              #sds               <- shipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
+              mu                <- shipFit[[iShip]]$mu
+              sds               <- shipFit[[iShip]]$sigma
 
               probs             <- dnorm(x=shipTacsat$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
               for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=shipTacsat$SI_SP,mean=mu[i],sd=sds[i]))
@@ -182,8 +184,10 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
             if(!class(res[[iGr]]) == "try-error"){
 
               #- Analyse the fit and turn it into a result of fishing - no fishing
-              mu                  <- sort.int(res[[iGr]]$mu,index.return=TRUE)
-              sds                 <- res[[iGr]]$sigma[mu$ix]; mu <- mu$x
+              #mu                  <- sort.int(res[[iGr]]$mu,index.return=TRUE)
+              #sds                 <- res[[iGr]]$sigma[mu$ix]; mu <- mu$x
+              mu                  <- res[[iGr]]$mu
+              sds                 <- res[[iGr]]$sigma
               probs               <- dnorm(x=subset(tyg,LE_GEAR==iGr)$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
               for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=subset(tyg,LE_GEAR==iGr)$SI_SP,mean=mu[i],sd=sds[i]))
               SI_STATE            <- apply(probs,1,which.max)
@@ -238,8 +242,10 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
             if(!class(nonshipFit[[iShip]]) == "try-error"){
 
               #- Analyse the fit and turn it into a result of fishing - no fishing
-              mu                  <- sort.int(nonshipFit[[iShip]]$mu,index.return=TRUE)
-              sds                 <- nonshipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
+              #mu                  <- sort.int(nonshipFit[[iShip]]$mu,index.return=TRUE)
+              #sds                 <- nonshipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
+              mu                  <- nonshipFit[[iShip]]$mu
+              sds                 <- nonshipFit[[iShip]]$sds
 
               probs               <- dnorm(x=shipTacsat$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
               for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=shipTacsat$SI_SP,mean=mu[i],sd=sds[i]))
@@ -337,8 +343,10 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
           if(!class(shipFit[[iShip]]) == "try-error"){
 
             #- Analyse the fit and turn it into a result of fishing - no fishing
-            mu                <- sort.int(shipFit[[iShip]]$mu,index.return=TRUE)
-            sds               <- shipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
+            #mu                <- sort.int(shipFit[[iShip]]$mu,index.return=TRUE)
+            #sds               <- shipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
+            mu                <- shipFit[[iShip]]$mu
+            sds               <- shipFit[[iShip]]$sigma
 
             probs             <- dnorm(x=shipTacsat$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
             for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=shipTacsat$SI_SP,mean=mu[i],sd=sds[i]))
@@ -385,8 +393,10 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
           if(!class(nonshipFit[[iShip]]) == "try-error"){
 
             #- Analyse the fit and turn it into a result of fishing - no fishing
-            mu                  <- sort.int(nonshipFit[[iShip]]$mu,index.return=TRUE)
-            sds                 <- nonshipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
+            #mu                  <- sort.int(nonshipFit[[iShip]]$mu,index.return=TRUE)
+            #sds                 <- nonshipFit[[iShip]]$sigma[mu$ix]; mu <- mu$x
+            mu                  <- nonshipFit[[iShip]]$mu
+            sds                 <- nonshipFit[[iShip]]$sigma
 
             probs               <- dnorm(x=shipTacsat$SI_SP,mean=mu[ceiling(length(mu)/2)],sd=sds[ceiling(length(mu)/2)])
             for(i in (ceiling(length(mu)/2)+1):length(mu)) probs <- cbind(probs,dnorm(x=shipTacsat$SI_SP,mean=mu[i],sd=sds[i]))
