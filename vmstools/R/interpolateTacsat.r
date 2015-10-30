@@ -1,4 +1,4 @@
-`interpolateTacsat` <-
+`interpolateTacsat_v2` <-
 function(tacsat                          #VMS datapoints
                               ,interval=120             #Specify in minutes, NULL means use all points
                               ,margin=12                #Specify the margin in minutes that the interval might deviate in a search for the next point
@@ -9,7 +9,7 @@ function(tacsat                          #VMS datapoints
                               ,fast=FALSE){
 
 if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM     <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-                              
+tacsat    <- sortTacsat(tacsat)
   #Start interpolating the data
 if(!method %in% c("cHs","SL"))  stop("method selected that does not exist")
 
@@ -50,33 +50,45 @@ if(fast){
     #Initiate returning result object
   returnInterpolations <- list()
 
+  #Make vectors out of tacsat data to speed up interpolation
+  VE_REF          <- tacsat$VE_REF
+  SI_LATI         <- tacsat$SI_LATI
+  SI_LONG         <- tacsat$SI_LONG
+  SI_SP           <- tacsat$SI_SP
+  SI_HE           <- tacsat$SI_HE
+  SI_DATIM        <- tacsat$SI_DATIM
+
     #Start iterating over succeeding points
   for(iStep in 1:(dim(tacsat)[1]-1)){
+  #for(iStep in 1:(4558)){
+    #print(iStep)
     if(iStep == 1){
       iSuccess    <- 0
       endDataSet  <- 0
       startVMS    <- 1
-      ship        <- tacsat$VE_REF[startVMS]
+      ship        <- VE_REF[startVMS]
     } else {
         if(is.na(endVMS)==TRUE) endVMS <- startVMS + 1
         startVMS <- endVMS
-        #-Check if the end of the dataset is reached
-        if(endDataSet == 1 & rev(unique(tacsat$VE_REF))[1] != ship){
-          startVMS  <- which(tacsat$VE_REF == unique(tacsat$VE_REF)[which(unique(tacsat$VE_REF)==ship)+1])[1]
-          ship      <- tacsat$VE_REF[startVMS]
-          endDataSet<- 0
-        }
-        if(endDataSet == 1 & rev(unique(tacsat$VE_REF))[1] == ship) endDataSet <- 2 #Final end of dataset
+        ship      <- VE_REF[startVMS]
+        if(endDataSet == 1 & (rev(unique(VE_REF))[1] == ship | startVMS > length(VE_REF))) endDataSet <- 2 #Final end of dataset
       }
 
     #if end of dataset is not reached, try to find succeeding point
     if(endDataSet != 2){
-      result      <- findEndTacsat(tacsat,startVMS,interval,margin)
-      endVMS      <- result[1]
+      idx         <- which(VE_REF == VE_REF[startVMS])
+      startidx    <- which(idx == startVMS)
+      result      <- findEndTacsat_v2(SI_DATIM[idx],startVMS=startidx,interval,margin)
+      endVMS      <- result[1]+idx[startidx]
       endDataSet  <- result[2]
+
+      if(startVMS == dim(tacsat)[1] | (startVMS+1 == dim(tacsat)[1] & VE_REF[startVMS] != VE_REF[startVMS+1])){
+        endDataSet <- 1
+        endVMS <- NA
+      }
+
       if(is.na(endVMS)==TRUE) int <- 0  #No interpolation possible
       if(is.na(endVMS)==FALSE) int <- 1  #Interpolation possible
-
         #Interpolate according to the Cubic Hermite Spline method
       if(method == "cHs" & int == 1){
 
@@ -92,26 +104,26 @@ if(fast){
         F01 <- -2*t^3+3*t^2
         F11 <- t^3-t^2
 
-        if (is.na(tacsat[startVMS,"SI_HE"])=="TRUE") tacsat[startVMS,"SI_HE"] <- 0
-        if (is.na(tacsat[endVMS,  "SI_HE"])=="TRUE") tacsat[endVMS,  "SI_HE"] <- 0
+        if (is.na(SI_HE[startVMS])=="TRUE") SI_HE[startVMS] <- 0
+        if (is.na(SI_HE[endVMS])=="TRUE")   SI_HE[endVMS]   <- 0
 
           #Heading at begin point in degrees
-        Hx0 <- sin(tacsat[startVMS,"SI_HE"]/(180/pi))
-        Hy0 <- cos(tacsat[startVMS,"SI_HE"]/(180/pi))
+        Hx0 <- sin(SI_HE[startVMS]/(180/pi))
+        Hy0 <- cos(SI_HE[startVMS]/(180/pi))
           #Heading at end point in degrees
-        Hx1 <- sin(tacsat[endVMS-headingAdjustment,"SI_HE"]/(180/pi))
-        Hy1 <- cos(tacsat[endVMS-headingAdjustment,"SI_HE"]/(180/pi))
+        Hx1 <- sin(SI_HE[endVMS-headingAdjustment]/(180/pi))
+        Hy1 <- cos(SI_HE[endVMS-headingAdjustment]/(180/pi))
 
-        Mx0 <- tacsat[startVMS, "SI_LONG"]
-        Mx1 <- tacsat[endVMS,   "SI_LONG"]
-        My0 <- tacsat[startVMS, "SI_LATI"]
-        My1 <- tacsat[endVMS,   "SI_LATI"]
+        Mx0 <- SI_LONG[startVMS]
+        Mx1 <- SI_LONG[endVMS]
+        My0 <- SI_LATI[startVMS]
+        My1 <- SI_LATI[endVMS]
 
           #Corrected for longitude lattitude effect
-        Hx0 <- Hx0 * params$fm * tacsat[startVMS,"SI_SP"] /((params$st[2]-params$st[1])/2+params$st[1])
-        Hx1 <- Hx1 * params$fm * tacsat[endVMS,"SI_SP"]   /((params$st[2]-params$st[1])/2+params$st[1])
-        Hy0 <- Hy0 * params$fm * lonLatRatio(tacsat[c(startVMS,endVMS),"SI_LONG"],tacsat[c(startVMS,endVMS),"SI_LATI"])[1] * tacsat[startVMS,"SI_SP"]/((params$st[2]-params$st[1])/2+params$st[1])
-        Hy1 <- Hy1 * params$fm * lonLatRatio(tacsat[c(startVMS,endVMS),"SI_LONG"],tacsat[c(startVMS,endVMS),"SI_LATI"])[2] * tacsat[endVMS,"SI_SP"]/((params$st[2]-params$st[1])  /2+params$st[1])
+        Hx0 <- Hx0 * params$fm * SI_SP[startVMS] /((params$st[2]-params$st[1])/2+params$st[1])
+        Hx1 <- Hx1 * params$fm * SI_SP[endVMS]   /((params$st[2]-params$st[1])/2+params$st[1])
+        Hy0 <- Hy0 * params$fm * lonLatRatio(SI_LONG[c(startVMS,endVMS)],SI_LATI[c(startVMS,endVMS)])[1] * SI_SP[startVMS]/((params$st[2]-params$st[1])/2+params$st[1])
+        Hy1 <- Hy1 * params$fm * lonLatRatio(SI_LONG[c(startVMS,endVMS)],SI_LATI[c(startVMS,endVMS)])[2] * SI_SP[endVMS]/((params$st[2]-params$st[1])  /2+params$st[1])
 
           #Finalizing the interpolation based on cHs
         fx <- numeric()
@@ -126,8 +138,8 @@ if(fast){
 
         #Interpolate according to a straight line
       if(method == "SL" & int == 1){
-        fx <- seq(tacsat$SI_LONG[startVMS],tacsat$SI_LONG[endVMS],length.out=res)
-        fy <- seq(tacsat$SI_LATI[startVMS],tacsat$SI_LATI[endVMS],length.out=res)
+        fx <- seq(SI_LONG[startVMS],SI_LONG[endVMS],length.out=res)
+        fy <- seq(SI_LATI[startVMS],SI_LATI[endVMS],length.out=res)
 
           #Add one to list of successful interpolations
         iSuccess <- iSuccess + 1

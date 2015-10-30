@@ -62,6 +62,8 @@ plotTools(x,level= "ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,
 }
   \item{returnRange}{Logical: return range of plotted values (which can be used to
   define own legend}
+  
+  \item{las}{Direction of axis legends. See ?par for more info}
 }
 \author{Niels T. Hintzen}
 \seealso{

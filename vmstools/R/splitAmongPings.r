@@ -56,6 +56,7 @@ eflaloNoVessel          <- eflaloNoTrip[which(!paste(eflaloNoTrip$VE_REF,format(
 
 if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
   if("day" %in% level){
+    print("level: day")
     if(!"SI_YEAR" %in% colnames(tacsatTrip))  tacsatTrip$SI_YEAR    <- an(format(tacsatTrip$SI_DATIM,format="%Y"))
     if(!"SI_DAY" %in%  colnames(tacsatTrip))  tacsatTrip$SI_DAY     <- an(format(tacsatTrip$SI_DATIM,format="%j"))
     if(!"LE_RECT" %in% colnames(tacsatTrip))  tacsatTrip$LE_RECT    <- ICESrectangle(tacsatTrip)
@@ -73,6 +74,7 @@ if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
     remainTacsat  <- res[["remainTacsat"]]
   }
   if("ICESrectangle" %in% level){
+    print("level: rectangle")
     if(!"SI_YEAR" %in% colnames(tacsatTrip))  tacsatTrip$SI_YEAR    <- an(format(tacsatTrip$SI_DATIM,format="%Y"))
     if(!"LE_RECT" %in% colnames(tacsatTrip))  tacsatTrip$LE_RECT    <- ICESrectangle(tacsatTrip)
 
@@ -88,6 +90,7 @@ if(dim(tacsatTrip)[1]>0 & dim(eflaloTrip)[1] >0){
     remainTacsat  <- res[["remainTacsat"]]
   }
   if("trip" %in% level){
+    print("level: trip")
     if(!"SI_YEAR" %in% colnames(tacsatTrip))  tacsatTrip$SI_YEAR    <- an(format(tacsatTrip$SI_DATIM,format="%Y"))
     if(!"SI_YEAR" %in% colnames(eflaloTrip))  eflaloTrip$SI_YEAR    <- an(format(eflaloTrip$LE_CDATIM,format="%Y"))
 
@@ -131,6 +134,7 @@ if(conserve == TRUE){
     #-------------------------------------------------------------------------------
 
     if("day" %in% level){
+      print("level: day & conserve = T, by vessel")
       if(!"SI_YEAR" %in% colnames(tacsat))  tacsat$SI_YEAR                <- an(format(tacsat$SI_DATIM,format="%Y"))
       if(!"SI_DAY" %in%  colnames(tacsat))  tacsat$SI_DAY                 <- an(format(tacsat$SI_DATIM,format="%j"))
       if(!"LE_RECT" %in% colnames(tacsat))  tacsat$LE_RECT                <- ICESrectangle(tacsat)
@@ -148,6 +152,7 @@ if(conserve == TRUE){
     }
 
     if("ICESrectangle" %in% level){
+      print("level: rectangle & conserve = T, by vessel")
       if(!"SI_YEAR" %in% colnames(tacsat))  tacsat$SI_YEAR                <- an(format(tacsat$SI_DATIM,format="%Y"))
       if(!"LE_RECT" %in% colnames(tacsat))  tacsat$LE_RECT                <- ICESrectangle(tacsat)
 
@@ -162,6 +167,7 @@ if(conserve == TRUE){
       byRectTacsat  <- res[["tacsat"]]
     }
     if(TRUE){ #-For remainder of vessel merging not at ICESrectangle level
+      print("level: year & conserve = T, by vessel")
       if(!"SI_YEAR" %in% colnames(tacsat))              tacsat$SI_YEAR    <- an(format(tacsat$SI_DATIM,format="%Y"))
       if(!"SI_YEAR" %in% colnames(eflaloVessel))  eflaloVessel$SI_YEAR    <- an(format(eflaloVessel$LE_CDATIM,format="%Y"))
 
@@ -195,6 +201,7 @@ if(conserve == TRUE){
     # 2a-2) Merge eflalo to tacsat with no matching FT_REF or VE_REF
     #-------------------------------------------------------------------------------
     if("day" %in% level){
+      print("level: day & conserve = T, no vessel match")
       if(!"SI_YEAR" %in% colnames(tacsat))  tacsat$SI_YEAR                    <- an(format(tacsat$SI_DATIM,format="%Y"))
       if(!"SI_DAY" %in%  colnames(tacsat))  tacsat$SI_DAY                     <- an(format(tacsat$SI_DATIM,format="%j"))
       if(!"LE_RECT" %in% colnames(tacsat))  tacsat$LE_RECT                    <- ICESrectangle(tacsat)
@@ -212,6 +219,7 @@ if(conserve == TRUE){
     }
 
     if("ICESrectangle" %in% level){
+      print("level: rectangle & conserve = T, no vessel match")
       if(!"SI_YEAR" %in% colnames(tacsat))  tacsat$SI_YEAR    <- an(format(tacsat$SI_DATIM,format="%Y"))
       if(!"LE_RECT" %in% colnames(tacsat))  tacsat$LE_RECT    <- ICESrectangle(tacsat)
 
@@ -226,6 +234,7 @@ if(conserve == TRUE){
       byRectTacsat      <- res[["tacsat"]]
     }
     if(TRUE){ #-For remainder of merging not at ICESrectangle level
+      print("level: year & conserve = T, no vessel match")
       if(!"SI_YEAR" %in% colnames(tacsat))          tacsat$SI_YEAR            <- an(format(tacsat$SI_DATIM,format="%Y"))
       if(!"SI_YEAR" %in% colnames(eflaloNoVessel))  eflaloNoVessel$SI_YEAR    <- an(format(eflaloNoVessel$LE_CDATIM,format="%Y"))
 

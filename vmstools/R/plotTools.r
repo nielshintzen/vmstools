@@ -1,4 +1,4 @@
-plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),returnRange=FALSE){
+plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),returnRange=FALSE,las=1){
   require(maps)
   require(mapdata)
   if(is.null(color)==TRUE) color <- rev(heat.colors(9))
@@ -89,7 +89,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
     ctrl                  <- control.eflalo
   }
 
-  map("worldHires",resolution=1,xlim=xlim,ylim=ylim,fill=TRUE,col="darkgreen");map.axes();box()
+  map("worldHires",resolution=1,xlim=xlim,ylim=ylim,fill=TRUE,col="darkgreen");axis(1,las=las);axis(2,las=las);box()
   for(iRect in 1:nrow(byRect)){
     if(log){
       if(is.null(zlim)==TRUE){ i         <- round((log(sum(byRect[iRect,ctrl$clm],na.rm=TRUE))-ifelse(rangeRect[1]==0,0,log(rangeRect[1])))
