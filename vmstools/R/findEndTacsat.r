@@ -1,4 +1,4 @@
-`findEndTacsat_v2` <-
+`findEndTacsat` <-
 function(SI_DATIM
                           ,startVMS #Starting point of VMS
                           ,interval #Specify in minutes, NULL means use all points  

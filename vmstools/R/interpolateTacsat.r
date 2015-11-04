@@ -1,4 +1,4 @@
-`interpolateTacsat_v2` <-
+`interpolateTacsat` <-
 function(tacsat                          #VMS datapoints
                               ,interval=120             #Specify in minutes, NULL means use all points
                               ,margin=12                #Specify the margin in minutes that the interval might deviate in a search for the next point
