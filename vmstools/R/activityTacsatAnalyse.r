@@ -8,8 +8,8 @@ activityTacsatAnalyse <- function(tacsat,units="year",analyse.by="LE_GEAR",ident
     if(units == "month"){ yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); mths  <- sort(unique(month(tacsat$SI_DATIM))); wks  <- 0}
     if(units == "week"){  yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); wks   <- sort(unique(week(tacsat$SI_DATIM)));  mths <- 0}
 
-    runScheme                 <- expand.grid(years=yrs,months=mths,weeks=wks)
-    storeScheme               <- expand.grid(years=yrs,months=mths,weeks=wks,analyse.by=unique(tacsat[,analyse.by]))
+    runScheme                 <- expand.grid(years=yrs,months=mths,weeks=wks,stringsAsFactors=FALSE)
+    storeScheme               <- expand.grid(years=yrs,months=mths,weeks=wks,analyse.by=unique(tacsat[,analyse.by]),stringsAsFactors=FALSE)
     storeScheme$peaks         <- NA
     storeScheme$fixPeaks      <- FALSE
     storeScheme$sigma0        <- 0.911
