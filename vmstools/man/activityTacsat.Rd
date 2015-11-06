@@ -3,7 +3,7 @@
 \title{Define activity of fishing vessel based on speed profile analyses.
 }
 \description{
-Analyse tacsat data by gear of vessel and define, based on speed profile and
+Analyse tacsat data by gear or vessel and define, based on speed profile and
 fitting normal distributions through these speed profiles, fishing and other
 activities.
 }
@@ -26,7 +26,7 @@ activityTacsat(tacsat, units = "year", analyse.by = "LE_GEAR", storeScheme = NUL
                starting values. level = "vessel" turns this option on.}
 }
 \details{
-The analyses assumes that the speed profile close to 0 can be mirrored to create
+The analysis assumes that the speed profile close to 0 can be mirrored to create
 a good normal distribution.
 Success of fit might depend on the initial guess in peaks or mean peak values.
 
@@ -35,7 +35,7 @@ are not given). The value of 0.911 corresponds to a width of 1.5knots on each si
 of the mean under a 90 percent CI.
 }
 \value{
-In general, a 5-peak analyses results in h=no fishing / in harbour, f=fishing, s=steaming.
+In general, a 5-peak analysis results in h=no fishing / in harbour, f=fishing, s=steaming.
 A 3-peak analyses results in f=fishing (closest to zero speed) and s=steaming.
 }
 \author{Niels T. Hintzen}
