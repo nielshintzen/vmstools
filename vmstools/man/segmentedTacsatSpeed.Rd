@@ -52,7 +52,7 @@ depends on accurate starting points. After 20 random tries the fitting procedure
 exits and returns a '0' success.
 }
 \value{
-SI_STATE = 0 for no-fishing and SI_STATE = 1 for fishing}
+SI_STATE = nf for no-fishing and SI_STATE = f for fishing}
 \references{
 Bastardie et al. 2010
 }
