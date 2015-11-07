@@ -5,7 +5,7 @@ Define activity based on segmented regression of speed profile}
 \description{
 Given the speed profile by gear or vessel in a user defined time frame a segmented
 regression analyses will be performed to indicate where the fishing speeds are
-located. The segmented regression takes place on the cummulative speed profile.
+located. The segmented regression takes place on the cumulative speed profile.
 }
 \usage{
 segmentedTacsatSpeed(tacsat, units = "year", analyse.by = "VE_REF",
@@ -49,10 +49,10 @@ Directory to save overview and success of fit. Default = tempdir().
 \details{
 To fit a speed profile at least 20 VMS pings must exist. The function highly
 depends on accurate starting points. After 20 random tries the fitting procedure
-exists and returns a '0' success.
+exits and returns a '0' success.
 }
 \value{
-SI_STATE = 0 for no-fishing and SI_STATE = 1 for fishing}
+SI_STATE = nf for no-fishing and SI_STATE = f for fishing}
 \references{
 Bastardie et al. 2010
 }
