@@ -63,8 +63,8 @@ if(method == "grid" & is.null(control.grid$spatGrid) == TRUE){
 if(method == "grid" & is.null(control.grid$spatGrid) == FALSE){
   sPDFObs     <- SpatialPointsDataFrame(data.frame(cbind(obs$SI_LONG,obs$SI_LATI)),data=obs)
   sPDFTac     <- SpatialPointsDataFrame(data.frame(cbind(tacsat$SI_LONG,tacsat$SI_LATI)),data=tacsat)
-  resObs      <- overlay(spatGrid,sPDFObs)
-  resTac      <- overlay(spatGrid,sPDFTac)
+  resObs      <- over(sPDFObs,spatGrid)
+  resTac      <- over(sPDFTac,spatGrid)
 
   idxObs      <- SpatialPoints(spatGrid)@coords[resObs,]
   idxTac      <- SpatialPoints(spatGrid)@coords[resTac,]

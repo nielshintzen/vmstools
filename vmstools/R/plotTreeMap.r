@@ -47,7 +47,7 @@ function (x, gridcell = c(0.1, 0.1), gear = "OTB", xlim = c(-1,
         gridcell[1], gridcell[2], type = "SpatialPixelsDataFrame")
     coords <- SpatialPointsDataFrame(cbind(x = an(ac(xx$SI_LONG)),
         y = an(ac(xx$SI_LATI))), data = xx)
-    coords$dens <- overlay(grids, coords)
+    coords@data$dens      <- over(as(coords,"SpatialPoints"), as(grids,"SpatialPixels"))
     DT <- data.table(data.frame(coords))
     DT$x <- af(ac(grids@coords[DT$dens, 1]))
     DT$y <- af(ac(grids@coords[DT$dens, 2]))

@@ -35,6 +35,7 @@ export(
 "distance",                       
 "distanceInterpolation",          
 "distanceTacsat",   
+"effort",
 "eflaloHaul2Tacsat",              
 "eflalo2Pings",                   
 "eflalo2relational",              

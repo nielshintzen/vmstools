@@ -41,7 +41,7 @@ countPings <- function(formula,tacsat,grid=NULL,by=NULL){
                       grid                      <- as(grid,"SpatialPixels");
                       grid                      <- as(grid,"SpatialPixelsDataFrame")
                       #Overlay the two spatial frameworks to see to which gridcell each tacsat coordinate belongs
-                      gridCellIndex             <- overlay( grid, sPDF )
+                      gridCellIndex             <- over(as(sPDF,"SpatialPoints"),as(grid,"SpatialPixels"))
                       newCoords                 <- sPDF@coords[gridCellIndex,]
 
                       tacsat$GR_LONG            <- newCoords[,1]
