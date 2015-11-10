@@ -78,7 +78,7 @@ if(fast){
     if(endDataSet != 2){
       idx         <- which(VE_REF == VE_REF[startVMS])
       startidx    <- which(idx == startVMS)
-      result      <- findEndTacsat_v2(SI_DATIM[idx],startVMS=startidx,interval,margin)
+      result      <- findEndTacsat(SI_DATIM[idx],startVMS=startidx,interval,margin)
       endVMS      <- result[1]+idx[startidx]
       endDataSet  <- result[2]
 
