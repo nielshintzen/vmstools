@@ -20,8 +20,8 @@ for(i in 1:length(interpolation)){
     avbear<- c(avbear[1],avbear,avbear[length(avbear)])
 
       #Calculate the destinated point taking a begin point, a bearing and a certain distance to travel
-    outpointr <- destFromBearing(xs,ys,(avbear+90+360)%%360,gearWidth)
-    outpointl <- destFromBearing(xs,ys,(avbear-90+360)%%360,gearWidth)
+    outpointr <- destFromBearing(xs,ys,(avbear+90+360)%%360,gearWidth/2)
+    outpointl <- destFromBearing(xs,ys,(avbear-90+360)%%360,gearWidth/2)
 
     singlePolygons <- list()
     for(j in 1:(nrow(outpointr)-1)){
