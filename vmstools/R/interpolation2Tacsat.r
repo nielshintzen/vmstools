@@ -57,9 +57,11 @@ idx       <- which(unlist(lapply(ret,function(x){length(grep(".1",colnames(x)))>
 nidx      <- which(unlist(lapply(ret,function(x){length(grep(".1",colnames(x)))>0}))==FALSE)
 retmin    <- lapply(ret[idx],function(x){x[,-grep(".1",colnames(x))]})
 ret       <- c(retmin,ret[nidx])
-clnames   <- colnames(ret[[1]])
+
 # Order columns
-ret       <- lapply(ret,function(x){x[,clnames]})
+ret       <- lapply(ret,function(x){addclnames <- clnames[which(!clnames %in% colnames(x))];
+                                    x[,addclnames] <- NA;
+                                    x[,clnames]})
 # Combine all interpolations with original file and return
 interpolationTot <- do.call(rbind,ret)
 interpolationTot <- formatTacsat(interpolationTot)
