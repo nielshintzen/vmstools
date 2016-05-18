@@ -8,7 +8,7 @@ ICESrectangle <- function(dF){
                                  #-Note that at 0 meridian the allocation of points at the meridian switch
                                  ifelse(dF[, "SI_LONG"] >=  0 & dF[, "SI_LONG"]<  10, "F",
                                  ifelse(dF[, "SI_LONG"] >= 10 & dF[, "SI_LONG"]<  20, "G",
-                                 ifelse(dF[, "SI_LONG"] >= 20 & dF[, "SI_LONG"]<  30, "H", "I"))))))))
+                                 ifelse(dF[, "SI_LONG"] >= 20 & dF[, "SI_LONG"]<  30, "H", "J"))))))))
                     rectChar4  <- rep(NA,nrow(dF))
                     idxlowzero <- which(dF[,"SI_LONG"] <  0)
                     idxabozero <- which(dF[,"SI_LONG"] >= 0)
