@@ -286,7 +286,7 @@ if(conserve==TRUE){
     if(variable == "all")   tacsatReturn <- tacsatReturn
   }
 
-return(orderBy(~ID,data=tacsatReturn)[,-grep("ID",colnames(tacsatReturn))])}
+return(orderBy(~ID,data=tacsatReturn)[,-match("ID",colnames(tacsatReturn))])}
 
 
 
