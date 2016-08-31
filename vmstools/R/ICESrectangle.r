@@ -1,5 +1,5 @@
 ICESrectangle <- function(dF){
-                    rectChar1n2 <- as.integer(2 * (dF[, "SI_LATI"] - 35.5))
+                    rectChar1n2 <- sprintf("%02i",as.integer(2 * (dF[, "SI_LATI"] - 35.5)))
                     rectChar3 <- ifelse(dF[, "SI_LONG"] > -50 & dF[, "SI_LONG"]<= -40, "A",
                                  ifelse(dF[, "SI_LONG"] > -40 & dF[, "SI_LONG"]<= -30, "B",
                                  ifelse(dF[, "SI_LONG"] > -30 & dF[, "SI_LONG"]<= -20, "C",
