@@ -6,7 +6,8 @@ Author: Niels Hintzen <niels.hintzen@wur.nl>, Francois Bastardie <fba@aqua.dtu.d
 Maintainer: Niels Hintzen <niels.hintzen@wur.nl>
 Description: To enable standardised analysis of fisheries VMS (Vessel Monitoring System) data in Europe, to include identifying trips, linking to logbook data, estimating fishing, converting points to spatial coverages and estimating pressure indicators. 
 License: GPL (>= 2)
-Imports: R (>= 3.0.0), cluster, data.table, doBy, maps, mapdata, maptools, PBSmapping, sp 
+Depends: R (>= 3.0.0)
+Imports: cluster, data.table, doBy, maps, mapdata, maptools, PBSmapping, sp 
 Suggests: adehabitat, amap, animation, aspace, FactoMineR, lattice, MASS, mda, mixtools,raster, segmented, shapefiles, SOAR, tcltk, ade4
 Repository: CRAN
 LazyLoad: Yes
