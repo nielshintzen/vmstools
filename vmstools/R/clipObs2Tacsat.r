@@ -40,8 +40,8 @@ if(method == "grid"){
 }
 
 if(is.null(temporalRange)==FALSE){
-  minTobs     <- range(obs$SI_DATIM,na.rm=TRUE)[1] + temporalRange[1]
-  maxTobs     <- range(obs$SI_DATIM,na.rm=TRUE)[2] + temporalRange[2]
+  minTobs     <- range(obs$SI_DATIM,na.rm=TRUE)[1] + temporalRange[1]*60
+  maxTobs     <- range(obs$SI_DATIM,na.rm=TRUE)[2] + temporalRange[2]*60
   tacsat      <- subset(tacsat,SI_DATIM >= minTobs & SI_DATIM <= maxTobs)
 }
 if(nrow(tacsat)==0) stop("Number of tacsat records that are within reach of obs dataset is zero")
@@ -170,7 +170,7 @@ if(method == "euclidean"){
 
        idx              <- apply(res,2,function(x){return(x <= control.euclidean$threshold)})
        idx              <- which(idx == TRUE,arr.ind=TRUE)
-       restime          <- difftime(obs$SI_DATIM[obsRows[idx[,1]]],tacsat$SI_DATIM[tacRows[idx[,2]]],units="mins")
+       restime          <- difftime(tacsat$SI_DATIM[tacRows[idx[,2]]],obs$SI_DATIM[obsRows[idx[,1]]],units="mins")
 
        if(is.null(temporalRange)==FALSE){ retrn       <- which(restime <= temporalRange[2] & restime >= temporalRange[1])
        } else { retrn <- 1:length(restime) }
