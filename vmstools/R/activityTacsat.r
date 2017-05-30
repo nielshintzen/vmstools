@@ -18,8 +18,8 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
 
   if(units == "all"){   yrs <- 0;                                   mths  <- 0;                                    wks  <- 0}
   if(units == "year"){  yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); mths  <- 0;                                    wks  <- 0}
-  if(units == "month"){ yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); mths  <- sort(unique(month(tacsat$SI_DATIM))); wks  <- 0}
-  if(units == "week"){  yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); wks   <- sort(unique(week(tacsat$SI_DATIM)));  mths <- 0}
+  if(units == "month"){ yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); mths  <- an(sort(unique(format(tacsat$SI_DATIM,"%m")))); wks  <- 0}
+  if(units == "week"){  yrs <- sort(unique(format(tacsat$SI_DATIM,"%Y"))); wks   <- an(sort(unique(format(tacsat$SI_DATIM,"%W"))))+1;  mths <- 0}
   
   runScheme                 <- expand.grid(years=yrs,months=mths,weeks=wks)
   
@@ -34,8 +34,8 @@ activityTacsat <- function(tacsat,units="year",analyse.by="LE_GEAR",storeScheme=
     if(nrow(runScheme)==1){ sTacsat <- tacsat
     } else {
         if(mth == 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr)
-        if(mth == 0 & wk != 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & week( tacsat$SI_DATIM) == wk)
-        if(mth != 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & month(tacsat$SI_DATIM) == mth)
+        if(mth == 0 & wk != 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & (an(format( tacsat$SI_DATIM,"%W"))+1) == wk)
+        if(mth != 0 & wk == 0) sTacsat <- subset(tacsat,format(tacsat$SI_DATIM,"%Y") == yr & format(tacsat$SI_DATIM,"%m") == mth)
       }
     if(plot==TRUE) x11();
     #---------------------------------------------------------------------------
