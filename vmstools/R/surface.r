@@ -38,7 +38,7 @@ surface <- function(obj,method="Trapezoid",includeNA=TRUE,zone=NULL){  #Methods 
         if (class(obj) %in% c('SpatialGridDataFrame')) # not empty...
           {
              if(method == "Trapezoid"){
-               res <- max(obj@grid@cellsize,na.rm=TRUE)/0.1 * 10  #automatic scaling
+               res <- ceiling(max(obj@grid@cellsize,na.rm=TRUE)/0.1 * 10)  #automatic scaling
                if(res < 3) res <- 3
                griddims <- summary(obj)$grid
                bboxdims <- bbox(obj)
