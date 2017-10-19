@@ -286,7 +286,7 @@ if(conserve==TRUE){
     if(variable == "kgs")   tacsatReturn <- tacsatReturn[,c(1:dim(tacsat)[2],grep("KG",colnames(tacsatReturn)))]
     if(variable == "all")   tacsatReturn <- tacsatReturn
   }
-  if(returnALl)
+  if(returnAll)
     tacsatReturn <- orderBy(~ID,data=rbindTacsat(tacsatReturn,remtacsat))
 
 return(orderBy(~ID,data=tacsatReturn)[,-match("ID",colnames(tacsatReturn))])}

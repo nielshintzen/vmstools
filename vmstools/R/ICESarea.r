@@ -1,6 +1,6 @@
 ICESarea <- function(tacsat,areas,proj4string=NULL,fast=FALSE){
-  if(class(areas) != "SpatialPolygons") stop("'areas' must be specified as class 'SpatialPolygons'")
-  
+  if(!class(areas) %in% c("SpatialPolygons","SpatialPolygonsDataFrame") stop("'areas' must be specified as class 'SpatialPolygons' or 'SpatialPolygonsDataFrame'")
+  if(class(areas) == "SpatialPolygonsDataFrame") areas <- as(areas,"SpatialPolygons")
   #filter NA values
   NAS         <- which(is.na(tacsat$SI_LONG)==F & is.na(tacsat$SI_LATI)==FALSE)
   
