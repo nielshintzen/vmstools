@@ -33,6 +33,5 @@ if(is.null(st)==FALSE){
   if(length(st)>2) stop("More than two speed values selected")
   VMS. <- VMS.[which(VMS.$SI_SP >= st[1] & VMS.$SI_SP <= st[2]),]
 }
-if(!"SI_DATIM" %in% colnames(VMS.)) colnames(VMS.) <- c(colnames(tacsat),"SI_DATIM")
 return(VMS.[,-grep("SI_DATIM",colnames(VMS.))])}
 

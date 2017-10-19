@@ -1,4 +1,4 @@
-splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TRUE,by=NULL){
+splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TRUE,by=NULL,returnAll){
 
   #level: day,ICESrectangle,trip
   #conserve: T,F
@@ -36,6 +36,7 @@ kgs                     <- grep("LE_KG",colnames(eflalo))
 eur                     <- grep("LE_EURO",colnames(eflalo))
 
   #- Subset tacsat file
+remtacsat               <- subset(tacsat,SI_STATE==0)
 tacsat                  <- subset(tacsat,SI_STATE != 0) #only attribute variable to fishing pings
 tacsatTrip              <- subset(tacsat,FT_REF != 0)
 remainTacsat            <- sort(unique(tacsatTrip$ID))
@@ -285,6 +286,8 @@ if(conserve==TRUE){
     if(variable == "kgs")   tacsatReturn <- tacsatReturn[,c(1:dim(tacsat)[2],grep("KG",colnames(tacsatReturn)))]
     if(variable == "all")   tacsatReturn <- tacsatReturn
   }
+  if(returnALl)
+    tacsatReturn <- orderBy(~ID,data=rbindTacsat(tacsatReturn,remtacsat))
 
 return(orderBy(~ID,data=tacsatReturn)[,-match("ID",colnames(tacsatReturn))])}
 

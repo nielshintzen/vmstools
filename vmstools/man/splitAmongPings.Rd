@@ -10,7 +10,7 @@ Also there is a possibility to merge the eflalo records without a matching tacsa
 }
 \usage{
 splitAmongPings(tacsat, eflalo, variable = "all",
-                level = "day", conserve = TRUE,by=NULL)
+                level = "day", conserve = TRUE,by=NULL,returnAll=FALSE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -34,7 +34,9 @@ Name of tacsat column by which KG and EURO should be dispatched. Default to NULL
 distributes KG and EURO equally by each ping. A tacsat column can be used instead
 to generate a 'weighted' dispatch of KG and EURO.
 }
-
+  \item{returnAll}{
+Logical, whether all non-fishing pings should be returned as well (default = FALSE)
+}
 }
 \details{
 Levels have hierachy, so if "day" is specified, also "ICESrectangle" and "trip" will be used.
