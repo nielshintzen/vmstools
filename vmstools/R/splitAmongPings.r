@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TRUE,by=NULL,returnAll){
   
   #level: day,ICESrectangle,trip
@@ -584,7 +583,3 @@ if(conserve==TRUE){
     tacsatReturn <- orderBy(~ID,data=rbindTacsat(tacsatReturn,remtacsat))
 
 return(orderBy(~ID,data=tacsatReturn)[,-match("ID",colnames(tacsatReturn))])}
-
-
-
->>>>>>> dcc1e4bcd3834062daf4bcc1967a4c49078b38da
