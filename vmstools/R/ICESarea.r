@@ -46,10 +46,5 @@ ICESarea <- function(tacsat,areas,proj4string=NULL,fast=FALSE){
   }
   return(totres)}
 
-© 2017 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
+
 
