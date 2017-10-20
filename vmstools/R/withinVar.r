@@ -4,10 +4,7 @@
 # we calculate the distance row by row                                         #
 ################################################################################
 
-withinVar <- function(oneRowOfCluster,centerOfGravityClusti)
-{
+withinVar <- function(oneRowOfCluster,centerOfGravityClusti){
   comb   <- rbind(centerOfGravityClusti, oneRowOfCluster)
-  sqrComb    <- (dist(comb)^2)
-  
-  return(sqrComb)
-}
+  sqrComb <- dist(comb)^2
+return(sqrComb)}
