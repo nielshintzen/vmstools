@@ -7,9 +7,8 @@ ICESarea <- function(tacsat,areas,proj4string=NULL,fast=FALSE){
   totres      <- rep(NA,length(tacsat$SI_LONG))
   nms         <- unlist(lapply(areas@polygons,function(x){return(x@ID)}))
   
-  if(is.null(proj4string)==TRUE){
+  if(is.null(proj4string)==TRUE & is.na(proj4string(tacsat))){
     #No projection string used
-    if(is.na(proj4string(areas))==FALSE) stop("Projection defined for areas, use proj4string argument in function")
     spPoint           <- SpatialPoints(data.frame(x=tacsat$SI_LONG[NAS], y=tacsat$SI_LATI[NAS]))
     
     if(nrow(tacsat)>1e4 & fast == FALSE) {
@@ -28,7 +27,8 @@ ICESarea <- function(tacsat,areas,proj4string=NULL,fast=FALSE){
     
   } else {
     #Use projection string
-    proj4string(lands)<- proj4string
+    if(is.null(proj4string))
+      proj4string     <- proj4string(areas)
     spPoint           <- SpatialPoints(data.frame(x=tacsat$SI_LONG[NAS],y=tacsat$SI_LATI[NAS]), proj4string=proj4string)
     if(nrow(tacsat)>1e4 & fast == FALSE) {
       idx     <- numeric()
