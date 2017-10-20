@@ -1,4 +1,5 @@
 ICESarea <- function(tacsat,areas,proj4string=NULL,fast=FALSE){
+  require(sp)
   if(!class(areas) %in% c("SpatialPolygons","SpatialPolygonsDataFrame")) stop("'areas' must be specified as class 'SpatialPolygons' or 'SpatialPolygonsDataFrame'")
   if(class(areas) == "SpatialPolygonsDataFrame") areas <- as(areas,"SpatialPolygons")
   #filter NA values
@@ -7,7 +8,7 @@ ICESarea <- function(tacsat,areas,proj4string=NULL,fast=FALSE){
   totres      <- rep(NA,length(tacsat$SI_LONG))
   nms         <- unlist(lapply(areas@polygons,function(x){return(x@ID)}))
   
-  if(is.null(proj4string)==TRUE & is.na(proj4string(tacsat))){
+  if(is.null(proj4string)==TRUE & is.na(proj4string(areas))){
     #No projection string used
     spPoint           <- SpatialPoints(data.frame(x=tacsat$SI_LONG[NAS], y=tacsat$SI_LATI[NAS]))
     
@@ -29,7 +30,7 @@ ICESarea <- function(tacsat,areas,proj4string=NULL,fast=FALSE){
     #Use projection string
     if(is.null(proj4string))
       proj4string     <- proj4string(areas)
-    spPoint           <- SpatialPoints(data.frame(x=tacsat$SI_LONG[NAS],y=tacsat$SI_LATI[NAS]), proj4string=proj4string)
+    spPoint           <- SpatialPoints(data.frame(x=tacsat$SI_LONG[NAS],y=tacsat$SI_LATI[NAS]), proj4string=CRS(proj4string))
     if(nrow(tacsat)>1e4 & fast == FALSE) {
       idx     <- numeric()
       cat(paste("Calculation memory demanding, therefore a stepwise approach is taken. use: fast=TRUE for memory demaning approach\n"))
