@@ -1,9 +1,9 @@
-splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TRUE,by=NULL,returnAll){
+splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TRUE,by=NULL,returnAll=T){
   
   #level: day,ICESrectangle,trip
   #conserve: T,F
   #variable: kgs,value,effort
-  
+  require(data.table)
   #- Create extra columns with time stamps
   if(!"FT_REF" %in% colnames(tacsat)) stop("tacsat file needs FT_REF detailing trip number")
   if(!"SI_STATE" %in% colnames(tacsat)) stop("tacsat file needs SI_STATE detailing activity of vessel")
@@ -286,7 +286,7 @@ splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TR
     if(variable == "kgs")   tacsatReturn <- tacsatReturn[,c(1:dim(tacsat)[2],grep("KG",colnames(tacsatReturn)))]
     if(variable == "all")   tacsatReturn <- tacsatReturn
   }
-  if(returnAll)
+  if(returnAll & nrow(remtacsat)>0)
     tacsatReturn <- orderBy(~ID,data=rbindTacsat(tacsatReturn,remtacsat))
   
   return(orderBy(~ID,data=tacsatReturn)[,-match("ID",colnames(tacsatReturn))])}

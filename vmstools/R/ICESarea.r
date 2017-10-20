@@ -44,3 +44,4 @@ ICESarea <- function(tacsat,areas,proj4string=NULL,fast=FALSE){
     
     totres[NAS]       <- nms[idx]
   }
+  return(totres)}
