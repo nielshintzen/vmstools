@@ -48,7 +48,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
         cah_cluster_var=cutree(cah_var,k=nb.finalclusters)
 
         png(paste(analysisName,"HAC_Dendogram_Step1.png",sep="_"), width = 1200, height = 800)
-        plclust(cah_var,labels=FALSE,hang=-1,ann=FALSE)
+        plot(cah_var,labels=FALSE,hang=-1,ann=FALSE)
         title(main="HAC dendogram",xlab="Species",ylab="Height")
         rect.hclust(cah_var, k=nb.finalclusters)
         dev.off()
@@ -97,7 +97,7 @@ selectMainSpecies=function(dat,analysisName="",RunHAC=TRUE,DiagFlag=FALSE){
 
         # Dendogram of the first cut in the residual species cluster
         png(paste(analysisName,"HAC_Dendogram_Step1_ResidualSpecies.png",sep="_"), width = 1200, height = 800)
-        plclust(cah_var,labels=FALSE,hang=-1,ann=FALSE)
+        plot(cah_var,labels=FALSE,hang=-1,ann=FALSE)
         title(main="HAC dendogram - Step",xlab="Species",ylab="Height")
         if((nb.finalclusters+nb_cut)>=(p-2)){
           rect.hclust(cah_var, k=kFinal)
