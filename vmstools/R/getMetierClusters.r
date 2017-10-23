@@ -373,19 +373,19 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_1_2_HAC',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_1_2_HAC',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_1_2_HAC',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_1_2_HAC',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(sizeClusters))[as.numeric(clusters)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_2_3_HAC',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_2_3_HAC',sep="_"), type='png')
     dev.off()
 
 
@@ -457,7 +457,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mat2=mat[,which(colnames(mat)%in%names(sp2))]
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
     print(levelplot(mat2, cuts=4, aspect=1, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
-    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png')
     dev.off()
 
 
@@ -758,19 +758,19 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_1_2_Kmeans',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_1_2_Kmeans',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_1_2_Kmeans',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_1_2_Kmeans',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$size))[as.numeric(clusters$cluster)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_2_3_Kmeans',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_2_3_Kmeans',sep="_"), type='png')
     dev.off()
 
 
@@ -834,7 +834,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mat2=mat[,which(colnames(mat)%in%names(sp2))]
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
     print(levelplot(mat2, cuts=4, aspect=1, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
-    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png')
     dev.off()
 
 
@@ -1175,19 +1175,19 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_1_2_PAM',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_1_2_PAM',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_1_2_PAM',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_1_2_PAM',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$id.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_2_3_PAM',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_2_3_PAM',sep="_"), type='png')
     dev.off()
 
     
@@ -1251,7 +1251,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mat2=mat[,which(colnames(mat)%in%names(sp2))]
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
     print(levelplot(mat2, cuts=4, aspect=1, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
-    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png')
     dev.off()
 
 
@@ -1590,19 +1590,19 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_1_2_CLARA',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_1_2_CLARA',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot(datLog[,1], datLog[,2], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 1", ylab="Axis 2")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_1_2_CLARA',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_1_2_CLARA',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot(datLog[,2], datLog[,3], pch=21, bg=rainbow(length(clusters$i.med))[as.numeric(clusters$clustering)], main="", xlab="Axis 2", ylab="Axis 3")
     abline(h=0, lty=2) ; abline(v=0, lty=2)
-    savePlot(filename=paste(analysisName,'projections_2_3_CLARA',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projections_2_3_CLARA',sep="_"), type='png')
     dev.off()
 
     # Catch profile of the dataset
@@ -1666,7 +1666,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
     mat2=mat[,which(colnames(mat)%in%names(sp2))]
     cc <- colorRampPalette(c("white", "black"),space = "rgb", interpolate="spline")
     print(levelplot(mat2, cuts=4, aspect=1, xlab="", ylab="", col.regions=cc(5), at=c(0,20,40,60,80,100), scales=list(cex=0.7), colorkey=list(space="right", at=c(0,20,40,60,80,100), width=1.1)))
-    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'mean_profile_by_cluster_levelplot',sep="_"), type='png')
     dev.off()
 
     # OR #

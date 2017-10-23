@@ -27,22 +27,22 @@ getTableAfterPCA = function(datSpecies,analysisName="",pcaYesNo="pca",criterion=
     
     X11(5,5)
     plot.PCA(log.pca, choix = "var", axes = 1:2, new.plot=FALSE, title="", lim.cos2.var = 0.1)
-    savePlot(filename=paste(analysisName,'species_projection_on_the_1_and_2_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'species_projection_on_the_1_and_2_factorial_axis',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot.PCA(log.pca, choix = "var", axes = 1:2, new.plot=FALSE, title="", lim.cos2.var = 0.1)
-    savePlot(filename=paste(analysisName,'species_projection_on_the_1_and_2_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'species_projection_on_the_1_and_2_factorial_axis',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot.PCA(log.pca, choix = "var", axes = 2:3, new.plot=FALSE, title="", lim.cos2.var = 0.1)
-    savePlot(filename=paste(analysisName,'species_projection_on_the_2_and_3_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'species_projection_on_the_2_and_3_factorial_axis',sep="_"), type='png')
     dev.off()
     
     X11(5,5)
     plot.PCA(log.pca, choix = "ind", axes = 1:2, habillage = "ind", title="", new.plot=FALSE, cex=1.1)
-    savePlot(filename=paste(analysisName,'projection_of_individuals_on_the_first_two_factorial_axis',sep="_"), type='png', restoreConsole = TRUE)
+    savePlot(filename=paste(analysisName,'projection_of_individuals_on_the_first_two_factorial_axis',sep="_"), type='png')
     dev.off()
  
 
