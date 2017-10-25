@@ -116,7 +116,7 @@ indicators <- function    ( indicatorNum=5,             # indicator 5, 6 or 7
       }
       
       # Create the grid
-      if (plotMapTF) {windows(record=TRUE)}
+      if (plotMapTF) {x11()}
       if (exportGridName!="") {outGridFileName<-paste(exportGridName,"_DCF",indicatorNum,"_Month", currMonth,".asc",sep="")} else {outGridFileName<-""}
       monthlyVmsGrid<-vmsGridCreate(monthlyTacsat, nameLon = "SI_LONG", nameLat = "SI_LATI", cellsizeX=cellresX, cellsizeY=cellresY, nameVarToSum, plotMap=plotMapTF, plotTitle=paste("Month ", currMonth), plotPoints = FALSE, outGridFile=outGridFileName)
       if (plotMapTF==TRUE & indicatorNum==6) {plot_mcp(plotnew=FALSE, plotpoints=FALSE, titletxt="")}   # plot the specific DCF 6 MCP
