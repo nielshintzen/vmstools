@@ -50,7 +50,8 @@
 <li>Link logbook and VMS data together in order to distinguish fishing from other activities</li>
 <li>Provide high-resolution maps of both fishing effort and -landings, interpolate vessel tracks</li>
 <li>Calculate indicators of fishing impact as listed under the Data Collection Framework at different spatio-temporal scales.</li>
-<li>Prepare data for FishFrame submission</li>
+<li>Perform some statistical analyses with VMS data</li>
+<li>Investigate the dependence of fishers on a certain enclosed area</li>
 <li>Link other spatial data to VMS and logbook data</li>
 </ul>
 
@@ -71,21 +72,30 @@ You can find the wiki pages <a href="https://github.com/nielshintzen/vmstools/wi
 <p>Download the VMStools zip or rar file from the repository under the release tab or build it yourself from the repository. Please note that the VMStools package depends on a number of other R packages. They are listed in the DESCRIPTION file in vmstools/ of the repository.
 The packages VMStools depends on can easily be installed through:</p>
 
+<pre><code>
+library(devtools)
+install_github("nielshintzen/vmstools/vmstools/")
+</code></pre>
+
+Or manually
+        
 <pre><code>vmstoolsPackages &lt;-  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp")
 
 for(i in vmstoolsPackages)       try(install.packages(pkgs=i,repos=getOption("repos")))
 
-Once you've installed all secondary packages install VMStools using 
+#- Once you've installed all secondary packages install VMStools using 
 install.packages("yourPath/vmstools.zip")
 </code></pre>
 
+If you run Rstudio and run into trouble, please install VMStools first into Rgui and then restart Rstudio.
+        
 <h2>
 <a id="system-requirements" class="anchor" href="#system-requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>System Requirements</h2>
 
 <p>You will need the following software to use the VMStools software and repository.</p>
 
 <ul>
-<li>R (version 3.x.x) for your system (still support for R2.14.x as well). Available <a href="http://www.r-project.org">here</a>.</li>
+<li>R (version 3.x.x or 4.x.x) for your system. Available <a href="http://www.r-project.org">here</a>.</li>
 <li>The VMStools package itself, available for download <a href="https://github.com/nielshintzen/vmstools/releases/">here</a>
 </li>
 <li>For very enthusiastic users / developers: For Windows users, we recommend TortoiseGit. Linux users will typically have access to such a client through their package distribution system.</li>
@@ -101,8 +111,6 @@ install.packages("yourPath/vmstools.zip")
 <li>Create a directory for your working copy (e.g. Desktop/VMStools) and</li>
 <li>"Checking out" the repository.</li>
 </ol>
-
-<p>We'll assume you can handle 1 and 2. yourself, but number 3. is a bit trickier, and is of course dependent on your SVN client. There are a number of good resources available e.g. for windows</p>
 
 <p>To download the source code, checkout the repository from <a href="https://github.com/nielshintzen/vmstools/tree/master/vmstools/">https://github.com/nielshintzen/vmstools/tree/master/vmstools/</a>. It will not be possible to commit your changes - however, contact us if you'd like to commit changes too.
 
