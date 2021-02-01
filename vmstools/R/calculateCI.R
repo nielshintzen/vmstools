@@ -2,6 +2,7 @@ calculateCI <- function(    int
                                ,tacint
                                ,params
                                ,grid
+                               ,spatialGrid
                                ,plot=FALSE){
 
   if (!"SI_DATIM" %in% colnames(tacint))
@@ -34,10 +35,13 @@ calculateCI <- function(    int
   origxs    <- seq(grid@cellcentre.offset[1],grid@cellcentre.offset[1] + grid@cellsize[1] * (grid@cells.dim[1]-1),by= grid@cellsize[1])
   origys    <- seq(grid@cellcentre.offset[2],grid@cellcentre.offset[2] + grid@cellsize[2] * (grid@cells.dim[2]-1),by= grid@cellsize[2])
 
+  if((min(newxrange) > bbox(spatialGrid)[1,"max"]) | (max(newxrange) < bbox(spatialGrid)[1,"min"])) stop("CI outside grid")
+  if((min(newyrange) > bbox(spatialGrid)[2,"max"]) | (max(newyrange) < bbox(spatialGrid)[2,"min"])) stop("CI outside grid")
+
   subxs     <- apply(abs(outer(origxs,newxrange,"-")),2,which.min)
   subys     <- apply(abs(outer(origys,newyrange,"-")),2,which.min)
 
-  grid      <- SpatialGrid(grid)[sort(grid@cells.dim[2]-seq(subys[1],subys[2])+1),seq(subxs[1],subxs[2])]
+  grid      <- spatialGrid[sort(grid@cells.dim[2]-seq(subys[1],subys[2])+1),seq(subxs[1],subxs[2])]
   grid      <- as(grid,"SpatialGridDataFrame")
 #  grid      <- createGrid(c((xrange[1] - grid@cellcentre.offset[1])                   %/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1],
 #                            (xrange[2] - grid@cellcentre.offset[1] + grid@cellsize[1])%/%grid@cellsize[1] * grid@cellsize[1] + grid@cellcentre.offset[1]),

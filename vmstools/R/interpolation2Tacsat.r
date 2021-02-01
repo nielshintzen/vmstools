@@ -1,73 +1,158 @@
+interpolation2Tacsat <- function (interpolation, tacsat, npoints = 10, equalDist = TRUE)
+{
+    tacsat <- sortTacsat(tacsat)
+    if (!"HL_ID" %in% colnames(tacsat))
+        tacsat$HL_ID <- 1:nrow(tacsat)
+    if (!"SI_DATIM" %in% colnames(tacsat))
+        tacsat$SI_DATIM <- as.POSIXct(paste(tacsat$SI_DATE, tacsat$SI_TIME,
+            sep = " "), tz = "GMT", format = "%d/%m/%Y  %H:%M")
 
-interpolation2Tacsat <- function(interpolation,tacsat,npoints=10,equalDist=TRUE){
+    #- Convert the interpolation to equally distance spaced points
+    if (equalDist) {
+        interpolationEQ <- equalDistance(interpolation, npoints)
+    } else {
+        interpolationEQ <- lapply(interpolation, function(x) {
+            idx <- round(seq(2, nrow(x), length.out = npoints))
+            return(x[c(1, idx), ])
+        })
+    }
+    #- Get the interpolated longitudes and latitudes out
+    int <- lapply(interpolationEQ, function(x) {
+        x[-1, ]
+    })
+    lenint <- lapply(int, length)
+    idx <- which(unlist(lenint) == (npoints * 2))
+    int <- lapply(interpolationEQ[idx], function(x) {
+        x[-1, ]
+    })
+    lenEQ <- length(interpolationEQ[idx])
+    intmin2 <- lapply(int, function(x) {
+        x <- x[-c(1, nrow(x)), ]
+        colnames(x) <- c("SI_LONG", "SI_LATI")
+        return(x)
+    })
+    intidx <- lapply(interpolationEQ[idx], function(x) {
+        x[1, ]
+    })
 
-# This function takes the list of tracks output by interpolateTacsat and converts them back to tacsat format.
-# The npoints argument is the optional number of points between each 'real' position.
-tacsat            <- sortTacsat(tacsat)
-if(!"HL_ID" %in% colnames(tacsat)) tacsat$HL_ID <- 1:nrow(tacsat)
-if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM  <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
-if(equalDist){
-  interpolationEQ <- equalDistance(interpolation,npoints)  #Divide points equally along interpolated track (default is 10).
-} else {
-  interpolationEQ <- lapply(interpolation,function(x){idx <- round(seq(2,nrow(x),length.out=npoints)); return(x[c(1,idx),])})
+    #- Make a unique ID per interpolation
+    INT_ID <- as.data.frame(do.call(rbind,intidx))
+    INT_ID$INT_ID <- 1:nrow(INT_ID)
+    tacsat$INT_ID <- NA
+    for(iRow in 1:nrow(INT_ID))
+      tacsat[INT_ID[iRow,1]:INT_ID[iRow,2],"INT_ID"] <- INT_ID$INT_ID[iRow]
+
+    #- Aggregate tacsat information for all pings within an interpolation
+    idxNoIntTacsat  <- which(is.na(tacsat$INT_ID))
+    if(length(idxNoIntTacsat)>0){
+      noIntTacsat     <- tacsat[idxNoIntTacsat,]
+      intTacsat       <- tacsat[-idxNoIntTacsat,]
+
+      matchClnms  <- c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsat)[kgeur(colnames(tacsat))])[which(c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsat)[kgeur(colnames(tacsat))]) %in% colnames(tacsat))]
+      aggInttacsat<- aggregate(tacsat[-idxNoIntTacsat,matchClnms],by=list(tacsat[-idxNoIntTacsat,"INT_ID"]),FUN=sum,na.rm=T)
+      colnames(aggInttacsat)[1] <- "INT_ID"
+    } else {
+      noIntTacsat <- numeric()
+      intTacsat   <- tacsat
+      matchClnms  <- c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsat)[kgeur(colnames(tacsat))])[which(c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsat)[kgeur(colnames(tacsat))]) %in% colnames(tacsat))]
+      aggInttacsat<- aggregate(tacsat[,matchClnms],by=list(tacsat[,"INT_ID"]),FUN=sum,na.rm=T)
+      colnames(aggInttacsat)[1] <- "INT_ID"
+    }
+
+    #- get the column names that cannot be interpolated
+    clnames <- colnames(tacsat)
+    b <- clnames[!clnames %in% c("SI_LONG", "SI_LATI",
+            "SI_HE", "SI_SP", "SI_DATE", "SI_TIME",
+            "SI_DATIM")]
+
+    #- Replicate values that cannot be interpolated
+    bvals <- lapply(as.list(1:lenEQ), function(x) {
+        matrix(unlist(tacsat[intidx[[x]][1], b]), nrow = npoints -
+            2, ncol = length(b), byrow = TRUE, dimnames = list(round(seq(intidx[[x]][1],
+            intidx[[x]][2], length.out = npoints - 2), 3), b))
+    })
+    #- Apply a simple equal speading to the data values (Ideally we would make this dependent on SI_SP but then the equalDist should be modified too)
+    bvals <- lapply(as.list(1:lenEQ),function(x){
+              dat2replace <- subset(aggInttacsat,INT_ID == bvals[[x]][1,"INT_ID"])
+              if(length(kgeur(b))>0){
+                for(iSpec in b[kgeur(b)])
+                  bvals[[x]][,iSpec] <- c(dat2replace[,iSpec]/(npoints-1))
+                mode(bvals[[x]][,kgeur(b)]) <- "numeric"
+              }
+              if("INTV" %in% b){
+                bvals[[x]][,"INTV"] <- c(dat2replace[,"INTV"]/(npoints-1))
+                mode(bvals[[x]][,"INTV"]) <- "numeric"
+              }
+              if("LE_SURF" %in% b){
+                bvals[[x]][,"LE_SURF"] <- c(dat2replace[,"LE_SURF"]/(npoints-1))
+                mode(bvals[[x]][,"LE_SURF"]) <- "numeric"
+              }
+              if("LE_SUBSURF" %in% b){
+                bvals[[x]][,"LE_SUBSURF"] <- c(dat2replace[,"LE_SUBSURF"]/(npoints-1))
+                mode(bvals[[x]][,"LE_SUBSURF"]) <- "numeric"
+              }
+              return(bvals[[x]])
+    })
+
+    SI_DATIMs <- data.frame(from = tacsat$SI_DATIM[do.call(rbind,
+        intidx)[, 1]], to = tacsat$SI_DATIM[do.call(rbind, intidx)[,
+        2]])
+    SI_DATIMs <- lapply(as.list(1:lenEQ), function(x) {
+        seq(SI_DATIMs[x, 1], SI_DATIMs[x, 2], length.out = npoints)[2:(npoints -
+            1)]
+    })
+    SI_DATE <- lapply(SI_DATIMs, function(x) {
+        format(x, format = "%d/%m/%Y")
+    })
+    timeNotation <- ifelse(length(unlist(strsplit(tacsat$SI_TIME[1],
+        ":"))) > 2, "secs", "mins")
+    if (timeNotation == "secs")
+        SI_TIME <- lapply(SI_DATIMs, function(x) {
+            format(x, format = "%H:%M:%S")
+        })
+    if (timeNotation == "mins")
+        SI_TIME <- lapply(SI_DATIMs, function(x) {
+            format(x, format = "%H:%M")
+        })
+    SI_SPs <- as.matrix(data.frame(from = tacsat$SI_SP[do.call(rbind,
+        intidx)[, 1]], to = tacsat$SI_SP[do.call(rbind, intidx)[,
+        2]]))
+    SI_SP <- mapply(seq, from = SI_SPs[, 1], to = SI_SPs[, 2],
+        length.out = npoints - 2)
+    SI_HE <- lapply(as.list(1:lenEQ), function(x) {
+        y <- int[[x]]
+        return(bearing(y[2:(nrow(y) - 1), 1], y[2:(nrow(y) -
+            1), 2], y[3:nrow(y), 1], y[3:nrow(y), 2]))
+    })
+    ret <- lapply(as.list(1:lenEQ), function(x) {
+        data.frame(bvals[[x]], intmin2[[x]], SI_DATIM = SI_DATIMs[[x]],
+            SI_DATE = SI_DATE[[x]], SI_TIME = SI_TIME[[x]], SI_SP = SI_SP[,
+                x], SI_HE = SI_HE[[x]], stringsAsFactors = F)
+    })
+
+    #- Need to apply the same equal spreading to the original tacsat data
+    matchClnms  <- c("INTV","LE_SURF","LE_SUBSURF",
+                     colnames(intTacsat)[kgeur(colnames(intTacsat))])[which(c("INTV","LE_SURF","LE_SUBSURF",colnames(intTacsat)[kgeur(colnames(intTacsat))]) %in% colnames(intTacsat))]
+    intTacsat[,matchClnms] <- intTacsat[,matchClnms] / (npoints-1)
+
+    #- Combine all together again
+    interpolationTot <- do.call(rbind, ret)
+    interpolationTot <- formatTacsat(interpolationTot)
+    if(length(noIntTacsat)>0){
+      tacsatInt <- rbindTacsat(rbindTacsat(intTacsat,noIntTacsat),interpolationTot)
+    } else {
+      tacsatInt <- rbindTacsat(intTacsat,interpolationTot)
+    }
+    for(iCol in c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsatInt)[kgeur(colnames(tacsatInt))]))
+      tacsatInt[,iCol] <- anf(tacsatInt[,iCol])
+    tacsatInt <- sortTacsat(tacsatInt)
+
+    #- Do consistency check
+    if(length(kgeur(colnames(tacsatInt)))>0){
+      ratio     <- sum(tacsatInt[,kgeur(colnames(tacsatInt))],na.rm=T)/sum(tacsat[,kgeur(colnames(tacsatInt))],na.rm=T)
+      if(ratio <= 0.99 | ratio >= 1.01 | is.na(ratio))
+        warnings("Some kilo/euros/surface area swept is misplaced")
+    }
+
+    return(tacsatInt)
 }
-
-
-# Take off the tacsat row identifier
-int       <- lapply(interpolationEQ,function(x){x[-1,]})
-# Check if there are interpolations that were not succesful
-lenint    <- lapply(int,length); idx <- which(unlist(lenint) == (npoints*2))
-# Take off identifier again
-int       <- lapply(interpolationEQ[idx],function(x){x[-1,]})
-# Count number of interpolations
-lenEQ     <- length(interpolationEQ[idx])
-# get the interpolation
-intmin2   <- lapply(int,function(x){x <- x[-c(1,nrow(x)),]; colnames(x)<- c("SI_LONG","SI_LATI"); return(x)})
-# Get the identifiers
-intidx    <- lapply(interpolationEQ[idx],function(x){x[1,]})
-clnames   <- colnames(tacsat)
-# Get the column names of the unique variables
-b         <- lapply(intidx,function(x){cls <- clnames[tacsat[x[1],] %in% tacsat[x[2] ,]]; return(cls[!cls%in% c("SI_LONG","SI_LATI","SI_HE","SI_SP","SI_DATE","SI_TIME","SI_DATIM")])})
-# make a matrix with new interpolated unique variables
-bvals     <- lapply(as.list(1:lenEQ),function(x){matrix(unlist(tacsat[intidx[[x]][1],b[[x]]]),nrow=npoints-2,ncol=length(b[[x]]),byrow=TRUE,
-                                                                 dimnames=list(round(seq(intidx[[x]][1],intidx[[x]][2],length.out=npoints-2),3),b[[x]]))})
-# Create non-unique variables
-SI_DATIMs <- data.frame(from=tacsat$SI_DATIM[do.call(rbind,intidx)[,1]],to=tacsat$SI_DATIM[do.call(rbind,intidx)[,2]])
-SI_DATIMs <- lapply(as.list(1:lenEQ),function(x){seq(SI_DATIMs[x,1],SI_DATIMs[x,2],length.out=npoints)[2:(npoints-1)]})
-SI_DATE   <- lapply(SI_DATIMs,function(x){format(x,format="%d/%m/%Y")})
-timeNotation <- ifelse(length(unlist(strsplit(tacsat$SI_TIME[1],":")))>2,"secs","mins")
-if(timeNotation=="secs") SI_TIME   <- lapply(SI_DATIMs,function(x){format(x,format="%H:%M:%S")})
-if(timeNotation=="mins") SI_TIME   <- lapply(SI_DATIMs,function(x){format(x,format="%H:%M")})
-SI_SPs    <- as.matrix(data.frame(from=tacsat$SI_SP[do.call(rbind,intidx)[,1]],to=tacsat$SI_SP[do.call(rbind,intidx)[,2]]))
-SI_SP     <- mapply(seq,from=SI_SPs[,1],to=SI_SPs[,2],length.out=npoints-2)
-SI_HE     <- lapply(as.list(1:lenEQ),function(x){y <- int[[x]]; return(bearing(y[2:(nrow(y)-1),1],y[2:(nrow(y)-1),2],y[3:nrow(y),1],y[3:nrow(y),2]))})
-HL_ID     <- lapply(as.list(1:lenEQ),function(x){rep(tacsat$HL_ID[intidx[[x]][1]],npoints-2)})
-
-# Combine all
-ret       <- lapply(as.list(1:lenEQ),function(x){data.frame(bvals[[x]],
-                                                            intmin2[[x]],
-                                                            SI_DATIM=SI_DATIMs[[x]],
-                                                            SI_DATE=SI_DATE[[x]],
-                                                            SI_TIME=SI_TIME[[x]],
-                                                            SI_SP=SI_SP[,x],
-                                                            SI_HE=SI_HE[[x]],
-                                                            HL_ID=HL_ID[[x]],stringsAsFactors=F)})
-# Remove duplicate records
-idx       <- which(unlist(lapply(ret,function(x){length(grep(".1",colnames(x)))>0}))==TRUE)
-nidx      <- which(unlist(lapply(ret,function(x){length(grep(".1",colnames(x)))>0}))==FALSE)
-retmin    <- lapply(ret[idx],function(x){x[,-grep(".1",colnames(x))]})
-ret       <- c(retmin,ret[nidx])
-
-# Order columns
-ret       <- lapply(ret,function(x){addclnames <- clnames[which(!clnames %in% colnames(x))];
-                                    x[,addclnames] <- NA;
-                                    x[,clnames]})
-# Combine all interpolations with original file and return
-interpolationTot <- do.call(rbind,ret)
-interpolationTot <- formatTacsat(interpolationTot)
-tacsatInt <- rbindTacsat(tacsat,interpolationTot)
-tacsatInt <- sortTacsat(tacsatInt)
-
-return(tacsatInt)}
-
-                                                                #467

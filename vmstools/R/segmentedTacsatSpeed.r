@@ -109,8 +109,8 @@ segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="
           }
           #Calculate the bounds and whether the fit has been successful or not
           if(is.null(bound1)==T & is.null(bound2)==TRUE){
-            bound1 <- max(range(sTacsat$SI_SP)[1],min(confint(o,level=CI)$x))
-            bound2 <- min(range(sTacsat$SI_SP)[2],max(confint(o,level=CI)$x))
+            bound1 <- max(range(sTacsat$SI_SP)[1],min(confint(o,level=CI)[,grep("low",colnames(confint(o)))]))
+            bound2 <- min(range(sTacsat$SI_SP)[2],max(confint(o,level=CI)[,grep("up", colnames(confint(o)))]))
             if(class(o)[1] != "try-error") storeScheme[iRun,"success"] <- 1
           }
 

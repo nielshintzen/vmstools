@@ -9,7 +9,9 @@ function(tacsat                          #VMS datapoints
                               ,fast=FALSE){
 
 if(!"SI_DATIM" %in% colnames(tacsat)) tacsat$SI_DATIM     <- as.POSIXct(paste(tacsat$SI_DATE,  tacsat$SI_TIME,   sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
+tacsat$sort.int <- 1:nrow(tacsat)
 tacsat    <- sortTacsat(tacsat)
+if(any(diff(tacsat$sort.int)!=1)) stop("Sort tacsat first using 'sortTacsat'")
   #Start interpolating the data
 if(!method %in% c("cHs","SL"))  stop("method selected that does not exist")
 
