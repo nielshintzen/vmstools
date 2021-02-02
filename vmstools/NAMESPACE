@@ -5,7 +5,10 @@ import("maps")
 import("mapdata")
 import("maptools")
 import("PBSmapping")
+import("segmented")
 import("sp")
+import("mixtools")
+
 export(
 "ac",    
 "activityTacsat",
@@ -139,5 +142,3 @@ exportMethods(
 "area.poly",
 "get.pts"
 )
-
-

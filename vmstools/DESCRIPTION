@@ -1,13 +1,13 @@
 Package: vmstools
 Title: For analysing fisheries VMS (Vessel Monitoring System) data
-Version: 0.75
-Date: 2017-10-18
+Version: 0.76
+Date: 2021-02-01
 Author: Niels Hintzen <niels.hintzen@wur.nl>, Francois Bastardie <fba@aqua.dtu.dk>, Doug Beare <douglas.beare@gmail.com>
 Maintainer: Niels Hintzen <niels.hintzen@wur.nl>
 Description: To enable standardised analysis of fisheries VMS (Vessel Monitoring System) data in Europe, to include identifying trips, linking to logbook data, estimating fishing, converting points to spatial coverages and estimating pressure indicators. 
 License: GPL (>= 2)
-Depends: R (>= 3.4.0)
-Imports: cluster, data.table, doBy, maps, mapdata, maptools, PBSmapping, sp 
-Suggests: adehabitat, amap, animation, aspace, FactoMineR, lattice, MASS, mda, mixtools,raster, segmented, shapefiles, SOAR, tcltk, ade4
+Depends: R (>= 3.5.0)
+Imports: cluster, data.table, doBy, maps, mapdata, maptools, PBSmapping, sp, segmented, mixtools
+Suggests: lattice, raster, shapefiles, tcltk
 Repository: CRAN
 LazyLoad: Yes
