@@ -78,12 +78,12 @@ install_github("nielshintzen/vmstools/vmstools/")
 
 Or manually
         
-<pre><code>vmstoolsPackages &lt;-  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp")
+<pre><code>vmstoolsPackages &lt;-  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp","mixtools","segmented")
 
 for(i in vmstoolsPackages)       try(install.packages(pkgs=i,repos=getOption("repos")))
 
 #- Once you've installed all secondary packages install VMStools using 
-install.packages("yourPath/vmstools.zip")
+install.packages("yourPath/vmstools.zip") #put in the correct name for the vmstools zip file, e.g. vmstools_0.76.zip
 </code></pre>
 
 If you run Rstudio and run into trouble, please install VMStools first into Rgui and then restart Rstudio.
