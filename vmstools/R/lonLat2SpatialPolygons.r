@@ -1,3 +1,32 @@
+#' Creates a 'SpatialPolygons' object from longitude-latitude dataset
+#' 
+#' Takes one set of longitude-lattitude or a list of lon-lat objects and
+#' converts it into one SpatialPolygons object.
+#' 
+#' If the longitude and latitude set do not make a full round, the function
+#' will do that for you.
+#' 
+#' @param SI_LONG Set with longitude values
+#' @param SI_LATI Set with latitude values
+#' @param lst list of objects, each with longitude and latitude values
+#' @return Returns a 'SpatialPolygons' set from the package 'sp'
+#' @note May take a while when many polygons need to be created
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{SpatialPolygons}}
+#' @examples
+#' 
+#' data(europa)
+#' 
+#' eurPols     <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
+#'                         function(x){data.frame(
+#'                           SI_LONG=subset(europa,SID==x)$X,
+#'                           SI_LATI=subset(europa,SID==x)$Y)}))
+#' 
+#' area        <- lonLat2SpatialPolygons(SI_LONG=c(2,2.5,2.7,2.1),SI_LATI=c(54,54.2,55.8,55.6))
+#' plot(eurPols,col="green",xlim=c(-4,10),ylim=c(48,62)); axis(1);axis(2);box()
+#' plot(area,add=TRUE,col="red")
+#' 
+#' @export lonLat2SpatialPolygons
 lonLat2SpatialPolygons <- function(SI_LONG=NULL,SI_LATI=NULL,lst=NULL){
   if((is.null(SI_LONG)==TRUE | is.null(SI_LATI)==TRUE) & is.null(lst)==TRUE) stop("Specify either longitude and latitude vectors or a list containing a dataframe with specified longitude and latitude vectors")
 

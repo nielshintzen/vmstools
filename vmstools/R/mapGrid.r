@@ -5,6 +5,56 @@
 #** OR  maybe just provide a wrapper to mapGriddedData instead ?
 #would need to add a better worldmap into that
 
+
+
+#' function to map grids
+#' 
+#' Accepts an input of a \code{SpatialGridDataFrame} Plots a map of the grid
+#' and optionally outputs to a gridAscii file and/or an image.
+#' 
+#' 
+#' @param sGDF a \code{SpatialGridDataFrame}
+#' @param sPDF an optional \code{SpatialPointsDataFrame} plotted if
+#' \code{plotPoints=TRUE}
+#' @param we western bounds of the area to plot, if not specified taken from
+#' the \code{sGDF}
+#' @param ea eastern bounds of the area to plot, if not specified taken from
+#' the \code{sGDF}
+#' @param so southern bounds of the area to plot, if not specified taken from
+#' the \code{sGDF}
+#' @param no northern bounds of the area to plot, if not specified taken from
+#' the \code{sGDF}
+#' @param gridValName the name of the attribute column to plot from the
+#' \code{SpatialGridDataFrame}
+#' @param plotTitle optional title to add to the plot
+#' @param numCats how many categories to classify grid values into for map plot
+#' (uses\code{pretty()}) classification)
+#' @param paletteCats color pallete to use
+#' @param addLegend whether to add a legend to the plot
+#' @param legendx position of legend should be one of 'bottomright', 'bottom',
+#' 'bottomleft', 'left', 'topleft', 'top', 'topright', 'right', 'center'
+#' @param legendncol number of columns in the legend
+#' @param legendtitle legend title
+#' @param plotPoints whether to add the original points to the plot
+#' @param colPoints color of points to plot
+#' @param legPoints Logical. Points in legend
+#' @param colland color of land
+#' @param addICESgrid Logical. Adding ICES grid on top
+#' @param addScale Logical. Adding axes
+#' @param outGridFile optional name for a gridAscii file to be created from the
+#' grid
+#' @param outPlot optional name for a png file to be created from the plot
+#' @param \dots NOT used yet
+#' @author Andy South
+#' @seealso \code{vmsGridCreate()}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' #mapGrid(dF, nameLon = "POS_LONGITUDE", nameLat = "POS_LATITUDE",
+#' #        cellsizeX = 0.5, cellsizeY = 0.5,legendx='bottomright',
+#' #        plotPoints=TRUE )
+#' 
+#' @export mapGrid
 mapGrid <- function( sGDF
                          , sPDF
                          , we=""

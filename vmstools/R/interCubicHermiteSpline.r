@@ -1,4 +1,17 @@
-
+#' Interpolate using Cubic Hermite Spline
+#' 
+#' This is an internal function of interpolateTacsat. Function to interpolate
+#' VMS data using a cubic hermite spline function.
+#' 
+#' 
+#' @param spltx Tacsat dataset split up by vessel using 'split'.
+#' @param spltCon List of VMS records that are connected
+#' @param res Number of additional points to use for interpolation
+#' @param params Parameters to use for interpolation
+#' @param headingAdjustment Parameter to adjust the choice of heading depending
+#' on its own or previous point
+#' @author Niels T. Hintzen
+#' @export interCubicHermiteSpline
 interCubicHermiteSpline <- function(spltx,spltCon,res,params,headingAdjustment){
 
       #Formula of Cubic Hermite Spline

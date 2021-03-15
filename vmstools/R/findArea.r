@@ -1,3 +1,41 @@
+#' Find area surface smaller than threshold
+#' 
+#' Find gridcells with maximum surface equal or smaller to 'threshold' and
+#' return their total value and gridcells involved
+#' 
+#' Diagonal means if area may include x+1,y+1 steps v versus only x+1 or y+1
+#' steps
+#' 
+#' @param grid A SpatialGridDataFrame
+#' @param threshold Maximum value of surfaces added up
+#' @param diagonal Allow diagonal steps in gridcell selection
+#' @return data.frame with minimum surface area and gridcells selected
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{surface}}
+#' @examples
+#' 
+#' xrange  <- c(0,4)
+#' yrange  <- c(52,56)
+#' resx    <- 0.25
+#' resy    <- 0.125
+#' 
+#' #-create grid and assign value column
+#' grd <- createGrid(xrange,yrange,resx,resy,type="SpatialGridDataFrame",exactBorder=TRUE)
+#' grd@data$value <- runif(nrow(coordinates(grd)),5,10)
+#' 
+#' #- find gridcells with maximum surface equal or smaller to 'threshold' and return their
+#' #  total value and gridcells involved (diagonal means if area may include x+1,y+1 steps v
+#' #  versus only x+1 or y+1 steps). Note, the larger the threshold, the longer the function
+#' #  will run!
+#' res     <- findArea(grd,threshold=1000,diagonal=TRUE)
+#' 
+#' #- Plot the result
+#' plot(grd,type="p",pch=19,cex=0.5)
+#' map.axes()
+#' selec   <- which.min(res$minval)
+#' points(coordinates(grd)[as.numeric(unlist(strsplit(res[selec,"idxs"]," "))),],col=2,lwd=3)
+#' 
+#' @export findArea
 findArea <- function(grid,threshold=100,diagonal=TRUE){
 
   if(class(grid) != "SpatialGridDataFrame") stop(paste("Function not defined for class",class(grid)))

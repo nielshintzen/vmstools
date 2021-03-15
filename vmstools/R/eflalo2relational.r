@@ -1,3 +1,21 @@
+#' Turn eflalo dataset into relational format
+#' 
+#' Turn the column setup of eflalo into a row setup where each species catch
+#' has its own row
+#' 
+#' May take a long time for long eflalo datasets
+#' 
+#' @param x Dataframe with eflalo data and eflalo format
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{formatEflalo}},\code{\link{readEflalo}}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' data(eflalo)
+#' eflalo    <- eflalo[1:20,]
+#' eflaloRel <- eflalo2relational(eflalo)
+#' 
+#' @export eflalo2relational
 eflalo2relational <- function(x){
   idxkg             <- grep("KG",colnames(x))
   idxeuro           <- grep("EURO",colnames(x))

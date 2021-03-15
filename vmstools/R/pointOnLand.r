@@ -1,3 +1,36 @@
+#' Find points on land given a set of coordinates
+#' 
+#' Find the points that are on land given a set of coordinates and polygons
+#' that determine the part that is land
+#' 
+#' With many coordinates, the checking might take longer.
+#' 
+#' @param tacsat Tacsat file
+#' @param lands Polygon of area that is considered to be land
+#' @param proj4string Projection string, default to NULL.
+#' @return Returns a vector with values 0 and 1. 1 indicating points on land, 0
+#' indicating points not on land.
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{pointInHarbour}}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' 
+#' data(tacsat)
+#' data(europa)
+#' tacsat  <- tacsat[1:1000,]
+#' tacsat  <- sortTacsat(tacsat)
+#' 
+#' pols    <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
+#'                 function(x){data.frame(SI_LONG=subset(europa,SID==x)$X,
+#'                                        SI_LATI=subset(europa,SID==x)$Y)}))
+#' idx     <- pointOnLand(tacsat,pols);
+#' idx     <- which(idx == 1)
+#' 
+#' plotMap(europa,xlim=c(0,10),ylim=c(48,62))
+#' points(tacsat$SI_LONG[idx],tacsat$SI_LATI[idx],col="red",cex=0.5,pch=19)
+#' 
+#' @export pointOnLand
 pointOnLand <- function(tacsat,lands,proj4string=NULL){
       if(class(lands) != "SpatialPolygons") stop("'lands' must be specified as class 'SpatialPolygons'")
 
