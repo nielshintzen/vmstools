@@ -1,3 +1,22 @@
+#' Get ICES rectangle from coordinates
+#' 
+#' Get the ICES rectangle from any lon,lat position, given that this position
+#' is within the ICES region.
+#' 
+#' 
+#' @param dF dataframe given that they have 'SI_LONG' and 'SI_LATI' columns
+#' @return Returns the rectangles as a vector
+#' @author Neil Campbell
+#' @seealso \code{\link{ICESarea}}, \code{\link{ICESrectangle2LonLat}}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' res <- data.frame(SI_LONG = c(1,2,2,4,2),
+#'                   SI_LATI = c(53,53.2,54,56.7,55.2))
+#' ICESrectangle(res)
+#' 
+#' 
+#' @export ICESrectangle
 ICESrectangle <- function(dF){
                     rectChar1n2 <- sprintf("%02i",as.integer(2 * (dF[, "SI_LATI"] - 35.5)))
                     rectChar3 <- ifelse(dF[, "SI_LONG"] > -50 & dF[, "SI_LONG"]<= -40, "A",

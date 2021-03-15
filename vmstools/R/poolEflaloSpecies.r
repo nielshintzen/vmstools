@@ -1,5 +1,19 @@
  # reduce the size of the eflalo data by merging species
  # threshold in euros
+
+
+#' merge species in eflalo to reduce the size of data according to a threshold
+#' in euros
+#' 
+#' merge species in eflalo to reduce the size of data according to a threshold
+#' in euros
+#' 
+#' 
+#' @param eflalo data.frame, eflalo format
+#' @param threshold.value numeric, in euro
+#' @param code character, a code for the species 'other'
+#' @author Francois Bastardie
+#' @export poolEflaloSpecies
 poolEflaloSpecies <- function(eflalo, threshold.value=3000000, code="MZZ"){
     if(!paste("LE_KG_", code, sep='') %in% colnames(eflalo)) {
               eflalo [, paste("LE_KG_", code, sep='')] <- NA

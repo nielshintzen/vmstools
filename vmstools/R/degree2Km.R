@@ -1,3 +1,26 @@
+#' Compute distance from degrees into kilometers
+#' 
+#' Function transformes the distance expressed in degrees into kilometers. This
+#' based on the GPS location of a point.
+#' 
+#' 
+#' @param lon Longitude of the GPS position
+#' @param lat Latitude of the GPS positiona
+#' @param degree Value in degrees to turn into Km
+#' @note Computation of Km is approximation based on the Haversine formula
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{distance}}, \code{\link{km2Degree}},
+#' \code{\link{lonLatRatio}}
+#' @references EU lot 2 project
+#' @examples
+#' 
+#' lon <- -4
+#' lat <- 50
+#' degree <- 1.601833
+#' 
+#' degree2Km(lon,lat,degree) #114.4897km
+#' 
+#' @export degree2Km
 `degree2Km` <-
 function(lon,lat,degree){
                       x1 <- lon

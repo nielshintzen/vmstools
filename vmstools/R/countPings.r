@@ -1,3 +1,41 @@
+#' Count the number of VMS pings in a selection
+#' 
+#' Count the number of VMS pings in any selection made in time and spatial
+#' frame.
+#' 
+#' Formula has form: ~Variable+timeVariable+anotherTimeVariable+spatialVariable
+#' \cr
+#' 
+#' options in formula for Variable: any column name of tacsat file \cr options
+#' in formula for timeVariable: day, week, month, quarter, year \cr options in
+#' formula for spatialVariable: icesrectangle, icesarea, gridcell \cr
+#' 
+#' @param formula specify the elements you want to use as axis of the count
+#' @param tacsat tacsat data file, possibly with additional columns
+#' @param grid if in formulate 'gridcell' is chosen, a SpatialGrid must be
+#' provided
+#' @return Returns the matrix with counted pings by each specified variable
+#' @note if Tacsat is a big file, the overlay function might fail resulting in
+#' terminating the function
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{createGrid}}, \code{\link{vmsGridCreate}}
+#' @references Hintzen et al. 2010 Improved estimation of trawling tracks using
+#' cubic Hermite spline interpolation of position registration data, EU lot 2
+#' project
+#' @examples
+#' 
+#' data(tacsat)
+#' 
+#' #make the tacsat file a bit smaller
+#' tacsat  <- tacsat[1:10000,]
+#' 
+#' grid          <- createGrid(range(tacsat$SI_LONG,na.rm=TRUE),
+#'                   range(tacsat$SI_LATI,na.rm=TRUE),0.5,0.5,type="SpatialGrid")
+#' 
+#' result        <- countPings(~VE_REF+year+gridcell,tacsat,grid=grid)
+#' result        <- countPings(~VE_REF+week+year+icesrectangle,tacsat)
+#' 
+#' @export countPings
 countPings <- function(formula,tacsat,grid=NULL,by=NULL){
 
                   #Turn selected variabels into element list

@@ -11,3 +11,4 @@ Imports: cluster, data.table, doBy, maps, mapdata, maptools, PBSmapping, sp, seg
 Suggests: lattice, raster, shapefiles, tcltk
 Repository: CRAN
 LazyLoad: Yes
+Roxygen: list(markdown = TRUE)

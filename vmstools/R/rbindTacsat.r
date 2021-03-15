@@ -1,3 +1,24 @@
+#' Row bind two tacsat sets together
+#' 
+#' Row binds two tacsat sets together while taking differences in column names
+#' into account
+#' 
+#' 
+#' @param set1 Tacsat set 1
+#' @param set2 Tacsat set 2
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{rbindEflalo}}, \code{\link{do.call}}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' data(tacsat)
+#' set1 <- tacsat
+#' set2 <- tacsat[seq(1,100,5),]
+#' 
+#' combined <- rbindTacsat(set1,set2)
+#' 
+#' 
+#' @export rbindTacsat
 rbindTacsat <- function(set1,set2){
   cln1  <- colnames(set1)
   cln2  <- colnames(set2)

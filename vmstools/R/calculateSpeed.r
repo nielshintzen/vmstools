@@ -1,3 +1,41 @@
+#' Calculate the speed of the vessel at each ping
+#' 
+#' Calculate the speed of a vessel based on the time and distance travelled
+#' between pings.
+#' 
+#' Note that the DEFAULT speed given is the difference between ping x and ping
+#' x-1. Hence, the first ping of a vessel or trip does NOT have a calculated
+#' speed and will display NA.
+#' 
+#' With weight you can specify if the speed is calculated between ping x and
+#' ping x-1 (weight = c(1,0)), if the speed is calculated between ping x and
+#' ping x+1 (weight = c(0,1)) or an intermediate weight (weight = c(0.4,0.6) /
+#' equal weight = c(0.5,0.5)).
+#' 
+#' @param tacsat tacsat dataset
+#' @param level level to get calculated speed at: trip or vessel
+#' @param weight weight to apply to calculation of mean speed towards and away
+#' from ping
+#' @param fill.na If speed cannot be calculated based on default or provided
+#' weight, take closest alternative to provide a speed
+#' @return The original tacsat file is returned including a column: SI_SPCA
+#' which holds the calculated speed in knots
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{interpolateTacsat}},\code{\link{intervalTacsat}}
+#' @references EU lot 2 project
+#' @examples
+#' 
+#' data(tacsat)
+#' result <- calculateSpeed(tacsat[1:100,],level="vessel")
+#' result <- calculateSpeed(tacsat[1:100,],level="vessel",weight=c(2,1),fill.na=TRUE)
+#' 
+#' data(eflalo)
+#' tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+#' result  <- calculateSpeed(tacsatp[1:100,],level="trip",weight=c(1,1),fill.na=FALSE)
+#' 
+#' 
+#' 
+#' @export calculateSpeed
 calculateSpeed <- function(tacsat,level="vessel",weight=c(1,1),fill.na=FALSE){
 
   if(length(weight) != 2) stop("weight must be specified as a length 2 numeric vector")

@@ -1,3 +1,51 @@
+#' Calculate the CI between two succeeding VMS datapoints
+#' 
+#' The interpolated tracks can be surrounded by a sort of confidence interval
+#' representing the outer region a vessel could have travelled between two
+#' succeeding datapoints. Within this function the CI's are computed.
+#' 
+#' 
+#' @param int interpolation, as data.frame from 'interpolateTacsat'
+#' @param tacint tacsat records (two rows) corresponding with the interpolation
+#' @param params list of parameters used to perform interpolation
+#' @param grid object of class 'GridTopology' specifying the grid dimensions
+#' @param plot Logical. Whether the result of the interpolation must be plotted
+#' @return Returns the Confidence Interval on a grid of class
+#' 'SpatialGridDataFrame' with the CI values in the data slot.
+#' @note Computation can take a very long time if either grid resolution is
+#' high or if many interpolations are used.
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{interpolateTacsat}},\code{\link{maxRangeCI}}
+#' @references Hintzen et al. 2010 Improved estimation of trawling tracks using
+#' cubic Hermite spline interpolation of position registration data, EU lot 2
+#' project
+#' @examples
+#' 
+#' data(tacsat)
+#' 
+#'   #Sort the Tacsat data
+#' tacsat     <- sortTacsat(tacsat)
+#' tacsat     <- tacsat[1:1000,]
+#' 
+#'   #Filter the Tacsat data
+#' tacsat          <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=TRUE)
+#' 
+#'   #Interpolate the VMS data
+#' interpolation <- interpolateTacsat(tacsat,interval=120,margin=10,
+#'                     res=100,method="cHs",params=list(fm=0.5,distscale=20,
+#'                     sigline=0.2,st=c(2,6)),headingAdjustment=0)
+#' 
+#'   #Create the final grid where all interpolations should fit on
+#' xrange        <- c(2,3); yrange <- c(51,52)
+#' grid          <- createGrid(xrange,yrange,resx=0.01,resy=0.005)
+#' 
+#' res           <- calculateCI(interpolation[[4]],
+#'                              tacsat[interpolation[[4]][1,],],
+#'                              params=list(fm=0.25,distscale=3.1,sigline=0.4,st=c(2,6)),
+#'                              grid=grid,
+#'                              plot=TRUE)
+#' 
+#' @export calculateCI
 calculateCI <- function(    int
                                ,tacint
                                ,params

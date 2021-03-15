@@ -1,3 +1,27 @@
+#' Get ICES area from coordinates
+#' 
+#' Get the ICES area from any lon,lat position, given that this position is
+#' within the ICES region.
+#' 
+#' 
+#' @param tacsat dataframe given that they have 'SI_LONG' and 'SI_LATI' columns
+#' (either tacsat format or other dataset with SI_LONG and SI_LATI columns)
+#' @param areas ICES areas as SpatialPolygons
+#' @param proj4string Projection string, default to NULL.
+#' @param fast If memory allocation is not a problem, a faster version can be
+#' switched on
+#' @return Returns the areas as a vector
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{ICESrectangle}}, \code{\link{ICESrectangle2LonLat}}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' data(ICESareas)
+#' res   <- data.frame(SI_LONG = c(1,2,2,4,2),
+#'                     SI_LATI = c(53,53.2,54,56.7,55.2))
+#' areas <- ICESarea(res,ICESareas)
+#' 
+#' @export ICESarea
 ICESarea <- function(tacsat,areas,proj4string=NULL,fast=FALSE){
   require(sp)
   if(!class(areas) %in% c("SpatialPolygons","SpatialPolygonsDataFrame")) stop("'areas' must be specified as class 'SpatialPolygons' or 'SpatialPolygonsDataFrame'")

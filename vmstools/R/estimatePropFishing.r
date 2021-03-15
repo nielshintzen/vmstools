@@ -1,3 +1,19 @@
+#' Estimate the proportion fishing per fishing trip
+#' 
+#' Estimate what proportion of time a fishing vessel is fishing when outside of
+#' harbour
+#' 
+#' 
+#' @param tacsat tacsat dataset, including FT_REF column
+#' @param eflalo eflalo dataset
+#' @param by column names to calculate the estimation over (e.g. LE_GEAR to
+#' estimate proportion fishing by gear or VE_REF to estimate proportion fishing
+#' by vessel ID)
+#' @return Returns the eflalo dataset including a new column 'propFish' which
+#' provides the estimated proportion fishing for each entry
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{raiseTacsat}}
+#' @export estimatePropFishing
 estimatePropFishing <- function(tacsat,eflalo,by=c("LE_GEAR","VE_REF")){
 
   if(!"SI_STATE" %in% colnames(tacsat))

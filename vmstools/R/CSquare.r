@@ -1,3 +1,27 @@
+#' Calculate the CSquare notation from the GPS locations
+#' 
+#' Compute the CSquare notation from the GPS location where you can define what
+#' resolution you want the CSquare notation to be.
+#' 
+#' 
+#' @param lon Longitudes of points
+#' @param lat Latitudes of points
+#' @param degrees Resolution of CSquare notation: 10, 5, 1, 0.5, 0.1, 0.05,
+#' 0.01
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{km2Degree}}, \code{\link{degree2Km}},
+#' \code{\link{lonLatRatio}}, \code{\link{distance}}
+#' @references EU Lot 2 project, based on CSquare:
+#' http://www.marine.csiro.au/csquares/
+#' @examples
+#' 
+#' lon <- -4
+#' lat <- 50
+#' degrees <- 0.01
+#' 
+#' CSquare(lon,lat,degrees) # "7500:104:100:100"
+#' 
+#' @export CSquare
 CSquare <- function(lon,lat,degrees){
 
               if(length(lon) != length(lat)) stop("length of longitude not equal to length of latitude")

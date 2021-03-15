@@ -1,3 +1,27 @@
+#' Calculate the GPS notation from the CSquare notation
+#' 
+#' Convert the CSquare notation to GPS location where you can define what
+#' resolution you want the GPS notation to be.
+#' 
+#' 
+#' @param csqr CSquare notation like: 1400:134:120:356
+#' @param degrees Degrees resolution of returned GPS notation : 10, 5, 1, 0.5,
+#' 0.1, 0.05, 0.01
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{km2Degree}}, \code{\link{degree2Km}},
+#' \code{\link{lonLatRatio}}, \code{\link{distance}}
+#' @references EU Lot 2 project, based on CSquare:
+#' http://www.marine.csiro.au/csquares/
+#' @examples
+#' 
+#' data(tacsat)
+#' tacsat$CSquare  <- CSquare(tacsat$SI_LONG,tacsat$SI_LATI,0.05)
+#' tacsat$SI_LONG2 <- CSquare2LonLat(tacsat$CSquare,0.5)$SI_LONG
+#' tacsat$SI_LATI2 <- CSquare2LonLat(tacsat$CSquare,0.5)$SI_LATI
+#' tacsat$CSquare2 <- CSquare(tacsat$SI_LONG2,tacsat$SI_LATI2,1)
+#' head(tacsat[which(tacsat$CSquare != tacsat$CSquare2),])
+#' 
+#' @export CSquare2LonLat
 CSquare2LonLat <- function(csqr,degrees){
 
 ra          <- 1e-6 #Artificial number to add for rounding of 5'ves (round(0.5) = 0, but in Excel (where conversion comes from, it is 1)
