@@ -1852,7 +1852,7 @@ getMetierClusters = function(datSpecies,datLog,analysisName="",methMetier="clara
 
     # OR #
     mat <- t(summaryClusters["Mean",,])
-    #mat=mat[,order(colnames(mat),decreasing=TRUE)]     # si on veut mettre les espèces par ordre descendant
+    #mat=mat[,order(colnames(mat),decreasing=TRUE)]     # si on veut mettre les especes par ordre descendant
     rownames(mat) <- c("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20")[1:nrow(mat)]
     sp <- apply(mat,2, function(x) length(which(x>20)))
     colnames(mat)[sp==0] <- ""
