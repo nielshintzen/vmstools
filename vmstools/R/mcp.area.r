@@ -1,4 +1,18 @@
 #This is taken from gpclib package
+
+
+#' Hidden function to calculate Minimum Convex Polygon
+#' 
+#' 
+#' 
+#' @param xy
+#' @param id
+#' @param percent
+#' @param unin
+#' @param unout
+#' @param plotit
+#' @author adehabitat
+#' @export mcp.area
 mcp.area <- function(xy, id, percent = seq(20, 100, by = 5),
                      unin = c("m","km"), unout = c("ha", "km2", "m2"), plotit = TRUE){
     unin <- match.arg(unin)

@@ -1,3 +1,19 @@
+#' Summarize primary aspects of tacsat file
+#' 
+#' Summary nr vessels, countries, spatial range, temporal range, effort from
+#' tacsat
+#' 
+#' 
+#' @param tacsat tacsat dataframe
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{summarizeEflalo}},\code{\link{summary}}
+#' @examples
+#' 
+#' data(tacsat)
+#' 
+#' summarizeTacsat(tacsat)
+#' 
+#' @export summarizeTacsat
 summarizeTacsat <- function(tacsat){
 
   nrVessels     <- length(unique(tacsat$VE_REF))
@@ -18,6 +34,24 @@ summarizeTacsat <- function(tacsat){
                         ac(range(tacsat$SI_DATIM,na.rm=TRUE)[1]),ac(range(tacsat$SI_DATIM,na.rm=TRUE)[2]),
                         range(tacsat$SI_HE,na.rm=TRUE),range(tacsat$SI_SP,na.rm=TRUE),round(totalEffort,1))),stringsAsFactors=FALSE))}
   
+
+
+#' Summarize primary aspects of eflalo file
+#' 
+#' Summary nr vessels, countries, temporal range, effort, top 3 catches and
+#' values
+#' 
+#' 
+#' @param eflalo eflalo dataframe
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{summarizeTacsat}},\code{\link{summary}}
+#' @examples
+#' 
+#' data(eflalo)
+#' 
+#' summarizeEflalo(eflalo)
+#' 
+#' @export summarizeEflalo
 summarizeEflalo <- function(eflalo){
 
   nrVessels     <- length(unique(eflalo$VE_REF))

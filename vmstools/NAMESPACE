@@ -6,7 +6,7 @@ import("mapdata")
 import("maptools")
 import("PBSmapping")
 import("segmented")
-import("sp")
+import("sf")
 import("mixtools")
 
 export(
@@ -58,7 +58,8 @@ export(
 "getTableAfterPCA",               
 "ICESarea",                       
 "ICESrectangle",                  
-"ICESrectangle2LonLat",           
+"ICESrectangle2LonLat", 
+"ICESrectangle2CSquare",          
 "indicators",                     
 "interpolateTacsat",    
 "interpolation2Tacsat", 
@@ -80,7 +81,7 @@ export(
 "N1p0",            
 "nearest",
 "nestedGrid",               
-"outsideMaxRange",       
+"outsideMaxRange",    
 "overlapPolygons",         
 "pings2EffortMaps",               
 "pings2Fishframe",                
@@ -109,7 +110,8 @@ export(
 "shortenEflalo",
 "sortTacsat",                     
 "splitAmongPings",                
-"splitAmongPings2",      
+"splitAmongPings2",
+"st_over",        
 "surface",
 "summarizeTacsat",
 "summarizeEflalo",

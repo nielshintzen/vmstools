@@ -1,3 +1,24 @@
+#' Row bind two eflalo sets together
+#' 
+#' Row binds two eflalo sets together while taking differences in column names
+#' into account
+#' 
+#' 
+#' @param set1 Eflalo set 1
+#' @param set2 Eflalo set 2
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{rbindTacsat}}, \code{\link{do.call}}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' data(eflalo)
+#' set1 <- eflalo
+#' set2 <- eflalo[seq(1,100,5),]
+#' 
+#' combined <- rbindEflalo(set1,set2)
+#' 
+#' 
+#' @export rbindEflalo
 rbindEflalo <- function(set1,set2){
   cln1  <- colnames(set1)
   cln2  <- colnames(set2)

@@ -1,5 +1,44 @@
+#' Count the number of VMS pings in a selection
+#' 
+#' Count the number of VMS pings in any selection made in time and spatial
+#' frame.
+#' 
+#' Formula has form: ~Variable+timeVariable+anotherTimeVariable+spatialVariable
+#' \cr
+#' 
+#' options in formula for Variable: any column name of tacsat file \cr options
+#' in formula for timeVariable: day, week, month, quarter, year \cr options in
+#' formula for spatialVariable: icesrectangle, icesarea, gridcell \cr
+#' 
+#' @param formula specify the elements you want to use as axis of the count
+#' @param tacsat tacsat data file, possibly with additional columns
+#' @param grid if in formulate 'gridcell' is chosen, a SpatialGrid must be
+#' provided
+#' @return Returns the matrix with counted pings by each specified variable
+#' @note if Tacsat is a big file, the overlay function might fail resulting in
+#' terminating the function
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{createGrid}}, \code{\link{vmsGridCreate}}
+#' @references Hintzen et al. 2010 Improved estimation of trawling tracks using
+#' cubic Hermite spline interpolation of position registration data, EU lot 2
+#' project
+#' @examples
+#' 
+#' data(tacsat)
+#' 
+#' #make the tacsat file a bit smaller
+#' tacsat  <- tacsat[1:10000,]
+#' 
+#' grid          <- createGrid(range(tacsat$SI_LONG,na.rm=TRUE),
+#'                   range(tacsat$SI_LATI,na.rm=TRUE),0.5,0.5,type="SpatialGrid")
+#' 
+#' result        <- countPings(~VE_REF+year+gridcell,tacsat,grid=grid)
+#' result        <- countPings(~VE_REF+week+year+icesrectangle,tacsat)
+#' 
+#' @export countPings
 countPings <- function(formula,tacsat,grid=NULL,by=NULL){
-
+                  require(sf)
+                  require(data.table)
                   #Turn selected variabels into element list
                   form <- formula
                   if (form[[1]] != "~")
@@ -36,13 +75,9 @@ countPings <- function(formula,tacsat,grid=NULL,by=NULL){
                     if("gridcell" %in% spatVars & is.null(grid) == FALSE){
                       #Create coordinates of tacsat data
                       coords                    <- cbind(x=tacsat$SI_LONG,y=tacsat$SI_LATI)
-                      sPDF                      <- SpatialPointsDataFrame(coords,data=tacsat)
-                      #Turn grid into a spatial pixel dataframe
-                      grid                      <- as(grid,"SpatialPixels");
-                      grid                      <- as(grid,"SpatialPixelsDataFrame")
-                      #Overlay the two spatial frameworks to see to which gridcell each tacsat coordinate belongs
-                      gridCellIndex             <- over(as(sPDF,"SpatialPoints"),as(grid,"SpatialPixels"))
-                      newCoords                 <- sPDF@coords[gridCellIndex,]
+                      sPDF                      <- st_as_sf(tacsat,coords=c("SI_LONG","SI_LATI"))
+                      idx                       <- sapply(st_intersects(sPDF,grid), function(z) if (length(z)==0) NA_integer_ else z[1])
+                      newCoords                 <- st_coordinates(st_centroid(grid))[idx,]
 
                       tacsat$GR_LONG            <- newCoords[,1]
                       tacsat$GR_LATI            <- newCoords[,2]
@@ -77,4 +112,3 @@ countPings <- function(formula,tacsat,grid=NULL,by=NULL){
                   #colnames(res)   <- c(totVars,"pings")
 
               return(data.frame(res))}
-

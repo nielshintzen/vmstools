@@ -1,4 +1,14 @@
-
+#' Interpolate using Straight line
+#' 
+#' This is an internal function of interpolateTacsat. Function to interpolate
+#' VMS data using a straight line.
+#' 
+#' 
+#' @param spltx Tacsat dataset split up by vessel using 'split'.
+#' @param spltCon List of VMS records that are connected
+#' @param res Number of additional points to use for interpolation
+#' @author Niels T. Hintzen
+#' @export interStraightLine
 interStraightLine <- function(spltx,spltCon,res){
 
      fx <- mapply(seq,spltx[spltCon[,1],"SI_LONG"],spltx[spltCon[,2],"SI_LONG"],length.out=res)

@@ -16,6 +16,16 @@ return(as.numeric(tclvalue(peaks)))}
 
 
 
+
+
+#' Internal function to retreive information on number of peaks
+#' 
+#' Internal function used together with analyseTacsatActivity.
+#' 
+#' 
+#' @param pks Number of peaks spotted
+#' @author Niels T. Hintzen
+#' @export callPeakValue
 callPeakValue <- function(pks){
 
 #-Put default values for peaks

@@ -1,3 +1,26 @@
+#' Convert the ICES rectangle to coordinates
+#' 
+#' Convert the ICES rectangle to the longitude and latitude position of that
+#' specific rectangle, with either midpoint or lower-left corner.
+#' 
+#' 
+#' @param statsq character vector of ICES rectangles
+#' @param midpoint logical statement if returned values need to be midpoints of
+#' rectangle or not (default)
+#' @return Returns dataframe with longitude and latitude columns
+#' @author Neil Campbell, Mark Payne
+#' @seealso \code{\link{ICESarea}}, \code{\link{ICESrectangle}}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' res       <- data.frame(SI_LONG = c(1,2,2,4,2),
+#'                         SI_LATI = c(53,53.2,54,56.7,55.2))
+#' rects     <- ICESrectangle(res)
+#' midpoints <- ICESrectangle2LonLat(rects,midpoint=TRUE)
+#' corners   <- ICESrectangle2LonLat(rects,midpoint=FALSE)
+#' 
+#' 
+#' @export ICESrectangle2LonLat
 ICESrectangle2LonLat <-
 function (statsq,midpoint=FALSE)
 {
