@@ -19,7 +19,8 @@
 #' data(ICESareas)
 #' res   <- data.frame(SI_LONG = c(1,2,2,4,2),
 #'                     SI_LATI = c(53,53.2,54,56.7,55.2))
-#' areas <- ICESarea(res,ICESareas)
+#' areas <- ICESarea(res,ICESareas,st_crs=4326)
+#' ICESareas$Area_Full[areas]
 #' 
 #' @export ICESarea
 ICESarea <- function(tacsat,areas,st_crs=NULL,fast=FALSE){
@@ -52,7 +53,7 @@ ICESarea <- function(tacsat,areas,st_crs=NULL,fast=FALSE){
     #Use projection string
     if(is.null(st_crs))
       st_crs     <- st_crs(areas)
-      spPoint      <- st_as_sf(tacsat[NAS,],coords=c("SI_LONG","SI_LATI"),crs=st_crs)
+    spPoint      <- st_as_sf(tacsat[NAS,],coords=c("SI_LONG","SI_LATI"),crs=st_crs)
 
     if(nrow(tacsat)>1e4 & fast == FALSE) {
       idx     <- numeric()

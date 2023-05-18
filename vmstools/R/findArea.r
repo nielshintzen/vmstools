@@ -11,7 +11,7 @@
 #' @param diagonal Allow diagonal steps in gridcell selection
 #' @return data.frame with minimum surface area and gridcells selected
 #' @author Niels T. Hintzen
-#' @seealso \code{\link{surface}}
+#' @seealso \code{\link{st_area}}
 #' @examples
 #' 
 #' xrange  <- c(0,4)
@@ -20,8 +20,9 @@
 #' resy    <- 0.125
 #' 
 #' #-create grid and assign value column
-#' grd <- createGrid(xrange,yrange,resx,resy,type="SpatialGridDataFrame",exactBorder=TRUE)
-#' grd@data$value <- runif(nrow(coordinates(grd)),5,10)
+#' grd <- createGrid(xrange,yrange,resx,resy,type="GridDF",exactBorder=TRUE)
+#' st_crs(grd) <- 4326
+#' grd$value <- runif(nrow(st_coordinates(st_centroid(grd))),5,10)
 #' 
 #' #- find gridcells with maximum surface equal or smaller to 'threshold' and return their
 #' #  total value and gridcells involved (diagonal means if area may include x+1,y+1 steps v
@@ -30,15 +31,15 @@
 #' res     <- findArea(grd,threshold=1000,diagonal=TRUE)
 #' 
 #' #- Plot the result
-#' plot(grd,type="p",pch=19,cex=0.5)
-#' map.axes()
+#' plot(st_geometry(grd),type="p",pch=19,cex=0.5)
+#' axis(1); axis(2)
 #' selec   <- which.min(res$minval)
-#' points(coordinates(grd)[as.numeric(unlist(strsplit(res[selec,"idxs"]," "))),],col=2,lwd=3)
+#' points(st_coordinates(st_centroid(grd))[as.numeric(unlist(strsplit(res[selec,"idxs"]," "))),],col=2,lwd=3)
 #' 
 #' @export findArea
 findArea <- function(grid,threshold=100,diagonal=TRUE){
 
-  if(is.na(st_crs(grid))) warnings("CRS is set as NA, please make sure threshold is in the same dimension")
+  if(is.na(st_crs(grid))) stop("CRS is set as NA, threshold is measured in km, so need a CRS to be set")
   if(!"sf" %in% class(grid)) stop(paste("Function not defined for class",class(grid)))
   if(!"value" %in% colnames(grid)) stop("No 'value' column available in data slot")
   grid$surface    <- st_area(grid)/(1000*1000)

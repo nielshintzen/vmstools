@@ -14,7 +14,7 @@
 #' (method = "grid") or only x km from observed datapoint (method =
 #' "euclidean")
 #' @param control.grid If method = "grid", control.grid is a list with
-#' specification of the spatialGrid (spatGrid, of class "SpatialGrid") or the
+#' specification of the grid (of class "sf") or the
 #' resolution in x and y values where the outermargins can be given by the
 #' tacsat dataset (gridBox="tacsat") or the observation dataset
 #' (gridBox="obs").

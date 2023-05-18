@@ -1,3 +1,33 @@
+#' Creates a 'SF polygon' object from longitude-latitude dataset
+#' 
+#' Takes one set of longitude-lattitude or a list of lon-lat objects and
+#' converts it into one sfc object.
+#' 
+#' 
+#' @param SI_LONG Set with longitude values
+#' @param SI_LATI Set with latitude values
+#' @param lst list of objects, each with longitude and latitude values
+#' @return Returns a 'sfc' object from the package 'sf'
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{st_polygon}}, \code{\link{st_multipolygon}}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' data(europa)
+#'
+#' eurPols     <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
+#'                       function(x){data.frame(
+#'                          SI_LONG=subset(europa,SID==x)$X,
+#'                          SI_LATI=subset(europa,SID==x)$Y)}))
+#'
+#' area        <- lonLat2SpatialPolygons(SI_LONG=c(2,2.5,2.7,2.1),SI_LATI=c(54,54.2,55.8,55.6))
+#' plot(eurPols,col="green",xlim=c(-4,10),ylim=c(48,62)); axis(1);axis(2);box()
+#' plot(area,add=TRUE,col="red")
+#' 
+#' 
+#' @export ICESrectangle2CSquare
+
+
 lonLat2SFPolygons <- function(SI_LONG=NULL,SI_LATI=NULL,lst=NULL){
   if((is.null(SI_LONG)==TRUE | is.null(SI_LATI)==TRUE) & is.null(lst)==TRUE) stop("Specify either longitude and latitude vectors or a list containing a dataframe with specified longitude and latitude vectors")
 

@@ -8,6 +8,10 @@ Description: To enable standardised analysis of fisheries VMS (Vessel Monitoring
 License: GPL (>= 2)
 Depends: R (>= 4.0.0)
 Imports: data.table, lubridate, doBy, sf, segmented, mixtools, ggplot2
-Suggests: tcltk
+Suggests: 
+    tcltk,
+    testthat (>= 3.0.0)
 Repository: CRAN
 LazyLoad: Yes
+RoxygenNote: 7.2.3
+Config/testthat/edition: 3

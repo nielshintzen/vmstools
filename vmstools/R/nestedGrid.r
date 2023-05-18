@@ -50,18 +50,16 @@
 #' tacsat$SWEPT_AREA <- tacsat$INTV / 60 * tacsat$SI_SP * tacsat$GEAR_WIDTH
 #' SPDF              <- nestedGrid(tacsat, resx=1, resy=0.5, maxstep=10, n=20,
 #'                       control=list(clm="SWEPT_AREA",FUN=sum))
-#' SP                <- as(SPDF,"SpatialPolygons")
-#' SP                <- surface(SP)
-#' tempfun           <- function(x){lapply(x@Polygons,function(y){y@area})}
-#' SPDF@data$surface <- unlist(lapply(SP@polygons,tempfun))
-#' SPDF@data$SAratio <- SPDF@data$SWEPT_AREA / SPDF@data$surface
-#' breaks            <- c(seq(0,quantile(SPDF@data$SAratio,0.95),length.out=9),2,5,10)
-#' i                 <- cut(SPDF@data$SAratio,breaks=breaks)
-#' SPDF@data$col     <- grey(seq(1, 0, length=length(breaks)))[i]
+#' st_crs(SPDF)      <- 4326
+#' SPDF$surface      <- st_area(SPDF)/(1000*1000) #convert to km2
+#' SPDF$SAratio      <- SPDF$SWEPT_AREA / SPDF$surface
+#' breaks            <- c(seq(0,an(quantile(SPDF$SAratio,0.95)),length.out=9),2,5,10)
+#' i                 <- cut(SPDF$SAratio,breaks=breaks)
+#' SPDF$col          <- grey(seq(1, 0, length=length(breaks)))[i]
 #' 
 #' plot(NA, xlim = c(1, 5), ylim = c(51.5,55), xlab = 'Longitude',ylab = 'Latitude'
 #'   ,asp=1/lonLatRatio(3,53))
-#' plot(SP,col=SPDF@data$col,add=TRUE,border="lightgrey"); box()
+#' plot(st_geometry(SPDF),col=SPDF$col,add=TRUE,border="lightgrey"); box()
 #' points(tacsat$SI_LONG,tacsat$SI_LAT,cex=0.1,col=4)
 #' 
 #' @export nestedGrid

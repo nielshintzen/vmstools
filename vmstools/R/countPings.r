@@ -30,7 +30,7 @@
 #' tacsat  <- tacsat[1:10000,]
 #' 
 #' grid          <- createGrid(range(tacsat$SI_LONG,na.rm=TRUE),
-#'                   range(tacsat$SI_LATI,na.rm=TRUE),0.5,0.5,type="SpatialGrid")
+#'                   range(tacsat$SI_LATI,na.rm=TRUE),0.5,0.5,type="Grid")
 #' 
 #' result        <- countPings(~VE_REF+year+gridcell,tacsat,grid=grid)
 #' result        <- countPings(~VE_REF+week+year+icesrectangle,tacsat)

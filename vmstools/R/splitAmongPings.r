@@ -16,7 +16,7 @@
 #' @param tacsat Tacsat object
 #' @param eflalo Eflalo object
 #' @param variable Indicating what to split: "all","value","kgs"
-#' @param level Levels can be: "day", "ICESrectangle", "trip"
+#' @param level Levels can be: "day", "ICESrectangle", "trip" or a combination. Include all levels that are needed.
 #' @param conserve Logical, if kgs or value needs to be conserved if merging by
 #' trip number is not possible (default = TRUE)
 #' @param by Name of tacsat column by which KG and EURO should be dispatched.
@@ -49,14 +49,14 @@
 #' tacsatp           <- subset(tacsatp,SI_STATE == 1)
 #' 
 #' tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
-#'                         variable="all",level="day",conserve=TRUE)
+#'                         variable="all",level=c("day","ICESrectangle","trip"),conserve=TRUE)
 #'                         
 #'                         
 #' #- When using the 'by' statement, make sure the by column does not contain NA,
 #' #  or zeros
 #' tacsatp           <- subset(tacsatp,!is.na(tacsatp$INTV) | tacsatp$INTV != 0)
 #' tacsatEflalo      <- splitAmongPings(tacsat=tacsatp,eflalo=eflalo,
-#'                         variable="all",level="day",conserve=TRUE,by="INTV")
+#'                         variable="all",level=c("day","trip"),conserve=TRUE,by="INTV")
 #' 
 #' @export splitAmongPings
 splitAmongPings <- function(tacsat,eflalo,variable="all",level="day",conserve=TRUE,by=NULL,returnAll=F){
@@ -70,7 +70,7 @@ require(lubridate)
 if(!"FT_DDATIM" %in% colnames(eflalo)) eflalo$FT_DDATIM   <- as.POSIXct(paste(eflalo$FT_DDAT, eflalo$FT_DTIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
 if(!"FT_LDATIM" %in% colnames(eflalo)) eflalo$FT_LDATIM   <- as.POSIXct(paste(eflalo$FT_LDAT, eflalo$FT_LTIME, sep=" "), tz="GMT", format="%d/%m/%Y  %H:%M")
              
-acrossYear <- which(year(eflalo$FT_DDATIM)) != year(eflalo$FT_LDATIM))
+acrossYear <- which(year(eflalo$FT_DDATIM) != year(eflalo$FT_LDATIM))
 if(length(acrossYear)>0)
   warning("There are trips that cross the year. This is not accounted for in splitAmongPings. Consider splitting those trips into half")
 

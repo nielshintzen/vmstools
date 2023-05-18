@@ -1,3 +1,38 @@
+#' Convert ICES rectangle to CSquares
+#' 
+#' Give the CSquares belonging to ICES rectangles.
+#' 
+#' 
+#' @param rectangles vector with ICES rectangle names
+#' @param degrees Resolution of CSquare notation: 10, 5, 1, 0.5, 0.1, 0.05,
+#' 0.01
+#' @param onLand logical. Should CSquares with their midpoints on land be returned
+#' @return Returns the rectangles as a vector
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{CSquare}}, \code{\link{ICESrectangle2LonLat}}
+#' @references EU Lot 2 project
+#' @examples
+#' 
+#' degrees       <- 0.05
+#' rectangles    <- c("33F3","33F4","32F3","34F3")
+#' squares       <- ICESrectangle2CSquare(rectangles,degrees)
+#' squares       <- do.call(c,squares)
+#' par(xaxs="i",yaxs="i",las=1,oma=c(2,2,1,1))
+#' plot(st_geometry(ICESareas),xlim=c(2,5),ylim=c(51.5,53),col="lightblue",fill=T);
+#' axis(1); axis(2)
+#' abline(v=seq(2,5,1),lty=3)
+#' abline(h=seq(51.5,53,0.5),lty=3)
+#' lonLatSquares <- CSquare2LonLat(squares,degrees=degrees)
+#' points(lonLatSquares$SI_LONG,lonLatSquares$SI_LATI,pch=19,cex=0.2,col=2)
+#' squares       <- ICESrectangle2CSquare(rectangles,degrees,onLand=F)
+#' squares       <- do.call(c,squares)
+#' lonLatSquares <- CSquare2LonLat(squares,degrees=degrees)
+#' points(lonLatSquares$SI_LONG,lonLatSquares$SI_LATI,pch=19,cex=0.2,col=4)
+#' 
+#' 
+#' @export ICESrectangle2CSquare
+
+
 ICESrectangle2CSquare <- function(rectangles,degrees,onLand=T){
 
   lonlats     <- ICESrectangle2LonLat(rectangles)

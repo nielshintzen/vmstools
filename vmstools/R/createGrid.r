@@ -15,12 +15,11 @@
 #' @param resx gridcell size in degrees in the longitude / x direction
 #' @param resy gridcell size in degrees in the latitude / y direction
 #' @param type specify output class:
-#' 'GridTopology','SpatialGrid','SpatialPixels',
-#' 'SpatialPixelsDataFrame','SpatialGridDataFrame'
+#' 'Grid' or 'GridDF'
 #' @param exactBorder Logical: if the specified resx and resy (lower-left
 #' values) should be taken as exact
 #' @author Niels T. Hintzen
-#' @seealso \code{\link{vmsGridCreate}}
+#' @seealso \code{\link{st_make_grid}}
 #' @references EU Lot 2 project
 #' @examples
 #' 
@@ -30,9 +29,9 @@
 #' yrange <- range(y,na.rm=TRUE)
 #' 
 #' #returns a grid with 1001 cells in the x-direction and 101 in the y-direction
-#' Grid <- createGrid(xrange,yrange,0.01,0.05,type="SpatialGrid")
+#' Grid <- createGrid(xrange,yrange,0.01,0.05,type="Grid")
 #' bbox(Grid)
-#' Grid <- createGrid(xrange,yrange,0.01,0.05,type="SpatialGrid",exactBorder=TRUE)
+#' Grid <- createGrid(xrange,yrange,0.01,0.05,type="Grid",exactBorder=TRUE)
 #' bbox(Grid)
 #' 
 #' @export createGrid
