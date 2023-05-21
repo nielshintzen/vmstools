@@ -8,11 +8,10 @@ The practicals you will work on will consist of some guidance text, some code th
 ### It is recommended to carefully read through the text that goes with each of the practicals ###
 
 ## Getting VMStools installed ##
-Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are Tinn-R or R-studio. However, programs such as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is [R2](https://code.google.com/p/vmstools/source/detail?r=2).14.x or higher (But not [R3](https://code.google.com/p/vmstools/source/detail?r=3).0.x yet)! (How can I check...)
-```
+Before doing anything, make sure you have installed a good editor where you can 'store' your code. Examples are R-studio, Sublime, Vi etc. However, programs such as notepad work as well (but do not have function and bracket color recognition). It is also important that you have a good R version running. Make sure that it is R4.X.X (How can I check...)
+```R.Version()$version.string```
 
-R.Version()$version.string```
-If this says anything below [R2](https://code.google.com/p/vmstools/source/detail?r=2).14.x, please upgrade. If this says [R3](https://code.google.com/p/vmstools/source/detail?r=3).0.x, you will run into problems too. Please use up to [R2](https://code.google.com/p/vmstools/source/detail?r=2).15.3 for this course. VMStools is still in development and R is as well. Over the past months considerable changes have taken place which do no not allow backward compatibility of VMStools with older R versions. VMStools will become available for [R3](https://code.google.com/p/vmstools/source/detail?r=3).0.x soon.
+If this says anything below R4.X.X, please upgrade. VMStools is still in development and R is as well. Over the past months considerable changes have taken place which do no not allow backward compatibility of VMStools with older R versions. With the latest release of VMStools of version 0.77 the functionality of metier identification has been lost. If you require those functions, please revert to an older version of VMStools and R.
 
 Now start a version of your favorite editor and start R. VMStools is an add-on package to R, and depends on several other packages. Hence, before we can run VMStools, we need to install these other packages too. This is how you do that:
 
@@ -20,23 +19,30 @@ Now start a version of your favorite editor and start R. VMStools is an add-on p
 
 ```
 
-vmstoolsPackages <-
-c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp")
+vmstoolsPackages <-  c("data.table","doBy","lubridate","sf","mixtools","segmented","ggplot2")
 
 for(i in vmstoolsPackages) try(install.packages(pkgs=i,repos=getOption("repos")))
 ```
 
 A pop-up box will appear allowing you to select a country, and place, to download the packages from; choose one nearby (e.g. Denmark).
 
-Now it is time to install the VMStools package, you have to download it first however from this website: [VMStools google repository](http://code.google.com/p/vmstools/downloads/list). Take either the vmstools\_0.66.zip version if you work under Windows or Mac and the vmstools\_0.66.tar.gz version if you work under Linux. Download the file to your local disk. Next you must install the VMStools package itself. Do this manually by clicking in R the 'Packages' tab and select the option 'Install packages from local zip files' and navigate to where the file was downloaded.  Alternatively it can be done, as follows, from the R command line:
+Now it is time to install the VMStools package, you have to download it first however from this website: [VMStools github repository](https://github.com/nielshintzen/vmstools/releases/). Take either the vmstools\_0.77.zip version if you work under Windows or Mac and the vmstools\_0.77.tar.gz version if you work under Linux. Download the file to your local disk. Next you must install the VMStools package itself. Do this manually by clicking in R the 'Packages' tab and select the option 'Install packages from local zip files' and navigate to where the file was downloaded.  Alternatively it can be done, as follows, from the R command line:
 
 ```
 
 path2VMStoolsDownload <- "C:/downloads/" #this folder is an example folder
-install.packages(paste(path2VMStoolsDownload,"vmstools_0.66.zip",sep=""))
+install.packages(paste(path2VMStoolsDownload,"vmstools_0.77.zip",sep=""))
 ```
 
 If all that went well, you have now successfully installed VMStools. Note that you only need to do this this once, and then all the packages will be available to you every time you start R.
+
+Alternatively, you can use the devtools library to install the package:
+
+```
+library(devtools)
+install_github("nielshintzen/vmstools/vmstools/")
+```
+
 
 ## Getting started ##
 Once more, open your editor and R version (if it is still running, that is fine as well). To load the VMStools package, you need to type the following at the 'R command lin'e or in the 'R interpreter':
@@ -69,7 +75,7 @@ $ SI_HE  : num  25 25 25 25 25 25 111 292 43 294 ...
 #- We can get a summary too
 summarizeTacsat(tacsat)
 ```
-Apparently, tacsat has class 'data.frame', has 97015 observations (rows), and 8 variables (columns). Each column name is given on a new row in the example above. The names might be a bit strange, but follow the agreed format as you can download from [Exchange\_EFLALO2\_v2-1.doc](http://code.google.com/p/vmstools/downloads/list).
+Apparently, tacsat has class 'data.frame', has 97015 observations (rows), and 8 variables (columns). Each column name is given on a new row in the example above. The names might be a bit strange, but follow the agreed format as you can download from [Exchange\_EFLALO2\_v2-1.doc](https://github.com/nielshintzen/vmstools/releases/tag/0.0).
 
 ### Exercise 1 ###
   1. Go through the columns of the dataset and try to understand what they mean.
@@ -127,15 +133,11 @@ summarizeEflalo(eflalo)
 
 This dataset contains a staggering amount of columns, 189! and only 4539 rows (observations). The data are structured in such a way that each species caught get's its own column. Hence, it might be more difficult to get the right information on your screen by just typing
 
-```
-
-head(eflalo)```
+```head(eflalo)```
 
 And therefore you might want to switch to
 
-```
-
-head(eflalo[,1:20])```
+```head(eflalo[,1:20])```
 
 Again, there is a lot of information available. It starts with vessel 238, which apparently is a beamtrawler (VE\_FLT = TBB), has a vessel length of 24 meters and a 221kW engine. From column 32 onwards, the weight (kgs) of fish caught and their associated cash value is given (LE\_KG\_spec and LE\_EURO\_spec).
 
@@ -179,7 +181,7 @@ str(tacsat) #How about now?
 
 ```
 
-Obviously the same thing works for eflalo. However, in most instances, the format of the data (i.e. the classes of each of the columns) is not correct. This will cause problems along the way, and therefore they must be put into the correct format using the VMStoosl R functions as follows:
+Obviously the same thing works for eflalo. However, in most instances, the format of the data (i.e. the classes of each of the columns) is not correct. This will cause problems along the way, and therefore they must be put into the correct format using the VMStools R functions as follows:
 
 ```
 
