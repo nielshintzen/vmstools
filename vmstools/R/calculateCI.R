@@ -11,7 +11,7 @@
 #' @param grid object of class 'sf' specifying the grid dimensions
 #' @param plot Logical. Whether the result of the interpolation must be plotted
 #' @return Returns the Confidence Interval on a grid of class
-#' 'SpatialGridDataFrame' with the CI values in the data slot.
+#' 'sf' with the CI values in the data.frame.
 #' @note Computation can take a very long time if either grid resolution is
 #' high or if many interpolations are used.
 #' @author Niels T. Hintzen
@@ -50,7 +50,6 @@ calculateCI <- function(    int
                                ,tacint
                                ,params
                                ,grid
-                               ,spatialGrid
                                ,plot=FALSE){
 
   if (!"SI_DATIM" %in% colnames(tacint))
@@ -76,8 +75,11 @@ calculateCI <- function(    int
   if(yrange[2] < yrg[2]) yrange[2] <- yrg[2] - diff(yrg)*0.1
 
   
-  cellsize  <- apply(abs(apply(subset(as.data.frame(st_coordinates(grid)),L2==st_coordinates(grid)[1,"L2"])[,c("X","Y")],2,diff)),2,max,na.rm=T)
-  celldim   <- c(length(apply(st_coordinates(grid),2,unique)$X),length(apply(st_coordinates(grid),2,unique)$Y))
+  #cellsize  <- apply(abs(apply(subset(as.data.frame(st_coordinates(grid)),L2==st_coordinates(grid)[1,"L2"])[,c("X","Y")],2,diff)),2,max,na.rm=T)
+  cellsize  <- apply(abs(apply(as.data.frame(st_coordinates(grid[1:5,]))[,c("X","Y")],2,diff)),2,max,na.rm=T) 
+  #celldim   <- c(length(apply(st_coordinates(grid),2,unique)$X),length(apply(st_coordinates(grid),2,unique)$Y))
+  celldim <- c(diff(st_bbox(grid)[c("xmin","xmax")])/cellsize[1]+1,
+               diff(st_bbox(grid)[c("ymin","ymax")])/cellsize[2]+1)
   celloffset<- st_bbox(grid)[c("xmin","ymin")] - cellsize/2
 
   newxrange <- c((xrange[1] - celloffset[1])                   %/%cellsize[1] * cellsize[1] + celloffset[1],
@@ -95,18 +97,18 @@ calculateCI <- function(    int
   subys     <- apply(abs(outer(origys,newyrange,"-")),2,which.min)
 
   idxy      <- expand.grid(x=1:(celldim[1]-1),y=1:(celldim[2]-1)) 
-  gridsm    <- grid[which(idxy[,"x"] %in% seq(subxs[1],subxs[2]) & idxy[,"y"] %in% seq(subys[1],subys[2]))]
+  gridsm    <- grid[which(idxy[,"x"] %in% seq(subxs[1],subxs[2]) & idxy[,"y"] %in% seq(subys[1],subys[2])),]
   coords    <- st_coordinates(st_centroid(gridsm))
 
   # Distance to begin or end point
-  bpDistan  <- distance(tacint$SI_LONG[1],tacint$SI_LATI[1],coords[,1],coords[,2])
-  epDistan  <- distance(tacint$SI_LONG[2],tacint$SI_LATI[2],coords[,1],coords[,2])
+  bpDistan  <- vmstools::distance(tacint$SI_LONG[1],tacint$SI_LATI[1],coords[,1],coords[,2])
+  epDistan  <- vmstools::distance(tacint$SI_LONG[2],tacint$SI_LATI[2],coords[,1],coords[,2])
   pdistan   <- pmin(bpDistan,epDistan)
   
   if(plot){ image(t(matrix(pdistan,ncol=length(seq(subxs[1],subxs[2])),nrow=length(seq(subys[1],subys[2])),byrow=TRUE)),col=rev(heat.colors(12))); box()}
 
   # Distance to interpolation
-  intDistan <- do.call(pmin,lapply(as.list(2:nrow(int)),function(x){distance(int[x,1],int[x,2],coords[,1],coords[,2])}))
+  intDistan <- do.call(pmin,lapply(as.list(2:nrow(int)),function(x){vmstools::distance(int[x,1],int[x,2],coords[,1],coords[,2])}))
     
   if(plot){ image(t(matrix(intDistan,ncol=length(seq(subxs[1],subxs[2])),nrow=length(seq(subys[1],subys[2])),byrow=TRUE)),col=rev(heat.colors(12))); box()}
 
@@ -114,6 +116,6 @@ calculateCI <- function(    int
   if(max(CI,na.rm=TRUE) < 0.1) warning("Prediction max(CI) is very small")
 
   if(plot){ image(t(matrix(CI,ncol=length(seq(subxs[1],subxs[2])),nrow=length(seq(subys[1],subys[2])),byrow=TRUE)),col=rev(heat.colors(12))); box()}
-  gridsm <- st_as_sf(data=CI,gridsm)  
+  gridsm$CI <- CI
 return(gridsm)}
 
