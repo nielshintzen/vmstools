@@ -64,6 +64,7 @@
 plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),returnRange=FALSE,las=1){
   if(is.null(color)==TRUE) color <- rev(heat.colors(9))
   require(data.table)
+  require(sf)
     #TACSAT
   if(all(c("SI_LATI","SI_LONG") %in% colnames(x))){
       #- Get left lower point from ICES rectangle in gps format
@@ -177,6 +178,7 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
   }
 
   pols <- st_as_sfc(plt)
+  st_crs(pols) <- 4326
 
   require(ggplot2)
   require(ggthemes)
@@ -205,12 +207,12 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
             legend.spacing   = unit(0, "cm"),  # updated from legend.margin which is deprecated
             legend.title     = element_text(face="italic", size=rel(0.8))
     ))
-  ggplot() +
+  print(ggplot() +
     geom_sf(data=europa) + theme_plot + 
     geom_sf(data=pols,colour=NA,fill=cols) +
     geom_sf(data=europa) +
     scale_x_continuous(limits = xlim) + 
-    scale_y_continuous(limits = ylim)
+    scale_y_continuous(limits = ylim))
 
   if(returnRange) return(rangeRect)
 }
