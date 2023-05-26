@@ -13,7 +13,7 @@ calculateCI(int, tacint, params, grid, spatialGrid, plot = FALSE)
 
 \item{params}{list of parameters used to perform interpolation}
 
-\item{grid}{object of class 'GridTopology' specifying the grid dimensions}
+\item{grid}{object of class 'sf' specifying the grid dimensions}
 
 \item{plot}{Logical. Whether the result of the interpolation must be plotted}
 }

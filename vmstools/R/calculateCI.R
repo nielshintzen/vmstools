@@ -8,7 +8,7 @@
 #' @param int interpolation, as data.frame from 'interpolateTacsat'
 #' @param tacint tacsat records (two rows) corresponding with the interpolation
 #' @param params list of parameters used to perform interpolation
-#' @param grid object of class 'GridTopology' specifying the grid dimensions
+#' @param grid object of class 'sf' specifying the grid dimensions
 #' @param plot Logical. Whether the result of the interpolation must be plotted
 #' @return Returns the Confidence Interval on a grid of class
 #' 'SpatialGridDataFrame' with the CI values in the data slot.

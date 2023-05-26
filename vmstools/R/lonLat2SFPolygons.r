@@ -15,17 +15,12 @@
 #' 
 #' data(europa)
 #'
-#' eurPols     <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
-#'                       function(x){data.frame(
-#'                          SI_LONG=subset(europa,SID==x)$X,
-#'                          SI_LATI=subset(europa,SID==x)$Y)}))
-#'
-#' area        <- lonLat2SpatialPolygons(SI_LONG=c(2,2.5,2.7,2.1),SI_LATI=c(54,54.2,55.8,55.6))
-#' plot(eurPols,col="green",xlim=c(-4,10),ylim=c(48,62)); axis(1);axis(2);box()
+#' area        <- lonLat2SFPolygons(SI_LONG=c(2,2.5,2.7,2.1),SI_LATI=c(54,54.2,55.8,55.6))
+#' plot(europa,col="green",xlim=c(-4,10),ylim=c(48,62)); axis(1);axis(2);box()
 #' plot(area,add=TRUE,col="red")
 #' 
 #' 
-#' @export ICESrectangle2CSquare
+#' @export lonLat2SFPolygons
 
 
 lonLat2SFPolygons <- function(SI_LONG=NULL,SI_LATI=NULL,lst=NULL){
@@ -114,7 +109,7 @@ lonLat2SFPolygons <- function(SI_LONG=NULL,SI_LATI=NULL,lst=NULL){
         }
     }
     #- Create spatial polygons
-    spol        <- storePols
+    spol        <- st_multipolygon(storePols)
   }
-  return(st_as_sfc(spol))}
-        
+  return(spol)}
+    

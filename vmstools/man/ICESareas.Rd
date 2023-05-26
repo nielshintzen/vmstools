@@ -3,18 +3,18 @@
 \docType{data}
 \name{ICESareas}
 \alias{ICESareas}
-\title{SpatialPolygons dataset of ICESareas}
+\title{sf dataset of ICESareas}
 \source{
 www.ices.dk
 }
 \description{
-A pre-defined SpatialPolygons dataset with the ICES areas.
+A pre-defined sf dataset with the ICES areas.
 }
 \examples{
 
 require(sp)
 data(ICESareas)
-plot(ICESareas)
+plot(st_geometry(ICESareas))
 
 }
 \keyword{datasets}

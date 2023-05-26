@@ -3,30 +3,20 @@
 \docType{data}
 \name{europa}
 \alias{europa}
-\title{Polygon dataset of Europe}
+\title{Geometry dataset of Europe}
 \format{
-A data frame with 83878 observations on the following 5 variables.
-\describe{ \item{list("PID")}{a numeric vector} \item{list("SID")}{a numeric
-vector} \item{list("POS")}{a numeric vector} \item{list("X")}{Longitude
-values} \item{list("Y")}{Latitude values} }
+\describe{ \item{geometry}{
 }
 \source{
 NOAA coastline datafile
 }
 \description{
-Polygon dataset with the coastlines of Europe.
+Geometry dataset with the coastlines of Europe.
 }
 \examples{
 
 data(europa)
-require(PBSmapping)
-
-eurPols     <- lonLat2SpatialPolygons(lst=lapply(as.list(sort(unique(europa$SID))),
-                        function(x){data.frame(
-                          SI_LONG=subset(europa,SID==x)$X,
-                          SI_LATI=subset(europa,SID==x)$Y)}))
-
-plot(eurPols,col="green",xlim=c(-4,10),ylim=c(48,62))
+plot(st_geometry(eurPols),col="green",xlim=c(-4,10),ylim=c(48,62))
 
 }
 \keyword{datasets}

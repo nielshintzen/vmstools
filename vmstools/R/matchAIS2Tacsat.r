@@ -1,3 +1,15 @@
+#' Find ais that fall within intervals of tacsat records
+#' 
+#' 
+#' @param ais Dataframe of vessel AIS in tacsat format
+#' @param tacsat Dataframe of vessel VMS in tacsat format
+#' @param interval Interval of VMS data, to be matched with AIS data
+#' @param margin Margin of VMS timestamps on either side to match with AIS data
+#' @param unitAIS time unit, either mins, hours or days.
+#' 
+#' @export matchAIS2Tacsat
+
+
 matchAIS2Tacsat <- function(ais,tacsat,interval=120,margin=12,unitAIS="mins"){
 
   #- Match vessels
