@@ -36,6 +36,7 @@
 #' @param returnRange Logical: return range of plotted values (which can be
 #' used to define own legend
 #' @param las Direction of axis legends. See ?par for more info
+#' @param returnPlot Logical: return ggplot object
 #' @author Niels T. Hintzen
 #' @seealso \code{\link{plotTreeMap}}, \code{\link{Grid2KLM}},
 #' \code{\link{landingsMap2GIFanim}}, \code{\link{pings2EffortMaps}},
@@ -57,11 +58,11 @@
 #' x11()
 #' plotTools(eflalo,level="ICESrectangle",xlim=c(-5,10),ylim=c(48,62),zlim=NULL,
 #'           log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),
-#'           control.eflalo=list(clm=c("LE_KG_COD","LE_KG_PLE")))
+#'           control.eflalo=list(clm=c("LE_KG_COD","LE_KG_PLE")),returnPlot=T)
 #' 
 #' 
 #' @export plotTools
-plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),returnRange=FALSE,las=1){
+plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,gridcell=c(0.1,0.05),color=NULL,control.tacsat=list(clm=NULL),control.eflalo=list(clm=NULL),returnRange=FALSE,las=1,returnPlot=F){
   if(is.null(color)==TRUE) color <- rev(heat.colors(9))
   require(data.table)
   require(sf)
@@ -207,12 +208,14 @@ plotTools <- function(x,level="ICESrectangle",xlim,ylim,zlim=NULL,log=FALSE,grid
             legend.spacing   = unit(0, "cm"),  # updated from legend.margin which is deprecated
             legend.title     = element_text(face="italic", size=rel(0.8))
     ))
-  print(ggplot() +
+  p <- ggplot() +
     geom_sf(data=europa) + theme_plot + 
     geom_sf(data=pols,colour=NA,fill=cols) +
     geom_sf(data=europa) +
     scale_x_continuous(limits = xlim) + 
-    scale_y_continuous(limits = ylim))
+    scale_y_continuous(limits = ylim)
+  print(p)
 
-  if(returnRange) return(rangeRect)
+  if(returnRange){ return(list(range=rangeRect,plot=p))
+    } else { return(list(plot=p))}
 }
