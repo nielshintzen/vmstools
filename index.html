@@ -46,7 +46,6 @@
 <ul>
 <li>Analyses use standardised data formats for logbook (EFLALO) and VMS (TACSAT)</li>
 <li>Handles erroneous data point detection and removal</li>
-<li>Métier identification through the use of clustering techniques</li>
 <li>Link logbook and VMS data together in order to distinguish fishing from other activities</li>
 <li>Provide high-resolution maps of both fishing effort and -landings, interpolate vessel tracks</li>
 <li>Calculate indicators of fishing impact as listed under the Data Collection Framework at different spatio-temporal scales.</li>
@@ -78,7 +77,7 @@ install_github("nielshintzen/vmstools/vmstools/")
 
 Or manually
         
-<pre><code>vmstoolsPackages &lt;-  c("cluster","data.table","doBy","maps","mapdata","maptools","PBSmapping","sp","mixtools","segmented")
+<pre><code>vmstoolsPackages &lt;-  c("data.table","doBy","lubridate","sf","mixtools","segmented","ggplot2")
 
 for(i in vmstoolsPackages)       try(install.packages(pkgs=i,repos=getOption("repos")))
 
@@ -94,7 +93,7 @@ If you run Rstudio and run into trouble, please install VMStools first into Rgui
 <p>You will need the following software to use the VMStools software and repository.</p>
 
 <ul>
-<li>R (version 3.x.x or 4.x.x) for your system. Available <a href="http://www.r-project.org">here</a>.</li>
+<li>R (version 4.x.x) for your system. Available <a href="http://www.r-project.org">here</a>.</li>
 <li>The VMStools package itself, available for download <a href="https://github.com/nielshintzen/vmstools/releases/">here</a>
 </li>
 <li>For very enthusiastic users / developers: For Windows users, we recommend TortoiseGit. Linux users will typically have access to such a client through their package distribution system.</li>
