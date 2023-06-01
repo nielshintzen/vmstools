@@ -1,3 +1,36 @@
+#' Filter out duplicated or out-of-range Tacsat datapoints
+#' 
+#' Filter out duplicated Tacsat datapoints and possible remove Tacsat
+#' datapoints that are outside a certain speed range or heading range. A new
+#' Tacsat set, without the out-filtered records is returned.
+#' 
+#' hd is computed as the change in heading from the previous Tacsat point (if
+#' ship remains the same). Hence, hd does not equal the heading as given in the
+#' Tacsat dataset
+#' 
+#' @param tacsat Original VMS data.frame with columns speed, heading, ship and
+#' date
+#' @param st Speed thresholds in between records are kept. Begin and end
+#' threshold or NULL
+#' @param hd Heading thresholds in between records are kept. Begin and end
+#' threshold or NULL
+#' @param remDup Remove duplicates: True or False
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{sortTacsat}}
+#' @references EU lot 2 project, see also: Mills et al. 2006
+#' @examples
+#' 
+#' data(tacsat)
+#' 
+#'   #Sort the VMS data
+#' tacsat     <- sortTacsat(tacsat)
+#' tacsat     <- tacsat[1:1000,]
+#' 
+#'   #Filter the VMS data
+#'   #A warning is given that duplicated VMS points have been removed
+#' tacsat     <- filterTacsat(tacsat,c(2,6),hd=NULL,remDup=TRUE)
+#' 
+#' @export filterTacsat
 `filterTacsat` <-
 function(tacsat
                          ,st=c(2,6)                #Speed threshold points (two values), NULL means use all points

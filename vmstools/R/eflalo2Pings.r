@@ -1,3 +1,23 @@
+#' Merge eflalo to tacsat pings
+#' 
+#' Internal function of splitAmongPings to merge eflalo landings or values to
+#' tacsat pings
+#' 
+#' 
+#' @param eflalo eflalo dataset
+#' @param tacsat tacsat dataset
+#' @param pings number of pings by variable
+#' @param vars variable to merge eflalo to tacsat
+#' @param eflaloCol column names of eflalo
+#' @param remainTacsat number of tacsat pings that have not been merged yet
+#' @return Returns a list of the eflalo dataset, but without the landings and
+#' values that have been merged, returns the merged tacsat dataset and returns
+#' the number tacsat pings that have not been merged yet
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{splitAmongPings}}, \code{\link{mergeEflalo2Tacsat}},
+#' \code{\link{mergeEflalo2Pings}}
+#' @references EU Lot 2 project
+#' @export eflalo2Pings
   eflalo2Pings <- function(eflalo,tacsat,pings,vars,eflaloCol,remainTacsat,by=NULL){
         #- Merge landings and values to get unique eflalo set given 'totVars'
       for(iVars in 1:length(vars)){

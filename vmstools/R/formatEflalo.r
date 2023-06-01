@@ -1,3 +1,20 @@
+#' Format Eflalo data to ensure that all columns are in right format
+#' 
+#' Reformat all the columns of the Eflalo data to ensure that all data is in
+#' the right format
+#' 
+#' 
+#' @param x eflalo file
+#' @return Returns original Eflalo file but now with reformatted data
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{formatTacsat}}
+#' @references EU lot 2 project
+#' @examples
+#' 
+#' data(eflalo)
+#' eflalo <- formatEflalo(eflalo)
+#' 
+#' @export formatEflalo
 formatEflalo <- function(x){
   x$VE_REF        <- ac(x$VE_REF)
   x$VE_FLT        <- ac(x$VE_FLT)

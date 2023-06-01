@@ -1,3 +1,17 @@
+#' Estimation and prediction of aggregation of bottom fishing
+#' 
+#' Estimation and prediction of aggregation of bottom fishing pings in a certain gridcell
+#' 
+#' @param x distribution table
+#' @param trustZeros logical. Whether to use the zeros estimation of aggregation or not
+#' @return Returns the observed and predicted distributions including parameters
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{raiseTacsat}}
+#' @export estimatePropFishing
+#' @export estimateZeros
+#' @export predictAggDistri
+
+
 estimateAggregation <- function(x,trustZeros=T){
 
     if(all(names(x) %in% c(0,1)))

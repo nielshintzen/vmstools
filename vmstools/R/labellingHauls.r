@@ -1,7 +1,30 @@
-
 # assign an identifier in'HL_ID' to each of the fishing sequences
 # (based on SI_STATE, assuming the "h", "f", "s" coding)
 # (useful to count them in a grid...)
+
+
+#' Labelling fishing operations
+#' 
+#' Labelling fishing sequences from the SI_STATE coding with an unique
+#' identifier
+#' 
+#' 
+#' @param tacsat a tacsat format with the SI_STATE coding informed for "h", "f"
+#' and "s"
+#' @return add a new column to the tacsat data.frame named HL_ID
+#' @author F. Bastardie
+#' @seealso \code{\link{activityTacsat}}
+#' @examples
+#' 
+#' data(tacsat)
+#' tacsat$SI_STATE <- 0
+#' tacsat$SI_SP    <- replace(tacsat$SI_SP, is.na(tacsat$SI_SP), 0)
+#' tacsat[tacsat$SI_SP >= 1.5 & tacsat$SI_SP <= 7.5,'SI_STATE']      <- 'f'
+#' tacsat[tacsat$SI_SP < 1.5,'SI_STATE']                              <- 'h'
+#' tacsat[tacsat$SI_SP > 7.5,'SI_STATE']                              <- 's'
+#' labellingHauls(tacsat)
+#' 
+#' @export labellingHauls
 labellingHauls <- function(tacsat){
             tacsat$SI_STATE2                             <- tacsat$SI_STATE
             tacsat$SI_STATE                              <- as.character(tacsat$SI_STATE)

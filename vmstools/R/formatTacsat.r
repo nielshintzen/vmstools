@@ -1,3 +1,20 @@
+#' Format tacsat data to ensure that all columns are in right format
+#' 
+#' Reformat all the columns of the tacsat data to ensure that all data is in
+#' the right format
+#' 
+#' 
+#' @param x tacsat file
+#' @return Returns original tacsat file but now with reformatted data
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{formatEflalo}}
+#' @references EU lot 2 project
+#' @examples
+#' 
+#' data(tacsat)
+#' tacsat <- formatTacsat(tacsat)
+#' 
+#' @export formatTacsat
 formatTacsat <- function(x){
   if("VE_COU" %in% colnames(x)) x$VE_COU <- ac(x$VE_COU)
   x$VE_REF    <- ac(x$VE_REF)

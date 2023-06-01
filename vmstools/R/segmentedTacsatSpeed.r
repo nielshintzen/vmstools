@@ -1,3 +1,54 @@
+#' Define activity based on segmented regression of speed profile
+#' 
+#' Given the speed profile by gear or vessel in a user defined time frame a
+#' segmented regression analyses will be performed to indicate where the
+#' fishing speeds are located. The segmented regression takes place on the
+#' cumulative speed profile.
+#' 
+#' To fit a speed profile at least 20 VMS pings must exist. The function highly
+#' depends on accurate starting points. After 20 random tries the fitting
+#' procedure exits and returns a '0' success.
+#' 
+#' @param tacsat A tacsat dataset (with optional column "LE_GEAR" when matched
+#' to eflalo)
+#' @param units Analyse by: "year", "month" and "week". "month" and "week"
+#' cannot be used at same time.
+#' @param analyse.by Analyse tacsat by gear ("LE_GEAR"), vessel ("VE_REF") or a
+#' combination of gear and vessel ("VE_REF+LE_GEAR").
+#' @param speed Define if speed profile used must be taken as given in the
+#' tacsat file (speed = "instantanious") or if internally speed must be
+#' calculated (speed = "calculated"). Default is "calculated"
+#' @param logfit Logical. Define whether the speed profile frequencies must be
+#' log-transformed. Default is F.
+#' @param CI Define confidence interval for calculated segmented break points.
+#' Default is 0.95.
+#' @param saveDir Directory to save overview and success of fit. Default =
+#' tempdir().
+#' @param forceLowerBound Fix the lower breakpoint value at the forceLowerBound
+#' given. If not specified, lower breakpoint is estimated.
+#' @return SI_STATE = nf for no-fishing and SI_STATE = f for fishing
+#' @author Niels T. Hintzen, Francois Bastardie
+#' @seealso \code{\link{activityTacsatAnalyse}}, \code{\link{activityTacsat}}
+#' @references Bastardie et al. 2010
+#' @examples
+#' 
+#' data(tacsat)
+#' tacsat <- tacsat[1:20000,]
+#' 
+#' #-Fit based on vessel and calculated speed
+#' newTacsat <- segmentedTacsatSpeed(tacsat,units="year",analyse.by="VE_REF",
+#'                                   speed="calculated",logfit=FALSE,CI=0.95)
+#' 
+#' data(eflalo)
+#' tacsatp <- mergeEflalo2Tacsat(eflalo,tacsat)
+#' tacsatp$LE_GEAR <- eflalo$LE_GEAR[match(tacsatp$FT_REF,eflalo$FT_REF)]
+#' 
+#' #-Fit based on gear and instantaneous speed
+#' newTacsat <- segmentedTacsatSpeed(tacsatp,units="year",analyse.by="LE_GEAR",
+#'                                   speed="instantaneous",logfit=FALSE,CI=0.95)
+#' 
+#' 
+#' @export segmentedTacsatSpeed
 segmentedTacsatSpeed <- function(tacsat,units="year",analyse.by="VE_REF",speed="calculated",logfit=FALSE,CI=0.95,saveDir=tempdir(),forceLowerBound=NULL){
 
   require(segmented)

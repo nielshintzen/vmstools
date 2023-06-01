@@ -1,3 +1,24 @@
+#' Sorting Tacsat dataframe
+#' 
+#' Sort the Tacsat data first by vessel, then by date, speed and heading. Needs
+#' to be in this order to be effectively used in other EU lot 2 project generic
+#' functions.
+#' 
+#' 
+#' @param dat tacsat dataframe
+#' @note Uses library(doBy)
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{filterTacsat}}
+#' @references EU lot 2 project
+#' @examples
+#' 
+#' data(tacsat)
+#' require(doBy)
+#' 
+#'   #Sort the Tacsat data
+#' tacsat     <- sortTacsat(tacsat)
+#' 
+#' @export sortTacsat
 `sortTacsat` <-
 function(dat){
 require(doBy)

@@ -1,3 +1,16 @@
+#' Convert eflalo (haul by haul / log-event) to tacsat format
+#' 
+#' Convert haul by haul / log event organised eflalo data to tacsat relational
+#' style
+#' 
+#' 
+#' @param x eflalo formatted dataset with haul-by-haul data (e.g.
+#' LE_STIME,LE_SLON)
+#' @param npoints Number of intermediate points to include (defaults to 10)
+#' @return Tacsat formatted dataset is returned
+#' @author Niels T. Hintzen
+#' @seealso \code{\link{eflalo2Relational}}
+#' @export eflaloHaul2Tacsat
 eflaloHaul2Tacsat <- function(x,npoints=NULL){
 
   if(is.null(npoints)==T)

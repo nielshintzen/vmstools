@@ -1,3 +1,22 @@
+#' Produce quoted list for use within data.table
+#' 
+#' Produce the quoted list format from a character vector which is used as
+#' input for the data.table format
+#' 
+#' character vector could contain e.g. colnames(x) or c("COL1","COL2","COL3")
+#' where COL1 etc are column names
+#' 
+#' @param \dots character vector
+#' @return Returnes quoted list
+#' @note With great thanks to original author.
+#' @author Niels T. Hintzen
+#' @seealso See \code{\link{data.table}} documentation
+#' @references See \code{\link{data.table}} documentation
+#' @examples
+#' 
+#' c.listquote(c("COL1","COL2","COL3")) #Returns: list(COL1,COL2,COL3)
+#' 
+#' @export c.listquote
 c.listquote <- function( ... ) {
 
    args <- as.list( match.call()[ -1 ] )
