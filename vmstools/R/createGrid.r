@@ -45,9 +45,9 @@ function(xrange
                              ){
                 
                   if(exactBorder){
-                    xs            <- seq(xrange[1]+resx/2,xrange[2]+resx,resx)
+                    xs            <- seq(xrange[1],xrange[2]+resx,resx)
                     xborder       <- range(xs)
-                    ys            <- seq(yrange[1]+resy/2,yrange[2]+resy,resy)
+                    ys            <- seq(yrange[1],yrange[2]+resy,resy)
                     yborder       <- range(ys)
                   } else {
                     roundDigitx <- getndp(resx)
