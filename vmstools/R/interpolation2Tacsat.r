@@ -98,13 +98,13 @@ interpolation2Tacsat <- function (interpolation, tacsat, npoints = 10, equalDist
 
       matchClnms  <- c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsat)[kgeur(colnames(tacsat))])[which(c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsat)[kgeur(colnames(tacsat))]) %in% colnames(tacsat))]
       aggInttacsat<- aggregate(tacsat[-idxNoIntTacsat,matchClnms],by=list(tacsat[-idxNoIntTacsat,"INT_ID"]),FUN=sum,na.rm=T)
-      colnames(aggInttacsat)[1] <- "INT_ID"
+      colnames(aggInttacsat) <- c("INT_ID",matchClnms)
     } else {
       noIntTacsat <- numeric()
       intTacsat   <- tacsat
       matchClnms  <- c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsat)[kgeur(colnames(tacsat))])[which(c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsat)[kgeur(colnames(tacsat))]) %in% colnames(tacsat))]
       aggInttacsat<- aggregate(tacsat[,matchClnms],by=list(tacsat[,"INT_ID"]),FUN=sum,na.rm=T)
-      colnames(aggInttacsat)[1] <- "INT_ID"
+      colnames(aggInttacsat) <- c("INT_ID",matchClnms)
     }
 
     #- get the column names that cannot be interpolated
@@ -121,7 +121,8 @@ interpolation2Tacsat <- function (interpolation, tacsat, npoints = 10, equalDist
     })
     #- Apply a simple equal speading to the data values (Ideally we would make this dependent on SI_SP but then the equalDist should be modified too)
     bvals <- lapply(as.list(1:lenEQ),function(x){
-              dat2replace <- subset(aggInttacsat,INT_ID == bvals[[x]][1,"INT_ID"])
+              sINT_ID     <- an(bvals[[x]][1,"INT_ID"])
+              dat2replace <- subset(aggInttacsat,INT_ID == sINT_ID)
               if(length(kgeur(b))>0){
                 for(iSpec in b[kgeur(b)])
                   bvals[[x]][,iSpec] <- c(dat2replace[,iSpec]/(npoints-1))
@@ -191,7 +192,8 @@ interpolation2Tacsat <- function (interpolation, tacsat, npoints = 10, equalDist
     } else {
       tacsatInt <- rbindTacsat(intTacsat,interpolationTot)
     }
-    for(iCol in c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsatInt)[kgeur(colnames(tacsatInt))]))
+    matchClnms  <- c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsatInt)[kgeur(colnames(tacsatInt))])[which(c("INTV","LE_SURF","LE_SUBSURF",colnames(tacsatInt)[kgeur(colnames(tacsatInt))]) %in% colnames(tacsat))]
+    for(iCol in matchClnms)
       tacsatInt[,iCol] <- anf(tacsatInt[,iCol])
     tacsatInt <- sortTacsat(tacsatInt)
 
